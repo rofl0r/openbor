@@ -19,19 +19,9 @@
 #include "stristr.h"
 #include "stringptr.h"
 
-#ifdef USE_XPM
-#include "xpm.h"
-#include "../resources/OpenBOR_Logo_320x240.h"
-#include "../resources/OpenBOR_Logo_480x272.h"
-#include "../resources/OpenBOR_Menu_320x240.h"
-#include "../resources/OpenBOR_Menu_480x272.h"
-#else
 #include "pngdec.h"
 #include "../resources/OpenBOR_Menu_480x272_png.h"
 #include "../resources/OpenBOR_Menu_320x240_png.h"
-#include "../resources/OpenBOR_Logo_480x272_png.h"
-#include "../resources/OpenBOR_Logo_320x240_png.h"
-#endif
 
 #include <dirent.h>
 
@@ -573,23 +563,19 @@ void initMenu(int type)
 #endif
 
 	// Read Logo or Menu from Array. xpmToSurface
-	#ifdef USE_XPM
-	if(!type) Source = xpmToSurface(isWide ? OpenBOR_Logo_480x272 : OpenBOR_Logo_320x240);
-	else Source = xpmToSurface(isWide ? OpenBOR_Menu_480x272 : OpenBOR_Menu_320x240);
-	#else
-	if(!type) Source = pngToSurface(isWide ? (void*) openbor_logo_480x272_png.data : (void*) openbor_logo_320x240_png.data);
-	else Source = pngToSurface(isWide ? (void*) openbor_menu_480x272_png.data : (void*) openbor_menu_320x240_png.data);
-	#endif
-	
-	// Depending on which mode we are in (WideScreen/FullScreen)
-	// allocate proper size for SDL_Surface to perform final Blitting.
-	Screen = SDL_SetVideoMode(Source->w * factor, Source->h * factor, bpp, flags);
+	if(type) {
+		Source = pngToSurface(isWide ? (void*) openbor_menu_480x272_png.data : (void*) openbor_menu_320x240_png.data);
 
-	// Allocate Scaler with extra space for upscaling.
-	Scaler = SDL_AllocSurface(SDL_SWSURFACE,
+		// Depending on which mode we are in (WideScreen/FullScreen)
+		// allocate proper size for SDL_Surface to perform final Blitting.
+		Screen = SDL_SetVideoMode(Source->w * factor, Source->h * factor, bpp, flags);
+
+		// Allocate Scaler with extra space for upscaling.
+		Scaler = SDL_AllocSurface(SDL_SWSURFACE,
 		                      factor > 1 ? Screen->w + 4 : Screen->w,
 							  factor > 1 ? Screen->h + 8 : Screen->h,
 							  bpp, 0, 0, 0, 0);
+	}
 
 	control_init(2);
 	apply_controls();
@@ -805,22 +791,11 @@ void drawLogs()
 	drawMenu();
 }
 
-void drawLogo()
-{
-	if(savedata.logo) return;
-	initMenu(0);
-	copyScreens(Source);
-	drawScreens(NULL);
-	SDL_Delay(2000);
-	termMenu();
-}
-
 void Menu()
 {
 	int done = 0;
 	int ctrl = 0;
 	loadsettings();
-	drawLogo();
 	dListCurrentPosition = 0;
 	if((dListTotal = findPaks()) != 1)
 	{
