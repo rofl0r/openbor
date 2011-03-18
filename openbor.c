@@ -24,7 +24,7 @@
 #define GET_FLOAT_ARGP(z) getValidFloat(GET_ARGP(z), filename, command)
 
 static const char* E_OUT_OF_MEMORY = "Error: Could not allocate sufficient memory.\n";
-static int DEFAULT_OFFSCREEN_KILL = 1000;
+static int DEFAULT_OFFSCREEN_KILL = 3000;
 
 
 /////////////////////////////////////////////////////////////////////////////
