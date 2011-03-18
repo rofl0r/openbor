@@ -98,9 +98,6 @@ endif
 ifeq ($(BUILD_LINUX), 0)
 BUILD_DEBUG     = 1
 endif
-ifdef BUILD_DEBUG
-BUILD_BACKTRACE = 1
-endif
 endif
 
 ifdef BUILD_DARWIN
@@ -338,7 +335,6 @@ INCS 	       += .                                                               
                   source/randlib                                                                    \
                   source/scriptlib                                                                  \
                   source/pnglib                                                                     \
-                  source/xpmlib
 
 ifndef BUILD_DC
 INCS 	       += source/pcxlib
@@ -416,7 +412,6 @@ SCRIPT          = source/scriptlib/StackedSymbolTable.o                         
 RAM             = source/ramlib/ram.o
 RAND	        = source/randlib/rand32.o
 PNG             = source/pnglib/pngdec.o
-XPM             = source/xpmlib/xpm.o
 SOURCE	        = source/stringptr.o                                                                \
 				  source/utils.o                                                                    \
                   source/stristr.o
@@ -478,8 +473,7 @@ GAME_CONSOLE   += sdl/joysticks.o                                               
                   sdl/timer.o                                                                       \
                   sdl/sdlport.o                                                                     \
                   sdl/video.o                                                                       \
-                  sdl/menu.o                                                                        \
-                  sdl/stacktrace.o
+                  sdl/menu.o                                                                        
 endif
 
 
@@ -517,7 +511,6 @@ OBJS            = $(GAME_CONSOLE)                                               
                   $(RAM)                                                                            \
                   $(RAND)                                                                           \
                   $(PNG)                                                                            \
-                  $(XPM)                                                                            \
                   $(MAIN)
 		  
 #----------------------------------------------------------------------------------------------------
@@ -616,11 +609,6 @@ endif
 
 ifdef BUILD_VERBOSE
 CFLAGS         += -DVERBOSE
-endif
-
-
-ifdef BUILD_BACKTRACE
-CFLAGS         += -rdynamic -DCUSTOM_SIGNAL_HANDLER
 endif
 
 
