@@ -9864,42 +9864,23 @@ void drawstatus(){
 
 void update_loading(int pos_x, int pos_y, int size_x, int text_x, int text_y, int value, int max, int font)
 {
-	static int lastpos = 0xFFFFFFF;
-	static unsigned int lastticks = -1;
-	int ticks = timer_gettick();
-	int pixelpos = size_x * ((float)value / max);
+	static size_t cticks = 0;
 	
 	sound_update_music();
 	
-	if(size_x > 0 && pixelpos != lastpos)
-	{
+	if(cticks  % 16 == 0 && loadingbg[0][0] > 0) {
 		loadingbarstatus.sizex = size_x;
 		bar(pos_x, pos_y, value, max, &loadingbarstatus);
-		if(pixelpos < lastpos)
-		{
-			font_printf(text_x, text_y, font, 0, "Loading...");
-			if(background) putscreen(vscreen, background, 0, 0, NULL);
-			else           clearscreen(vscreen);
-		}
-		spriteq_draw(vscreen, 0);
-		video_copy_screen(vscreen);
-		spriteq_clear();
-	}
-	else if(size_x <= 0 && pixelpos < lastpos)
-	{
 		font_printf(text_x, text_y, font, 0, "Loading...");
 		if(background) putscreen(vscreen, background, 0, 0, NULL);
 		else           clearscreen(vscreen);
 		spriteq_draw(vscreen, 0);
 		video_copy_screen(vscreen);
 		spriteq_clear();
+		control_update(playercontrolpointers, 1); // respond to exit and/or fullscreen requests from user/OS
 	}
 	
-	if(ticks - lastticks >= 500)
-		control_update(playercontrolpointers, 1); // respond to exit and/or fullscreen requests from user/OS
-	
-	lastpos = pixelpos;
-	lastticks = ticks;
+	cticks++;
 }
 
 void addscore(int playerindex, int add){
