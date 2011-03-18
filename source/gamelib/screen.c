@@ -46,7 +46,7 @@ s_screen * allocscreen(int width, int height, int pixelformat)
 
 void freescreen(s_screen **screen)
 {
-	if((*screen) != NULL) tracefree((*screen));
+	if((*screen) != NULL) free((*screen));
 	(*screen) = NULL;
 }
 

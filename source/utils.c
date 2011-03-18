@@ -200,7 +200,7 @@ stringptr* readFromLogFile(int which)
 	rewind(handle);
 	if (size == 0) goto CLOSE_AND_QUIT;
 	// allocate memory to contain the whole file:
-	//buffer = (char*)tracemalloc("readFromLogFile()", sizeof(char)*(size+1)); // alloc one additional byte for the 
+	//buffer = (char*)malloc(sizeof(char)*(size+1)); // alloc one additional byte for the 
 	buffer = new_string(size);
 	if(buffer == NULL) goto CLOSE_AND_QUIT;
 	disCcWarns = fread(buffer->ptr, 1, size, handle);
@@ -498,7 +498,7 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 	{
 		if( *array != NULL )
 		{
-			tracefree(*array);
+			free(*array);
 			*array = NULL;
 		}
 		*curr_size_allocated = 0;
@@ -540,7 +540,7 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 		memset( copy + old_size, 0, *curr_size_allocated - old_size );
 	
 	// Free previous array memory
-	tracefree(*array);
+	free(*array);
 
 	// ReAssign the new allocated array
 	*array = copy;

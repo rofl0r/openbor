@@ -51,7 +51,7 @@ void List_AddHash(List* list, Node* node) {
 	save = list->buckets[h]->size;
 	assert(list->buckets[h]->used <= save);
 	if (list->buckets[h]->used == save) {
-		list->buckets[h]->nodes = tracerealloc(list->buckets[h]->nodes, sizeof(Node*) * (save * 2));
+		list->buckets[h]->nodes = realloc(list->buckets[h]->nodes, sizeof(Node*) * (save * 2));
 		assert(list->buckets[h]->nodes != NULL);
 		list->buckets[h]->size = save * 2;
 	}
@@ -91,11 +91,11 @@ void List_FreeHashes(List* list) {
 	if(!list->buckets) return;
 	for (i=0;i<256;i++) {
 		if(list->buckets[i]) {
-			tracefree(list->buckets[i]->nodes);
-			tracefree(list->buckets[i]);
+			free(list->buckets[i]->nodes);
+			free(list->buckets[i]);
 		}		
 	}
-	tracefree(list->buckets);
+	free(list->buckets);
 	list->buckets = NULL;
 }
 
@@ -147,9 +147,9 @@ void List_AddIndex(List* list, Node* node, size_t index) {
 	save = list->mindices[h]->size;
 	assert(list->mindices[h]->used <= save);
 	if (list->mindices[h]->used == save) {
-		list->mindices[h]->nodes = tracerealloc(list->mindices[h]->nodes, sizeof(Node*) * (save * 2));
+		list->mindices[h]->nodes = realloc(list->mindices[h]->nodes, sizeof(Node*) * (save * 2));
 		assert(list->mindices[h]->nodes != NULL);
-		list->mindices[h]->indices = tracerealloc(list->mindices[h]->indices, sizeof(ptrdiff_t) * (save * 2));
+		list->mindices[h]->indices = realloc(list->mindices[h]->indices, sizeof(ptrdiff_t) * (save * 2));
 		assert(list->mindices[h]->indices != NULL);		
 		list->mindices[h]->size = save * 2;
 	}
@@ -205,12 +205,12 @@ void List_FreeIndices(List* list) {
 	if(!list->mindices) return;
 	for (i=0;i<256;i++) {
 		if(list->mindices[i]) {
-			tracefree(list->mindices[i]->indices);
-			tracefree(list->mindices[i]->nodes);
-			tracefree(list->mindices[i]);
+			free(list->mindices[i]->indices);
+			free(list->mindices[i]->nodes);
+			free(list->mindices[i]);
 		}		
 	}
-	tracefree(list->mindices);
+	free(list->mindices);
 	list->mindices = NULL;
 }
 #endif
@@ -254,7 +254,7 @@ void List_SetCurrent(List* list, Node* current) {
 void Node_Clear(Node* node)
 {
 	if(!node) return;
-	if(node->name) tracefree((void*)node->name);
+	if(node->name) free((void*)node->name);
 }
 
 void List_Init(List* list)
@@ -288,11 +288,11 @@ void List_Solidify(List* list)
 #ifdef LIST_DEBUG
 	printf("List_Solidify %p\n", list);
 #endif
-	if(list->solidlist) tracefree(list->solidlist);
+	if(list->solidlist) free(list->solidlist);
 	if(!list->size) return;
 	
 	sldsize = sizeof(void*)*(list->size);
-	list->solidlist = (void**)tracemalloc("List_Solidify", sldsize);
+	list->solidlist = (void**)malloc(sldsize);
 	
 	savesize = list->size;
 	
@@ -375,7 +375,7 @@ void List_Copy(List* listdest, const List* listsrc)
 	List_Init(listdest);
 	if (lptr == NULL) return;
 	//create the first Node
-	nptr = (Node*)tracemalloc("List Copy", sizeof(Node));
+	nptr = (Node*)malloc(sizeof(Node));
 	nptr->value = lptr->value;
 	nptr->name = NAME(lptr->name);
 	nptr->prev = NULL;
@@ -428,12 +428,12 @@ void List_Clear(List* list)
 	{
 		list->current = list->current->next;
 		Node_Clear(nptr);
-		tracefree(nptr);
+		free(nptr);
 		nptr = list->current;
 	}
 	if(list->solidlist)
 	{
-		tracefree(list->solidlist);
+		free(list->solidlist);
 		list->solidlist = NULL;
 	}
 
@@ -464,7 +464,7 @@ void List_InsertBefore(List* list, void* e, LPCSTR theName)
 	#endif
 	
 	//Construct a new Node
-	Node *nptr = (Node*)tracemalloc("List_InsertBefore", sizeof(Node));
+	Node *nptr = (Node*)malloc(sizeof(Node));
 	assert(nptr != NULL);
 	
 	nptr->value = e;
@@ -511,7 +511,7 @@ void List_InsertAfter(List* list, void* e, LPCSTR theName) {
 	#endif
 	
 	//Construct a new Node and fill it with the appropriate value
-	Node *nptr = (Node*)tracemalloc("List_InsertAfter", sizeof(Node));
+	Node *nptr = (Node*)malloc(sizeof(Node));
 	
 	assert(nptr != NULL);
 	nptr->value = e;
@@ -564,7 +564,7 @@ void List_Remove(List* list)
 		List_RemoveHash(list, list->current);
 		#endif		
 		Node_Clear(list->current);
-		tracefree(list->current);
+		free(list->current);
 		list->first = list->current = list->last = NULL;
 		#ifdef USE_INDEX
 		List_FreeIndices(list);
@@ -595,7 +595,7 @@ void List_Remove(List* list)
 		#endif
 		
 		Node_Clear(list->current);
-		tracefree(list->current);
+		free(list->current);
 		
 		if (list->current == list->last)
 			list->last = nptr;

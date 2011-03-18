@@ -44,7 +44,7 @@ void SymbolTable_Clear(SymbolTable* stable)
 	  if(psymbol)
 	  {
 		 ScriptVariant_Clear(&(psymbol->var));
-		 tracefree(psymbol);
+		 free(psymbol);
 	  }
    );
    List_Clear(&(stable->SymbolList));

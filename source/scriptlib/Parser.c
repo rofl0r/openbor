@@ -28,7 +28,7 @@ void Parser_Clear(Parser* pparser){
 	while(!Stack_IsEmpty(&(pparser->LabelStack)))
 	{
 		label = (Label)Stack_Top(&(pparser->LabelStack));
-		tracefree((void*)label);
+		free((void*)label);
 		Stack_Pop(&(pparser->LabelStack));
 	}
 	List_Clear(&(pparser->LabelStack));
@@ -98,7 +98,7 @@ void Parser_ParseExpression(Parser* pparser, List* pIList, LPSTR scriptText,
 
    //Append a semi-colon to the end of the expression, in order to use the
    //same grammar as regular script text.
-   LPSTR expressionText = (CHAR*)tracemalloc("Parser_ParseExpression", sizeof(CHAR) * strlen(scriptText) + 2);
+   LPSTR expressionText = (CHAR*)malloc(sizeof(CHAR) * strlen(scriptText) + 2);
    strcpy( (CHAR*)expressionText, scriptText );
    strcat( (CHAR*)expressionText, ";" );
 
@@ -126,7 +126,7 @@ void Parser_ParseExpression(Parser* pparser, List* pIList, LPSTR scriptText,
    Parser_Expr(pparser);
 
    //release text buffer
-   tracefree((void*)expressionText);
+   free((void*)expressionText);
 }
 
 /******************************************************************************
@@ -141,7 +141,7 @@ void Parser_ParseExpression(Parser* pparser, List* pIList, LPSTR scriptText,
 void Parser_AddInstructionViaToken(Parser* pparser, OpCode pCode, Token* pToken, Label label )
 {
 	Instruction* pInstruction = NULL;
-	pInstruction = (Instruction*)tracemalloc("Parser_AddInstructionViaToken", sizeof(Instruction));
+	pInstruction = (Instruction*)malloc(sizeof(Instruction));
 	Instruction_InitViaToken(pInstruction, pCode, pToken);
 	List_InsertAfter(pparser->pIList, pInstruction, label );
 }
@@ -157,7 +157,7 @@ void Parser_AddInstructionViaToken(Parser* pparser, OpCode pCode, Token* pToken,
 void Parser_AddInstructionViaLabel(Parser* pparser, OpCode pCode, Label instrLabel, Label listLabel )
 {
 	Instruction* pInstruction = NULL;
-	pInstruction = (Instruction*)tracemalloc("Parser_AddInstructionViaLabel", sizeof(Instruction));
+	pInstruction = (Instruction*)malloc(sizeof(Instruction));
 	Instruction_InitViaLabel(pInstruction, pCode, instrLabel);
 	List_InsertAfter(pparser->pIList, pInstruction, listLabel );
 }
@@ -197,7 +197,7 @@ Label Parser_CreateLabel( Parser* pparser )
 	//Allocate a buffer for the new Label.  A long can take 10 characters at
 	//most, so allocate that plus two extra for the "" and the null
 	//terminator
-	Label theLabel = (CHAR*)tracemalloc("Parser_CreateLabel", 12);
+	Label theLabel = (CHAR*)malloc(12);
 	memset((void*)theLabel, 0, 12);
 
 	//Increment the label count.
@@ -490,7 +490,7 @@ void Parser_Param_list2(Parser* pparser )
 			 List_GotoPrevious(pparser->pIList);
 
 		 sprintf( buf, "%d", pparser->paramCount );
-		 pinstruction = (Instruction*)tracemalloc("Parser_Param_list2", sizeof(Instruction));
+		 pinstruction = (Instruction*)malloc(sizeof(Instruction));
 		 Instruction_InitViaLabel(pinstruction, CHECKARG, buf);
 
 		 List_InsertBefore(pparser->pIList, (void*)pinstruction, NULL );
@@ -601,7 +601,7 @@ void Parser_Comp_stmt_Label(Parser* pparser, Label theLabel )
 	   Parser_Comp_stmt2(pparser );
 	   Parser_Comp_stmt3(pparser );
 	   Parser_AddInstructionViaToken(pparser, NOOP, (Token*)NULL, label );
-	   tracefree((void*)label);//dont forget to free the label
+	   free((void*)label);//dont forget to free the label
 	   Parser_AddInstructionViaToken(pparser, POP, (Token*)NULL, NULL );
 	   Parser_Check(pparser, TOKEN_RCURLY );
 	   Parser_Match(pparser);
@@ -619,7 +619,7 @@ void Parser_Comp_stmt(Parser* pparser )
 		Parser_Comp_stmt2(pparser );
 		Parser_Comp_stmt3(pparser );
 		Parser_AddInstructionViaToken(pparser, NOOP, (Token*)NULL, jumpLabel );
-		tracefree((void*)jumpLabel);
+		free((void*)jumpLabel);
 		Parser_AddInstructionViaToken(pparser, POP, (Token*)NULL, NULL );
 		Parser_Check(pparser, TOKEN_RCURLY );
 		Parser_Match(pparser);
@@ -666,8 +666,8 @@ void Parser_Select_stmt(Parser* pparser )
 		Parser_Opt_else(pparser );
 		Parser_AddInstructionViaToken(pparser, NOOP, (Token*)NULL, endLabel );
 		//dont forget to free the labels
-		tracefree((void*)falseLabel);
-		tracefree((void*)endLabel);
+		free((void*)falseLabel);
+		free((void*)endLabel);
 	}
 	else Parser_Error(pparser, select_stmt );
 }
@@ -768,7 +768,7 @@ void Parser_Iter_stmt(Parser* pparser )
 			);
 
 			List_Clear(pDefInst);
-			tracefree((void*)pDefInst);
+			free((void*)pDefInst);
 		}
 
 		//Add the jump statement
@@ -779,8 +779,8 @@ void Parser_Iter_stmt(Parser* pparser )
 		Stack_Pop(&(pparser->LabelStack));//**********
 	}
 	else Parser_Error(pparser, iter_stmt );
-	tracefree((void*)startLabel);
-	tracefree((void*)endLabel);
+	free((void*)startLabel);
+	free((void*)endLabel);
 }
 
 void Parser_Opt_expr_stmt(Parser* pparser )
@@ -800,7 +800,7 @@ List* Parser_Defer_expr_stmt(Parser* pparser )
 		//We have to swap out instruction lists
 		pMainList = pparser->pIList;
 		//create a new Instruction List
-		pparser->pIList = (List*)tracemalloc("Parser_Defer_expr_stmt", sizeof(List));
+		pparser->pIList = (List*)malloc(sizeof(List));
 		List_Init(pparser->pIList);
 
 		//Expr_stmt( );
@@ -1214,7 +1214,7 @@ void Parser_Postfix_expr2(Parser* pparser )
 		pInstruction->OpCode = CALL;
 		List_InsertAfter(pparser->pIList, (void*)pInstruction, label );
 		//dont forget to free the label
-		tracefree((void*)label);
+		free((void*)label);
 
 		Parser_Postfix_expr2(pparser );
 	}

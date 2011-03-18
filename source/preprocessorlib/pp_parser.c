@@ -27,7 +27,7 @@
 #if PP_TEST // using pp_test.c to test the preprocessor functionality; OpenBOR functionality is not available
 #undef printf
 #define tracemalloc(name, size)		malloc(size)
-#define tracefree(ptr)				free(ptr)
+#define free(ptr)				free(ptr)
 #define openpackfile(fname, pname)	((int)fopen(fname, "rb"))
 #define readpackfile(hnd, buf, len)	fread(buf, 1, len, (FILE*)hnd)
 #define seekpackfile(hnd, loc, md)	fseek((FILE*)hnd, loc, md)
@@ -73,7 +73,7 @@ void pp_context_destroy(pp_context* self)
 	List_Reset(&self->macros);
 	while(self->macros.size > 0)
 	{
-		tracefree(List_Retrieve(&self->macros));
+		free(List_Retrieve(&self->macros));
 		List_Remove(&self->macros);
 	}
 	List_Clear(&self->macros);
@@ -85,11 +85,11 @@ void pp_context_destroy(pp_context* self)
 		List* params = List_Retrieve(&self->func_macros);
 		while(params->size > 0) 
 		{
-			tracefree(List_Retrieve(params));
+			free(List_Retrieve(params));
 			List_Remove(params);
 		}
 		List_Clear(params);
-		tracefree(params);
+		free(params);
 		List_Remove(&self->func_macros);
 	}
 	List_Clear(&self->func_macros);
@@ -133,7 +133,7 @@ void pp_parser_init(pp_parser* self, pp_context* ctx, const char* filename, char
  */
 pp_parser* pp_parser_alloc(pp_parser* parent, const char* filename, char* sourceCode, pp_parser_type type)
 {
-	pp_parser* self = tracemalloc("pp_parser_alloc", sizeof(pp_parser));
+	pp_parser* self = malloc(sizeof(pp_parser));
 	TEXTPOS initialPos = {1, 0};
 	
 	pp_parser_init(self, parent->ctx, filename, sourceCode, initialPos);
@@ -320,16 +320,16 @@ pp_token* pp_parser_emit_token(pp_parser* self)
 				List_Reset(&self->ctx->macros);
 				for(i=0; i<self->child->numParams; i++)
 				{
-					// the string is allocated by strdup(), so use free() instead of tracefree()
+					// the string is allocated by strdup(), so use free() instead of free()
 					free(List_Retrieve(&self->ctx->macros));
 					List_Remove(&self->ctx->macros);
 				}
 				
 				// free the source code and filename if necessary
-				if(self->child->freeFilename) tracefree((void*)self->child->filename);
-				if(self->child->freeSourceCode) tracefree(self->child->sourceCode);
+				if(self->child->freeFilename) free((void*)self->child->filename);
+				if(self->child->freeSourceCode) free(self->child->sourceCode);
 				
-				tracefree(self->child);
+				free(self->child);
 				self->child = NULL;
 				
 				if(child_token == NULL) return NULL;
@@ -562,7 +562,7 @@ HRESULT pp_parser_stringify(pp_parser* self)
  */
 void pp_parser_concatenate(pp_parser* self, const char* token1, const char* token2)
 {
-	char* output = tracemalloc("pp_concatenate", strlen(token1) + strlen(token2) + 1);
+	char* output = malloc(strlen(token1) + strlen(token2) + 1);
 	pp_parser* outputParser;
 	
 	sprintf(output, "%s%s", token1, token2);
@@ -633,7 +633,7 @@ HRESULT pp_parser_parse_directive(pp_parser* self)
 			if(FAILED(pp_parser_lex_token(self, true))) return E_FAIL;
 			if(List_FindByName(&self->ctx->macros, self->token.theSource))
 			{
-				tracefree(List_Retrieve(&self->ctx->macros));
+				free(List_Retrieve(&self->ctx->macros));
 				List_Remove(&self->ctx->macros);
 			}
 			if(List_FindByName(&self->ctx->func_macros, self->token.theSource))
@@ -641,11 +641,11 @@ HRESULT pp_parser_parse_directive(pp_parser* self)
 				List* params = List_Retrieve(&self->ctx->func_macros);
 				while(params->size > 0) 
 				{
-					tracefree(List_Retrieve(params));
+					free(List_Retrieve(params));
 					List_Remove(params);
 				}
 				List_Clear(params);
-				tracefree(params);
+				free(params);
 				List_Remove(&self->ctx->func_macros);
 			}
 			
@@ -711,7 +711,7 @@ HRESULT pp_parser_include(pp_parser* self, char* filename)
 	seekpackfile(handle, 0, SEEK_SET);
 	
 	// Allocate a buffer for the file's contents
-	buffer = tracemalloc("#include", length + 1);
+	buffer = malloc(length + 1);
 	memset(buffer, 0, length + 1);
 	
 	// Read the file into the buffer
@@ -720,7 +720,7 @@ HRESULT pp_parser_include(pp_parser* self, char* filename)
 	
 	if(bytesRead != length)
 	{
-		tracefree(buffer);
+		free(buffer);
 		return pp_error(self, "I/O error: %s", strerror(errno));
 	}
 	
@@ -741,7 +741,7 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 {
 	char* contents = NULL;
 	bool is_function = false; // true if this is a function-style #define; false otherwise
-	List* params = tracemalloc("#define params", sizeof(List));
+	List* params = malloc(sizeof(List));
 	
 	List_Init(params);
 	
@@ -750,7 +750,7 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 	if(List_FindByName(&self->ctx->macros, name))
 	{
 		pp_warning(self, "'%s' redefined", name);
-		tracefree(List_Retrieve(&self->ctx->macros));
+		free(List_Retrieve(&self->ctx->macros));
 		List_Remove(&self->ctx->macros);
 	}
 	if(List_FindByName(&self->ctx->func_macros, name))
@@ -759,11 +759,11 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 		pp_warning(self, "'%s' redefined", name);
 		while(params->size > 0)
 		{
-			tracefree(List_Retrieve(params));
+			free(List_Retrieve(params));
 			List_Remove(params);
 		}
 		List_Clear(params);
-		tracefree(params);
+		free(params);
 		List_Remove(&self->ctx->func_macros);
 	}
 	
@@ -804,7 +804,7 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 	else self->overread = true;
 	
 	// Read macro contents
-	contents = tracemalloc("#define contents", MACRO_CONTENTS_SIZE);
+	contents = malloc(MACRO_CONTENTS_SIZE);
 	contents[0] = '\0';
 	if(FAILED(pp_parser_readline(self, contents, MACRO_CONTENTS_SIZE))) goto error;
 	
@@ -816,7 +816,7 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 	}
 	else
 	{
-		tracefree(params);
+		free(params);
 		List_InsertAfter(&self->ctx->macros, contents, name);
 	}
 	
@@ -825,8 +825,8 @@ HRESULT pp_parser_define(pp_parser* self, char* name)
 error:
 	List_Reset(params);
 	while(List_GetSize(params)) List_Remove(params);
-	tracefree(params);
-	if(contents) tracefree(contents);
+	free(params);
+	if(contents) free(contents);
 	return E_FAIL;
 }
 

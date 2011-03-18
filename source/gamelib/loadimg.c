@@ -141,7 +141,7 @@ static int readbmp(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 		}
 	}
 
-	if(pal && (linebuffer=(unsigned char*)tracemalloc("readbmp", 1024))){
+	if(pal && (linebuffer=(unsigned char*)malloc(1024))){
 		seekpackfile(handle,bmp_header.picstart-1024, SEEK_SET);
 		readpackfile(handle,linebuffer,1024);
 		if(pb==512) // 16bit 565
@@ -164,7 +164,7 @@ static int readbmp(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 				*(unsigned*)(pal+d) = colour32(linebuffer[s+2], linebuffer[s+1], linebuffer[s]);
 			}
 		}
-		tracefree(linebuffer);
+		free(linebuffer);
 		linebuffer = NULL;
 	}
 
@@ -186,12 +186,12 @@ static png_bytep * row_pointers = NULL;
 // SX: XBOX does not support PNG user memory allocations
 static png_voidp png_tracemalloc(png_structp pngp, png_size_t size)
 {
-	return tracemalloc("png_tracemalloc", size);
+	return malloc(size);
 }
 
-static void png_tracefree(png_structp pngp, png_voidp ptr)
+static void png_free(png_structp pngp, png_voidp ptr)
 {
-	if(ptr) tracefree(ptr);
+	if(ptr) free(ptr);
 	ptr = NULL;
 }
 #endif
@@ -216,10 +216,10 @@ static void closepng()
 	{
 		for (y=0; y<png_height; y++)
 		{
-			tracefree(row_pointers[y]);
+			free(row_pointers[y]);
 			row_pointers[y]=NULL;
 		}
-		tracefree(row_pointers);
+		free(row_pointers);
 		row_pointers = NULL;
 	}
 	png_height = 0;
@@ -242,8 +242,8 @@ static int openpng(char *filename, char *packfilename)
 	// SX: XBOX does not support PNG user memory allocations
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #else
-	// UT: make sure to set tracemalloc/tracefree here
-	png_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL, NULL, png_tracemalloc, png_tracefree);
+	// UT: make sure to set tracemalloc/free here
+	png_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL, NULL, png_tracemalloc, png_free);
 #endif
 
 	if (!png_ptr) goto openpng_abort;
@@ -253,7 +253,7 @@ static int openpng(char *filename, char *packfilename)
 
 #ifndef XBOX
 	// SX: XBOX does not support PNG user memory allocations
-	png_set_mem_fn(png_ptr, NULL, png_tracemalloc, png_tracefree);
+	png_set_mem_fn(png_ptr, NULL, png_tracemalloc, png_free);
 #endif
 
 	info_ptr = png_create_info_struct(png_ptr);
@@ -270,9 +270,9 @@ static int openpng(char *filename, char *packfilename)
 
 	png_read_update_info(png_ptr, info_ptr);
 
-	row_pointers = (png_bytep*) tracemalloc("openpng", sizeof(png_bytep) * png_height);
+	row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * png_height);
 	for (y=0; y<png_height; y++)
-		row_pointers[y] = (png_byte*) tracemalloc("openpng", png_get_rowbytes(png_ptr, info_ptr));
+		row_pointers[y] = (png_byte*) malloc(png_get_rowbytes(png_ptr, info_ptr));
 
 	png_read_image(png_ptr, row_pointers);
 	return 1;
@@ -558,16 +558,16 @@ static int readgif(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 		if(pal){
 			if(pb==512) // 16bit 565
 			{
-				pbuf = tracemalloc("readgif#1", 768);
+				pbuf = malloc(768);
 				if(readpackfile(handle,pbuf,numcolours*3) != numcolours*3){
-					tracefree(pbuf); pbuf = NULL;
+					free(pbuf); pbuf = NULL;
 					return 0;
 				}
 				for(i=0, j=0; i<512; i+=2, j+=3)
 				{
 					*(unsigned short*)(pal+i) = colour16(pbuf[j], pbuf[j+1], pbuf[j+2]);
 				}
-				tracefree(pbuf); pbuf = NULL;
+				free(pbuf); pbuf = NULL;
 			}
 			else if(pb==768) // 24bit
 			{
@@ -577,16 +577,16 @@ static int readgif(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 			}
 			else if(pb==1024) // 32bit
 			{
-				pbuf = tracemalloc("readgif#2", 768);
+				pbuf = malloc(768);
 				if(readpackfile(handle,pbuf,numcolours*3) != numcolours*3){
-					tracefree(pbuf); pbuf = NULL;
+					free(pbuf); pbuf = NULL;
 					return 0;
 				}
 				for(i=0, j=0; i<1024; i+=4, j+=3)
 				{
 					*(unsigned*)(pal+i) = colour32(pbuf[j], pbuf[j+1], pbuf[j+2]);
 				}
-				tracefree(pbuf); pbuf = NULL;
+				free(pbuf); pbuf = NULL;
 			}
 		}
 		else seekpackfile(handle,numcolours*3,SEEK_CUR);
@@ -706,7 +706,7 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 
 	if(buf){
 
-		if(!(codebuffer=(unsigned char*)tracemalloc("readpcx", 64000))) return 0;
+		if(!(codebuffer=(unsigned char*)malloc(64000))) return 0;
 
 		x = 0;
 		y = 0;
@@ -718,7 +718,7 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 			seekpackfile(handle, 128+spos, SEEK_SET);
 
 			if((readpackfile(handle, codebuffer, 64000))==-1){
-				tracefree(codebuffer);
+				free(codebuffer);
 				codebuffer = NULL;
 				return 0;
 			}
@@ -753,7 +753,7 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 			}
 			spos+=cpos;
 		}
-		tracefree(codebuffer);
+		free(codebuffer);
 		codebuffer = NULL;
 	}
 
@@ -761,16 +761,16 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 		seekpackfile(handle, -768, SEEK_END);
 		if(pb==512) // 16bit 565
 		{
-			pbuf = tracemalloc("readpcx#1", 768);
+			pbuf = malloc(768);
 			if(readpackfile(handle,pbuf,768) != 768){
-				tracefree(pbuf); pbuf = NULL;
+				free(pbuf); pbuf = NULL;
 				return 0;
 			}
 			for(i=0, j=0; i<512; i+=2, j+=3)
 			{
 				*(unsigned short*)(pal+i) = colour16(pbuf[j], pbuf[j+1], pbuf[j+2]);
 			}
-			tracefree(pbuf); pbuf = NULL;
+			free(pbuf); pbuf = NULL;
 		}
 		else if(pb==768) // 24bit
 		{
@@ -780,16 +780,16 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 		}
 		else if(pb==1024) // 32bit
 		{
-			pbuf = tracemalloc("readpcx#2", 768);
+			pbuf = malloc(768);
 			if(readpackfile(handle,pbuf,768) != 768){
-				tracefree(pbuf); pbuf = NULL;
+				free(pbuf); pbuf = NULL;
 				return 0;
 			}
 			for(i=0, j=0; i<1024; i+=4, j+=3)
 			{
 				*(unsigned*)(pal+i) = colour32(pbuf[j], pbuf[j+1], pbuf[j+2]);
 			}
-			tracefree(pbuf); pbuf = NULL;
+			free(pbuf); pbuf = NULL;
 		}
 	}
 	return 1;

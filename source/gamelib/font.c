@@ -40,7 +40,7 @@ void font_unload(int which){
 	which %= MAX_FONTS;
 
 	for(i=0; i<256; i++){
-		if(fonts[which].token[i] != NULL) tracefree(fonts[which].token[i]);
+		if(fonts[which].token[i] != NULL) free(fonts[which].token[i]);
 		fonts[which].token[i] = NULL;
 	}
 	fonts[which].font_loaded = 0;
@@ -77,7 +77,7 @@ int font_load(int which, char *filename, char *packfile, int monospace){
 			clipbitmap(bitmap, &cx, NULL, &cy, NULL);
 			if(index>0)  bitmap->palette=NULL;
 			size = fakey_encodesprite(bitmap);
-			fonts[which].token[index] = (s_sprite*)tracemalloc("font_load", size);
+			fonts[which].token[index] = (s_sprite*)malloc(size);
 			if(!fonts[which].token[index]){
 				font_unload(which);
 				goto err;
