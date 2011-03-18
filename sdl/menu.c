@@ -562,7 +562,7 @@ void initMenu(int type)
 	flags = SDL_SWSURFACE;
 #endif
 
-	// Read Logo or Menu from Array. xpmToSurface
+	// Read Logo or Menu from Array.
 	if(type) {
 		Source = pngToSurface(isWide ? (void*) openbor_menu_480x272_png.data : (void*) openbor_menu_320x240_png.data);
 
