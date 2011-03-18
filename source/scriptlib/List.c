@@ -38,12 +38,12 @@ void List_AddHash(List* list, Node* node) {
 	assert(node);
 	if(!node->name) return;
 	
-	if (!list->buckets) list->buckets = tracecalloc("create bucket pointer array", sizeof(Bucket*) * 256);
+	if (!list->buckets) list->buckets = calloc(1, sizeof(Bucket*) * 256);
 	
 	h = strhash((char*)node->name);
 	if (!list->buckets[h]) {
-		list->buckets[h] = tracecalloc("create bucket item", sizeof(Bucket));
-		list->buckets[h]->nodes = tracecalloc("create bucket nodes", sizeof(Node*) * 8);
+		list->buckets[h] = calloc(1, sizeof(Bucket));
+		list->buckets[h]->nodes = calloc(1, sizeof(Node*) * 8);
 		assert(list->buckets[h]->nodes != NULL);
 		list->buckets[h]->size = 8;
 	}
@@ -132,14 +132,14 @@ void List_AddIndex(List* list, Node* node, size_t index) {
 	assert(node);	
 	
 	if (!list->mindices) 
-		list->mindices = tracecalloc("create listindex pointer array", sizeof(LIndex*) * 256);
+		list->mindices = calloc(1, sizeof(LIndex*) * 256);
 	
 	h = ptrhash(node->value);
 	if (!list->mindices[h]) {
-		list->mindices[h] = tracecalloc("create listindex item", sizeof(LIndex));
-		list->mindices[h]->nodes = tracecalloc("create listindex nodes", sizeof(Node*) * 8);
+		list->mindices[h] = calloc(1, sizeof(LIndex));
+		list->mindices[h]->nodes = calloc(1, sizeof(Node*) * 8);
 		assert(list->mindices[h]->nodes != NULL);
-		list->mindices[h]->indices = tracecalloc("create listindex indices", sizeof(ptrdiff_t) * 8);
+		list->mindices[h]->indices = calloc(1, sizeof(ptrdiff_t) * 8);
 		assert(list->mindices[h]->indices != NULL);		
 		list->mindices[h]->size = 8;
 	}

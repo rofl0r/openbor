@@ -26,8 +26,6 @@
 
 #if PP_TEST // using pp_test.c to test the preprocessor functionality; OpenBOR functionality is not available
 #undef printf
-#define tracemalloc(name, size)		malloc(size)
-#define free(ptr)				free(ptr)
 #define openpackfile(fname, pname)	((int)fopen(fname, "rb"))
 #define readpackfile(hnd, buf, len)	fread(buf, 1, len, (FILE*)hnd)
 #define seekpackfile(hnd, loc, md)	fseek((FILE*)hnd, loc, md)
@@ -38,7 +36,6 @@
 #else // otherwise, we can use OpenBOR functionality like tracemalloc and writeToLogFile
 #include "openbor.h"
 #include "globals.h"
-#include "tracemalloc.h"
 #include "packfile.h"
 #define tellpackfile(hnd)			seekpackfile(hnd, 0, SEEK_CUR)
 #endif

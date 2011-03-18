@@ -16,8 +16,6 @@
 #include "bitmap.h"
 #include "sprite.h"
 #include "spriteq.h"
-#include "tracemalloc.h"
-
 
 #define		MAX_FONTS		8
 #define		FONT_LAYER		0x0FFFFFFF

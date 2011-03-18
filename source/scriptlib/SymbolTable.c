@@ -7,7 +7,6 @@
  */
 
 #include "SymbolTable.h"
-#include "tracemalloc.h"
 #include <stdio.h>
 
 

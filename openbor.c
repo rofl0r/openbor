@@ -4438,23 +4438,23 @@ s_model* init_model(int cacheindex, int unload) {
 	//to free: newchar, newchar->offense_factors, newchar->special, newchar->animation - OK
 	int i;
 
-	s_model* newchar = tracecalloc("newchar", sizeof(s_model));
+	s_model* newchar = calloc(1, sizeof(s_model));
 	if(!newchar) shutdown(1, (char*)E_OUT_OF_MEMORY);	
 	newchar->name = model_cache[cacheindex].name; // well give it a name for sort method
 	newchar->index = cacheindex;
 	newchar->isSubclassed = 0;
 	newchar->freetypes = MF_ALL;
 
-	newchar->defense_factors        = (float*)tracecalloc("newchar->defense_factors",           sizeof(float)*(max_attack_types + 1));
-	newchar->defense_pain           = (float*)tracecalloc("newchar->defense_pain",              sizeof(float)*(max_attack_types + 1));
-	newchar->defense_knockdown      = (float*)tracecalloc("newchar->defense_knockdown",         sizeof(float)*(max_attack_types + 1));
-	newchar->defense_blockpower     = (float*)tracecalloc("newchar->defense_blockpower",        sizeof(float)*(max_attack_types + 1));
-	newchar->defense_blockthreshold = (float*)tracecalloc("newchar->defense_blockthreshold",    sizeof(float)*(max_attack_types + 1));
-	newchar->defense_blockratio     = (float*)tracecalloc("newchar->defense_blockratio",        sizeof(float)*(max_attack_types + 1));
-	newchar->defense_blocktype      = (float*)tracecalloc("newchar->defense_blocktype",         sizeof(float)*(max_attack_types + 1));
-	newchar->offense_factors        = (float*)tracecalloc("newchar->offense_factors",           sizeof(float)*(max_attack_types + 1));
+	newchar->defense_factors        = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_pain           = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_knockdown      = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_blockpower     = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_blockthreshold = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_blockratio     = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->defense_blocktype      = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
+	newchar->offense_factors        = (float*)calloc(1, sizeof(float)*(max_attack_types + 1));
 
-	newchar->special                = tracecalloc("newchar->special", sizeof(*newchar->special)*max_freespecials);
+	newchar->special                = calloc(1, sizeof(*newchar->special)*max_freespecials);
 	if(!newchar->special) shutdown(1, (char*)E_OUT_OF_MEMORY);
 
 	alloc_all_scripts(&newchar->scripts);
@@ -4520,7 +4520,7 @@ s_model* init_model(int cacheindex, int unload) {
 	newchar->star                       = -1;
 	newchar->knife                      = -1;
 
-	newchar->animation = (s_anim**)tracecalloc("newchar->animation", sizeof(s_anim*)*max_animations);
+	newchar->animation = (s_anim**)calloc(1, sizeof(s_anim*)*max_animations);
 	if(!newchar->animation) shutdown(1, (char*)E_OUT_OF_MEMORY);
 
 	// default string value, only by reference

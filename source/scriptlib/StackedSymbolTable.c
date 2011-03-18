@@ -7,7 +7,6 @@
  */
 
 #include "StackedSymbolTable.h"
-#include "tracemalloc.h"
 #include <stdio.h>
 /******************************************************************************
 *  CStackedSymbolTable -- This class handles the scoping issues related to

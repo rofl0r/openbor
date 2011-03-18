@@ -9,7 +9,6 @@
 #include "utils.h"
 #include "packfile.h"
 #include "filecache.h"
-#include "tracemalloc.h"
 #include "openbor.h"
 
 #ifdef PSP

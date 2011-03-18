@@ -508,7 +508,7 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 	else if( *array == NULL )
 	{
 		*curr_size_allocated = grow_step;
-		*array = tracemalloc(f_caller, *curr_size_allocated );
+		*array = malloc(*curr_size_allocated );
 		if( *array == NULL)
 			shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
 		memset( *array, 0, *curr_size_allocated );
@@ -528,7 +528,7 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 	*curr_size_allocated = ((int)ceil((float)new_size / (float)grow_step)) * grow_step;
 
 	// Alloc a new array
-	void* copy = tracemalloc(f_caller, *curr_size_allocated );
+	void* copy = malloc(*curr_size_allocated );
 	if(copy == NULL)
 		shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
 	

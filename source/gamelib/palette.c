@@ -22,8 +22,6 @@
 	Last update: 27-jan-2003
 */
 
-#include "tracemalloc.h"
-
 #include "vga.h"
 #include "palette.h"
 

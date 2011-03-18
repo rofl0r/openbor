@@ -20,7 +20,6 @@
 #include "bitmap.h"
 #include "screen.h"
 #include "packfile.h"
-#include "tracemalloc.h"
 #include "png.h"
 
 #ifndef DC
@@ -181,20 +180,6 @@ static int png_height = 0;
 static png_structp png_ptr = NULL;
 static png_infop info_ptr = NULL;
 static png_bytep * row_pointers = NULL;
-	
-#ifndef XBOX
-// SX: XBOX does not support PNG user memory allocations
-static png_voidp png_tracemalloc(png_structp pngp, png_size_t size)
-{
-	return malloc(size);
-}
-
-static void png_free(png_structp pngp, png_voidp ptr)
-{
-	if(ptr) free(ptr);
-	ptr = NULL;
-}
-#endif
 
 static void png_read_fn(png_structp pngp, png_bytep outp, png_size_t size)
 {
@@ -238,23 +223,12 @@ static int openpng(char *filename, char *packfilename)
 
 	if (png_sig_cmp(header, 0, 8)) goto openpng_abort;
 
-#ifdef XBOX
-	// SX: XBOX does not support PNG user memory allocations
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-#else
-	// UT: make sure to set tracemalloc/free here
-	png_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL, NULL, png_tracemalloc, png_free);
-#endif
 
 	if (!png_ptr) goto openpng_abort;
 
 	//UT: use customized file read function here, because we use pak file methods instead of stdio
 	png_set_read_fn(png_ptr, &handle, png_read_fn);
-
-#ifndef XBOX
-	// SX: XBOX does not support PNG user memory allocations
-	png_set_mem_fn(png_ptr, NULL, png_tracemalloc, png_free);
-#endif
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) goto openpng_abort;

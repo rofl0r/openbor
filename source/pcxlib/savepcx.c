@@ -24,7 +24,6 @@
 #include "borendian.h"
 #include "types.h"
 #include "packfile.h"
-#include "tracemalloc.h"
 #include <fcntl.h>
 #include <malloc.h>
 #include <string.h>

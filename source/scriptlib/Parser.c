@@ -7,7 +7,6 @@
  */
 
 #include "Parser.h"
-#include "tracemalloc.h"
 
 Parser* pcurParser = NULL;
 

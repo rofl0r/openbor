@@ -43,8 +43,6 @@
 #include "sblaster.h"
 #include "soundmix.h"
 #include "packfile.h"
-#include "tracemalloc.h"
-
 
 #ifdef DC
 #include <ivorbisfile.h>

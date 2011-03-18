@@ -8,7 +8,6 @@
 
 #include "Interpreter.h"
 #include "ImportCache.h"
-#include "tracemalloc.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

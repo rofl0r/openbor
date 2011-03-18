@@ -33,7 +33,6 @@
 #include "stristr.h"
 #include "packfile.h"
 #include "filecache.h"
-#include "tracemalloc.h"
 #include "globals.h"
 #include "openbor.h"
 

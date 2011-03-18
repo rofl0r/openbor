@@ -15,7 +15,6 @@
 #include "List.h"
 #include "Interpreter.h"
 #include "packfile.h"
-#include "tracemalloc.h"
 #include "globals.h"
 #include "openborscript.h" // for extern declaration of "theFunctionList"
 

@@ -47,7 +47,6 @@
 #include "gfx.h"
 #include "interp.h"
 #include "gfxtypes.h"
-#include "tracemalloc.h"
 
 #ifdef MMX
 void _Hq2x16MMX(u8*, u8*, u32, u32, u32, u32);

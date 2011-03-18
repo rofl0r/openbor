@@ -12,12 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include "globals.h"
 #include "types.h"
-#include "tracemalloc.h"
-
 
 #define		TRANS_INDEX		0x00
-
 
 s_bitmap * allocbitmap(int width, int height, int format){
 	s_bitmap *b;
