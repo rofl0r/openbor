@@ -71,7 +71,7 @@ s_model* getFirstModel(void) {
 
 s_model* getCurrentModel(void) {
 	assert(modellist);
-	Node* n = List_GetCurrent(modellist);
+	Node* n = List_GetCurrentNode(modellist);
 	if(n)
 		return (s_model*) n->value;
 	else
@@ -80,8 +80,9 @@ s_model* getCurrentModel(void) {
 
 s_model* getNextModel(void) {
 	assert(modellist);
-	List_GotoNext(modellist);
-	return getCurrentModel();
+	if (List_GotoNext(modellist))
+		return getCurrentModel();
+	else return NULL;
 }
 
 int isLastModel(void) {
