@@ -3712,8 +3712,8 @@ int free_model(s_model* model)
 void free_models()
 {
 	s_model* temp;
-	
-	while((temp = getFirstModel())) 
+
+	while((temp = getFirstModel()))
 		free_model(temp);
 
 	// free animation ids
@@ -8367,7 +8367,7 @@ void unload_level(){
 			if(!temp) break;
 			if(temp->unload) {
 				free_model(temp);
-				temp = getCurrentModel();				
+				temp = getCurrentModel();
 			} else
 				temp = getNextModel();
 		} while(temp);
@@ -9072,7 +9072,7 @@ void load_level(char *filename){
 				{
 					next.name = tempmodel->name;
 					next.index = get_cached_model_index(next.name);
-					//next.exists = 2;    //2011_03_21, DC - Pass 2 to exists property to confirm this is a level spawn.
+					next.spawntype = 1;     //2011_03_23, DC; Spawntype 1 (level spawn).
 					crlf = 1;
 				}
 				break;
@@ -9855,7 +9855,7 @@ void update_loading(s_loadingbar* s,  int value, int max) {
 		soundtick = ticks;
 	}
 
-	if(ticks - lasttick > 250) {
+	if(ticks - keybtick > 250) {
 		control_update(playercontrolpointers, 1); // Respond to exit and/or fullscreen requests from user/OS
 		keybtick = ticks;
 	}
@@ -12984,7 +12984,6 @@ void set_model_ex(entity* ent, char* modelname, int index, s_model* newmodel, in
 		ent->animation = newmodel->animation[ent->animnum];
 		ent_copy_uninit(ent, &oldmodel);
 	}
-
 
 	ent->modeldata.type = type;
 
@@ -18595,7 +18594,7 @@ entity * smartspawn(s_spawn_entry * props){   // 7-1-2005 Entire section replace
 	if(props->itemhealth) e->itemhealth = props->itemhealth;
 	e->itemplayer_count = props->itemplayer_count;
 
-	//if(props->exists) e->exists = 2;    //2011_03_21, DC; Pass 2 to exists property to confirm this is a level spawn.
+	if(props->spawntype) e->spawntype = props->spawntype;   //2011_03_23, Pass spawntype.
 
 	if(props->health[playercount-1] != 0){
 		e->health = e->modeldata.health = props->health[playercount-1];
@@ -20070,7 +20069,7 @@ void shutdown(int status, char *msg, ...)
 		freeCommandList(levelcmdlist);
 	if(levelordercmdlist)
 		freeCommandList(levelordercmdlist);
-	
+
 	freeModelList();
 
 	freefilenamecache();
