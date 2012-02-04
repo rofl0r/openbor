@@ -36,17 +36,7 @@
 #include "globals.h"
 #include "openbor.h"
 
-#ifdef PS2
-#include <sifdev.h>
-#endif
-
-#if GP2X || LINUX || DINGOO || SYMBIAN
 #define	stricmp	strcasecmp
-#endif
-
-#ifndef DC
-#pragma pack (1)
-#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -65,11 +55,7 @@ static const size_t USED_FLAG = (((size_t) 1) << ((sizeof(size_t)*8) - 1));
 // cacheblocks must be 255 or less!
 //
 #define CACHEBLOCKSIZE (32768)
-#ifndef DINGOO
 #define CACHEBLOCKS    (96)
-#else
-#define CACHEBLOCKS    (8)
-#endif
 
 static int pak_initialized;
 int printFileUsageStatistics = 0;
@@ -218,7 +204,6 @@ static char * slashfwd(const char *sz)
 }
 #endif
 
-#ifdef LINUX
 char * casesearch(const char *dir, const char *filepath)
 {
 	DIR *d;
@@ -259,7 +244,6 @@ char * casesearch(const char *dir, const char *filepath)
 	return rest_of_path == NULL ? fullpath : casesearch(fullpath, rest_of_path);
 }
 
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -327,9 +311,7 @@ int openPackfile(const char *filename, const char *packfilename)
 	int h, handle;
 	unsigned int magic, version, headerstart, p;
 	pnamestruct pn;
-#ifdef LINUX
 	char *fspath;
-#endif
 
 	h = getFreeHandle();
 	if (h == -1) return -1;
@@ -367,7 +349,6 @@ int openPackfile(const char *filename, const char *packfilename)
 		return h;
 	}
 
-#ifdef LINUX
 	// Try a case-insensitive search for a separate file.
 	fspath = casesearch(".", filename);
 	if (fspath != NULL)
@@ -394,7 +375,6 @@ int openPackfile(const char *filename, const char *packfilename)
 			return h;
 		}
 	}
-#endif
 
 #ifndef WIN
 	// Convert slashes to backslashes

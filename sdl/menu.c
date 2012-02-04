@@ -545,22 +545,14 @@ int ControlBGM()
 
 void initMenu(int type)
 {
-#if WIN || LINUX
 	factor = savedata.screen[videoMode][0] ? savedata.screen[videoMode][0] : 1;
 	isFull = savedata.fullscreen;
 	//isWide = savedata.fullscreen && (((float)nativeWidth / (float)nativeHeight) > 1.54);
-#ifndef DARWIN
 	bpp = 32;
-#endif
-#endif
 
 	Init_Gfx(bpp==32 ? 888 : 565, bpp);
 	memset(pDeltaBuffer, 0x00, 1244160);
-#if !defined(DINGOO) && !defined(WIZ)
 	flags = isFull?(SDL_SWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN):(SDL_SWSURFACE|SDL_DOUBLEBUF);
-#else
-	flags = SDL_SWSURFACE;
-#endif
 
 	// Read Logo or Menu from Array.
 	if(type) {
