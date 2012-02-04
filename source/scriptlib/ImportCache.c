@@ -9,7 +9,7 @@
 // Author: Plombo
 // Start date: Feb 27 2011
 
-#include <stdio.h>
+#include "debug.h"
 #include "depends.h"
 #include "ImportCache.h"
 #include "List.h"
@@ -82,17 +82,14 @@ ImportNode* ImportCache_Retrieve(const char* path)
 
 	if(List_FindByName(&importCache, (char*) path)) // already imported by another file
 	{
-#ifdef VERBOSE
-		printf("Reusing import %s\n", path);
-#endif
+		PDEBUG("Reusing import %s\n", path);
 		node = List_Retrieve(&importCache);
 		node->numRefs++;
 	}
 	else // file is being imported for the first time
 	{
-#ifdef VERBOSE
-		printf("Allocating import %s\n", path);
-#endif
+		PDEBUG("Allocating import %s\n", path);
+
 		node = malloc(sizeof(ImportNode));
 		if(FAILED(ImportNode_Init(node, path))) { free(node); return NULL; }
 		node->numRefs = 0;

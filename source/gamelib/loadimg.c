@@ -11,7 +11,7 @@
 // Now loading to screens or bitmaps,
 // creating them on-the-fly if necessary.
 
-#include <stdio.h>
+#include "debug.h"
 #include <string.h>
 #include <assert.h>
 #include "utils.h"
@@ -836,27 +836,22 @@ static int readimage(unsigned char *buf, unsigned char *pal, int maxwidth, int m
 	switch(open_type){
 		case OT_GIF:
 			result = readgif(buf, pal, maxwidth, maxheight);
-			#ifdef VERBOSE
-			printf("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "GIF", result);
-			#endif
+			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "GIF", result);
 			break;
 		case OT_PCX:
 			result = readpcx(buf, pal, maxwidth, maxheight);
-			#ifdef VERBOSE
-			printf("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PCX", result);
-			#endif
+			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PCX", result);
 			break;
 		case OT_BMP:
 			result = readbmp(buf, pal, maxwidth, maxheight);
-			#ifdef VERBOSE
-			printf("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "BMP", result);
-			#endif
+			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "BMP", result);
 			break;
 		case OT_PNG:
 			result = readpng(buf, pal, maxwidth, maxheight);
-			#ifdef VERBOSE
-			printf("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PNG", result);
-			#endif
+			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PNG", result);
+			break;
+		default:
+			PDEBUG("callign readimage with unknown open_type! buf is %s\n", buf);
 			break;
 	}
 	if(pal)
@@ -878,9 +873,8 @@ static void closeimage(){
 int loadscreen(char *filename, char *packfile, unsigned char *pal, int format, s_screen **screen){
 	int result;
 	unsigned char* p;
-#ifdef VERBOSE
-	printf("loadscreen called packfile: %s, filename %s\n", packfile, filename);
-#endif
+	PDEBUG("loadscreen called packfile: %s, filename %s\n", packfile, filename);
+
 	if((*screen)) freescreen(screen);
 	if(!openimage(filename, packfile)) return 0;
 	if(!(*screen) || ((*screen)->width != res[0] && (*screen)->height != res[1] && (*screen)->pixelformat != format)){

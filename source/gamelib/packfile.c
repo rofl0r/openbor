@@ -26,7 +26,7 @@
 #ifndef SPK_SUPPORTED
 
 #include <fcntl.h>
-#include <stdio.h>
+#include "debug.h"
 #include <string.h>
 #include "utils.h"
 #include "borendian.h"
@@ -211,9 +211,7 @@ char * casesearch(const char *dir, const char *filepath)
 	char filename[256] = {""}, *rest_of_path;
 	static char fullpath[256];
 	int i=0;
-#ifdef VERBOSE
-	printf("casesearch: %s, %s\n", dir, filepath);
-#endif
+	PDEBUG("casesearch: %s, %s\n", dir, filepath);
 
 	if ((d=opendir(dir)) == NULL) return NULL;
 
@@ -292,7 +290,7 @@ int isRawData()
 
 int openpackfile(const char *filename, const char *packfilename)
 {
-#ifdef VERBOSE
+#ifdef DEBUG
 	char* pointsto;
 
 	if (pOpenPackfile == openPackfileCached)
@@ -301,7 +299,7 @@ int openpackfile(const char *filename, const char *packfilename)
 		pointsto = "openPackFile";
 	else
 		pointsto = "unknown destination";
-	printf ("openpackfile called: f: %s, p: %s, dest: %s\n", filename, packfilename, pointsto);
+	PDEBUG ("openpackfile called: f: %s, p: %s, dest: %s\n", filename, packfilename, pointsto);
 #endif
 	return pOpenPackfile(filename, packfilename);
 }
@@ -331,17 +329,13 @@ int openPackfile(const char *filename, const char *packfilename)
 	{
 		if((packfilesize[h]=lseek(handle,0,SEEK_END))==-1)
 		{
-			#ifdef VERBOSE
-			printf ("err handles 1\n");
-			#endif
+			PDEBUG ("err handles 1\n");
 			close(handle);
 			return -1;
 		}
 		if(lseek(handle,0,SEEK_SET)==-1)
 		{
-			#ifdef VERBOSE
-			printf ("err handles 2\n");
-			#endif
+			PDEBUG ("err handles 2\n");
 			close(handle);
 			return -1;
 		}
@@ -357,17 +351,13 @@ int openPackfile(const char *filename, const char *packfilename)
 		{
 			if((packfilesize[h]=lseek(handle,0,SEEK_END))==-1)
 			{
-				#ifdef VERBOSE
-				printf ("err handles 3\n");
-				#endif
+				PDEBUG ("err handles 3\n");
 				close(handle);
 				return -1;
 			}
 			if(lseek(handle,0,SEEK_SET)==-1)
 			{
-				#ifdef VERBOSE
-				printf ("err handles 4\n");
-				#endif
+				PDEBUG ("err handles 4\n");
 				close(handle);
 				return -1;
 			}
@@ -383,9 +373,7 @@ int openPackfile(const char *filename, const char *packfilename)
 
 	// Try to open packfile
 	if((handle=open(packfilename, O_RDONLY|O_BINARY, 777))==-1) {
-		#ifdef VERBOSE
-		printf ("perm err\n");
-		#endif
+		PDEBUG ("perm err\n");
 		return -1;
 	}
 
@@ -393,19 +381,14 @@ int openPackfile(const char *filename, const char *packfilename)
 	// Read magic dword ("PACK" identifier)
 	if(read(handle,&magic,4)!=4 || magic!=SwapLSB32(PACKMAGIC))
 	{
-		#ifdef VERBOSE
-		printf ("err magic\n");
-		#endif
+		PDEBUG ("err magic\n");
 		close(handle);
 		return -1;
 	}
 	// Read version from packfile
 	if(read(handle,&version,4)!=4 || version!=SwapLSB32(PACKVERSION))
 	{
-		#ifdef VERBOSE
-		printf ("err version\n");
-		#endif
-
+		PDEBUG ("err version\n");
 		close(handle);
 		return -1;
 	}
@@ -413,18 +396,14 @@ int openPackfile(const char *filename, const char *packfilename)
 	// Seek to position of headerstart indicator
 	if(lseek(handle,-4,SEEK_END)==-1)
 	{
-		#ifdef VERBOSE
-		printf ("seek failed\n");
-		#endif
+		PDEBUG ("seek failed\n");
 		close(handle);
 		return -1;
 	}
 	// Read headerstart
 	if(read(handle,&headerstart,4)!=4)
 	{
-		#ifdef VERBOSE
-		printf ("err header\n");
-		#endif
+		PDEBUG ("err header\n");
 		close(handle);
 		return -1;
 	}
@@ -434,9 +413,7 @@ int openPackfile(const char *filename, const char *packfilename)
 	// Seek to headerstart
 	if(lseek(handle,headerstart,SEEK_SET)==-1)
 	{
-		#ifdef VERBOSE
-		printf ("err headerstart 1\n");
-		#endif
+		PDEBUG ("err headerstart 1\n");
 		close(handle);
 		return -1;
 	}
@@ -460,17 +437,13 @@ int openPackfile(const char *filename, const char *packfilename)
 		p += pn.pns_len;
 		if(lseek(handle,p,SEEK_SET)==-1)
 		{
-			#ifdef VERBOSE
-			printf ("err seek handles\n");
-			#endif
+			PDEBUG ("err seek handles\n");
 			close(handle);
 			return -1;
 		}
 	}
 	// Filename not found
-	#ifdef VERBOSE
-	printf ("err filename not found\n");
-	#endif
+	PDEBUG ("err filename not found\n");
 	close(handle);
 	return -1;
 }
@@ -684,7 +657,7 @@ int readPackfileCached(int handle, void *buf, int len)
 
 int closepackfile(int handle)
 {
-#ifdef VERBOSE
+#ifdef DEBUG
 	char* pointsto;
 
 	if (pClosePackfile == closePackfileCached)
@@ -693,28 +666,22 @@ int closepackfile(int handle)
 		pointsto = "closePackFile";
 	else
 		pointsto = "unknown destination";
-	printf ("closepackfile called: h: %d, dest: %s\n", handle, pointsto);
+	PDEBUG ("closepackfile called: h: %d, dest: %s\n", handle, pointsto);
 #endif
 	return pClosePackfile(handle);
 }
 
 int closePackfile(int handle)
 {
-#ifdef VERBOSE
-	printf ("closePackfile called: h: %d\n", handle);
-#endif
+	PDEBUG ("closePackfile called: h: %d\n", handle);
 
 	if(handle<0 || handle>=MAXPACKHANDLES)
 	{
-#ifdef VERBOSE
-		printf("handle too small/big\n");
-#endif
+		PDEBUG("handle too small/big\n");
 		return -1;
 	}
 	if(packhandle[handle] == -1) {
-#ifdef VERBOSE
-		printf("packhandle -1\n");
-#endif
+		PDEBUG("packhandle -1\n");
 		return -1;
 	}
 	close(packhandle[handle]);

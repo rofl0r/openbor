@@ -9,6 +9,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#ifdef DEBUG
+#include <stdio.h>
+# define PDEBUG(fmt, args...) do { fprintf(stderr,"DEBUG: "fmt, ## args); fflush(stderr); } while (0)
+#else
+# define PDEBUG(fmt, args...)
+#endif
+
+
 // *** INCLUDES ***
 #include "types.h"
 #include "stringptr.h"

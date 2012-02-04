@@ -33,10 +33,10 @@
 **  will cause errors!!!
 */
 
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include "utils.h"
+#include "debug.h"
 #include "stristr.h"
 #include "adpcm.h"
 #include "borendian.h"
@@ -938,9 +938,7 @@ size_t readpackfile_callback(void *buf, size_t len, size_t nmembers, int *handle
 { return readpackfile(*handle, buf, (int)(len * nmembers)); }
 int closepackfile_callback(void *ptr)
 {
-#ifdef VERBOSE
-	printf ("closepack cb %d\n", *(int*)ptr);
-#endif
+	PDEBUG ("closepack cb %d\n", *(int*)ptr);
 
 	return closepackfile(*(int*)ptr);
 }
@@ -970,25 +968,18 @@ int sound_open_ogg(char *filename, char *packname, int volume, int loop, u32 mus
 	if(!mixing_active) return 0;
 
 	sound_close_music();
-#ifdef VERBOSE
-	printf("trying to open OGG file %s from %s, vol %d, loop %d, ofs %u\n", filename, packname, volume, loop, music_offset);
-#endif
+
+	PDEBUG("trying to open OGG file %s from %s, vol %d, loop %d, ofs %u\n", filename, packname, volume, loop, music_offset);
 	// Open file, etcetera
 	ogg_handle = openpackfile(filename, packname);
-#ifdef VERBOSE
-	printf ("ogg handle %d\n", ogg_handle);
-#endif
+	PDEBUG ("ogg handle %d\n", ogg_handle);
 	if(ogg_handle<0) {
-#ifdef VERBOSE
-		printf("couldn't get handle\n");
-#endif
+		PDEBUG("couldn't get handle\n");
 		return 0;
 	}
 	oggfile = malloc(sizeof(OggVorbis_File));
 	if (ov_open_callbacks(&ogg_handle, oggfile, NULL, 0, ogg_callbacks)!=0) {
-#ifdef VERBOSE
-		printf("ov_open_callbacks failed\n");
-#endif
+		PDEBUG("ov_open_callbacks failed\n");
 		goto error_exit;
 	}
 
@@ -997,9 +988,7 @@ int sound_open_ogg(char *filename, char *packname, int volume, int loop, u32 mus
 	if((stream_info->channels!=1 && stream_info->channels!=2) ||
 		stream_info->rate < 11025 || stream_info->rate > 44100){
 			sound_close_ogg();
-#ifdef VERBOSE
-			printf("NOT can i play it\n");
-#endif
+			PDEBUG("NOT can i play it\n");
 
 			goto error_exit;
 	}
@@ -1017,9 +1006,7 @@ int sound_open_ogg(char *filename, char *packname, int volume, int loop, u32 mus
 		musicchannel.buf[i] = malloc(MUSIC_BUF_SIZE*sizeof(short));
 		if(musicchannel.buf[i]==NULL){
 			sound_close_ogg();
-#ifdef VERBOSE
-			printf("buf is null\n");
-#endif
+			PDEBUG("buf is null\n");
 			goto error_exit;
 		}
 		memset(musicchannel.buf[i], 0, MUSIC_BUF_SIZE*sizeof(short));
@@ -1149,9 +1136,7 @@ int sound_query_ogg(char *artist, char *title){
 
 int sound_open_music(char *filename, char *packname, int volume, int loop, u32 music_offset){
 	static char fnam[128];
-#ifdef VERBOSE
-	printf("trying to open music file %s from %s, vol %d, loop %d, ofs %u\n", filename, packname, volume, loop, music_offset);
-#endif
+	PDEBUG("trying to open music file %s from %s, vol %d, loop %d, ofs %u\n", filename, packname, volume, loop, music_offset);
 	// try opening filename exactly as specified
 	if(sound_open_adpcm(filename, packname, volume, loop, music_offset)) return 1;
 	if(sound_open_ogg(filename, packname, volume, loop, music_offset)) return 1;

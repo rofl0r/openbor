@@ -11,6 +11,7 @@
 //	Side-scrolling beat-'em-up                                              //
 /////////////////////////////////////////////////////////////////////////////
 
+#include "debug.h"
 #include "openbor.h"
 #include "commands.h"
 #include "models.h"
@@ -616,14 +617,10 @@ int buffer_pakfile(char* filename, char** pbuffer, size_t* psize)
 	*psize = 0;
 	*pbuffer = NULL;
 	// Read file
-#ifdef VERBOSE
-	printf("pakfile requested: %s.\n", filename); //ASDF
-#endif
+	PDEBUG("pakfile requested: %s.\n", filename); //ASDF
 
 	if((handle=openpackfile(filename,packfile)) < 0) {
-#ifdef VERBOSE
-		printf("couldnt get handle!\n");
-#endif
+		PDEBUG("couldnt get handle!\n");
 		return 0;
 	}
 	*psize = seekpackfile(handle,0,SEEK_END);
@@ -3265,9 +3262,7 @@ void prepare_sprite_map(size_t size)
 {
 	if(sprite_map == NULL || size + 1 > sprite_map_max_items )
 	{
-#ifdef VERBOSE
-		printf("%s %p\n", "prepare_sprite_map was", sprite_map);
-#endif
+		PDEBUG("%s %p\n", "prepare_sprite_map was", sprite_map);
 		do {
 			sprite_map_max_items += 256;
 		}
@@ -3918,9 +3913,7 @@ void prepare_cache_map(size_t size)
 {
 	if(model_cache== NULL || size + 1 > cache_map_max_items )
 	{
-#ifdef VERBOSE
-		printf("%s %p\n", "prepare_cache_map was", model_cache);
-#endif
+		PDEBUG("%s %p\n", "prepare_cache_map was", model_cache);
 		do {
 			cache_map_max_items += 128;
 		}
