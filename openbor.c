@@ -160,9 +160,6 @@ int                 light[2] = {0, 0};
 int                 shadowcolor = 0;
 int                 shadowalpha = BLEND_MULTIPLY+1;
 
-u64 totalram = 0;
-u64 usedram = 0;
-u64 freeram = 0;
 u32 interval = 0;
 extern unsigned long seed;
 
@@ -915,15 +912,15 @@ int getsyspropertybyindex(ScriptVariant* var, int index)
 		break;
 	case _e_totalram:
 		 ScriptVariant_ChangeType(var, VT_INTEGER);
-		 var->lVal = (LONG)getSystemRam(KBYTES);
+		 var->lVal = 64 * 1024;
 		break;
 	case _e_freeram:
 		ScriptVariant_ChangeType(var, VT_INTEGER);
-		var->lVal = (LONG)getFreeRam(KBYTES);
+		var->lVal = 63 * 1024;
 		break;
 	case _e_usedram:
 		 ScriptVariant_ChangeType(var, VT_INTEGER);
-		 var->lVal = (LONG)getUsedRam(KBYTES);
+		 var->lVal = 1024;
 		break;
 	default:
 		// We use indices now, but players/modders don't need to be exposed
@@ -8350,7 +8347,6 @@ void unload_level(){
 		level->waiting = 0;
 
 		printf("Level Unloading: '%s'\n", level->name);
-		getRamStatus(BYTES);
 		free(level->name);
 		level->name = NULL;
 		free_level(level);
@@ -8365,7 +8361,6 @@ void unload_level(){
 				temp = getNextModel();
 		} while(temp);
 		printf("Done.\n");
-		getRamStatus(BYTES);
 
 
 	}
@@ -8506,10 +8501,6 @@ void load_level(char *filename){
 	unload_level();
 
 	printf("Level Loading:   '%s'\n", filename);
-
-
-
-	getRamStatus(BYTES);
 
 	if(isLoadingScreenTypeBg(loadingbg[1].set)) {
 		if(custBkgrds) {
@@ -9269,8 +9260,6 @@ void load_level(char *filename){
 
 	if(crlf) printf("\n");
 	printf("Level Loaded:    '%s'\n", level->name);
-	totalram = getSystemRam(BYTES); freeram = getFreeRam(BYTES); usedram = getUsedRam(BYTES);
-	printf("Total Ram: %"PRIu64" Bytes\n Free Ram: %"PRIu64" Bytes\n Used Ram: %"PRIu64" Bytes\n\n", totalram, freeram, usedram);
 
 	lCleanup:
 
@@ -9702,9 +9691,6 @@ void predrawstatus(){
 	{
 		spriteq_add_box(0, videomodes.dOffset-12, videomodes.hRes, videomodes.dOffset+12, 0x0FFFFFFE, 0, 0);
 		font_printf(2,                   videomodes.dOffset-10, 0, 0, "FPS: %02d", getFPS());
-		font_printf(videomodes.hRes / 2, videomodes.dOffset-10, 0, 0, "Free Ram: %s KBytes", commaprint(freeram/1000));
-		font_printf(2,                   videomodes.dOffset,    0, 0, "Total Ram: %s KBytes", commaprint(totalram/1000));
-		font_printf(videomodes.hRes / 2, videomodes.dOffset,    0, 0, "Used Ram: %s KBytes", commaprint(usedram/1000));
 	}
 
 	dt = timeleft/COUNTER_SPEED;
@@ -20001,7 +19987,6 @@ void shutdown(int status, char *msg, ...)
 	if(!disablelog) printf("%s", buf);
 
 
-	getRamStatus(BYTES);
 	savesettings();
 
 	if(status != 2) ; //display_credits();
@@ -22244,12 +22229,6 @@ void system_options(){
 
 	while(!quit){
 		_menutextm(2, -5, 0, "System Options");
-
-		_menutext(0, col1, -2, "Total RAM:");
-		_menutext(0, col2, -2, "%s KBytes", commaprint(getSystemRam(KBYTES)));
-
-		_menutext(0, col1, -1, "Used RAM:");
-		_menutext(0, col2, -1, "%s KBytes", commaprint(getUsedRam(KBYTES)));
 
 		_menutext((selector==0), col1, 0, "Debug Info:");
 		_menutext((selector==0), col2, 0, (savedata.debuginfo ? "Enabled" : "Disabled"));

@@ -44,7 +44,6 @@ INCS 	       += .                                                               
                   source/adpcmlib                                                                   \
                   source/gamelib                                                                    \
                   source/preprocessorlib                                                            \
-                  source/ramlib                                                                     \
                   source/randlib                                                                    \
                   source/scriptlib                                                                  \
                   source/pnglib                                                                     \
@@ -113,7 +112,6 @@ SCRIPT          = source/scriptlib/StackedSymbolTable.o                         
                   source/scriptlib/SolidList.o                                                      \
                   source/preprocessorlib/pp_lexer.o                                                 \
                   source/preprocessorlib/pp_parser.o
-RAM             = source/ramlib/ram.o
 RAND	        = source/randlib/rand32.o
 PNG             = source/pnglib/pngdec.o source/pnglib/savepng.o
 SOURCE	        = source/stringptr.o                                                                \
@@ -157,7 +155,6 @@ OBJS            = $(GAME_CONSOLE)                                               
                   $(GAME)                                                                           \
                   $(SOURCE)                                                                         \
                   $(SCRIPT)                                                                         \
-                  $(RAM)                                                                            \
                   $(RAND)                                                                           \
                   $(PNG)                                                                            \
                   $(MAIN)

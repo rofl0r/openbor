@@ -8,7 +8,6 @@
 
 #include "sdlport.h"
 #include "packfile.h"
-#include "ram.h"
 #include "video.h"
 #include "menu.h"
 
@@ -78,7 +77,6 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	setSystemRam();
 	initSDL();
 
 	packfile_mode(0);

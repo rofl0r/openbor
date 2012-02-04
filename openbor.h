@@ -39,7 +39,6 @@
 #include	"texture.h"
 #include    "openborscript.h"
 #include    "globals.h"
-#include    "ram.h"
 #include    "version.h"
 
 #ifdef SDL
