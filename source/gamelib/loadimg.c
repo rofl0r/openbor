@@ -22,9 +22,40 @@
 #include "packfile.h"
 #include "png.h"
 
-#ifndef DC
 #pragma pack (1)
-#endif
+
+typedef enum {
+	OT_GIF,
+	OT_BMP,
+	OT_PCX,
+	OT_PNG,
+} imagetype;
+/*
+#define OT_GIF 1
+#define OT_BMP 2
+#define OT_PCX 3
+#define OT_PNG 4
+*/
+static const char* type_str[] = {
+	[OT_GIF] = "GIF",
+	[OT_PCX] = "PCX",
+	[OT_BMP] = "BMP",
+	[OT_PNG] = "PNG",
+};
+
+typedef int (*imagetype_read_func) (unsigned char*, unsigned char*, int, int);
+static int readgif(unsigned char *buf, unsigned char *pal, int maxwidth, int maxheight);
+static int readbmp(unsigned char *buf, unsigned char *pal, int maxwidth, int maxheight);
+static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int maxheight);
+static int readpng(unsigned char *buf, unsigned char *pal, int maxwidth, int maxheight);
+
+static const imagetype_read_func type_read_func[] = {
+	[OT_GIF] = &readgif,
+	[OT_PCX] = &readpcx,
+	[OT_BMP] = &readbmp,
+	[OT_PNG] = &readpng,
+};
+
 
 // ============================== Globals ===============================
 
@@ -261,7 +292,7 @@ static int readpng(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 	png_colorp png_pal_ptr = 0;
 	int png_pal_num = 0;
 	int pb = PAL_BYTES;
-
+	
 	cw = res[0]>maxwidth?maxwidth:res[0];
 	ch = res[1]>maxheight?maxheight:res[1];
 	if(buf)
@@ -526,7 +557,6 @@ static int readgif(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 	bitdepth = (gif_header.flags&7)+1;
 	numcolours = (1<<bitdepth);
 
-
 	// get palette if present and if wanted
 	if(gif_header.flags&0x80){
 		if(pal){
@@ -776,10 +806,6 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 
 // ============================== auto loading ===============================
 
-#define OT_GIF 1
-#define OT_BMP 2
-#define OT_PCX 3
-#define OT_PNG 4
 
 static int open_type = 0;
 
@@ -834,26 +860,16 @@ static int openimage(char *filename, char *packfile){
 static int readimage(unsigned char *buf, unsigned char *pal, int maxwidth, int maxheight){
 	int result = 0;
 	switch(open_type){
-		case OT_GIF:
-			result = readgif(buf, pal, maxwidth, maxheight);
-			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "GIF", result);
-			break;
-		case OT_PCX:
-			result = readpcx(buf, pal, maxwidth, maxheight);
-			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PCX", result);
-			break;
-		case OT_BMP:
-			result = readbmp(buf, pal, maxwidth, maxheight);
-			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "BMP", result);
-			break;
-		case OT_PNG:
-			result = readpng(buf, pal, maxwidth, maxheight);
-			PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, "PNG", result);
+		case OT_GIF: case OT_PCX: case OT_BMP: case OT_PNG:
 			break;
 		default:
-			PDEBUG("callign readimage with unknown open_type! buf is %s\n", buf);
+			PDEBUG("calling readimage with unknown open_type!\n");
+			assert(0);
 			break;
 	}
+	result = type_read_func[open_type](buf, pal, maxwidth, maxheight);
+	PDEBUG("calling readimage %p %p %d %d with format %s, result is %d\n", buf, pal, maxwidth, maxheight, type_str[open_type], result);
+	
 	if(pal)
 		memset(pal, 0, (PAL_BYTES)>>8);
 	return result;
