@@ -6,7 +6,7 @@
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "joysticks.h"
 
 const char *JoystickKeyName[JOY_NAME_SIZE] = {

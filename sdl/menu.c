@@ -8,7 +8,7 @@
 
 
 #include <unistd.h>
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "sdlport.h"
 #include "video.h"
 #include "openbor.h"

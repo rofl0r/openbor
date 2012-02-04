@@ -6,7 +6,7 @@
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
 
-#include <SDL_framerate.h>
+#include <SDL/SDL_framerate.h>
 #include <math.h>
 #include "types.h"
 #include "video.h"

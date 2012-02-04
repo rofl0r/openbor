@@ -12,7 +12,7 @@
 s_screen* pngToScreen(const void* data);
 
 #ifdef SDL
-#include "SDL.h"
+#include <SDL/SDL.h>
 SDL_Surface* pngToSurface(const void* data);
 #endif
 

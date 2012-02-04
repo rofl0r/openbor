@@ -6,7 +6,7 @@
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "timer.h"
 
 #define GETTIME_FREQ (1000)

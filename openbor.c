@@ -21403,30 +21403,7 @@ void init_videomodes(int log)
 
 	// Use an alternative video.txt if there is one.  Some of these are long filenames; create your PAKs with borpak and you'll be fine.
 #define tryfile(X) if((tmp=openpackfile(X,packfile))!=-1) { closepackfile(tmp); filename=X; goto readfile; }
-#if WIN || LINUX
 	tryfile("data/videopc.txt");
-#elif WII
-	tryfile("data/videowii.txt");
-	if(CONF_GetAspectRatio() == CONF_ASPECT_16_9) { tryfile("data/video169.txt") }
-	else tryfile("data/video43.txt");
-#elif PSP
-	tryfile("data/videopsp.txt");
-	tryfile("data/video169.txt");
-#elif DC
-	tryfile("data/videodc.txt");
-	tryfile("data/video43.txt");
-#elif WIZ
-	tryfile("data/videowiz.txt");
-	tryfile("data/video169.txt");
-#elif GP2X
-	tryfile("data/videogp2x.txt");
-	tryfile("data/video43.txt");
-#elif DINGOO
-	tryfile("data/videodingoo.txt");
-	tryfile("data/video43.txt");
-#elif SYMBIAN
-	tryfile("data/videosymbian.txt");
-#endif
 #undef tryfile
 
 readfile:

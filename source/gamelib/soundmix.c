@@ -52,9 +52,7 @@
 #include <vorbis/vorbisfile.h>
 #endif
 
-#if LINUX || GP2X || DINGOO || SYMBIAN
 #define stricmp strcasecmp
-#endif
 
 #define		AUDIOCIDE_VERSION	"2.00"
 #define		MIXSHIFT		     3	    // 2 should be OK

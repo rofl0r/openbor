@@ -16,8 +16,8 @@
  * all 4 sides.
  */
 
-#include <SDL.h>
-#include <SDL_framerate.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_framerate.h>
 #include <math.h>
 #include "openbor.h"
 #include "opengl.h"

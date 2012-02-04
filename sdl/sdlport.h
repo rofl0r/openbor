@@ -9,17 +9,15 @@
 #ifndef SDLPORT_H
 #define SDLPORT_H
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 #include "globals.h"
 
-#if GP2X || LINUX || DINGOO || SYMBIAN
 #define stricmp  strcasecmp
 #define strnicmp strncasecmp
-#endif
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL13

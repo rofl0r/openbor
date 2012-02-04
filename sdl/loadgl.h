@@ -16,7 +16,7 @@
 #endif
 
 #ifdef GLES
-#include "SDL_opengles.h"
+#include <SDL/SDL_opengles.h>
 #elif WIN
 // SDL_opengl.h in Windows includes <windows.h>, which clashes with several
 // definitions in openbor.h :(
@@ -24,7 +24,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 #else
-#include "SDL_opengl.h"
+#include <SDL/SDL_opengl.h>
 #endif
 
 #ifdef LOADGL

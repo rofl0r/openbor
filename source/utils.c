@@ -20,13 +20,8 @@
 #include "openbor.h"
 #include "packfile.h"
 
-#if PSP || WIN || LINUX || GP2X || DINGOO || SYMBIAN
 #include <dirent.h>
-#endif
-
-#if GP2X || LINUX || DINGOO
 #include <sys/stat.h>
-#endif
 
 #ifdef DOS
 #include <direct.h>
@@ -59,11 +54,7 @@
 #include "savepcx.h"
 #endif
 
-#if PSP || GP2X || LINUX || DINGOO || WII || SYMBIAN
 #define MKDIR(x) mkdir(x, 0777)
-#else
-#define MKDIR(x) mkdir(x)
-#endif
 
 #ifdef XBOX
 #define CHECK_LOGFILE(type)  type ? fileExists("d:\\Logs\\OpenBorLog.txt") : fileExists("d:\\Logs\\ScriptLog.txt")

@@ -12,7 +12,7 @@
 #include <assert.h>
 
 #ifdef SDL
-#include "SDL.h"
+#include <SDL/SDL.h>
 #endif
 
 #if PNG_LIBPNG_VER_MAJOR == 1 && PNG_LIBPNG_VER_MINOR == 2 && PNG_LIBPNG_VER_RELEASE < 9

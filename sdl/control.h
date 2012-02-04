@@ -10,7 +10,7 @@
 #define	CONTROL_H
 
 // Generic control stuff (keyboard+joystick).
-#include <SDL_keysym.h>
+#include <SDL/SDL_keysym.h>
 #include "joysticks.h"
 
 #ifdef DINGOO

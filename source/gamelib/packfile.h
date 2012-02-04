@@ -14,13 +14,11 @@
 #include <stdio.h>
 #include <dirent.h>
 
-#if DOS || PSP || DC || LINUX || GP2X || DINGOO || WII
 #include <unistd.h>
 #define O_BINARY 0
-#endif
 
 #ifdef SDL
-#include <SDL.h>
+#include <SDL/SDL.h>
 #endif
 
 #ifdef PSP

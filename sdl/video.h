@@ -11,7 +11,7 @@
 
 #include "gfxtypes.h"
 #include "types.h"
-#include "SDL.h"
+#include <SDL/SDL.h>
 
 extern u8 pDeltaBuffer[480 * 2592];
 extern int opengl;
