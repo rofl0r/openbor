@@ -20011,7 +20011,7 @@ void shutdown(int status, char *msg, ...)
 	getRamStatus(BYTES);
 	savesettings();
 
-	if(status != 2) display_credits();
+	if(status != 2) ; //display_credits();
 	if(startup_done) term_videomodes();
 
 	if(!disablelog) printf("Release level data");
