@@ -25,10 +25,11 @@
 #pragma pack (1)
 
 typedef enum {
-	OT_GIF,
+	OT_GIF = 0,
 	OT_BMP,
 	OT_PCX,
 	OT_PNG,
+	OT_MAX,
 } imagetype;
 /*
 #define OT_GIF 1
@@ -41,6 +42,13 @@ static const char* type_str[] = {
 	[OT_PCX] = "PCX",
 	[OT_BMP] = "BMP",
 	[OT_PNG] = "PNG",
+};
+
+static const char* fext_str[] = {
+	[OT_GIF] = "gif",
+	[OT_PCX] = "pcx",
+	[OT_BMP] = "bmp",
+	[OT_PNG] = "png",
 };
 
 typedef int (*imagetype_read_func) (unsigned char*, unsigned char*, int, int);
@@ -56,6 +64,18 @@ static const imagetype_read_func type_read_func[] = {
 	[OT_PNG] = &readpng,
 };
 
+typedef int (*imagetype_open_func) (char*, char*);
+static int opengif(char *filename, char *packfilename);
+static int openbmp(char *filename, char *packfilename);
+static int openpcx(char *filename, char *packfilename);
+static int openpng(char *filename, char *packfilename);
+
+static const imagetype_open_func type_open_func[] = {
+	[OT_GIF] = &opengif,
+	[OT_PCX] = &openpcx,
+	[OT_BMP] = &openbmp,
+	[OT_PNG] = &openpng,
+};
 
 // ============================== Globals ===============================
 
@@ -811,49 +831,25 @@ static int open_type = 0;
 
 static int openimage(char *filename, char *packfile){
 	char fnam[128];
-	open_type = 0;
-
-	if(openpng(filename, packfile)){
-		open_type = OT_PNG;
-		return 1;
-	}
-	sprintf(fnam, "%s.png", filename);
-	if(openpng(fnam, packfile)){
-		open_type = OT_PNG;
-		return 1;
-	}
-
-	if(strlen(filename)>=128-4) return 0;
-
-	if(opengif(filename, packfile)){
-		open_type = OT_GIF;
-		return 1;
-	}
-	sprintf(fnam, "%s.gif", filename);
-	if(opengif(fnam, packfile)){
-		open_type = OT_GIF;
-		return 1;
+	unsigned l = strlen(filename);
+	char *ext = strrchr(filename, '.');
+	open_type = -1;
+	
+	if(ext && ext - filename == l - 4)
+		for(open_type = 0; open_type < OT_MAX; open_type++)
+			if(!memcmp(ext + 1, fext_str[open_type], 3) || !memcmp(ext + 1, type_str[open_type], 3))
+				return type_open_func[open_type](filename, packfile);
+	
+	assert(l <= sizeof(fnam) - 4);
+	
+	memcpy(fnam, filename, l);
+	fnam[l] = '.';
+	for(open_type = 0; open_type < OT_MAX; open_type++) {
+		memcpy(fnam + l + 1, fext_str[open_type], 4);
+		if(type_open_func[open_type](fnam, packfile))
+			return 1;
 	}
 
-	if(openpcx(filename, packfile)){
-		open_type = OT_PCX;
-		return 1;
-	}
-	sprintf(fnam, "%s.pcx", filename);
-	if(openpcx(fnam, packfile)){
-		open_type = OT_PCX;
-		return 1;
-	}
-
-	if(openbmp(filename, packfile)){
-		open_type = OT_BMP;
-		return 1;
-	}
-	sprintf(fnam, "%s.bmp", filename);
-	if(openbmp(fnam, packfile)){
-		open_type = OT_BMP;
-		return 1;
-	}
 	return 0;
 }
 
