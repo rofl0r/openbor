@@ -115,11 +115,10 @@ SCRIPT          = source/scriptlib/StackedSymbolTable.o                         
                   source/preprocessorlib/pp_parser.o
 RAM             = source/ramlib/ram.o
 RAND	        = source/randlib/rand32.o
-PNG             = source/pnglib/pngdec.o
+PNG             = source/pnglib/pngdec.o source/pnglib/savepng.o
 SOURCE	        = source/stringptr.o                                                                \
                   source/utils.o                                                                    \
                   source/stristr.o
-PCX             = source/pcxlib/savepcx.o
 
 
 ifdef BUILD_SDL
@@ -156,7 +155,6 @@ OBJS            = $(GAME_CONSOLE)                                               
                   $(ADPCM)                                                                          \
                   $(GFX)                                                                            \
                   $(GAME)                                                                           \
-                  $(PCX)                                                                            \
                   $(SOURCE)                                                                         \
                   $(SCRIPT)                                                                         \
                   $(RAM)                                                                            \

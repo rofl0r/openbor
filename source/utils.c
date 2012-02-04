@@ -19,39 +19,14 @@
 #include "stristr.h"
 #include "openbor.h"
 #include "packfile.h"
+#include "savepng.h"
 
 #include <dirent.h>
 #include <sys/stat.h>
 
-#ifdef DOS
-#include <direct.h>
-#include "dosport.h"
-#include "savepcx.h"
-#endif
-
 #ifdef SDL
 #include <unistd.h>
 #include "sdlport.h"
-#include "savepcx.h"
-#endif
-
-#ifdef DC
-#include "dcport.h"
-#endif
-
-#ifdef XBOX
-#include "xboxport.h"
-#include "savepcx.h"
-#endif
-
-#ifdef PSP
-#include "image.h"
-#endif
-
-
-#if WII && !SDL
-#include "wiiport.h"
-#include "savepcx.h"
 #endif
 
 #define MKDIR(x) mkdir(x, 0777)
@@ -297,65 +272,19 @@ void getPakName(char name[256], int type){
 }
 
 void screenshot(s_screen *vscreen, unsigned char *pal, int ingame){
-#ifndef DC
 	int	 shotnum = 0;
 	char shotname[128] = {""};
 	char modname[128]  = {""};
 
 	getPakName(modname,99);
-#ifdef PSP
-	if(dirExists("ms0:/PICTURE/", 1) && dirExists("ms0:/PICTURE/Beats Of Rage/", 1)){
-#endif
 		do{
-#if PSP
-			sprintf(shotname, "ms0:/PICTURE/Beats Of Rage/%s - ScreenShot - %02u.png", modname,shotnum);
-#elif DOS
-			sprintf(shotname, "./SShots/s%04u.pcx", shotnum);
-#elif XBOX
-			sprintf(shotname, "d:\\ScreenShots\\%s - %04u.pcx", modname,shotnum);
-#elif WII && SDL
-			sprintf(shotname, "sd:/apps/OpenBOR/ScreenShots/%s - %04u.pcx", modname,shotnum);
-#elif WII
-			sprintf(shotname, "%s/%s - %04u.pcx", screenShotsDir,modname,shotnum);
-#else
-			sprintf(shotname, "./ScreenShots/%s - %04u.pcx", modname,shotnum);
-#endif
+			sprintf(shotname, "./ScreenShots/%s - %04u.png", modname, shotnum);
 			++shotnum;
-		}while(fileExists(shotname) && shotnum<100);
+		} while(fileExists(shotname) && shotnum<100);
 
-#ifdef PSP
-		if(shotnum<10000) saveImage(shotname);
-#else
-		if(shotnum<10000) savepcx(shotname, vscreen, pal);
-#endif
+		if(shotnum<10000) savepng(shotname, vscreen, pal);
 		if(ingame) debug_printf("Saved %s", shotname);
-#ifdef PSP
-	}
-#endif
-#endif
 }
-
-#ifdef XBOX
-int findmods(void)
-{
-	int i = 0;
-	HANDLE hFind;
-	WIN32_FIND_DATAA oFindData;
-	hFind = FindFirstFile("d:\\Paks\\*", &oFindData);
-	if(hFind == INVALID_HANDLE_VALUE) return 1;
-	do
-	{
-		if(stristr(oFindData.cFileName, ".pak") && stricmp(oFindData.cFileName, "menu.pak") != 0)
-		{
-			strncpy(paklist[i].filename, oFindData.cFileName, 128-strlen(oFindData.cFileName));
-			i++;
-		}
-	}
-	while(FindNextFile(hFind, &oFindData));
-	FindClose(hFind);
-	return i;
-}
-#endif
 
 unsigned readlsb32(const unsigned char *src)
 {
