@@ -6,8 +6,7 @@
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
 
-// Functions to load GIF, PCX and BMP files.
-// Last update: 26-jan-2003
+// Functions to load GIF, PCX and BMP and PNG files.
 // Now loading to screens or bitmaps,
 // creating them on-the-fly if necessary.
 
@@ -22,6 +21,7 @@
 #include "packfile.h"
 #include "png.h"
 
+/* required for gif structs */
 #pragma pack (1)
 
 typedef enum {
@@ -31,12 +31,7 @@ typedef enum {
 	OT_PNG,
 	OT_MAX,
 } imagetype;
-/*
-#define OT_GIF 1
-#define OT_BMP 2
-#define OT_PCX 3
-#define OT_PNG 4
-*/
+
 static const char* type_str[] = {
 	[OT_GIF] = "GIF",
 	[OT_PCX] = "PCX",
@@ -86,65 +81,32 @@ static int res[2] = {0, 0};	// Resolution of opened image
 
 typedef struct{
 	unsigned short	bm;
-	int		        filesize;
-	int		        reserved;
-	int		        picstart;
-	int		        headersize;
-	int		        xsize;
-	int		        ysize;
-	unsigned short	numplanes;
-	unsigned short	bpp;
-	int		        compression;
-	int		        picsize;
-	int		        hres;
-	int		        vres;
-	int		        numcolors_used;
-	int		        numcolors_important;
+	int filesize;
+	int reserved;
+	int picstart;
+	int headersize;
+	int xsize;
+	int ysize;
+	unsigned short numplanes;
+	unsigned short bpp;
+	int compression;
+	int picsize;
+	int hres;
+	int vres;
+	int numcolors_used;
+	int numcolors_important;
 }s_bmpheader;
 
 static s_bmpheader bmp_header;
 
-#if DC || PS2 || GP2X || SYMBIAN
-static void build_bmp_header(s_bmpheader *h, const unsigned char *s) {
-
-  h->bm          = readlsb32(s+0x00);
-  h->filesize    = readlsb32(s+0x02);
-  h->reserved    = readlsb32(s+0x06);
-  h->picstart    = readlsb32(s+0x0A);
-  h->headersize  = readlsb32(s+0x0E);
-  h->xsize       = readlsb32(s+0x12);
-  h->ysize       = readlsb32(s+0x16);
-  h->numplanes   = readlsb32(s+0x1A);
-  h->bpp         = readlsb32(s+0x1C);
-  h->compression = readlsb32(s+0x1E);
-  h->picsize     = readlsb32(s+0x22);
-  h->hres        = readlsb32(s+0x26);
-  h->vres        = readlsb32(s+0x2A);
-  h->numcolors_used      = readlsb32(s+0x2E);
-  h->numcolors_important = readlsb32(s+0x32);
-}
-#endif
-
 // Open a BMP stream
 static int openbmp(char *filename, char *packfilename){
-
-#if DC || PS2 || GP2X || SYMBIAN
-	unsigned char mybmpheader[0x36];
-#endif
-
 	if((handle=openpackfile(filename,packfilename))==-1) return 0;
-#if DC || PS2 || GP2X || SYMBIAN
-	if(readpackfile(handle,&mybmpheader,0x36)!=0x36){
-#else
 	if(readpackfile(handle,&bmp_header,sizeof(s_bmpheader))!=sizeof(s_bmpheader)){
-#endif
 		closepackfile(handle);
 		return 0;
 	}
 
-#if DC || PS2 || GP2X || SYMBIAN
-	build_bmp_header(&bmp_header,mybmpheader);
-#else
 	bmp_header.bm = SwapLSB16(bmp_header.bm);
 	bmp_header.numplanes = SwapLSB16(bmp_header.numplanes);
 	bmp_header.bpp = SwapLSB16(bmp_header.bpp);
@@ -163,7 +125,6 @@ static int openbmp(char *filename, char *packfilename){
 	bmp_header.vres = SwapLSB32(bmp_header.vres);
 	bmp_header.numcolors_used = SwapLSB32(bmp_header.numcolors_used);
 	bmp_header.numcolors_important = SwapLSB32(bmp_header.numcolors_important);
-#endif
 
 	if(bmp_header.bm!=0x4D42 || bmp_header.bpp!=8 || bmp_header.compression){
 		closepackfile(handle);
@@ -220,11 +181,6 @@ static int readbmp(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 
 	return 1;
 }
-
-//static void closebmp(){
-//	closepackfile(handle);
-//	handle = -1;
-//}
 
 //============================ PNG, use libpng =============================
 static int png_height = 0;
@@ -360,30 +316,22 @@ static int readpng(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 	return 1;
 }
 
-
 // ============================== GIF loading ===============================
 
+/* these structs seem to require #pragma pack(1), otherwise the palette will get messed up */
 
 typedef struct{
-	char		    magic[6];
+	char magic[6];
 	unsigned short	screenwidth, screenheight;
 	unsigned char	flags;
 	unsigned char	background;
 	unsigned char	aspect;
-}gifheaderstruct;
-
-#if DC || PS2 || GP2X || SYMBIAN
-#define sizeof_gifheaderstruct 13
-#endif
+} gifheaderstruct;
 
 typedef struct {
 	unsigned short   left, top, width, height;
 	unsigned char    flags;
-}gifblockstruct;
-
-#if DC || PS2 || GP2X || SYMBIAN
-#define sizeof_iblock 9
-#endif
+} gifblockstruct;
 
 static gifheaderstruct gif_header;
 
@@ -421,13 +369,15 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 	static unsigned char lastcodestack[4096];
 	static short codestack[4096];
 
-	static short wordmasktable[] = {    0x0000, 0x0001, 0x0003, 0x0007,
-					0x000f, 0x001f, 0x003f, 0x007f,
-					0x00ff, 0x01ff, 0x03ff, 0x07ff,
-					0x0fff, 0x1fff, 0x3fff, 0x7fff };
+	static const short wordmasktable[] = {
+		0x0000, 0x0001, 0x0003, 0x0007,
+		0x000f, 0x001f, 0x003f, 0x007f,
+		0x00ff, 0x01ff, 0x03ff, 0x07ff,
+		0x0fff, 0x1fff, 0x3fff, 0x7fff
+	};
 
-	static short inctable[] = { 8, 8, 4, 2, 0 };
-	static short startable[] = { 0, 4, 2, 1, 0 };
+	static const short inctable[] = { 8, 8, 4, 2, 0 };
+	static const short startable[] = { 0, 4, 2, 1, 0 };
 
 	p = q = b;
 	bitsleft = 8;
@@ -539,11 +489,7 @@ static int opengif(char *filename, char *packfilename){
 
 	if((handle=openpackfile(filename,packfilename))==-1) return 0;
 
-#if DC || PS2 || GP2X || SYMBIAN
-	if(readpackfile(handle,&gif_header,sizeof_gifheaderstruct)!=sizeof_gifheaderstruct){
-#else
 	if(readpackfile(handle,&gif_header,sizeof(gifheaderstruct))!=sizeof(gifheaderstruct)){
-#endif
 		closepackfile(handle);
 		return 0;
 	}
@@ -624,11 +570,7 @@ static int readgif(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 		switch(c){
 			case ',':        // An image block
 
-#if DC || PS2 || GP2X || SYMBIAN
-			if(readpackfile(handle, &iblock, sizeof_iblock)!=sizeof_iblock){
-#else
 			if(readpackfile(handle, &iblock, sizeof(iblock))!=sizeof(iblock)){
-#endif
 				return 0;
 			}
 
