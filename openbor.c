@@ -315,7 +315,10 @@ u32                 go_time             = 0;
 u32                 time                = 0;
 u32                 newtime             = 0;
 unsigned char       slowmotion[3]       = {0,2,0};              // [0] = enable/disable; [1] = duration; [2] = counter;
+
 int                 disablelog          = 0;
+#define PLOG(fmt, args...) do { if(!disablelog) fprintf(stdout, fmt, ## args); } while (0)
+
 int                 currentspawnplayer  = 0;
 int                 PLAYER_MIN_Z        = 160;
 int                 PLAYER_MAX_Z        = 232;
@@ -19970,73 +19973,69 @@ void shutdown(int status, char *msg, ...)
 	vsprintf(buf, msg, arglist);
 	va_end(arglist);
 
-	if(!disablelog)
+	switch(status)
 	{
-		switch(status)
-		{
-		case 0:
-			printf("\n************ Shutting Down ************\n\n");
-			break;
-		default:
-			printf("\n********** An Error Occurred **********"
-				"\n*            Shutting Down            *\n\n");
-			break;
-		}
+	case 0:
+		PLOG("\n************ Shutting Down ************\n\n");
+		break;
+	default:
+		PLOG("\n********** An Error Occurred **********"
+			"\n*            Shutting Down            *\n\n");
+		break;
 	}
 
-	if(!disablelog) printf("%s", buf);
-
+	PLOG("%s", buf);
 
 	savesettings();
 
 	if(status != 2) ; //display_credits();
 	if(startup_done) term_videomodes();
 
-	if(!disablelog) printf("Release level data");
+	PLOG("Release level data");
 	if (startup_done) unload_levelorder();
-	if(!disablelog) printf("...........");
+	PLOG("...........");
 	if(startup_done) unload_level();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
-	if(!disablelog) printf("Release graphics data");
-	if(!disablelog) printf("..");
+	PLOG("Release graphics data");
+	PLOG("..");
 	if(startup_done) freescreen(&vscreen); // allocated by init_videomodes
-	if(!disablelog) printf("..");
+	PLOG("..");
 	if(startup_done) freescreen(&background);
-	if(!disablelog) printf("..");
+	PLOG("..");
 #if WII
 	if(startup_done) for(i=0; i<MAX_CACHED_BACKGROUNDS; i++) freescreen(&bg_cache[i]);
-	if(!disablelog) printf("..");
+	PLOG("..");
 #endif
 	if(startup_done) freesprites();
-	if(!disablelog) printf("..");
+	PLOG("..");
 	if(startup_done) unload_all_fonts();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
 
-	if(!disablelog) printf("Release game data............\n\n");
+	PLOG("Release game data............\n\n");
 
 	if(startup_done) free_ents();
 	if(startup_done) free_models();
 	if(startup_done) free_modelcache();
 	if(startup_done) clear_scripts();
-	if(!disablelog) printf("\nRelease game data............\tDone!\n");
+	PLOG("\nRelease game data............\tDone!\n");
 
-	if(!disablelog) printf("Release timer................");
+	PLOG("Release timer................");
 	if(startup_done) borTimerExit();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
-	if(!disablelog) printf("Release input hardware.......");
+	PLOG("Release input hardware.......");
 	if(startup_done) control_exit();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
-	if(!disablelog) printf("Release sound system.........");
+	PLOG("Release sound system.........");
 	if(startup_done) sound_exit();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
-	if(!disablelog) printf("Release FileCaching System...");
+	PLOG("Release FileCaching System...");
 	if(startup_done) pak_term();
-	if(!disablelog) printf("\tDone!\n");
+	PLOG("\tDone!\n");
 
 	if(modelcmdlist)
 		freeCommandList(modelcmdlist); // moved here because list is not initialized if shutdown is initiated from inside the menu
@@ -20052,9 +20051,9 @@ void shutdown(int status, char *msg, ...)
 	freefilenamecache();
 
 
-	if(!disablelog) printf("\n**************** Done *****************\n\n");
+	PLOG("\n**************** Done *****************\n\n");
 
-	if(!disablelog) printf("%s", buf);
+	PLOG("%s", buf);
 	#ifdef DEBUG
 	assert(status == 0); // this way we can haz backtrace.
 	#endif
