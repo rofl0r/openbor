@@ -61,6 +61,6 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-extern int int_assert[sizeof(int)==4?1:-1];
+extern int int_assert[sizeof(int) == 4 ? 1 : -1];
 
 #endif

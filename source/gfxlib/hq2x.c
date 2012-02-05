@@ -49,45 +49,37 @@
 #include "gfxtypes.h"
 
 #ifdef MMX
-void _Hq2x16MMX(u8*, u8*, u32, u32, u32, u32);
+void _Hq2x16MMX(u8 *, u8 *, u32, u32, u32, u32);
 u32 *RGBtoYUV;
 u32 *LUT16to32;
 #endif
 
-static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count)
-{
+static void hq2x_16_def(u16 * dst0, u16 * dst1, const u16 * src0, const u16 * src1, const u16 * src2, unsigned count) {
 	unsigned i;
 
-	for(i=0;i<count;++i)
-	{
+	for(i = 0; i < count; ++i) {
 		unsigned char mask;
-	    u16 c[9];
+		u16 c[9];
 
 		c[1] = src0[0];
 		c[4] = src1[0];
 		c[7] = src2[0];
 
-		if (i>0)
-		{
+		if(i > 0) {
 			c[0] = src0[-1];
 			c[3] = src1[-1];
 			c[6] = src2[-1];
-		}
-		else
-		{
+		} else {
 			c[0] = c[1];
 			c[3] = c[4];
 			c[6] = c[7];
 		}
 
-		if (i<count-1)
-		{
+		if(i < count - 1) {
 			c[2] = src0[1];
 			c[5] = src1[1];
 			c[8] = src2[1];
-		}
-		else
-		{
+		} else {
 			c[2] = c[1];
 			c[5] = c[4];
 			c[8] = c[7];
@@ -95,14 +87,22 @@ static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 
 		mask = 0;
 
-		if (interp_16_diff(c[0], c[4])) mask |= 1 << 0;
-		if (interp_16_diff(c[1], c[4])) mask |= 1 << 1;
-		if (interp_16_diff(c[2], c[4]))	mask |= 1 << 2;
-		if (interp_16_diff(c[3], c[4]))	mask |= 1 << 3;
-		if (interp_16_diff(c[5], c[4]))	mask |= 1 << 4;
-		if (interp_16_diff(c[6], c[4]))	mask |= 1 << 5;
-	    if (interp_16_diff(c[7], c[4]))	mask |= 1 << 6;
-		if (interp_16_diff(c[8], c[4])) mask |= 1 << 7;
+		if(interp_16_diff(c[0], c[4]))
+			mask |= 1 << 0;
+		if(interp_16_diff(c[1], c[4]))
+			mask |= 1 << 1;
+		if(interp_16_diff(c[2], c[4]))
+			mask |= 1 << 2;
+		if(interp_16_diff(c[3], c[4]))
+			mask |= 1 << 3;
+		if(interp_16_diff(c[5], c[4]))
+			mask |= 1 << 4;
+		if(interp_16_diff(c[6], c[4]))
+			mask |= 1 << 5;
+		if(interp_16_diff(c[7], c[4]))
+			mask |= 1 << 6;
+		if(interp_16_diff(c[8], c[4]))
+			mask |= 1 << 7;
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -127,9 +127,8 @@ static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 #define I1411(p0,p1,p2) interp_16_1411(c[p0], c[p1], c[p2])
 #define I151(p0,p1) interp_16_151(c[p0], c[p1])
 
-		switch (mask)
-		{
-			#include "hq2x.h"
+		switch (mask) {
+#include "hq2x.h"
 		}
 
 #undef P0
@@ -163,40 +162,32 @@ static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 	}
 }
 
-static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count)
-{
+static void hq2x_32_def(u32 * dst0, u32 * dst1, const u32 * src0, const u32 * src1, const u32 * src2, unsigned count) {
 	unsigned i;
 
-	for(i=0;i<count;++i)
-	{
+	for(i = 0; i < count; ++i) {
 		unsigned char mask;
-	    u32 c[9];
+		u32 c[9];
 
 		c[1] = src0[0];
 		c[4] = src1[0];
 		c[7] = src2[0];
 
-		if (i>0)
-		{
+		if(i > 0) {
 			c[0] = src0[-1];
 			c[3] = src1[-1];
 			c[6] = src2[-1];
-		}
-		else
-		{
+		} else {
 			c[0] = c[1];
 			c[3] = c[4];
 			c[6] = c[7];
 		}
 
-		if (i<count-1)
-		{
+		if(i < count - 1) {
 			c[2] = src0[1];
 			c[5] = src1[1];
 			c[8] = src2[1];
-		}
-		else
-		{
+		} else {
 			c[2] = c[1];
 			c[5] = c[4];
 			c[8] = c[7];
@@ -204,14 +195,22 @@ static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 
 		mask = 0;
 
-		if (interp_32_diff(c[0], c[4])) mask |= 1 << 0;
-		if (interp_32_diff(c[1], c[4])) mask |= 1 << 1;
-		if (interp_32_diff(c[2], c[4])) mask |= 1 << 2;
-		if (interp_32_diff(c[3], c[4])) mask |= 1 << 3;
-		if (interp_32_diff(c[5], c[4])) mask |= 1 << 4;
-		if (interp_32_diff(c[6], c[4])) mask |= 1 << 5;
-		if (interp_32_diff(c[7], c[4])) mask |= 1 << 6;
-	    if (interp_32_diff(c[8], c[4])) mask |= 1 << 7;
+		if(interp_32_diff(c[0], c[4]))
+			mask |= 1 << 0;
+		if(interp_32_diff(c[1], c[4]))
+			mask |= 1 << 1;
+		if(interp_32_diff(c[2], c[4]))
+			mask |= 1 << 2;
+		if(interp_32_diff(c[3], c[4]))
+			mask |= 1 << 3;
+		if(interp_32_diff(c[5], c[4]))
+			mask |= 1 << 4;
+		if(interp_32_diff(c[6], c[4]))
+			mask |= 1 << 5;
+		if(interp_32_diff(c[7], c[4]))
+			mask |= 1 << 6;
+		if(interp_32_diff(c[8], c[4]))
+			mask |= 1 << 7;
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -236,9 +235,8 @@ static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 #define I1411(p0,p1,p2) interp_32_1411(c[p0], c[p1], c[p2])
 #define I151(p0,p1) interp_32_151(c[p0], c[p1])
 
-		switch (mask)
-		{
-			#include "hq2x.h"
+		switch (mask) {
+#include "hq2x.h"
 		}
 
 #undef P0
@@ -279,12 +277,10 @@ static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
  * This effect is derived from the hq2x effect made by Maxim Stepin
  */
 
-static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count)
-{
+static void lq2x_16_def(u16 * dst0, u16 * dst1, const u16 * src0, const u16 * src1, const u16 * src2, unsigned count) {
 	unsigned i;
 
-	for(i=0;i<count;++i)
-	{
+	for(i = 0; i < count; ++i) {
 		unsigned char mask;
 		u16 c[9];
 
@@ -292,27 +288,21 @@ static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 		c[4] = src1[0];
 		c[7] = src2[0];
 
-		if (i>0)
-		{
+		if(i > 0) {
 			c[0] = src0[-1];
 			c[3] = src1[-1];
 			c[6] = src2[-1];
-		}
-		else
-		{
+		} else {
 			c[0] = c[1];
 			c[3] = c[4];
 			c[6] = c[7];
 		}
 
-		if (i<count-1)
-		{
+		if(i < count - 1) {
 			c[2] = src0[1];
 			c[5] = src1[1];
 			c[8] = src2[1];
-		}
-		else
-		{
+		} else {
 			c[2] = c[1];
 			c[5] = c[4];
 			c[8] = c[7];
@@ -320,14 +310,22 @@ static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 
 		mask = 0;
 
-		if (c[0] != c[4]) mask |= 1 << 0;
-		if (c[1] != c[4]) mask |= 1 << 1;
-		if (c[2] != c[4]) mask |= 1 << 2;
-		if (c[3] != c[4]) mask |= 1 << 3;
-	    if (c[5] != c[4]) mask |= 1 << 4;
-		if (c[6] != c[4]) mask |= 1 << 5;
-	    if (c[7] != c[4]) mask |= 1 << 6;
-	    if (c[8] != c[4]) mask |= 1 << 7;
+		if(c[0] != c[4])
+			mask |= 1 << 0;
+		if(c[1] != c[4])
+			mask |= 1 << 1;
+		if(c[2] != c[4])
+			mask |= 1 << 2;
+		if(c[3] != c[4])
+			mask |= 1 << 3;
+		if(c[5] != c[4])
+			mask |= 1 << 4;
+		if(c[6] != c[4])
+			mask |= 1 << 5;
+		if(c[7] != c[4])
+			mask |= 1 << 6;
+		if(c[8] != c[4])
+			mask |= 1 << 7;
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -352,9 +350,8 @@ static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 #define I1411(p0,p1,p2) interp_16_1411(c[p0], c[p1], c[p2])
 #define I151(p0,p1) interp_16_151(c[p0], c[p1])
 
-		switch (mask)
-		{
-			#include "lq2x.h"
+		switch (mask) {
+#include "lq2x.h"
 		}
 
 #undef P0
@@ -388,40 +385,32 @@ static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
 	}
 }
 
-static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count)
-{
+static void lq2x_32_def(u32 * dst0, u32 * dst1, const u32 * src0, const u32 * src1, const u32 * src2, unsigned count) {
 	unsigned i;
 
-	for(i=0;i<count;++i)
-	{
-	    unsigned char mask;
+	for(i = 0; i < count; ++i) {
+		unsigned char mask;
 		u32 c[9];
 
-	    c[1] = src0[0];
+		c[1] = src0[0];
 		c[4] = src1[0];
 		c[7] = src2[0];
 
-		if (i>0)
-		{
+		if(i > 0) {
 			c[0] = src0[-1];
 			c[3] = src1[-1];
 			c[6] = src2[-1];
-		}
-		else
-		{
+		} else {
 			c[0] = c[1];
 			c[3] = c[4];
 			c[6] = c[7];
 		}
 
-		if (i<count-1)
-		{
+		if(i < count - 1) {
 			c[2] = src0[1];
 			c[5] = src1[1];
 			c[8] = src2[1];
-		}
-		else
-		{
+		} else {
 			c[2] = c[1];
 			c[5] = c[4];
 			c[8] = c[7];
@@ -429,14 +418,22 @@ static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 
 		mask = 0;
 
-		if (c[0] != c[4]) mask |= 1 << 0;
-		if (c[1] != c[4]) mask |= 1 << 1;
-		if (c[2] != c[4]) mask |= 1 << 2;
-		if (c[3] != c[4]) mask |= 1 << 3;
-		if (c[5] != c[4]) mask |= 1 << 4;
-		if (c[6] != c[4]) mask |= 1 << 5;
-		if (c[7] != c[4]) mask |= 1 << 6;
-		if (c[8] != c[4]) mask |= 1 << 7;
+		if(c[0] != c[4])
+			mask |= 1 << 0;
+		if(c[1] != c[4])
+			mask |= 1 << 1;
+		if(c[2] != c[4])
+			mask |= 1 << 2;
+		if(c[3] != c[4])
+			mask |= 1 << 3;
+		if(c[5] != c[4])
+			mask |= 1 << 4;
+		if(c[6] != c[4])
+			mask |= 1 << 5;
+		if(c[7] != c[4])
+			mask |= 1 << 6;
+		if(c[8] != c[4])
+			mask |= 1 << 7;
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -461,9 +458,8 @@ static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 #define I1411(p0,p1,p2) interp_32_1411(c[p0], c[p1], c[p2])
 #define I151(p0,p1) interp_32_151(c[p0], c[p1])
 
-		switch (mask)
-		{
-			#include "lq2x.h"
+		switch (mask) {
+#include "lq2x.h"
 		}
 
 #undef P0
@@ -497,8 +493,7 @@ static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 	}
 }
 
-void Hq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
-{
+void Hq2x(u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32 dstPitch, int width, int height) {
 #ifdef MMX
 	if(GetMMX())
 		_Hq2x16MMX(srcPtr, dstPtr, width, height, srcPitch, dstPitch);
@@ -506,18 +501,17 @@ void Hq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int 
 #endif
 	{
 		int count;
-		u16 *dst0 = (u16 *)dstPtr;
+		u16 *dst0 = (u16 *) dstPtr;
 		u16 *dst1 = dst0 + (dstPitch >> 1);
-		u16 *src0 = (u16 *)srcPtr;
+		u16 *src0 = (u16 *) srcPtr;
 		u16 *src1 = src0 + (srcPitch >> 1);
 		u16 *src2 = src1 + (srcPitch >> 1);
 
 		hq2x_16_def(dst0, dst1, src0, src0, src1, width);
 
 		count = height;
-  		count -= 2;
-		while(count)
-		{
+		count -= 2;
+		while(count) {
 			dst0 += dstPitch;
 			dst1 += dstPitch;
 			hq2x_16_def(dst0, dst1, src0, src1, src2, width);
@@ -532,12 +526,11 @@ void Hq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int 
 	}
 }
 
-void Hq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
-{
+void Hq2x32(u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32 dstPitch, int width, int height) {
 	int count;
-	u32 *dst0 = (u32 *)dstPtr;
+	u32 *dst0 = (u32 *) dstPtr;
 	u32 *dst1 = dst0 + (dstPitch >> 2);
-	u32 *src0 = (u32 *)srcPtr;
+	u32 *src0 = (u32 *) srcPtr;
 	u32 *src1 = src0 + (srcPitch >> 2);
 	u32 *src2 = src1 + (srcPitch >> 2);
 
@@ -545,8 +538,7 @@ void Hq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, in
 
 	count = height;
 	count -= 2;
-	while(count)
-	{
+	while(count) {
 		dst0 += dstPitch >> 1;
 		dst1 += dstPitch >> 1;
 		hq2x_32_def(dst0, dst1, src0, src1, src2, width);
@@ -560,12 +552,11 @@ void Hq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, in
 	hq2x_32_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void Lq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
-{
+void Lq2x(u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32 dstPitch, int width, int height) {
 	int count;
-	u16 *dst0 = (u16 *)dstPtr;
+	u16 *dst0 = (u16 *) dstPtr;
 	u16 *dst1 = dst0 + (dstPitch >> 1);
-	u16 *src0 = (u16 *)srcPtr;
+	u16 *src0 = (u16 *) srcPtr;
 	u16 *src1 = src0 + (srcPitch >> 1);
 	u16 *src2 = src1 + (srcPitch >> 1);
 
@@ -573,9 +564,8 @@ void Lq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int 
 
 	count = height;
 	count -= 2;
-	while(count)
-	{
-	    dst0 += dstPitch;
+	while(count) {
+		dst0 += dstPitch;
 		dst1 += dstPitch;
 		lq2x_16_def(dst0, dst1, src0, src1, src2, width);
 		src0 = src1;
@@ -588,12 +578,11 @@ void Lq2x(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int 
 	lq2x_16_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void Lq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
-{
+void Lq2x32(u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32 dstPitch, int width, int height) {
 	int count;
-	u32 *dst0 = (u32 *)dstPtr;
+	u32 *dst0 = (u32 *) dstPtr;
 	u32 *dst1 = dst0 + (dstPitch >> 2);
-	u32 *src0 = (u32 *)srcPtr;
+	u32 *src0 = (u32 *) srcPtr;
 	u32 *src1 = src0 + (srcPitch >> 2);
 	u32 *src2 = src1 + (srcPitch >> 2);
 
@@ -601,8 +590,7 @@ void Lq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, in
 
 	count = height;
 	count -= 2;
-	while(count)
-	{
+	while(count) {
 		dst0 += dstPitch >> 1;
 		dst1 += dstPitch >> 1;
 		lq2x_32_def(dst0, dst1, src0, src1, src2, width);
@@ -617,8 +605,7 @@ void Lq2x32(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, in
 }
 
 #ifdef MMX
-void Init_LUTs(u32 BitFormat)
-{
+void Init_LUTs(u32 BitFormat) {
 	int r, g, b;
 	int Y, u, v;
 	int color;
@@ -627,7 +614,9 @@ void Init_LUTs(u32 BitFormat)
 	int rMask, gMask, bMask;
 
 	if(BitFormat == 565)
-		rBits = 5; gBits = 6; bBits = 5;
+		rBits = 5;
+	gBits = 6;
+	bBits = 5;
 
 	rShift = gBits + bBits;
 	gShift = bBits;
@@ -639,12 +628,11 @@ void Init_LUTs(u32 BitFormat)
 
 	// Allocate the YUV/LUT buffers on the fly if needed.
 	if(RGBtoYUV == NULL)
-		RGBtoYUV = (u32 *)malloc(65536 * sizeof(u32));
+		RGBtoYUV = (u32 *) malloc(65536 * sizeof(u32));
 	if(LUT16to32 == NULL)
-	    LUT16to32 = (u32 *)malloc(65536 * sizeof(u32));
+		LUT16to32 = (u32 *) malloc(65536 * sizeof(u32));
 
-	for (color = 0; color < 65536; ++color)
-	{
+	for(color = 0; color < 65536; ++color) {
 		r = ((color & rMask) >> rShift) << (8 - rBits);
 		g = ((color & gMask) >> gShift) << (8 - gBits);
 		b = ((color & bMask) >> bShift) << (8 - bBits);
@@ -659,23 +647,19 @@ void Init_LUTs(u32 BitFormat)
 #endif
 
 #ifdef MMX
-void Term_LUTs()
-{
-	if(RGBtoYUV != NULL)
-	{
-	    free(RGBtoYUV);
-	    RGBtoYUV = NULL;
+void Term_LUTs() {
+	if(RGBtoYUV != NULL) {
+		free(RGBtoYUV);
+		RGBtoYUV = NULL;
 	}
-	if(LUT16to32 != NULL)
-	{
-	    free(LUT16to32);
-	    LUT16to32 = NULL;
+	if(LUT16to32 != NULL) {
+		free(LUT16to32);
+		LUT16to32 = NULL;
 	}
 }
 #endif
 
-void Init_Hq2x(u32 BitFormat, u32 BitsPerPixel)
-{
+void Init_Hq2x(u32 BitFormat, u32 BitsPerPixel) {
 	interp_set(BitsPerPixel);
 #ifdef MMX
 	if(GetMMX())
@@ -683,8 +667,7 @@ void Init_Hq2x(u32 BitFormat, u32 BitsPerPixel)
 #endif
 }
 
-void Term_Hq2x()
-{
+void Term_Hq2x() {
 #ifdef MMX
 	Term_LUTs();
 #endif

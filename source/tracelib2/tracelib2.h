@@ -24,16 +24,16 @@
 
 typedef struct {
 	int line;
-	char* file;
+	char *file;
 	size_t size;
-	char* buf;
+	char *buf;
 } tlInfo;
 
 void tlinit(void);
-void* tlmalloc(int line, char* file, size_t size);
-void tlfree(int line, char* file, void* ptr);
-void* tlrealloc(int line, char* file, void* ptr, size_t size);
-void* tlcalloc(int line, char* file, size_t count, size_t size);
+void *tlmalloc(int line, char *file, size_t size);
+void tlfree(int line, char *file, void *ptr);
+void *tlrealloc(int line, char *file, void *ptr, size_t size);
+void *tlcalloc(int line, char *file, size_t count, size_t size);
 int tlstats(void);
 
 #endif

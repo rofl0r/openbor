@@ -1,49 +1,49 @@
 #include "commands.h"
 
 
-void freeCommandList(List* list) {
+void freeCommandList(List * list) {
 	List_Clear(list);
 	free(list);
 }
 
 // attention: modifies usercommand to lowercase
-void* getCommandlistCommand(List* list, char* usercommand) {
-	if (!usercommand || !usercommand[0])
+void *getCommandlistCommand(List * list, char *usercommand) {
+	if(!usercommand || !usercommand[0])
 		goto fail;
 	lc(usercommand, strlen(usercommand));
-	Node* n = List_GetNodeByName(list, usercommand);
+	Node *n = List_GetNodeByName(list, usercommand);
 	if(n)
 		return n->value;
 	fail:
 	return NULL;
 }
 
-modelCommands getModelCommand(List* list, char* usercommand) {
+modelCommands getModelCommand(List * list, char *usercommand) {
 	return (modelCommands) getCommandlistCommand(list, usercommand);
 }
 
-modelstxtCommands getModelstxtCommand(List* list, char* usercommand) {
+modelstxtCommands getModelstxtCommand(List * list, char *usercommand) {
 	return (modelstxtCommands) getCommandlistCommand(list, usercommand);
 }
 
-levelCommands getLevelCommand(List* list, char* usercommand) {
+levelCommands getLevelCommand(List * list, char *usercommand) {
 	return (levelCommands) getCommandlistCommand(list, usercommand);
 }
 
-levelOrderCommands getLevelOrderCommand(List* list, char* usercommand) {
+levelOrderCommands getLevelOrderCommand(List * list, char *usercommand) {
 	return (levelOrderCommands) getCommandlistCommand(list, usercommand);
 }
 
-List* prepareList(void) {
-	List* result = malloc(sizeof(List));
+List *prepareList(void) {
+	List *result = malloc(sizeof(List));
 	assert(result);
 	List_Init(result);
 	return result;
 }
 
-List* createModelstxtCommandList(void) {
-	List* result = prepareList();
-	#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
+List *createModelstxtCommandList(void) {
+	List *result = prepareList();
+#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
 	LIST_ADD(CMD_MODELSTXT_MAXIDLES, "maxidles");
 	LIST_ADD(CMD_MODELSTXT_MAXWALKS, "maxwalks");
 	LIST_ADD(CMD_MODELSTXT_MAXBACKWALKS, "maxbackwalks");
@@ -72,13 +72,13 @@ List* createModelstxtCommandList(void) {
 	LIST_ADD(CMD_MODELSTXT_LIFESCORE, "lifescore");
 	LIST_ADD(CMD_MODELSTXT_CREDSCORE, "credscore");
 	LIST_ADD(CMD_MODELSTXT_VERSUSDAMAGE, "versusdamage");
-	#undef LIST_ADD
+#undef LIST_ADD
 	return result;
 }
 
-List* createModelCommandList(void) {
-	List* result = prepareList();
-	#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
+List *createModelCommandList(void) {
+	List *result = prepareList();
+#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
 	LIST_ADD(CMD_MODEL_NAME, "name");
 	LIST_ADD(CMD_MODEL_TYPE, "type");
 	LIST_ADD(CMD_MODEL_SUBTYPE, "subtype");
@@ -362,13 +362,13 @@ List* createModelCommandList(void) {
 	LIST_ADD(CMD_MODEL_MPCOST, "mpcost");
 	LIST_ADD(CMD_MODEL_SUBCLASS, "subclass");
 
-	#undef LIST_ADD
+#undef LIST_ADD
 	return result;
 }
 
-List* createLevelCommandList(void) {
-	List* result = prepareList();
-	#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
+List *createLevelCommandList(void) {
+	List *result = prepareList();
+#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
 
 	LIST_ADD(CMD_LEVEL_LOADINGBG, "loadingbg");
 	LIST_ADD(CMD_LEVEL_MUSICFADE, "musicfade");
@@ -461,13 +461,13 @@ List* createLevelCommandList(void) {
 	LIST_ADD(CMD_LEVEL_COORDS, "coords");
 	LIST_ADD(CMD_LEVEL_SPAWNSCRIPT, "spawnscript");
 
-	#undef LIST_ADD
+#undef LIST_ADD
 	return result;
 }
 
-List* createLevelOrderCommandList(void) {
-	List* result = prepareList();
-	#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
+List *createLevelOrderCommandList(void) {
+	List *result = prepareList();
+#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
 	LIST_ADD(CMD_LEVELORDER_BLENDFX, "blendfx");
 	LIST_ADD(CMD_LEVELORDER_SET, "set");
 	LIST_ADD(CMD_LEVELORDER_IFCOMPLETE, "ifcomplete");
@@ -579,6 +579,6 @@ List* createLevelOrderCommandList(void) {
 	LIST_ADD(CMD_LEVELORDER_MAXWALLHEIGHT, "maxwallheight");
 	LIST_ADD(CMD_LEVELORDER_SCOREFORMAT, "scoreformat");
 
-	#undef LIST_ADD
+#undef LIST_ADD
 	return result;
 }

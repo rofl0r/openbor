@@ -45,9 +45,9 @@ const char *JoystickKeyName[JOY_NAME_SIZE] = {
 	x" Button 27",      \
 	x" Button 28",
 	JOYSTICK_NAMES("P1")
-	JOYSTICK_NAMES("P2")
-	JOYSTICK_NAMES("P3")
-	JOYSTICK_NAMES("P4")
+	    JOYSTICK_NAMES("P2")
+	    JOYSTICK_NAMES("P3")
+	    JOYSTICK_NAMES("P4")
 	"undefined"
 };
 
@@ -87,9 +87,9 @@ const char *SonyKeyName[JOY_NAME_SIZE] = {
 	x" unknown 27",     \
 	x" unknown 28",
 	SONY_NAMES("P1")
-	SONY_NAMES("P2")
-	SONY_NAMES("P3")
-	SONY_NAMES("P4")
+	    SONY_NAMES("P2")
+	    SONY_NAMES("P3")
+	    SONY_NAMES("P4")
 	"undefined"
 };
 
@@ -129,9 +129,9 @@ const char *MicrosoftKeyName[JOY_NAME_SIZE] = {
 	x" unknown 27",     \
 	x" unknown 28",
 	MICROSOFT_NAMES("P1")
-	MICROSOFT_NAMES("P2")
-	MICROSOFT_NAMES("P3")
-	MICROSOFT_NAMES("P4")
+	    MICROSOFT_NAMES("P2")
+	    MICROSOFT_NAMES("P3")
+	    MICROSOFT_NAMES("P4")
 	"undefined"
 };
 
@@ -167,49 +167,49 @@ const char *GameparkKeyName[JOY_NAME_SIZE] = {
 	x" unknown 27",     \
 	x" unknown 28",
 	GAMEPARK_NAMES("P1")
-	GAMEPARK_NAMES("P2")
-	GAMEPARK_NAMES("P3")
-	GAMEPARK_NAMES("P4")
+	    GAMEPARK_NAMES("P2")
+	    GAMEPARK_NAMES("P3")
+	    GAMEPARK_NAMES("P4")
 	"undefined"
 };
 
 const int JoystickBits[JOY_MAX_INPUTS + 1] = {
-	0x00000000, // No Buttons Pressed
-	0x00000001, // Hat Up
-	0x00000002,	// Hat Right
-	0x00000004, // Hat Down
-	0x00000008,	// Hat Left
-	0x00000010,	// Button 1
-	0x00000020,	// Button 2
-	0x00000040,	// Button 3
-	0x00000080,	// Button 4
-	0x00000100,	// Button 5
-	0x00000200,	// Button 6
-	0x00000400,	// Button 7
-	0x00000800,	// Button 8
-	0x00001000, // Button 9
-	0x00002000,	// Button 10
-	0x00004000,	// Button 11
-	0x00008000,	// Button 12
-	0x00010000,	// Button 13
-	0x00020000,	// Button 14
-	0x00040000,	// Button 15
-	0x00080000,	// Button 16
-	0x00100000,	// Button 17
-	0x00200000,	// Button 18
-	0x00400000,	// Button 19
-	0x00800000,	// Button 20
-	0x01000000,	// Button 21
-	0x02000000,	// Button 22
-	0x04000000,	// Button 23
-	0x08000000,	// Button 24
-	0x10000000,	// Button 25
-	0x20000000,	// Button 26
-	0x40000000,	// Button 27
-	0x80000000 	// Button 28
+	0x00000000,		// No Buttons Pressed
+	0x00000001,		// Hat Up
+	0x00000002,		// Hat Right
+	0x00000004,		// Hat Down
+	0x00000008,		// Hat Left
+	0x00000010,		// Button 1
+	0x00000020,		// Button 2
+	0x00000040,		// Button 3
+	0x00000080,		// Button 4
+	0x00000100,		// Button 5
+	0x00000200,		// Button 6
+	0x00000400,		// Button 7
+	0x00000800,		// Button 8
+	0x00001000,		// Button 9
+	0x00002000,		// Button 10
+	0x00004000,		// Button 11
+	0x00008000,		// Button 12
+	0x00010000,		// Button 13
+	0x00020000,		// Button 14
+	0x00040000,		// Button 15
+	0x00080000,		// Button 16
+	0x00100000,		// Button 17
+	0x00200000,		// Button 18
+	0x00400000,		// Button 19
+	0x00800000,		// Button 20
+	0x01000000,		// Button 21
+	0x02000000,		// Button 22
+	0x04000000,		// Button 23
+	0x08000000,		// Button 24
+	0x10000000,		// Button 25
+	0x20000000,		// Button 26
+	0x40000000,		// Button 27
+	0x80000000		// Button 28
 };
 
-const char* JoystickButtonNames[JOY_NAME_SIZE] = {
+const char *JoystickButtonNames[JOY_NAME_SIZE] = {
 	"...",
 #define BUTTON_NAMES(x) \
 	x" Button 1",       \
@@ -245,12 +245,12 @@ const char* JoystickButtonNames[JOY_NAME_SIZE] = {
 	x" Button 31",      \
 	x" Button 32",
 	BUTTON_NAMES("P1")
-	BUTTON_NAMES("P2")
-	BUTTON_NAMES("P3")
-	BUTTON_NAMES("P4")
+	    BUTTON_NAMES("P2")
+	    BUTTON_NAMES("P3")
+	    BUTTON_NAMES("P4")
 };
 
-const char* JoystickAxisNames[JOY_NAME_SIZE] = {
+const char *JoystickAxisNames[JOY_NAME_SIZE] = {
 	"...",
 #define AXIS_BUTTONS(x,n)   x" Axis "n" -", x" Axis "n" +",
 #define AXIS_NAMES(x)     \
@@ -271,12 +271,12 @@ const char* JoystickAxisNames[JOY_NAME_SIZE] = {
 	AXIS_BUTTONS(x,"15")  \
 	AXIS_BUTTONS(x,"16")
 	AXIS_NAMES("P1")
-	AXIS_NAMES("P2")
-	AXIS_NAMES("P3")
-	AXIS_NAMES("P4")
+	    AXIS_NAMES("P2")
+	    AXIS_NAMES("P3")
+	    AXIS_NAMES("P4")
 };
 
-const char* JoystickHatNames[JOY_NAME_SIZE] = {
+const char *JoystickHatNames[JOY_NAME_SIZE] = {
 	"...",
 #define HAT_BUTTONS(x,n) \
 	x" Hat "n" Up",      \
@@ -293,12 +293,12 @@ const char* JoystickHatNames[JOY_NAME_SIZE] = {
 	HAT_BUTTONS(x,"7")   \
 	HAT_BUTTONS(x,"8")
 	HAT_NAMES("P1")
-	HAT_NAMES("P2")
-	HAT_NAMES("P3")
-	HAT_NAMES("P4")
+	    HAT_NAMES("P2")
+	    HAT_NAMES("P3")
+	    HAT_NAMES("P4")
 };
 
-const char* JoystickUnknownNames[JOY_NAME_SIZE] = {
+const char *JoystickUnknownNames[JOY_NAME_SIZE] = {
 	"...",
 #define UNKNOWN_NAMES(x) \
 	x" unknown 1",       \
@@ -334,46 +334,60 @@ const char* JoystickUnknownNames[JOY_NAME_SIZE] = {
 	x" unknown 31",      \
 	x" unknown 32",
 	UNKNOWN_NAMES("P1")
-	UNKNOWN_NAMES("P2")
-	UNKNOWN_NAMES("P3")
-	UNKNOWN_NAMES("P4")
+	    UNKNOWN_NAMES("P2")
+	    UNKNOWN_NAMES("P3")
+	    UNKNOWN_NAMES("P4")
 };
 
 // Numbering order: buttons, then axes, then hats
-const char* PC_GetJoystickKeyName(int portnum, int keynum)
-{
-	int keycode = (portnum*JOY_MAX_INPUTS) + keynum;
+const char *PC_GetJoystickKeyName(int portnum, int keynum) {
+	int keycode = (portnum * JOY_MAX_INPUTS) + keynum;
 	int firstAxis = joysticks[portnum].NumButtons;
-	int firstHat = firstAxis + (2*joysticks[portnum].NumAxes);
-	int firstUnknown = firstHat + (4*joysticks[portnum].NumHats);
+	int firstHat = firstAxis + (2 * joysticks[portnum].NumAxes);
+	int firstUnknown = firstHat + (4 * joysticks[portnum].NumHats);
 
-	     if (keynum < firstAxis+1)            return JoystickButtonNames[keycode];
-	else if (keynum < firstHat+1)             return JoystickAxisNames[keycode-firstAxis];
-	else if (keynum < firstUnknown+1)         return JoystickHatNames[keycode-firstHat];
-	else                                      return JoystickUnknownNames[keycode-firstUnknown];
+	if(keynum < firstAxis + 1)
+		return JoystickButtonNames[keycode];
+	else if(keynum < firstHat + 1)
+		return JoystickAxisNames[keycode - firstAxis];
+	else if(keynum < firstUnknown + 1)
+		return JoystickHatNames[keycode - firstHat];
+	else
+		return JoystickUnknownNames[keycode - firstUnknown];
 }
 
 #ifdef DINGOO
-char* DINGOO_GetKeyName(int keycode)
-{
-	     if (keycode == DINGOO_BUTTON_UP)     return "Up";
-	else if (keycode == DINGOO_BUTTON_DOWN)   return "Down";
-	else if (keycode == DINGOO_BUTTON_LEFT)   return "Left";
-	else if (keycode == DINGOO_BUTTON_RIGHT)  return "Right";
-	else if (keycode == DINGOO_BUTTON_A)      return "A";
-	else if (keycode == DINGOO_BUTTON_B)      return "B";
-	else if (keycode == DINGOO_BUTTON_X)      return "X";
-	else if (keycode == DINGOO_BUTTON_Y)      return "Y";
-	else if (keycode == DINGOO_BUTTON_L)      return "L";
-	else if (keycode == DINGOO_BUTTON_R)      return "R";
-	else if (keycode == DINGOO_BUTTON_START)  return "Start";
-	else if (keycode == DINGOO_BUTTON_SELECT) return "Select";
-	else return "...";
+char *DINGOO_GetKeyName(int keycode) {
+	if(keycode == DINGOO_BUTTON_UP)
+		return "Up";
+	else if(keycode == DINGOO_BUTTON_DOWN)
+		return "Down";
+	else if(keycode == DINGOO_BUTTON_LEFT)
+		return "Left";
+	else if(keycode == DINGOO_BUTTON_RIGHT)
+		return "Right";
+	else if(keycode == DINGOO_BUTTON_A)
+		return "A";
+	else if(keycode == DINGOO_BUTTON_B)
+		return "B";
+	else if(keycode == DINGOO_BUTTON_X)
+		return "X";
+	else if(keycode == DINGOO_BUTTON_Y)
+		return "Y";
+	else if(keycode == DINGOO_BUTTON_L)
+		return "L";
+	else if(keycode == DINGOO_BUTTON_R)
+		return "R";
+	else if(keycode == DINGOO_BUTTON_START)
+		return "Start";
+	else if(keycode == DINGOO_BUTTON_SELECT)
+		return "Select";
+	else
+		return "...";
 }
 #endif
 
-char* JOY_GetKeyName(int keycode)
-{
+char *JOY_GetKeyName(int keycode) {
 #ifdef DINGOO
 	return DINGOO_GetKeyName(keycode);
 #else

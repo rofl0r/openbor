@@ -14,13 +14,7 @@
 // hint: if you set realfd to a negative number, that means it'll use the
 // gdrom routines to read a pak file starting at that (positive) lba
 //
-void filecache_init(
-  int realfd,
-  int pakcdsectors,
-  int blocksize,
-  unsigned char blocks,
-  int vfds
-);
+void filecache_init(int realfd, int pakcdsectors, int blocksize, unsigned char blocks, int vfds);
 
 //
 // Clear All Allocations
@@ -31,13 +25,7 @@ void filecache_term(void);
 // attempt to read a block
 // returns the number of bytes read or 0 on error
 //
-int filecache_readpakblock(
-  unsigned char *dest,
-  int pakblock,
-  int startofs,
-  int bytes,
-  int blocking
-);
+int filecache_readpakblock(unsigned char *dest, int pakblock, int startofs, int bytes, int blocking);
 
 //
 // set up where the vfd pointers are
@@ -54,4 +42,3 @@ void filecache_wait_for_prebuffer(int vfd, int nblocks);
 /////////////////////////////////////////////////////////////////////////////
 
 #endif
-

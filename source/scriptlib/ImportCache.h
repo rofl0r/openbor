@@ -20,13 +20,12 @@ typedef struct ImportNode {
 	Interpreter interpreter;
 } ImportNode;
 
-HRESULT ImportNode_Init(ImportNode* node, const char* path);
-void ImportNode_Clear(ImportNode* node);
+HRESULT ImportNode_Init(ImportNode * node, const char *path);
+void ImportNode_Clear(ImportNode * node);
 
 void ImportCache_Init();
-ImportNode* ImportCache_Retrieve(const char* path);
-void ImportCache_Release(ImportNode* node);
+ImportNode *ImportCache_Retrieve(const char *path);
+void ImportCache_Release(ImportNode * node);
 void ImportCache_Clear();
 
 #endif
-

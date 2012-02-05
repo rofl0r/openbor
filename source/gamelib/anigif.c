@@ -31,20 +31,20 @@
 
 
 
-typedef struct{
-	char		magic[6];
-	unsigned short	screenwidth, screenheight;
-		unsigned char	flags;
-	unsigned char	background;
-	unsigned char	aspect;
-}gifheaderstruct;
+typedef struct {
+	char magic[6];
+	unsigned short screenwidth, screenheight;
+	unsigned char flags;
+	unsigned char background;
+	unsigned char aspect;
+} gifheaderstruct;
 
 
 typedef struct {
-	short	left, top;
+	short left, top;
 	unsigned short width, height;
-	unsigned char	flags;
-}gifblockstruct;
+	unsigned char flags;
+} gifblockstruct;
 
 static gifheaderstruct gif_header;
 
@@ -69,7 +69,7 @@ static int lastdelay;
 
 
 
-static unsigned char readbyte(int handle){
+static unsigned char readbyte(int handle) {
 	unsigned char c = 0;
 	readpackfile(handle, &c, 1);
 	return c;
@@ -79,30 +79,34 @@ static unsigned char readbyte(int handle){
 
 
 
-static void passgifblock(int handle){
+static void passgifblock(int handle) {
 	int len;
 
 	// Skip all contained blocks
-	while((len=readbyte(handle))!=0) seekpackfile(handle, len, SEEK_CUR);
+	while((len = readbyte(handle)) != 0)
+		seekpackfile(handle, len, SEEK_CUR);
 }
 
 
 
-static void handle_gfx_control(int handle){
+static void handle_gfx_control(int handle) {
 	int len;
 	int skip;
 	unsigned char buf[4];
 
 
 	// Handle all contained blocks
-	while((len=readbyte(handle))!=0){
+	while((len = readbyte(handle)) != 0) {
 		skip = len - 4;
-		if(len>4) len = 4;
+		if(len > 4)
+			len = 4;
 		readpackfile(handle, buf, len);
-		if(skip>0) seekpackfile(handle, skip, SEEK_CUR);
+		if(skip > 0)
+			seekpackfile(handle, skip, SEEK_CUR);
 
-		if(buf[0]&1) transparent = buf[3];
-		lastdelay = (buf[2]<<8) | buf[1];
+		if(buf[0] & 1)
+			transparent = buf[3];
+		lastdelay = (buf[2] << 8) | buf[1];
 
 		// disposal = (buf[0]>>2) & 7;
 		// inputflag = (buf[0]>>1) & 1;
@@ -111,14 +115,14 @@ static void handle_gfx_control(int handle){
 
 
 
-static void gifextension(int handle){
+static void gifextension(int handle) {
 	int function;
 
 	// Get extension function code
 	function = readbyte(handle);
 
 	// Note: function may be repeated multiple times (size, data, size, data)
-	switch(function){
+	switch (function) {
 		case 0xF9:
 			// Graphic control
 			handle_gfx_control(handle);
@@ -147,7 +151,7 @@ int readnonzero(int handle){
 
 
 
-static int decodegifblock(int handle, unsigned char *buf, int width, int height, gifblockstruct *gb){
+static int decodegifblock(int handle, unsigned char *buf, int width, int height, gifblockstruct * gb) {
 
 	unsigned char bits;
 	short bits2;
@@ -175,10 +179,11 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 	static unsigned char lastcodestack[4096];
 	static short codestack[4096];
 
-	static short wordmasktable[] = {0x0000, 0x0001, 0x0003, 0x0007,
-					0x000f, 0x001f, 0x003f, 0x007f,
-					0x00ff, 0x01ff, 0x03ff, 0x07ff,
-					0x0fff, 0x1fff, 0x3fff, 0x7fff };
+	static short wordmasktable[] = { 0x0000, 0x0001, 0x0003, 0x0007,
+		0x000f, 0x001f, 0x003f, 0x007f,
+		0x00ff, 0x01ff, 0x03ff, 0x07ff,
+		0x0fff, 0x1fff, 0x3fff, 0x7fff
+	};
 
 	static short inctable[] = { 8, 8, 4, 2, 0 };
 	static short startable[] = { 0, 4, 2, 1, 0 };
@@ -186,7 +191,8 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 
 	// get the initial LZW code bits
 	bits = readbyte(handle);
-	if(bits<2 || bits>8) return 0;
+	if(bits < 2 || bits > 8)
+		return 0;
 
 
 	p = q = b;
@@ -200,30 +206,30 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 	linebuffer = buf + (gb->top * width);
 
 	// loop until something breaks
-	for(;;){
-		if(bitsleft == 8){
+	for(;;) {
+		if(bitsleft == 8) {
 			if(++p >= q && (((blocksize = readbyte(handle)) < 1) ||
-				(q=(p=b) + readpackfile(handle, b, blocksize)) < (b+blocksize))){
+					(q = (p = b) + readpackfile(handle, b, blocksize)) < (b + blocksize))) {
 				return 1;	// Done
 			}
 			bitsleft = 0;
 		}
 		thiscode = *p;
-		if((currentcode=(codesize+bitsleft)) <= 8){
+		if((currentcode = (codesize + bitsleft)) <= 8) {
 			*p >>= codesize;
 			bitsleft = currentcode;
-		}
-		else{
+		} else {
 			if(++p >= q && (((blocksize = readbyte(handle)) < 1) ||
-				(q=(p=b)+readpackfile(handle, b, blocksize)) < (b+blocksize))){
+					(q = (p = b) + readpackfile(handle, b, blocksize)) < (b + blocksize))) {
 				return 1;	// Done
 			}
 
 			thiscode |= *p << (8 - bitsleft);
-			if(currentcode<=16) *p >>= (bitsleft = currentcode - 8);
-			else{
+			if(currentcode <= 16)
+				*p >>= (bitsleft = currentcode - 8);
+			else {
 				if(++p >= q && (((blocksize = readbyte(handle)) < 1) ||
-					(q=(p=b) + readpackfile(handle, b, blocksize)) < (b+blocksize))){
+						(q = (p = b) + readpackfile(handle, b, blocksize)) < (b + blocksize))) {
 					return 1;	// Done
 				}
 
@@ -234,55 +240,61 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 		thiscode &= wordmasktable[codesize];
 		currentcode = thiscode;
 
-		if(thiscode==(bits2+1)) break;
-		if(thiscode>nextcode){
-			return 0;			// Bad code
+		if(thiscode == (bits2 + 1))
+			break;
+		if(thiscode > nextcode) {
+			return 0;	// Bad code
 		}
 
-		if(thiscode==bits2){
+		if(thiscode == bits2) {
 			nextcode = bits2 + 2;
-			codesize2 = 1 << (codesize = (bits+1));
+			codesize2 = 1 << (codesize = (bits + 1));
 			oldtoken = oldcode = NO_CODE;
 			continue;
 		}
 
 		u = firstcodestack;
 
-		if(thiscode==nextcode){
-			if(oldcode==NO_CODE){
-				return 0;		// Bad code
+		if(thiscode == nextcode) {
+			if(oldcode == NO_CODE) {
+				return 0;	// Bad code
 			}
 			*u++ = oldtoken;
 			thiscode = oldcode;
 		}
 
-		while(thiscode>=bits2){
-			*u++ = lastcodestack [thiscode];
+		while(thiscode >= bits2) {
+			*u++ = lastcodestack[thiscode];
 			thiscode = codestack[thiscode];
 		}
 
 		oldtoken = thiscode;
-		do{
-			if(byte<width && byte>=0 && gb->top+line>=0 && line<(height - gb->top) && thiscode!=transparent) linebuffer[byte] = thiscode;
+		do {
+			if(byte < width && byte >= 0 && gb->top + line >= 0 && line < (height - gb->top)
+			   && thiscode != transparent)
+				linebuffer[byte] = thiscode;
 			byte++;
-			if(byte >= gb->left + gb->width){
+			if(byte >= gb->left + gb->width) {
 				byte = gb->left;
 				// check for interlaced image
-				if(gb->flags&0x40){
+				if(gb->flags & 0x40) {
 					line += inctable[pass];
-					if(line >= gb->height) line = startable[++pass];
-				}
-				else ++line;
-				linebuffer = buf + (width*(gb->top+line));
+					if(line >= gb->height)
+						line = startable[++pass];
+				} else
+					++line;
+				linebuffer = buf + (width * (gb->top + line));
 			}
-			if (u<=firstcodestack) break;
+			if(u <= firstcodestack)
+				break;
 			thiscode = *--u;
-		}while(1);
+		} while(1);
 
-		if(nextcode<4096 && oldcode!=NO_CODE){
+		if(nextcode < 4096 && oldcode != NO_CODE) {
 			codestack[nextcode] = oldcode;
 			lastcodestack[nextcode] = oldtoken;
-			if(++nextcode>=codesize2 && codesize<12) codesize2 = 1<<++codesize;
+			if(++nextcode >= codesize2 && codesize < 12)
+				codesize2 = 1 << ++codesize;
 		}
 		oldcode = currentcode;
 	}
@@ -297,7 +309,7 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 
 
 
-void anigif_close(){
+void anigif_close() {
 	closepackfile(handle);
 	handle = -1;
 }
@@ -305,27 +317,29 @@ void anigif_close(){
 
 
 // Returns true on success
-int anigif_open(char *filename, char *packfilename, unsigned char *pal){
+int anigif_open(char *filename, char *packfilename, unsigned char *pal) {
 	unsigned char tpal[1024];
 	int i, j;
 	anigif_close();
 
 #if PSP || PS2 || DC
-	if((handle=openreadaheadpackfile(filename,packfilename,1*1024*1024, 131072))==-1) return 0;
+	if((handle = openreadaheadpackfile(filename, packfilename, 1 * 1024 * 1024, 131072)) == -1)
+		return 0;
 #else
-	if((handle=openpackfile(filename,packfilename))==-1) return 0;
+	if((handle = openpackfile(filename, packfilename)) == -1)
+		return 0;
 #endif
 
 #if PSP || PS2 || DC
-	if(readpackfile(handle,&gif_header,sizeof_gifheaderstruct)!=sizeof_gifheaderstruct){
+	if(readpackfile(handle, &gif_header, sizeof_gifheaderstruct) != sizeof_gifheaderstruct) {
 #else
-	if(readpackfile(handle,&gif_header,sizeof(gifheaderstruct))!=sizeof(gifheaderstruct)){
+	if(readpackfile(handle, &gif_header, sizeof(gifheaderstruct)) != sizeof(gifheaderstruct)) {
 #endif
 		anigif_close();
 		return 0;
 	}
 
-	if(gif_header.magic[0]!='G' || gif_header.magic[1]!='I' || gif_header.magic[2]!='F'){
+	if(gif_header.magic[0] != 'G' || gif_header.magic[1] != 'I' || gif_header.magic[2] != 'F') {
 		// Not a GIF file!
 		anigif_close();
 		return 0;
@@ -334,40 +348,38 @@ int anigif_open(char *filename, char *packfilename, unsigned char *pal){
 	current_res[0] = SwapLSB16(gif_header.screenwidth);
 	current_res[1] = SwapLSB16(gif_header.screenheight);
 
-	bitdepth = (gif_header.flags&7)+1;
-	numcolours = (1<<bitdepth);
+	bitdepth = (gif_header.flags & 7) + 1;
+	numcolours = (1 << bitdepth);
 	lastdelay = 1;
 
 
 	// Get global palette, if present and if wanted
-	if(gif_header.flags&0x80){
-		if(pal){
-			if(readpackfile(handle, tpal, numcolours*3) != numcolours*3){
+	if(gif_header.flags & 0x80) {
+		if(pal) {
+			if(readpackfile(handle, tpal, numcolours * 3) != numcolours * 3) {
 
 				anigif_close();
 				return 0;
 			}
 			*tpal &= 0xFF000000;
-			switch(PAL_BYTES)
-			{
-			case 768:
-				memcpy(pal, tpal, 768);
-				break;
-			case 1024:
-				for(i=0, j=0; i<1024; i+=4, j+=3)
-				{
-					*(unsigned*)(pal+i) = colour32(tpal[j], tpal[j+1], tpal[j+2]);
-				}
-				break;
-			case 512:
-				for(i=0, j=0; i<512; i+=2, j+=3)
-				{
-					*(unsigned short*)(pal+i) = colour16(tpal[j], tpal[j+1], tpal[j+2]);
-				}
-				break;
+			switch (PAL_BYTES) {
+				case 768:
+					memcpy(pal, tpal, 768);
+					break;
+				case 1024:
+					for(i = 0, j = 0; i < 1024; i += 4, j += 3) {
+						*(unsigned *) (pal + i) = colour32(tpal[j], tpal[j + 1], tpal[j + 2]);
+					}
+					break;
+				case 512:
+					for(i = 0, j = 0; i < 512; i += 2, j += 3) {
+						*(unsigned short *) (pal + i) =
+						    colour16(tpal[j], tpal[j + 1], tpal[j + 2]);
+					}
+					break;
 			}
-		}
-		else seekpackfile(handle, numcolours*3, SEEK_CUR);
+		} else
+			seekpackfile(handle, numcolours * 3, SEEK_CUR);
 	}
 
 	return 1;
@@ -377,39 +389,39 @@ int anigif_open(char *filename, char *packfilename, unsigned char *pal){
 
 
 // Returns type of action to take (frame, retry, end)
-int anigif_decode(s_screen * screen, int *delay, int x, int y){
+int anigif_decode(s_screen * screen, int *delay, int x, int y) {
 
 	gifblockstruct iblock;
 	unsigned char c;
 
 
-	if(handle<0) return ANIGIF_DECODE_END;
-	if(screen==NULL){
+	if(handle < 0)
+		return ANIGIF_DECODE_END;
+	if(screen == NULL) {
 		anigif_close();
 		return ANIGIF_DECODE_END;
 	}
 
-	if(readpackfile(handle,&c,1)!=1){
+	if(readpackfile(handle, &c, 1) != 1) {
 		anigif_close();
 		return ANIGIF_DECODE_END;
 	}
 
 
-	switch(c){
+	switch (c) {
 		case ',':
 			// An image block
 #if PSP || PS2 || DC
-			if(readpackfile(handle, &iblock, sizeof_iblock)!=sizeof_iblock){
+			if(readpackfile(handle, &iblock, sizeof_iblock) != sizeof_iblock) {
 #else
-			if(readpackfile(handle, &iblock, sizeof(iblock))!=sizeof(iblock)){
+			if(readpackfile(handle, &iblock, sizeof(iblock)) != sizeof(iblock)) {
 #endif
 				anigif_close();
 				return ANIGIF_DECODE_END;
 			}
-
 			// We don't do local palettes
-			if(iblock.flags&0x80){
-				seekpackfile(handle, numcolours*3, SEEK_CUR);
+			if(iblock.flags & 0x80) {
+				seekpackfile(handle, numcolours * 3, SEEK_CUR);
 			}
 
 			iblock.left = SwapLSB16(iblock.left);
@@ -419,7 +431,7 @@ int anigif_decode(s_screen * screen, int *delay, int x, int y){
 			iblock.left += x;
 			iblock.top += y;
 
-			decodegifblock(handle, (unsigned char*)screen->data, screen->width, screen->height, &iblock);
+			decodegifblock(handle, (unsigned char *) screen->data, screen->width, screen->height, &iblock);
 /*
 			if(!decodegifblock(handle, screen->data, screen->width, screen->height, &iblock)){
 				anigif_close();
@@ -427,7 +439,8 @@ int anigif_decode(s_screen * screen, int *delay, int x, int y){
 			}
 */
 
-			if(delay) *delay = lastdelay;
+			if(delay)
+				*delay = lastdelay;
 			// lastdelay = 0;
 			return ANIGIF_DECODE_FRAME;
 
@@ -438,22 +451,14 @@ int anigif_decode(s_screen * screen, int *delay, int x, int y){
 			// lastdelay = 0;
 			return ANIGIF_DECODE_RETRY;
 
-//		case 0:
+//              case 0:
 		default:
 			// Isn't this an EOF?
 			return ANIGIF_DECODE_RETRY;
-//			anigif_close();
-//			return ANIGIF_DECODE_END;
+//                      anigif_close();
+//                      return ANIGIF_DECODE_END;
 	}
 
 	anigif_close();
 	return ANIGIF_DECODE_END;
 }
-
-
-
-
-
-
-
-

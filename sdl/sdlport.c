@@ -14,20 +14,18 @@
 #define appExit exit
 #undef exit
 
-char packfile[128] = {"bor.pak"};
-char paksDir[128] = {"Paks"};
-char savesDir[128] = {"Saves"};
-char logsDir[128] = {"Logs"};
-char screenShotsDir[128] = {"ScreenShots"};
+char packfile[128] = { "bor.pak" };
+char paksDir[128] = { "Paks" };
+char savesDir[128] = { "Saves" };
+char logsDir[128] = { "Logs" };
+char screenShotsDir[128] = { "ScreenShots" };
 
-void borExit(int reset)
-{
+void borExit(int reset) {
 	SDL_Delay(1000);
 	appExit(0);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 #ifdef CUSTOM_SIGNAL_HANDLER
 	struct sigaction sigact;
 #endif
@@ -36,8 +34,7 @@ int main(int argc, char *argv[])
 	sigact.sa_sigaction = handleFatalSignal;
 	sigact.sa_flags = SA_RESTART | SA_SIGINFO;
 
-	if(sigaction(SIGSEGV, &sigact, NULL) != 0)
-	{
+	if(sigaction(SIGSEGV, &sigact, NULL) != 0) {
 		printf("Error setting signal handler for %d (%s)\n", SIGSEGV, strsignal(SIGSEGV));
 		exit(EXIT_FAILURE);
 	}
@@ -57,4 +54,3 @@ int main(int argc, char *argv[])
 	borExit(0);
 	return 0;
 }
-

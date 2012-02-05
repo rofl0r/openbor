@@ -9,16 +9,16 @@
 #include "pp_parser.h"
 #undef printf
 
-bool lexFile(char* filename)
-{
+bool lexFile(char *filename) {
 	int length;
-	char* buffer;
+	char *buffer;
 	pp_lexer lexer;
 	pp_token token;
 
 	// Open the file and read it into a memory buffer
-	FILE* fp = fopen(filename, "rb");
-	if(fp == NULL) return false;
+	FILE *fp = fopen(filename, "rb");
+	if(fp == NULL)
+		return false;
 	fseek(fp, 0, SEEK_END);
 	length = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -26,14 +26,18 @@ bool lexFile(char* filename)
 
 	buffer = malloc(length + 1);
 	memset(buffer, 0, length + 1);
-	if(fread(buffer, 1, length, fp) != length) return false;
+	if(fread(buffer, 1, length, fp) != length)
+		return false;
 	fclose(fp);
 
-	TEXTPOS position = {0,0};
+	TEXTPOS position = { 0, 0 };
 	pp_lexer_Init(&lexer, buffer, position);
 
 	do {
-		if(FAILED(pp_lexer_GetNextToken(&lexer, &token))) { fprintf(stderr, "Fail.\n"); return false; }
+		if(FAILED(pp_lexer_GetNextToken(&lexer, &token))) {
+			fprintf(stderr, "Fail.\n");
+			return false;
+		}
 		printf("%s", token.theSource);
 	} while(token.theType != PP_TOKEN_EOF);
 
@@ -43,19 +47,19 @@ bool lexFile(char* filename)
 	return true;
 }
 
-bool parseFile(char* filename)
-{
+bool parseFile(char *filename) {
 	int length;
-	char* buffer;
+	char *buffer;
 	bool success = true;
-	FILE* fp;
+	FILE *fp;
 	pp_parser parser;
 	pp_context ctx;
-	TEXTPOS initialPosition = {1, 0};
+	TEXTPOS initialPosition = { 1, 0 };
 
 	// Open the file and determine its size
 	fp = fopen(filename, "rb");
-	if(fp == NULL) return false;
+	if(fp == NULL)
+		return false;
 	fseek(fp, 0, SEEK_END);
 	length = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -66,7 +70,8 @@ bool parseFile(char* filename)
 	if(fread(buffer, 1, length, fp) != length)
 		success = false;
 	fclose(fp);
-	if(!success) return false;
+	if(!success)
+		return false;
 
 	// Initialize the preprocessor
 	pp_context_init(&ctx);
@@ -74,9 +79,8 @@ bool parseFile(char* filename)
 
 	// Parse the file
 	//pp_parser_parse(&parser);
-	pp_token* token;
-	while((token = pp_parser_emit_token(&parser)) && token->theType != PP_TOKEN_EOF)
-	{
+	pp_token *token;
+	while((token = pp_parser_emit_token(&parser)) && token->theType != PP_TOKEN_EOF) {
 		printf("%s", token->theSource);
 	}
 
@@ -86,7 +90,8 @@ bool parseFile(char* filename)
 	// Print out all imports
 	int size, i;
 	fprintf(stderr, "Imports:\n");
-	FOREACH(ctx.imports, fprintf(stderr, "%s\n", List_GetName(&ctx.imports)););
+	FOREACH(ctx.imports, fprintf(stderr, "%s\n", List_GetName(&ctx.imports));
+	    );
 
 	//printf("%s", ctx.tokens);
 	pp_context_destroy(&ctx);
@@ -94,11 +99,9 @@ bool parseFile(char* filename)
 	return success;
 }
 
-int main(int argc, char** argv)
-{
-	char* filename;
-	if(argc != 2)
-	{
+int main(int argc, char **argv) {
+	char *filename;
+	if(argc != 2) {
 		printf("Usage: %s filename\n", argv[0]);
 		return 1;
 	}
@@ -108,5 +111,3 @@ int main(int argc, char** argv)
 	bool success = parseFile(filename);
 	return !success;
 }
-
-

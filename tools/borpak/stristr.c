@@ -25,62 +25,52 @@
 typedef unsigned int uint;
 
 #if defined(__cplusplus) && __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-char *stristr(const char *String, const char *Pattern)
-{
-      char *pptr, *sptr, *start;
+	char *stristr(const char *String, const char *Pattern) {
+		char *pptr, *sptr, *start;
 
-      for (start = (char *)String; *start != NUL; start++)
-      {
-            /* find start of pattern in string */
-            for ( ; ((*start!=NUL) && (toupper(*start) != toupper(*Pattern))); start++)
-                  ;
-            if (NUL == *start)
-                  return NULL;
+		for(start = (char *) String; *start != NUL; start++) {
+			/* find start of pattern in string */
+			for(; ((*start != NUL) && (toupper(*start) != toupper(*Pattern))); start++) ;
+			if(NUL == *start)
+				return NULL;
 
-            pptr = (char *)Pattern;
-            sptr = (char *)start;
+			pptr = (char *) Pattern;
+			sptr = (char *) start;
 
-            while (toupper(*sptr) == toupper(*pptr))
-            {
-                  sptr++;
-                  pptr++;
+			while(toupper(*sptr) == toupper(*pptr)) {
+				sptr++;
+				pptr++;
 
-                  /* if end of pattern then pattern was found */
+				/* if end of pattern then pattern was found */
 
-                  if (NUL == *pptr)
-                        return (start);
-            }
-      }
-      return NULL;
-}
+				if(NUL == *pptr)
+					return (start);
+		}} return NULL;
+	}
 
 #if defined(__cplusplus) && __cplusplus
- }
+}
 #endif
 
 #ifdef TEST
 
-int main(void)
-{
-      int i;
-      char *buffer[2] = {"heLLo, HELLO, hello, hELLo, HellO", "Hell"};
-      char *sptr;
+int main(void) {
+	int i;
+	char *buffer[2] = { "heLLo, HELLO, hello, hELLo, HellO", "Hell" };
+	char *sptr;
 
-      for (i = 0; i < 2; ++i)
-      {
-            printf("\nTest string=\"%s\"\n", sptr = buffer[i]);
-            while (0 != (sptr = stristr(sptr, "hello")))
-            {
-                  printf("Testing %s:\n", sptr);
-                  printf("Found %5.5s!\n", sptr++);
-            }
-      }
+	for(i = 0; i < 2; ++i) {
+		printf("\nTest string=\"%s\"\n", sptr = buffer[i]);
+		while(0 != (sptr = stristr(sptr, "hello"))) {
+			printf("Testing %s:\n", sptr);
+			printf("Found %5.5s!\n", sptr++);
+		}
+	}
 
-      return(0);
+	return (0);
 }
 
-#endif /* TEST */
-
+#endif				/* TEST */

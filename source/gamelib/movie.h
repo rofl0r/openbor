@@ -11,8 +11,8 @@ extern int movieplay;
 extern int moviebufptr;
 extern int movielen;
 extern int movieloglen;
-extern FILE* moviefile;
-extern u32 (*moviebuffer)[5][2]; //keyflags, newkeyflags;
+extern FILE *moviefile;
+extern u32(*moviebuffer)[5][2];	//keyflags, newkeyflags;
 
 void movie_openfile(int save);
 void movie_flushbuf();

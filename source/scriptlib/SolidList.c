@@ -9,15 +9,17 @@
 #include <string.h>
 #include "SolidList.h"
 
-SolidList* SolidListFromList(List* list) {
-	SolidList* result;
+SolidList *SolidListFromList(List * list) {
+	SolidList *result;
 	assert(list);
-	size_t sldsize = sizeof(void*)*(list->size);
+	size_t sldsize = sizeof(void *) * (list->size);
 	size_t i = 0;
-	if(!list->size) return NULL;
+	if(!list->size)
+		return NULL;
 	result = malloc(sizeof(SolidList));
-	if(!result) return NULL;
-	result->solidlist = (void**)malloc(sldsize);
+	if(!result)
+		return NULL;
+	result->solidlist = (void **) malloc(sldsize);
 	result->size = list->size;
 	List_GotoFirst(list);
 	while(list->current) {
@@ -28,8 +30,9 @@ SolidList* SolidListFromList(List* list) {
 	return result;
 }
 
-void freeSolidList(SolidList* s) {
-	if(!s) return;
+void freeSolidList(SolidList * s) {
+	if(!s)
+		return;
 	if(s->solidlist)
 		free(s->solidlist);
 	free(s);
@@ -79,4 +82,4 @@ void List_Solidify(List* list)
 	List_FreeHashes(list);
 	#endif
 }
-*/
+*/ 

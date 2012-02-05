@@ -16,7 +16,3 @@ unsigned int rand32(void);
 void srand32(int n);
 
 #endif
-
-
-
-

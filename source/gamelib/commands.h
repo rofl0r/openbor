@@ -219,7 +219,7 @@ typedef enum levelCommand {
 } levelCommands;
 
 typedef enum modelCommand {
-	CMD_MODEL_NAME=1,
+	CMD_MODEL_NAME = 1,
 	CMD_MODEL_TYPE,
 	CMD_MODEL_SUBTYPE,
 	CMD_MODEL_STATS,
@@ -535,19 +535,18 @@ typedef enum {
 	CMD_MODELSTXT_VERSUSDAMAGE,
 } modelstxtCommands;
 
-void freeCommandList(List* list);
+void freeCommandList(List * list);
 
-List* createModelCommandList(void);
-modelCommands getModelCommand(List* list, char* usercommand);
+List *createModelCommandList(void);
+modelCommands getModelCommand(List * list, char *usercommand);
 
-List* createModelstxtCommandList(void);
-modelstxtCommands getModelstxtCommand(List* list, char* usercommand);
+List *createModelstxtCommandList(void);
+modelstxtCommands getModelstxtCommand(List * list, char *usercommand);
 
-List* createLevelCommandList(void);
-levelCommands getLevelCommand(List* list, char* usercommand);
+List *createLevelCommandList(void);
+levelCommands getLevelCommand(List * list, char *usercommand);
 
-List* createLevelOrderCommandList(void);
-levelOrderCommands getLevelOrderCommand(List* list, char* usercommand);
+List *createLevelOrderCommandList(void);
+levelOrderCommands getLevelOrderCommand(List * list, char *usercommand);
 
 #endif
-

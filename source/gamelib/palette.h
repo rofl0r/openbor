@@ -21,17 +21,15 @@ void palette_set_corrected(unsigned char *pal, int gr, int gg, int gb, int br, i
 // Find colour in palette
 int palette_find(unsigned char *pal, int r, int g, int b);
 
-typedef unsigned char* (*palette_table_function)(unsigned char*);
+typedef unsigned char *(*palette_table_function) (unsigned char *);
 
 // Create lookup tables
-unsigned char * palette_table_multiply(unsigned char *pal);
-unsigned char * palette_table_screen(unsigned char *pal);
-unsigned char * palette_table_dodge(unsigned char *pal);
-unsigned char * palette_table_half(unsigned char *pal);
-unsigned char * palette_table_overlay(unsigned char *pal);
-unsigned char * palette_table_hardlight(unsigned char *pal);
+unsigned char *palette_table_multiply(unsigned char *pal);
+unsigned char *palette_table_screen(unsigned char *pal);
+unsigned char *palette_table_dodge(unsigned char *pal);
+unsigned char *palette_table_half(unsigned char *pal);
+unsigned char *palette_table_overlay(unsigned char *pal);
+unsigned char *palette_table_hardlight(unsigned char *pal);
 
 
 #endif
-
-

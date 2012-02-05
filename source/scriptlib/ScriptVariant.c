@@ -13,92 +13,82 @@
 
 // use string cache to cut the memory usage down, because not all variants are string, no need to give each of them an array
 #define STRCACHE_INC      64
-CHAR** strcache = NULL;
-int   strcache_size = 0;
-int   strcache_top = -1;
-int*  strcache_index = NULL;
+CHAR **strcache = NULL;
+int strcache_size = 0;
+int strcache_top = -1;
+int *strcache_index = NULL;
 
 //clear the string cache
-void StrCache_Clear()
-{
+void StrCache_Clear() {
 	int i;
-	if(strcache)
-	{
-		for(i=0; i<strcache_size; i++)
-		{
+	if(strcache) {
+		for(i = 0; i < strcache_size; i++) {
 			free(strcache[i]);
 			strcache[i] = NULL;
 		}
 		free(strcache);
 		strcache = NULL;
 	}
-	if(strcache_index) {free(strcache_index); strcache_index = NULL;}
+	if(strcache_index) {
+		free(strcache_index);
+		strcache_index = NULL;
+	}
 	strcache_size = 0;
 	strcache_top = -1;
 }
 
 // int the string cache
-void StrCache_Init()
-{
+void StrCache_Init() {
 	int i;
-	StrCache_Clear(); // just in case
-	strcache = malloc(sizeof(CHAR*)*STRCACHE_INC);
+	StrCache_Clear();	// just in case
+	strcache = malloc(sizeof(CHAR *) * STRCACHE_INC);
 	//if(!strcache) shutdown(1, "out of memory");
-	strcache_index = malloc(sizeof(int)*STRCACHE_INC);
+	strcache_index = malloc(sizeof(int) * STRCACHE_INC);
 	//if(!strcache_index) shutdown(1, "out of memory");
-	for(i=0; i<STRCACHE_INC; i++)
-	{
-		strcache[i] = malloc((MAX_STR_VAR_LEN+1)*sizeof(CHAR));
+	for(i = 0; i < STRCACHE_INC; i++) {
+		strcache[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(CHAR));
 		//if(!strcache[i]) shutdown(1, "out of memory");
 		strcache[i][0] = 0;
 		strcache_index[i] = i;
 	}
 	strcache_size = STRCACHE_INC;
-	strcache_top = strcache_size-1;
+	strcache_top = strcache_size - 1;
 }
 
-void StrCache_Collect(int index)
-{
-	if(strcache_size)
-	{
+void StrCache_Collect(int index) {
+	if(strcache_size) {
 		strcache_top++;
-		if(strcache_top<strcache_size)
-		{
+		if(strcache_top < strcache_size) {
 			strcache_index[strcache_top] = index;
 		}
 	}
 }
 
-int StrCache_Pop()
-{
-	CHAR** temp;
-	int*   tempi;
+int StrCache_Pop() {
+	CHAR **temp;
+	int *tempi;
 	int i;
-	if(strcache_size==0)
-	{
+	if(strcache_size == 0) {
 		StrCache_Init();
 	}
-	if(strcache_top<0) // realloc
+	if(strcache_top < 0)	// realloc
 	{
-		temp = malloc(sizeof(CHAR*)*(strcache_size+STRCACHE_INC));
+		temp = malloc(sizeof(CHAR *) * (strcache_size + STRCACHE_INC));
 		//if(!temp) shutdown(1, "out of memory");
-		for(i=strcache_size; i<strcache_size+STRCACHE_INC; i++)
-		{
-			temp[i] = malloc((MAX_STR_VAR_LEN+1)*sizeof(CHAR));
+		for(i = strcache_size; i < strcache_size + STRCACHE_INC; i++) {
+			temp[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(CHAR));
 			//if(!strcache[i]) shutdown(1, "out of memory");
 			temp[i][0] = 0;
 		}
-		for(i=0; i<strcache_size; i++)
-		{
+		for(i = 0; i < strcache_size; i++) {
 			temp[i] = strcache[i];
 		}
 		free(strcache);
 		strcache = temp;
-		tempi = malloc(sizeof(int)*(strcache_size+STRCACHE_INC));
+		tempi = malloc(sizeof(int) * (strcache_size + STRCACHE_INC));
 		//if(!tempi) shutdown(1, "out of memory");
-		for(i=0; i<STRCACHE_INC; i++)
-		{
-			tempi[i] = strcache_size+i;
+		for(i = 0; i < STRCACHE_INC; i++) {
+			tempi[i] = strcache_size + i;
 		}
 		free(strcache_index);
 		strcache_index = tempi;
@@ -108,32 +98,28 @@ int StrCache_Pop()
 	return strcache_index[strcache_top--];
 }
 
-CHAR* StrCache_Get(int index)
-{
-	if(index<strcache_size)
-	{
+CHAR *StrCache_Get(int index) {
+	if(index < strcache_size) {
 		return strcache[index];
 	}
 	return NULL;
 }
 
 
-void ScriptVariant_Clear(ScriptVariant* var)
-{
+void ScriptVariant_Clear(ScriptVariant * var) {
 	ScriptVariant_ChangeType(var, VT_EMPTY);
-	var->ptrVal = NULL; // not sure, maybe this is the longest member in the union
+	var->ptrVal = NULL;	// not sure, maybe this is the longest member in the union
 }
 
-void ScriptVariant_Init(ScriptVariant* var)
-{
+void ScriptVariant_Init(ScriptVariant * var) {
 	//memset(var, 0, 8);
-	var->ptrVal = NULL; // not sure, maybe this is the longest member in the union
+	var->ptrVal = NULL;	// not sure, maybe this is the longest member in the union
 	var->vt = VT_EMPTY;
 }
 
-void ScriptVariant_ChangeType(ScriptVariant* var, VARTYPE cvt)
-{
-	if(var->vt == cvt) return;
+void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
+	if(var->vt == cvt)
+		return;
 /*
 	if(var->vt == VT_INTEGER)
 	{
@@ -161,173 +147,149 @@ void ScriptVariant_ChangeType(ScriptVariant* var, VARTYPE cvt)
 			break;
 		}
 	}
-	else */if(var->vt == VT_STR)
-	{
-		if(cvt != VT_STR)
-		{
+	else */ if(var->vt == VT_STR) {
+		if(cvt != VT_STR) {
 			StrCache_Collect(var->strVal);
 		}
-	}
-	else if(cvt == VT_STR)
-	{
-	   var->strVal = StrCache_Pop();
+	} else if(cvt == VT_STR) {
+		var->strVal = StrCache_Pop();
 	}
 	var->vt = cvt;
 
 }
 
-HRESULT ScriptVariant_IntegerValue(ScriptVariant* var, LONG* pVal)
-{
-	if(var->vt == VT_INTEGER)
-	{
+HRESULT ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal) {
+	if(var->vt == VT_INTEGER) {
 		*pVal = var->lVal;
-	}
-	else if(var->vt == VT_DECIMAL)
-	{
-		*pVal = (LONG)var->dblVal;
-	}
-	else return E_FAIL;
+	} else if(var->vt == VT_DECIMAL) {
+		*pVal = (LONG) var->dblVal;
+	} else
+		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT ScriptVariant_DecimalValue(ScriptVariant* var, DOUBLE* pVal)
-{
-	if(var->vt == VT_INTEGER)
-	{
-		*pVal = (DOUBLE)var->lVal;
-	}
-	else if(var->vt == VT_DECIMAL)
-	{
+HRESULT ScriptVariant_DecimalValue(ScriptVariant * var, DOUBLE * pVal) {
+	if(var->vt == VT_INTEGER) {
+		*pVal = (DOUBLE) var->lVal;
+	} else if(var->vt == VT_DECIMAL) {
 		*pVal = var->dblVal;
-	}
-	else return E_FAIL;
+	} else
+		return E_FAIL;
 
 	return S_OK;
 }
 
 
-BOOL ScriptVariant_IsTrue(ScriptVariant* svar)
-{
-	switch(svar->vt)
-	{
-	case VT_STR:
-		return StrCache_Get(svar->strVal)[0]!=0;
-	case VT_INTEGER:
-		return svar->lVal !=0;
-	case VT_DECIMAL:
-		return svar->dblVal != 0.0;
-	case VT_PTR:
-		return svar->ptrVal != 0;
-	default:
-		return 0;
+BOOL ScriptVariant_IsTrue(ScriptVariant * svar) {
+	switch (svar->vt) {
+		case VT_STR:
+			return StrCache_Get(svar->strVal)[0] != 0;
+		case VT_INTEGER:
+			return svar->lVal != 0;
+		case VT_DECIMAL:
+			return svar->dblVal != 0.0;
+		case VT_PTR:
+			return svar->ptrVal != 0;
+		default:
+			return 0;
 	}
 }
 
-void ScriptVariant_ToString(ScriptVariant* svar, LPSTR buffer )
-{
-   switch( svar->vt ){
-   case VT_EMPTY:
-	  sprintf( buffer, "<VT_EMPTY>   Unitialized" );
-	  break;
-   case VT_INTEGER:
-	  sprintf( buffer, "%d", svar->lVal);
-	  break;
-   case VT_DECIMAL:
-	  sprintf( buffer, "%lf", svar->dblVal );
-	  break;
-   case VT_PTR:
-	   sprintf(buffer, "#%ld",(long)(svar->ptrVal));
-	   break;
-   case VT_STR:
-	   sprintf(buffer, "%s", StrCache_Get(svar->strVal));
-	   break;
-   default:
-	  sprintf(buffer, "<Unprintable VARIANT type.>" );
-	  break;
-   }
+void ScriptVariant_ToString(ScriptVariant * svar, LPSTR buffer) {
+	switch (svar->vt) {
+		case VT_EMPTY:
+			sprintf(buffer, "<VT_EMPTY>   Unitialized");
+			break;
+		case VT_INTEGER:
+			sprintf(buffer, "%d", svar->lVal);
+			break;
+		case VT_DECIMAL:
+			sprintf(buffer, "%lf", svar->dblVal);
+			break;
+		case VT_PTR:
+			sprintf(buffer, "#%ld", (long) (svar->ptrVal));
+			break;
+		case VT_STR:
+			sprintf(buffer, "%s", StrCache_Get(svar->strVal));
+			break;
+		default:
+			sprintf(buffer, "<Unprintable VARIANT type.>");
+			break;
+	}
 }
 
 // faster if it is not VT_STR
-void ScriptVariant_Copy(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   // collect the str cache index
-   if(svar->vt==VT_STR && rightChild->vt!=VT_STR)
-   {
-	   StrCache_Collect(svar->strVal);
-   }
-   switch( rightChild->vt )
-   {
-   case VT_INTEGER:
-	  svar->lVal = rightChild->lVal;
-	  break;
-   case VT_DECIMAL:
-	  svar->dblVal = rightChild->dblVal;
-	  break;
-   case VT_PTR:
-	   svar->ptrVal = rightChild->ptrVal;
-	   break;
-   case VT_STR:
-	   // if it is not string, give it a string cache index
-	   if(svar->vt!=VT_STR) svar->strVal = StrCache_Pop();
-	   StrCache_Get(rightChild->strVal)[MAX_STR_VAR_LEN] = 0;
-	   strcpy(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal));
-	   break;
-   default:
-	  //should not happen unless the variant is not intialized correctly
-	  //shutdown(1, "invalid variant type");
-	  svar->ptrVal = NULL;
-	  break;
-   }
-   svar->vt = rightChild->vt;
+void ScriptVariant_Copy(ScriptVariant * svar, ScriptVariant * rightChild) {
+	// collect the str cache index
+	if(svar->vt == VT_STR && rightChild->vt != VT_STR) {
+		StrCache_Collect(svar->strVal);
+	}
+	switch (rightChild->vt) {
+		case VT_INTEGER:
+			svar->lVal = rightChild->lVal;
+			break;
+		case VT_DECIMAL:
+			svar->dblVal = rightChild->dblVal;
+			break;
+		case VT_PTR:
+			svar->ptrVal = rightChild->ptrVal;
+			break;
+		case VT_STR:
+			// if it is not string, give it a string cache index
+			if(svar->vt != VT_STR)
+				svar->strVal = StrCache_Pop();
+			StrCache_Get(rightChild->strVal)[MAX_STR_VAR_LEN] = 0;
+			strcpy(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal));
+			break;
+		default:
+			//should not happen unless the variant is not intialized correctly
+			//shutdown(1, "invalid variant type");
+			svar->ptrVal = NULL;
+			break;
+	}
+	svar->vt = rightChild->vt;
 }
 
 // light version, for compiled call, faster than above, but not safe in some situations
-ScriptVariant* ScriptVariant_Assign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Assign(ScriptVariant * svar, ScriptVariant * rightChild) {
 	ScriptVariant_Copy(svar, rightChild);
 	return rightChild;
 }
 
 
-ScriptVariant* ScriptVariant_MulAssign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   ScriptVariant_Copy(svar, ScriptVariant_Mul(svar, rightChild));
-   return svar;
+ScriptVariant *ScriptVariant_MulAssign(ScriptVariant * svar, ScriptVariant * rightChild) {
+	ScriptVariant_Copy(svar, ScriptVariant_Mul(svar, rightChild));
+	return svar;
 }
 
 
-ScriptVariant* ScriptVariant_DivAssign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   ScriptVariant_Copy(svar, ScriptVariant_Div(svar, rightChild));
-   return svar;
+ScriptVariant *ScriptVariant_DivAssign(ScriptVariant * svar, ScriptVariant * rightChild) {
+	ScriptVariant_Copy(svar, ScriptVariant_Div(svar, rightChild));
+	return svar;
 }
 
 
-ScriptVariant* ScriptVariant_AddAssign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   ScriptVariant_Copy(svar, ScriptVariant_Add(svar, rightChild));
-   return svar;
+ScriptVariant *ScriptVariant_AddAssign(ScriptVariant * svar, ScriptVariant * rightChild) {
+	ScriptVariant_Copy(svar, ScriptVariant_Add(svar, rightChild));
+	return svar;
 }
 
 
-ScriptVariant* ScriptVariant_SubAssign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   ScriptVariant_Copy(svar, ScriptVariant_Sub(svar, rightChild));
-   return svar;
+ScriptVariant *ScriptVariant_SubAssign(ScriptVariant * svar, ScriptVariant * rightChild) {
+	ScriptVariant_Copy(svar, ScriptVariant_Sub(svar, rightChild));
+	return svar;
 }
 
 
-ScriptVariant* ScriptVariant_ModAssign(ScriptVariant* svar, ScriptVariant* rightChild )
-{
-   ScriptVariant_Copy(svar, ScriptVariant_Mod(svar, rightChild));
-   return svar;
+ScriptVariant *ScriptVariant_ModAssign(ScriptVariant * svar, ScriptVariant * rightChild) {
+	ScriptVariant_Copy(svar, ScriptVariant_Mod(svar, rightChild));
+	return svar;
 }
 
 //Logical Operations
 
-ScriptVariant* ScriptVariant_Or( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Or(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 	retvar.lVal = (ScriptVariant_IsTrue(svar) || ScriptVariant_IsTrue(rightChild));
@@ -335,39 +297,27 @@ ScriptVariant* ScriptVariant_Or( ScriptVariant* svar, ScriptVariant* rightChild 
 }
 
 
-ScriptVariant* ScriptVariant_And( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_And(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 	retvar.lVal = (ScriptVariant_IsTrue(svar) && ScriptVariant_IsTrue(rightChild));
 	return &retvar;
 }
 
-ScriptVariant* ScriptVariant_Eq( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Eq(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		retvar.lVal = (dbl1==dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		retvar.lVal = (dbl1 == dbl2);
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
 		retvar.lVal = !(strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal)));
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal==rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY && rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal == rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY && rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 1;
-	}
-	else
-	{
+	} else {
 		retvar.lVal = !(memcmp(svar, rightChild, sizeof(ScriptVariant)));
 	}
 
@@ -375,64 +325,42 @@ ScriptVariant* ScriptVariant_Eq( ScriptVariant* svar, ScriptVariant* rightChild 
 }
 
 
-ScriptVariant* ScriptVariant_Ne( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Ne(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		retvar.lVal = (dbl1!=dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		retvar.lVal = (dbl1 != dbl2);
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
 		retvar.lVal = strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal));
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal!=rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY && rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal != rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY && rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 0;
-	}
-	else
-	{
-		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant))!=0);
+	} else {
+		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant)) != 0);
 	}
 
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Lt( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Lt(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		retvar.lVal = (dbl1 < dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
-		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal))<0);
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal<rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
+		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal)) < 0);
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal < rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 0;
-	}
-	else
-	{
-		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant))<0);
+	} else {
+		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant)) < 0);
 	}
 
 	return &retvar;
@@ -440,32 +368,21 @@ ScriptVariant* ScriptVariant_Lt( ScriptVariant* svar, ScriptVariant* rightChild 
 
 
 
-ScriptVariant* ScriptVariant_Gt( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Gt(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		retvar.lVal = (dbl1 > dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
-		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal))>0);
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal>rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
+		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal)) > 0);
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal > rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 0;
-	}
-	else
-	{
-		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant))>0);
+	} else {
+		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant)) > 0);
 	}
 
 
@@ -474,94 +391,67 @@ ScriptVariant* ScriptVariant_Gt( ScriptVariant* svar, ScriptVariant* rightChild 
 
 
 
-ScriptVariant* ScriptVariant_Ge( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Ge(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		retvar.lVal = (dbl1 >= dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
-		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal))>=0);
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal>=rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
+		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal)) >= 0);
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal >= rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 0;
-	}
-	else
-	{
-		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant))>=0);
+	} else {
+		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant)) >= 0);
 	}
 
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Le( ScriptVariant* svar, ScriptVariant* rightChild )
-{
-	DOUBLE dbl1,dbl2;
+ScriptVariant *ScriptVariant_Le(ScriptVariant * svar, ScriptVariant * rightChild) {
+	DOUBLE dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		retvar.lVal = (dbl1 <= dbl2);
-	}
-	else if(svar->vt == VT_STR && rightChild->vt == VT_STR)
-	{
-		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal))<=0);
-	}
-	else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR)
-	{
-		retvar.lVal = (svar->ptrVal<=rightChild->ptrVal);
-	}
-	else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY)
-	{
+	} else if(svar->vt == VT_STR && rightChild->vt == VT_STR) {
+		retvar.lVal = (strcmp(StrCache_Get(svar->strVal), StrCache_Get(rightChild->strVal)) <= 0);
+	} else if(svar->vt == VT_PTR && rightChild->vt == VT_PTR) {
+		retvar.lVal = (svar->ptrVal <= rightChild->ptrVal);
+	} else if(svar->vt == VT_EMPTY || rightChild->vt == VT_EMPTY) {
 		retvar.lVal = 0;
-	}
-	else
-	{
-		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant))<=0);
+	} else {
+		retvar.lVal = (memcmp(svar, rightChild, sizeof(ScriptVariant)) <= 0);
 	}
 
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Add( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Add(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
 	static int flag = 1;
-	DOUBLE dbl1,dbl2;
-	CHAR buf[MAX_STR_VAR_LEN+1];
-	if(flag) {ScriptVariant_Init(&retvar);flag = 0;}
-	else     ScriptVariant_Clear(&retvar);
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		if(svar->vt==VT_DECIMAL || rightChild->vt==VT_DECIMAL)
-		{
+	DOUBLE dbl1, dbl2;
+	CHAR buf[MAX_STR_VAR_LEN + 1];
+	if(flag) {
+		ScriptVariant_Init(&retvar);
+		flag = 0;
+	} else
+		ScriptVariant_Clear(&retvar);
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
 			ScriptVariant_ChangeType(&retvar, VT_DECIMAL);
-			retvar.dblVal = dbl1+dbl2;
-		}
-		else
-		{
+			retvar.dblVal = dbl1 + dbl2;
+		} else {
 			ScriptVariant_ChangeType(&retvar, VT_INTEGER);
-			retvar.lVal = (LONG)(dbl1+dbl2);
+			retvar.lVal = (LONG) (dbl1 + dbl2);
 		}
-	}
-	else if(svar->vt == VT_STR || rightChild->vt == VT_STR)
-	{
+	} else if(svar->vt == VT_STR || rightChild->vt == VT_STR) {
 		ScriptVariant_ChangeType(&retvar, VT_STR);
 		StrCache_Get(retvar.strVal)[0] = 0;
 		ScriptVariant_ToString(svar, StrCache_Get(retvar.strVal));
@@ -573,100 +463,69 @@ ScriptVariant* ScriptVariant_Add( ScriptVariant* svar, ScriptVariant* rightChild
 }
 
 
-ScriptVariant* ScriptVariant_Sub( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Sub(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1,dbl2;
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		if(svar->vt==VT_DECIMAL || rightChild->vt==VT_DECIMAL)
-		{
-			retvar.vt=VT_DECIMAL;
-			retvar.dblVal = dbl1-dbl2;
+	DOUBLE dbl1, dbl2;
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
+			retvar.vt = VT_DECIMAL;
+			retvar.dblVal = dbl1 - dbl2;
+		} else {
+			retvar.vt = VT_INTEGER;
+			retvar.lVal = (LONG) (dbl1 - dbl2);
 		}
-		else
-		{
-			retvar.vt=VT_INTEGER;
-			retvar.lVal = (LONG)(dbl1-dbl2);
-		}
-	}
-	else
-	{
+	} else {
 		ScriptVariant_Init(&retvar);
 	}
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Mul( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Mul(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1,dbl2;
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		if(svar->vt==VT_DECIMAL || rightChild->vt==VT_DECIMAL)
-		{
-			retvar.vt=VT_DECIMAL;
-			retvar.dblVal = dbl1*dbl2;
+	DOUBLE dbl1, dbl2;
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
+			retvar.vt = VT_DECIMAL;
+			retvar.dblVal = dbl1 * dbl2;
+		} else {
+			retvar.vt = VT_INTEGER;
+			retvar.lVal = (LONG) (dbl1 * dbl2);
 		}
-		else
-		{
-			retvar.vt=VT_INTEGER;
-			retvar.lVal = (LONG)(dbl1*dbl2);
-		}
-	}
-	else
-	{
+	} else {
 		ScriptVariant_Init(&retvar);
 	}
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Div( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Div(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1,dbl2;
-	if(ScriptVariant_DecimalValue(svar, &dbl1)==S_OK &&
-	   ScriptVariant_DecimalValue(rightChild, &dbl2)==S_OK)
-	{
-		if(dbl2 == 0)
-		{
+	DOUBLE dbl1, dbl2;
+	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
+		if(dbl2 == 0) {
 			ScriptVariant_Init(&retvar);
+		} else if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
+			retvar.vt = VT_DECIMAL;
+			retvar.dblVal = dbl1 / dbl2;
+		} else {
+			retvar.vt = VT_INTEGER;
+			retvar.lVal = (LONG) (dbl1 / dbl2);
 		}
-		else if(svar->vt==VT_DECIMAL || rightChild->vt==VT_DECIMAL)
-		{
-			retvar.vt=VT_DECIMAL;
-			retvar.dblVal = dbl1/dbl2;
-		}
-		else
-		{
-			retvar.vt=VT_INTEGER;
-			retvar.lVal = (LONG)(dbl1/dbl2);
-		}
-	}
-	else
-	{
+	} else {
 		ScriptVariant_Init(&retvar);
 	}
 	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Mod( ScriptVariant* svar, ScriptVariant* rightChild )
-{
+ScriptVariant *ScriptVariant_Mod(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
 	LONG l1, l2;
-	if(ScriptVariant_IntegerValue(svar, &l1)==S_OK &&
-	   ScriptVariant_IntegerValue(rightChild, &l2)==S_OK)
-	{
-		retvar.vt=VT_INTEGER;
+	if(ScriptVariant_IntegerValue(svar, &l1) == S_OK && ScriptVariant_IntegerValue(rightChild, &l2) == S_OK) {
+		retvar.vt = VT_INTEGER;
 		retvar.lVal = l1 % l2;
-	}
-	else
-	{
+	} else {
 		ScriptVariant_Init(&retvar);
 	}
 	return &retvar;
@@ -675,96 +534,102 @@ ScriptVariant* ScriptVariant_Mod( ScriptVariant* svar, ScriptVariant* rightChild
 //Unary Operations
 //++i
 
-ScriptVariant* ScriptVariant_Inc_Op(ScriptVariant* svar )
-{
-   if(svar->vt == VT_DECIMAL) ++(svar->dblVal);
-   else if(svar->vt == VT_INTEGER) ++(svar->lVal);
+ScriptVariant *ScriptVariant_Inc_Op(ScriptVariant * svar) {
+	if(svar->vt == VT_DECIMAL)
+		++(svar->dblVal);
+	else if(svar->vt == VT_INTEGER)
+		++(svar->lVal);
 
-   //Send back this ScriptVariant
-   return svar;
+	//Send back this ScriptVariant
+	return svar;
 }
 
 // i++
 
-ScriptVariant* ScriptVariant_Inc_Op2(ScriptVariant* svar )
-{
-   static ScriptVariant retvar;
-   memcpy(&retvar, svar, sizeof(ScriptVariant));
+ScriptVariant *ScriptVariant_Inc_Op2(ScriptVariant * svar) {
+	static ScriptVariant retvar;
+	memcpy(&retvar, svar, sizeof(ScriptVariant));
 
-   if(svar->vt == VT_DECIMAL)      svar->dblVal++;
-   else if(svar->vt == VT_INTEGER) svar->lVal++;
-   else ScriptVariant_Init(&retvar);
+	if(svar->vt == VT_DECIMAL)
+		svar->dblVal++;
+	else if(svar->vt == VT_INTEGER)
+		svar->lVal++;
+	else
+		ScriptVariant_Init(&retvar);
 
-   return &retvar;
+	return &retvar;
 }
 
 //--i
 
-ScriptVariant* ScriptVariant_Dec_Op(ScriptVariant* svar )
-{
-   if(svar->vt == VT_DECIMAL) --(svar->dblVal);
-   else if(svar->vt == VT_INTEGER) --(svar->lVal);
+ScriptVariant *ScriptVariant_Dec_Op(ScriptVariant * svar) {
+	if(svar->vt == VT_DECIMAL)
+		--(svar->dblVal);
+	else if(svar->vt == VT_INTEGER)
+		--(svar->lVal);
 
-   //Send back this ScriptVariant
-   return svar;
+	//Send back this ScriptVariant
+	return svar;
 }
 
 // i--
 
-ScriptVariant* ScriptVariant_Dec_Op2(ScriptVariant* svar )
-{
-   static ScriptVariant retvar;
-   memcpy(&retvar, svar, sizeof(ScriptVariant));
+ScriptVariant *ScriptVariant_Dec_Op2(ScriptVariant * svar) {
+	static ScriptVariant retvar;
+	memcpy(&retvar, svar, sizeof(ScriptVariant));
 
-   if(svar->vt == VT_DECIMAL)      svar->dblVal--;
-   else if(svar->vt == VT_INTEGER) svar->lVal--;
-   else ScriptVariant_Init(&retvar);
+	if(svar->vt == VT_DECIMAL)
+		svar->dblVal--;
+	else if(svar->vt == VT_INTEGER)
+		svar->lVal--;
+	else
+		ScriptVariant_Init(&retvar);
 
-   return &retvar;
+	return &retvar;
 }
 
 //+i
 
 
-ScriptVariant* ScriptVariant_Pos( ScriptVariant* svar)
-{
-   static ScriptVariant retvar;
-   memcpy(&retvar, svar, sizeof(ScriptVariant));
+ScriptVariant *ScriptVariant_Pos(ScriptVariant * svar) {
+	static ScriptVariant retvar;
+	memcpy(&retvar, svar, sizeof(ScriptVariant));
 
-   if(svar->vt == VT_DECIMAL)      retvar.dblVal = +(svar->dblVal);
-   else if(svar->vt == VT_INTEGER) retvar.lVal = +(svar->lVal);
-   else ScriptVariant_Init(&retvar);
+	if(svar->vt == VT_DECIMAL)
+		retvar.dblVal = +(svar->dblVal);
+	else if(svar->vt == VT_INTEGER)
+		retvar.lVal = +(svar->lVal);
+	else
+		ScriptVariant_Init(&retvar);
 
-   ScriptVariant_Copy(svar, &retvar);
-   return &retvar;
+	ScriptVariant_Copy(svar, &retvar);
+	return &retvar;
 }
 
 //-i
 
-ScriptVariant* ScriptVariant_Neg( ScriptVariant* svar)
-{
-   static ScriptVariant retvar;
-   memcpy(&retvar, svar, sizeof(ScriptVariant));
+ScriptVariant *ScriptVariant_Neg(ScriptVariant * svar) {
+	static ScriptVariant retvar;
+	memcpy(&retvar, svar, sizeof(ScriptVariant));
 
-   if(svar->vt == VT_DECIMAL)      retvar.dblVal = -(svar->dblVal);
-   else if(svar->vt == VT_INTEGER) retvar.lVal = -(svar->lVal);
-   else ScriptVariant_Init(&retvar);
+	if(svar->vt == VT_DECIMAL)
+		retvar.dblVal = -(svar->dblVal);
+	else if(svar->vt == VT_INTEGER)
+		retvar.lVal = -(svar->lVal);
+	else
+		ScriptVariant_Init(&retvar);
 
-   ScriptVariant_Copy(svar, &retvar);
-   return &retvar;
+	ScriptVariant_Copy(svar, &retvar);
+	return &retvar;
 }
 
 
-ScriptVariant* ScriptVariant_Boolean_Not(ScriptVariant* svar )
-{
-   static ScriptVariant retvar;
-   retvar.vt = VT_INTEGER;
+ScriptVariant *ScriptVariant_Boolean_Not(ScriptVariant * svar) {
+	static ScriptVariant retvar;
+	retvar.vt = VT_INTEGER;
 
-   retvar.lVal = !ScriptVariant_IsTrue(svar);
+	retvar.lVal = !ScriptVariant_IsTrue(svar);
 
-   ScriptVariant_Copy(svar, &retvar);
-   return &retvar;
+	ScriptVariant_Copy(svar, &retvar);
+	return &retvar;
 }
-
-
-

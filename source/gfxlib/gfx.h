@@ -27,13 +27,14 @@
 #define  BLITTER_MOTIONBLUR	  13
 #define  BLITTER_MAX          14
 
-typedef void (*GfxBlitterTypes)(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height);
+typedef void (*GfxBlitterTypes) (u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32 dstPitch, int width,
+				 int height);
 extern GfxBlitterTypes GfxBlitters[BLITTER_MAX * 2];
-extern char* GfxBlitterNames[(BLITTER_MAX * 2) + 1];
+extern char *GfxBlitterNames[(BLITTER_MAX * 2) + 1];
 
-extern void SetMMX   (bool);
-extern bool GetMMX   ();
-extern int  Init_Gfx (u32 BitFormat, u32 ColorDepth);
-extern void Term_Gfx ();
+extern void SetMMX(bool);
+extern bool GetMMX();
+extern int Init_Gfx(u32 BitFormat, u32 ColorDepth);
+extern void Term_Gfx();
 
 #endif

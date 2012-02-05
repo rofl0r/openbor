@@ -14,23 +14,23 @@
 static unsigned lastinterval = 0;
 
 
-void borTimerInit(){}
-void borTimerExit(){}
+void borTimerInit() {
+}
+void borTimerExit() {
+}
 
-unsigned timer_getinterval(unsigned freq)
-{
-	unsigned tickspassed,ebx,blocksize,now;
-	now=SDL_GetTicks();
-	ebx=now-lastinterval;
-	blocksize=GETTIME_FREQ/freq;
-	ebx+=GETTIME_FREQ%freq;
-	tickspassed=ebx/blocksize;
-	ebx-=ebx%blocksize;
-	lastinterval+=ebx;
+unsigned timer_getinterval(unsigned freq) {
+	unsigned tickspassed, ebx, blocksize, now;
+	now = SDL_GetTicks();
+	ebx = now - lastinterval;
+	blocksize = GETTIME_FREQ / freq;
+	ebx += GETTIME_FREQ % freq;
+	tickspassed = ebx / blocksize;
+	ebx -= ebx % blocksize;
+	lastinterval += ebx;
 	return tickspassed;
 }
 
-unsigned timer_gettick()
-{
+unsigned timer_gettick() {
 	return SDL_GetTicks();
 }

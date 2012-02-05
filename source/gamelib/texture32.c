@@ -16,7 +16,8 @@ extern float _amp;
 #define distortion(x) ((int)(_sinfactors[x]*_amp+0.5))
 
 
-void texture_wavex8p32(s_screen *screen, int x, int y, int width, int height, int offsx, int offsy, s_bitmap *bitmap, int offsd, int step, unsigned* pal32){
+void texture_wavex8p32(s_screen * screen, int x, int y, int width, int height, int offsx, int offsy, s_bitmap * bitmap,
+		       int offsd, int step, unsigned *pal32) {
 
 	unsigned char *src, *sp;
 	unsigned *dest, *dp;
@@ -24,34 +25,39 @@ void texture_wavex8p32(s_screen *screen, int x, int y, int width, int height, in
 	int sy;
 	int twidth;
 	int tx;
-	unsigned* thepal = pal32?pal32:(unsigned*)bitmap->palette;
+	unsigned *thepal = pal32 ? pal32 : (unsigned *) bitmap->palette;
 
-	if(thepal==NULL) return;
+	if(thepal == NULL)
+		return;
 	// Check dimensions
-	if(x >= screen->width) return;
-	if(y >= screen->height) return;
-	if(x<0){
+	if(x >= screen->width)
+		return;
+	if(y >= screen->height)
+		return;
+	if(x < 0) {
 		width += x;
 		x = 0;
 	}
-	if(y<0){
+	if(y < 0) {
 		height += y;
-		y=0;
+		y = 0;
 	}
-	if(x+width > screen->width){
+	if(x + width > screen->width) {
 		width = screen->width - x;
 	}
-	if(y+height > screen->height){
+	if(y + height > screen->height) {
 		height = screen->height - y;
 	}
-	if(width<=0) return;
-	if(height<=0) return;
+	if(width <= 0)
+		return;
+	if(height <= 0)
+		return;
 
 	// Dest ptr
-	dest = ((unsigned*)screen->data) + ((y * screen->width) + x);
+	dest = ((unsigned *) screen->data) + ((y * screen->width) + x);
 
 	// Fill area
-	do{
+	do {
 		// Source line ptr
 		sy = offsy % bitmap->height;
 		src = bitmap->data + (sy * bitmap->width);
@@ -65,27 +71,31 @@ void texture_wavex8p32(s_screen *screen, int x, int y, int width, int height, in
 		// Copy loop
 		tx = 0;
 		twidth = bitmap->width - s;
-		if(twidth > width) twidth = width;
-		while(twidth > 0){
+		if(twidth > width)
+			twidth = width;
+		while(twidth > 0) {
 			// apply texture to 24bit screen
-			dp = dest+tx;
-			sp = src+s;
-			for(i=0; i<twidth; i++) dp[i] = thepal[sp[i]];
+			dp = dest + tx;
+			sp = src + s;
+			for(i = 0; i < twidth; i++)
+				dp[i] = thepal[sp[i]];
 			s = 0;
 			tx += twidth;
 			twidth = width - tx;
-			if(twidth > bitmap->width) twidth = bitmap->width;
+			if(twidth > bitmap->width)
+				twidth = bitmap->width;
 		}
 
 		// Advance destination line pointer
 		dest += screen->width;
-	}while(--height);
+	} while(--height);
 
 }
 
 
 
-static void draw_plane_line(unsigned *destline, unsigned char *srcline, int destlen, int srclen, int stretchto, int texture_offset, unsigned* table){
+static void draw_plane_line(unsigned *destline, unsigned char *srcline, int destlen, int srclen, int stretchto,
+			    int texture_offset, unsigned *table) {
 	int i;
 	unsigned int s, s_pos, s_step;
 	int center_offset = destlen / 2;
@@ -94,9 +104,9 @@ static void draw_plane_line(unsigned *destline, unsigned char *srcline, int dest
 	s_step = srclen * 256 / stretchto;
 	s_pos -= center_offset * s_step;
 
-	for(i=0; i<destlen; i++){
+	for(i = 0; i < destlen; i++) {
 		s = s_pos >> 8;
-		if(s > srclen){
+		if(s > srclen) {
 			s %= srclen;
 			s_pos = (s_pos & 0xFF) | (s << 8);
 		}
@@ -108,53 +118,57 @@ static void draw_plane_line(unsigned *destline, unsigned char *srcline, int dest
 
 
 // Draw a plane (like the sea)
-void texture_planex8p32(s_screen *screen, int x, int y, int width, int height, int fixp_offs, int factor, s_bitmap *bitmap, unsigned* pal32){
+void texture_planex8p32(s_screen * screen, int x, int y, int width, int height, int fixp_offs, int factor,
+			s_bitmap * bitmap, unsigned *pal32) {
 
 	int i;
 	unsigned *dest;
 	unsigned char *src;
 	int sy;
-	unsigned* thepal = pal32?pal32:(unsigned*)bitmap->palette;
+	unsigned *thepal = pal32 ? pal32 : (unsigned *) bitmap->palette;
 
-	if(!thepal) return;
+	if(!thepal)
+		return;
 
-	if(factor < 0) return;
+	if(factor < 0)
+		return;
 	factor++;
 
 	// Check dimensions
-	if(x >= screen->width) return;
-	if(y >= screen->height) return;
-	if(x<0){
+	if(x >= screen->width)
+		return;
+	if(y >= screen->height)
+		return;
+	if(x < 0) {
 		width += x;
 		x = 0;
 	}
-	if(y<0){
+	if(y < 0) {
 		height += y;
-		y=0;
+		y = 0;
 	}
-	if(x+width > screen->width){
+	if(x + width > screen->width) {
 		width = screen->width - x;
 	}
-	if(y+height > screen->height){
+	if(y + height > screen->height) {
 		height = screen->height - y;
 	}
-	if(width<=0) return;
-	if(height<=0) return;
+	if(width <= 0)
+		return;
+	if(height <= 0)
+		return;
 
 
-	dest = ((unsigned*)screen->data) + ((y*screen->width) + x);
+	dest = ((unsigned *) screen->data) + ((y * screen->width) + x);
 	sy = 0;
-	for(i=0; i<height; i++){
+	for(i = 0; i < height; i++) {
 
 		sy = i % bitmap->height;
 		src = bitmap->data + (sy * bitmap->width);
 
-		draw_plane_line(dest,src, width,bitmap->width, bitmap->width + ((bitmap->width * i) / factor), fixp_offs, thepal);
+		draw_plane_line(dest, src, width, bitmap->width, bitmap->width + ((bitmap->width * i) / factor),
+				fixp_offs, thepal);
 
 		dest += screen->width;
 	}
 }
-
-
-
-

@@ -6,7 +6,7 @@
 
 
 // Scale in 256ths
-void putsprite_scaled(int x, int y, s_sprite *frame, s_screen *screen, int scale);
+void putsprite_scaled(int x, int y, s_sprite * frame, s_screen * screen, int scale);
 
 
 #endif

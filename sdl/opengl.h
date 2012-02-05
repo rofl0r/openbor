@@ -15,10 +15,10 @@
 
 // OpenGL video functions
 int video_gl_set_mode(s_videomodes);
-int video_gl_copy_screen(s_screen*);
+int video_gl_copy_screen(s_screen *);
 void video_gl_clearscreen();
 void video_gl_fullscreen_flip();
-void video_gl_setpalette(unsigned char*);
+void video_gl_setpalette(unsigned char *);
 void video_gl_set_color_correction(int, int);
 
 #else
@@ -33,4 +33,3 @@ void video_gl_set_color_correction(int, int);
 
 #endif
 #endif
-

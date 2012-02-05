@@ -50,9 +50,8 @@ extern PFNGLUNIFORM4FARBPROC glUniform4fARB;
 // includes multitexturing, which became core in OpenGL 1.3 (2001).
 void APIENTRY glActiveTexture(GLenum texture);
 void APIENTRY glMultiTexCoord2f(GLenum texture, GLfloat s, GLfloat t);
-#endif // WIN
+#endif				// WIN
 
-#endif // LOADGL
+#endif				// LOADGL
 
-#endif // !defined(LOADGL_H)
-
+#endif				// !defined(LOADGL_H)

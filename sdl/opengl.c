@@ -28,11 +28,12 @@
 #define nextpowerof2(x) pow(2,ceil(log(x)/log(2)))
 #define abs(x)			((x<0)?-(x):(x))
 
-static SDL_Surface* screen = NULL;
-static SDL_Surface* bscreen = NULL; // FIXME: unnecessary SDL dependency; this should be an s_screen
+static SDL_Surface *screen = NULL;
+static SDL_Surface *bscreen = NULL;	// FIXME: unnecessary SDL dependency; this should be an s_screen
 
-static int textureDepths[4] = {16,16,24,32};
-static const char* glExtensions;
+static int textureDepths[4] = { 16, 16, 24, 32 };
+
+static const char *glExtensions;
 
 static float ycompress = 1.0;
 
@@ -44,16 +45,16 @@ static GLint textureInternalColorFormat;
 static GLint textureColorFormat;
 static GLint texturePixelFormat;
 
-static int viewportWidth, viewportHeight;      // dimensions of display area
-static int scaledWidth, scaledHeight;          // dimensions of game screen after scaling
-static int textureWidth, textureHeight;        // dimensions of game screen and GL texture
-static int xOffset, yOffset;                   // offset of game screen on display area
+static int viewportWidth, viewportHeight;	// dimensions of display area
+static int scaledWidth, scaledHeight;	// dimensions of game screen after scaling
+static int textureWidth, textureHeight;	// dimensions of game screen and GL texture
+static int xOffset, yOffset;	// offset of game screen on display area
 static int bytesPerPixel;
 
 #ifdef GLES
-static GLfixed tcx, tcy; // maximum x and y texture coords in fixed-point form
+static GLfixed tcx, tcy;	// maximum x and y texture coords in fixed-point form
 #else
-static GLfloat tcx, tcy; // maximum x and y texture coords in floating-point form
+static GLfloat tcx, tcy;	// maximum x and y texture coords in floating-point form
 #endif
 
 // use some variables declared in video.c that are common to both backends
@@ -75,15 +76,14 @@ extern int nativeWidth, nativeHeight;
 #endif
 
 // calculates scale factors and offsets based on viewport and texture sizes
-void video_gl_setup_screen()
-{
+void video_gl_setup_screen() {
 	// set up the viewport
 	glViewport(0, 0, viewportWidth, viewportHeight);
 
 	// set up orthographic projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, viewportWidth-1, 0, viewportHeight-1, -1, 1);
+	glOrtho(0, viewportWidth - 1, 0, viewportHeight - 1, -1, 1);
 
 	// reset the model view
 	glMatrixMode(GL_MODELVIEW);
@@ -91,8 +91,7 @@ void video_gl_setup_screen()
 }
 
 // initializes the OpenGL texture for the game screen
-void video_gl_init_textures()
-{
+void video_gl_init_textures() {
 	int allocTextureWidth, allocTextureHeight;
 	bool npotTexturesSupported;
 
@@ -107,7 +106,8 @@ void video_gl_init_textures()
 
 	// detect support for non-power-of-two texture dimensions
 #ifdef GLES
-	npotTexturesSupported = strstr(glExtensions, "GL_IMG_texture_npot") || strstr(glExtensions, "GL_OES_texture_npot");
+	npotTexturesSupported = strstr(glExtensions, "GL_IMG_texture_npot")
+	    || strstr(glExtensions, "GL_OES_texture_npot");
 #else
 	npotTexturesSupported = strstr(glExtensions, "GL_ARB_texture_non_power_of_two") ? true : false;
 #endif
@@ -121,35 +121,34 @@ void video_gl_init_textures()
 	 */
 	npotTexturesSupported = false;
 
-	if(npotTexturesSupported)
-	{
+	if(npotTexturesSupported) {
 		allocTextureWidth = textureWidth;
 		allocTextureHeight = textureHeight;
-	}
-	else
-	{
+	} else {
 		allocTextureWidth = nextpowerof2(textureWidth);
 		allocTextureHeight = nextpowerof2(textureHeight);
 	}
 
 	// calculate maximum texture coordinates
 #ifdef GLES
-	tcx = (textureWidth == 0) ? 0 : (textureWidth<<16) / allocTextureWidth;
-	tcy = (textureHeight == 0) ? 0 : (textureHeight<<16) / allocTextureHeight;
+	tcx = (textureWidth == 0) ? 0 : (textureWidth << 16) / allocTextureWidth;
+	tcy = (textureHeight == 0) ? 0 : (textureHeight << 16) / allocTextureHeight;
 #else
-	tcx = (textureWidth == 0) ? 0 : (float)textureWidth / (float)allocTextureWidth;
-	tcy = (textureHeight == 0) ? 0 : (float)textureHeight / (float)allocTextureHeight;
+	tcx = (textureWidth == 0) ? 0 : (float) textureWidth / (float) allocTextureWidth;
+	tcy = (textureHeight == 0) ? 0 : (float) textureHeight / (float) allocTextureHeight;
 #endif
 
 	// allocate a surface to initialize the texture with
-	bscreen = SDL_AllocSurface(SDL_SWSURFACE, allocTextureWidth, allocTextureHeight, textureDepths[bytesPerPixel-1], 0,0,0,0);
+	bscreen =
+	    SDL_AllocSurface(SDL_SWSURFACE, allocTextureWidth, allocTextureHeight, textureDepths[bytesPerPixel - 1], 0,
+			     0, 0, 0);
 
 	// create texture object
 	glDeleteTextures(1, &gltexture);
 	glGenTextures(1, &gltexture);
 	glBindTexture(textureTarget, gltexture);
 	glTexImage2D(textureTarget, 0, textureInternalColorFormat, allocTextureWidth,
-			allocTextureHeight, 0, textureColorFormat, texturePixelFormat, bscreen->pixels);
+		     allocTextureHeight, 0, textureColorFormat, texturePixelFormat, bscreen->pixels);
 	glTexParameter(textureTarget, GL_TEXTURE_WRAP_S, BOR_CLAMP);
 	glTexParameter(textureTarget, GL_TEXTURE_WRAP_T, BOR_CLAMP);
 
@@ -157,11 +156,11 @@ void video_gl_init_textures()
 	SDL_FreeSurface(bscreen);
 	bscreen = NULL;
 
-	if(bytesPerPixel == 1) bscreen = SDL_AllocSurface(SDL_SWSURFACE, textureWidth, textureHeight, 16, 0,0,0,0);
+	if(bytesPerPixel == 1)
+		bscreen = SDL_AllocSurface(SDL_SWSURFACE, textureWidth, textureHeight, 16, 0, 0, 0, 0);
 }
 
-int video_gl_set_mode(s_videomodes videomodes)
-{
+int video_gl_set_mode(s_videomodes videomodes) {
 	GLint maxTextureSize;
 
 	bytesPerPixel = videomodes.pixel;
@@ -169,19 +168,18 @@ int video_gl_set_mode(s_videomodes videomodes)
 	textureHeight = videomodes.vRes;
 
 	// use the current monitor resolution in fullscreen mode to prevent aspect ratio distortion
-	viewportWidth = savedata.fullscreen ? nativeWidth : (int)(videomodes.hRes * MAX(0.25,savedata.glscale));
-	viewportHeight = savedata.fullscreen ? nativeHeight : (int)(videomodes.vRes * MAX(0.25,savedata.glscale));
+	viewportWidth = savedata.fullscreen ? nativeWidth : (int) (videomodes.hRes * MAX(0.25, savedata.glscale));
+	viewportHeight = savedata.fullscreen ? nativeHeight : (int) (videomodes.vRes * MAX(0.25, savedata.glscale));
 
 	// zero width/height means close the window, not make it enormous!
-	if((viewportWidth == 0) || (viewportHeight == 0)) return 0;
+	if((viewportWidth == 0) || (viewportHeight == 0))
+		return 0;
 
 	// set up OpenGL double buffering
-	if(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0)
-	{
+	if(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0) {
 		printf("Can't set up OpenGL double buffering (%s)...", SDL_GetError());
 		goto error;
 	}
-
 	// try to disable vertical retrace syncing (VSync)
 #ifdef SDL13
 	if(SDL_GL_SetSwapInterval(0) < 0)
@@ -191,48 +189,47 @@ int video_gl_set_mode(s_videomodes videomodes)
 	{
 		printf("Warning: can't disable vertical retrace sync (%s)\n", SDL_GetError());
 	}
-
 	// free existing surfaces
 	// if(screen) SDL_FreeAndNullVideoSurface(screen);
-	if(bscreen) { SDL_FreeSurface(bscreen); bscreen=NULL; }
-
+	if(bscreen) {
+		SDL_FreeSurface(bscreen);
+		bscreen = NULL;
+	}
 	// create main video surface and initialize OpenGL context
-	screen = SDL_SetVideoMode(viewportWidth, viewportHeight, 0, savedata.fullscreen ? (SDL_OPENGL|SDL_FULLSCREEN) : SDL_OPENGL);
+	screen =
+	    SDL_SetVideoMode(viewportWidth, viewportHeight, 0,
+			     savedata.fullscreen ? (SDL_OPENGL | SDL_FULLSCREEN) : SDL_OPENGL);
 
 	// make sure the surface was created successfully
-	if(!screen)
-	{
+	if(!screen) {
 		printf("OpenGL initialization failed (%s)...", SDL_GetError());
 		goto error;
 	}
-
 	// update viewport size based on actual dimensions
 	viewportWidth = screen->w;
 	viewportHeight = screen->h;
 
 #ifdef LOADGL
 	// load OpenGL functions dynamically in Linux/Windows/OSX
-	if(LoadGLFunctions() == 0) goto error;
+	if(LoadGLFunctions() == 0)
+		goto error;
 #endif
 
 	// reject the MesaGL software renderer (swrast) because it's much slower than SDL software blitting
-	if(stricmp((const char*)glGetString(GL_RENDERER), "Software Rasterizer") == 0)
-	{
+	if(stricmp((const char *) glGetString(GL_RENDERER), "Software Rasterizer") == 0) {
 		printf("Not going to use the Mesa software renderer...");
 		goto error;
 	}
-
 	// get the list of available extensions
-	glExtensions = (const char*)glGetString(GL_EXTENSIONS);
+	glExtensions = (const char *) glGetString(GL_EXTENSIONS);
 
 	// don't try to create a texture larger than the maximum allowed dimensions
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-	if((textureWidth > maxTextureSize) || (textureHeight > maxTextureSize))
-	{
-		printf("Unable to create a %ix%i OpenGL texture (max texture size %i)...", textureWidth, textureHeight, maxTextureSize);
+	if((textureWidth > maxTextureSize) || (textureHeight > maxTextureSize)) {
+		printf("Unable to create a %ix%i OpenGL texture (max texture size %i)...", textureWidth, textureHeight,
+		       maxTextureSize);
 		goto error;
 	}
-
 	// set background to black
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -260,17 +257,18 @@ int video_gl_set_mode(s_videomodes videomodes)
 
 	opengl = 1;
 	return 1;
-error:
+	error:
 	printf("falling back on SDL video backend\n");
-	if(screen) SDL_FreeAndNullVideoSurface(screen);
-	if(bscreen) SDL_FreeAndNullVideoSurface(bscreen);
+	if(screen)
+		SDL_FreeAndNullVideoSurface(screen);
+	if(bscreen)
+		SDL_FreeAndNullVideoSurface(bscreen);
 	opengl = 0;
 	savedata.usegl = 0;
 	return 0;
 }
 
-void video_gl_clearscreen()
-{
+void video_gl_clearscreen() {
 	// clear both buffers in a double-buffered setup
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapBuffers();
@@ -278,19 +276,17 @@ void video_gl_clearscreen()
 	SDL_GL_SwapBuffers();
 }
 
-void video_gl_fullscreen_flip()
-{
+void video_gl_fullscreen_flip() {
 	savedata.fullscreen ^= 1;
 	video_set_mode(stored_videomodes);
 }
 
-void video_gl_draw_quad(int x, int y, int width, int height)
-{
+void video_gl_draw_quad(int x, int y, int width, int height) {
 #ifdef GLES
 	// OpenGL ES supports neither quads nor glBegin()/glEnd()  :(
-	GLshort box[] = {x,y,    x+width-1,y,  x+width-1,y+height-1,  x,y+height-1};
-	GLfixed tex[] = {0,tcy,  tcx,tcy,      tcx,0,                 0,0,        };
-	GLubyte indices[] = {0,1,3,2};
+	GLshort box[] = { x, y, x + width - 1, y, x + width - 1, y + height - 1, x, y + height - 1 };
+	GLfixed tex[] = { 0, tcy, tcx, tcy, tcx, 0, 0, 0, };
+	GLubyte indices[] = { 0, 1, 3, 2 };
 
 	glActiveTexture(GL_TEXTURE0);
 	glTexCoordPointer(2, GL_FIXED, 0, tex);
@@ -300,66 +296,68 @@ void video_gl_draw_quad(int x, int y, int width, int height)
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 #else
 	glBegin(GL_QUADS);
-		// Top left
-		glMultiTexCoord2f(GL_TEXTURE0, 0.0, tcy);
-		glMultiTexCoord2f(GL_TEXTURE1, 0.0, tcy);
-		glVertex2i(x, y);
+	// Top left
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0, tcy);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0, tcy);
+	glVertex2i(x, y);
 
-		// Top right
-		glMultiTexCoord2f(GL_TEXTURE0, tcx, tcy);
-		glMultiTexCoord2f(GL_TEXTURE1, tcx, tcy);
-		glVertex2i(x+width-1, y);
+	// Top right
+	glMultiTexCoord2f(GL_TEXTURE0, tcx, tcy);
+	glMultiTexCoord2f(GL_TEXTURE1, tcx, tcy);
+	glVertex2i(x + width - 1, y);
 
-		// Bottom right
-		glMultiTexCoord2f(GL_TEXTURE0, tcx, 0.0);
-		glMultiTexCoord2f(GL_TEXTURE1, tcx, 0.0);
-		glVertex2i(x+width-1, y+height-1);
+	// Bottom right
+	glMultiTexCoord2f(GL_TEXTURE0, tcx, 0.0);
+	glMultiTexCoord2f(GL_TEXTURE1, tcx, 0.0);
+	glVertex2i(x + width - 1, y + height - 1);
 
-		// Bottom left
-		glMultiTexCoord2f(GL_TEXTURE0, 0.0, 0.0);
-		glMultiTexCoord2f(GL_TEXTURE1, 0.0, 0.0);
-		glVertex2i(x, y+height-1);
+	// Bottom left
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0, 0.0);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0, 0.0);
+	glVertex2i(x, y + height - 1);
 	glEnd();
 #endif
 }
 
-int video_gl_copy_screen(s_screen* src)
-{
+int video_gl_copy_screen(s_screen * src) {
 	unsigned char *sp;
 	unsigned char *dp;
 	int width, height, linew, slinew;
 	int h;
 	float texScale;
-	SDL_Surface* ds = NULL;
+	SDL_Surface *ds = NULL;
 
 	// Convert 8-bit s_screen to a 16-bit SDL_Surface
-	if(bscreen)
-	{
-		if(SDL_MUSTLOCK(bscreen)) SDL_LockSurface(bscreen);
+	if(bscreen) {
+		if(SDL_MUSTLOCK(bscreen))
+			SDL_LockSurface(bscreen);
 
 		width = bscreen->w;
-		if(width > src->width) width = src->width;
+		if(width > src->width)
+			width = src->width;
 		height = bscreen->h;
-		if(height > src->height) height = src->height;
-		if(!width || !height) return 0;
+		if(height > src->height)
+			height = src->height;
+		if(!width || !height)
+			return 0;
 		h = height;
 
-		sp = (unsigned char*)src->data;
+		sp = (unsigned char *) src->data;
 		ds = bscreen;
 		dp = ds->pixels;
 
-		linew = width*bytesPerPixel;
-		slinew = src->width*bytesPerPixel;
+		linew = width * bytesPerPixel;
+		slinew = src->width * bytesPerPixel;
 
-		do{
-			u16pcpy((unsigned short*)dp, sp, glpalette, linew);
+		do {
+			u16pcpy((unsigned short *) dp, sp, glpalette, linew);
 			sp += slinew;
 			dp += ds->pitch;
-		}while(--h);
+		} while(--h);
 
-		if(SDL_MUSTLOCK(bscreen)) SDL_UnlockSurface(bscreen);
+		if(SDL_MUSTLOCK(bscreen))
+			SDL_UnlockSurface(bscreen);
 	}
-
 	// update texture contents with new surface contents
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(textureTarget, gltexture);
@@ -367,24 +365,21 @@ int video_gl_copy_screen(s_screen* src)
 			texturePixelFormat, bscreen ? bscreen->pixels : src->data);
 
 	// determine x and y scale factors
-	texScale = MIN((float)viewportWidth/(float)textureWidth, (float)viewportHeight/(float)textureHeight);
+	texScale = MIN((float) viewportWidth / (float) textureWidth, (float) viewportHeight / (float) textureHeight);
 
 	// determine on-screen dimensions
-	scaledWidth = (int)(textureWidth * texScale);
-	scaledHeight = (int)(textureHeight * texScale) * ycompress;
+	scaledWidth = (int) (textureWidth * texScale);
+	scaledHeight = (int) (textureHeight * texScale) * ycompress;
 
 	// determine offsets
 	xOffset = (viewportWidth - scaledWidth) / 2;
 	yOffset = (viewportHeight - scaledHeight) / 2;
 
 	// set texture scaling type
-	if((savedata.glfilter && !savedata.fullscreen) || (textureWidth == (stretch ? viewportWidth : scaledWidth)))
-	{
+	if((savedata.glfilter && !savedata.fullscreen) || (textureWidth == (stretch ? viewportWidth : scaledWidth))) {
 		glTexParameter(textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameter(textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-	else
-	{
+	} else {
 		glTexParameter(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameter(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
@@ -404,25 +399,26 @@ int video_gl_copy_screen(s_screen* src)
 	return 1;
 }
 
-void video_gl_setpalette(unsigned char* pal)
-{
+void video_gl_setpalette(unsigned char *pal) {
 	int i;
-	for(i=0; i<256; i++)
-	{
+	for(i = 0; i < 256; i++) {
 		glpalette[i] = colour16(pal[0], pal[1], pal[2]);
 		pal += 3;
 	}
 }
 
 // Set the brightness and gamma values
-void video_gl_set_color_correction(int gamma, int brightness)
-{
+void video_gl_set_color_correction(int gamma, int brightness) {
 	int numTexEnvStages = 0;
 
-	if(gamma < -256) gamma = -256;
-	if(gamma > 256) gamma = 256;
-	if(brightness < -256) brightness = -256;
-	if(brightness > 256) brightness = 256;
+	if(gamma < -256)
+		gamma = -256;
+	if(gamma > 256)
+		gamma = 256;
+	if(brightness < -256)
+		brightness = -256;
+	if(brightness > 256)
+		brightness = 256;
 	glColor4f(abs(gamma / 256.0), abs(gamma / 256.0), abs(gamma / 256.0), abs(brightness / 256.0));
 
 #if GLES
@@ -431,15 +427,14 @@ void video_gl_set_color_correction(int gamma, int brightness)
 	if(strstr(glExtensions, "GL_ARB_texture_env_combine"))
 #endif
 	{
-		if(gamma > 0)
-		{
+		if(gamma > 0) {
 			numTexEnvStages = 3;
 
 			// first stage: c*g
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(textureTarget, gltexture);
 			glEnable(textureTarget);
-		    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
@@ -450,7 +445,7 @@ void video_gl_set_color_correction(int gamma, int brightness)
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(textureTarget, gltexture);
 			glEnable(textureTarget);
-		    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
@@ -465,16 +460,14 @@ void video_gl_set_color_correction(int gamma, int brightness)
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_PREVIOUS);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
-		}
-		else if(gamma < 0)
-		{
+		} else if(gamma < 0) {
 			numTexEnvStages = 2;
 
 			// first stage: (1.0-c)*g
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(textureTarget, gltexture);
 			glEnable(textureTarget);
-		    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
@@ -485,7 +478,7 @@ void video_gl_set_color_correction(int gamma, int brightness)
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(textureTarget, gltexture);
 			glEnable(textureTarget);
-		    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
@@ -496,8 +489,7 @@ void video_gl_set_color_correction(int gamma, int brightness)
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(textureTarget, 0);
 			glDisable(textureTarget);
-		}
-		else // gamma == 0 -> no gamma correction
+		} else		// gamma == 0 -> no gamma correction
 		{
 			numTexEnvStages = 0;
 
@@ -505,7 +497,7 @@ void video_gl_set_color_correction(int gamma, int brightness)
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(textureTarget, gltexture);
 			glEnable(textureTarget);
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 			// second stage: disabled
 			glActiveTexture(GL_TEXTURE1);
@@ -519,11 +511,10 @@ void video_gl_set_color_correction(int gamma, int brightness)
 		}
 	}
 
-	if(brightness)
-	{
+	if(brightness) {
 		// brightness correction
-		GLfloat blendColor = brightness > 0 ? 1.0 : 0.0; // white (positive brightess) or black (0 or negative)
-		GLfloat rgba[4] = {blendColor, blendColor, blendColor, 1.0};
+		GLfloat blendColor = brightness > 0 ? 1.0 : 0.0;	// white (positive brightess) or black (0 or negative)
+		GLfloat rgba[4] = { blendColor, blendColor, blendColor, 1.0 };
 
 		glActiveTexture(GL_TEXTURE0 + numTexEnvStages);
 		glBindTexture(textureTarget, gltexture);
@@ -538,8 +529,5 @@ void video_gl_set_color_correction(int gamma, int brightness)
 		glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_PRIMARY_COLOR);
 		glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_ONE_MINUS_SRC_ALPHA);
 	}
-
 	//fprintf(stderr, "set brightness=%d and gamma=%d in %d texenv stages\n", brightness, gamma, numTexEnvStages + 1);
 }
-
-

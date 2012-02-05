@@ -19,8 +19,8 @@ typedef struct {
 
 // makes a solidlist from a list
 // side effects: List_Clear will be called on the List.
-SolidList* SolidListFromList(List* list);
+SolidList *SolidListFromList(List * list);
 
-void freeSolidList(SolidList* s);
+void freeSolidList(SolidList * s);
 
 #endif

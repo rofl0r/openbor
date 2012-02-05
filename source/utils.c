@@ -61,12 +61,13 @@
 #define COPY_PAKS_PATH(buf, name) strncpy(buf, "./Paks/", 7); strncat(buf, name, strlen(name));
 #endif
 
-void debugBuf(unsigned char* buf, size_t size, int columns) {
+void debugBuf(unsigned char *buf, size_t size, int columns) {
 	size_t pos = 0;
 	int i;
-	while(pos<size) {
-		for(i=0;i<columns;i++) {
-			if(pos >= size) break;
+	while(pos < size) {
+		for(i = 0; i < columns; i++) {
+			if(pos >= size)
+				break;
 			printf("%02x", buf[pos]);
 			pos++;
 		}
@@ -75,31 +76,31 @@ void debugBuf(unsigned char* buf, size_t size, int columns) {
 }
 
 //lowercases a buffer inplace
-void lc(char* buf, size_t size) {
+void lc(char *buf, size_t size) {
 	ptrdiff_t i;
-	for(i=0;i<size;i++)
-		buf[i] = tolower((int)buf[i]);
+	for(i = 0; i < size; i++)
+		buf[i] = tolower((int) buf[i]);
 }
 
 // returns position after next newline in buf
-size_t getNewLineStart(char* buf) {
+size_t getNewLineStart(char *buf) {
 	size_t res = 0;
-	while(buf[res] && buf[res]!='\n' && buf[res]!='\r') ++res;
-	while(buf[res] && (buf[res]=='\n' || buf[res]=='\r')) ++res;
+	while(buf[res] && buf[res] != '\n' && buf[res] != '\r')
+		++res;
+	while(buf[res] && (buf[res] == '\n' || buf[res] == '\r'))
+		++res;
 	return res;
 }
 
-FILE* openborLog = NULL;
-FILE* scriptLog = NULL;
+FILE *openborLog = NULL;
+FILE *scriptLog = NULL;
 char debug_msg[2048];
 unsigned long debug_time = 0xFFFFFFFF;
 
-void getBasePath(char *newName, char *name, int type)
-{
+void getBasePath(char *newName, char *name, int type) {
 #ifndef DC
-	char buf[128] = {""};
-	switch(type)
-	{
+	char buf[128] = { "" };
+	switch (type) {
 		case 0:
 			COPY_ROOT_PATH(buf, name);
 			break;
@@ -116,26 +117,24 @@ void getBasePath(char *newName, char *name, int type)
 
 
 #ifndef DC
-int dirExists(char *dname, int create)
-{
-	char realName[128] = {""};
+int dirExists(char *dname, int create) {
+	char realName[128] = { "" };
 #ifdef XBOX
 	getBasePath(realName, dname, 0);
 	return CreateDirectory(realName, NULL);
 #else
-	DIR	*fd1 = NULL;
-	int  fd2 = -1;
+	DIR *fd1 = NULL;
+	int fd2 = -1;
 	strncpy(realName, dname, 128);
 	fd1 = opendir(realName);
-	if(fd1 != NULL)
-	{
+	if(fd1 != NULL) {
 		closedir(fd1);
 		return 1;
 	}
-	if(create)
-	{
+	if(create) {
 		fd2 = MKDIR(realName);
-		if(fd2 < 0) return 0;
+		if(fd2 < 0)
+			return 0;
 #ifdef DARWIN
 		chmod(realName, 0777);
 #endif
@@ -145,30 +144,32 @@ int dirExists(char *dname, int create)
 	return 0;
 }
 
-int fileExists(char *fnam)
-{
+int fileExists(char *fnam) {
 	FILE *handle = NULL;
-	if((handle=fopen(fnam,"rb")) == NULL) return 0;
+	if((handle = fopen(fnam, "rb")) == NULL)
+		return 0;
 	fclose(handle);
 	return 1;
 }
 
-stringptr* readFromLogFile(int which)
-{
-	long  size;
+stringptr *readFromLogFile(int which) {
+	long size;
 	int disCcWarns;
-	FILE* handle = NULL;
-	stringptr* buffer = NULL;
+	FILE *handle = NULL;
+	stringptr *buffer = NULL;
 	handle = READ_LOGFILE((which ? OPENBOR_LOG : SCRIPT_LOG));
-	if(handle == NULL) return NULL;
+	if(handle == NULL)
+		return NULL;
 	fseek(handle, 0, SEEK_END);
 	size = ftell(handle);
 	rewind(handle);
-	if (size == 0) goto CLOSE_AND_QUIT;
+	if(size == 0)
+		goto CLOSE_AND_QUIT;
 	// allocate memory to contain the whole file:
 	//buffer = (char*)malloc(sizeof(char)*(size+1)); // alloc one additional byte for the
 	buffer = new_string(size);
-	if(buffer == NULL) goto CLOSE_AND_QUIT;
+	if(buffer == NULL)
+		goto CLOSE_AND_QUIT;
 	disCcWarns = fread(buffer->ptr, 1, size, handle);
 	CLOSE_AND_QUIT:
 	fclose(handle);
@@ -176,8 +177,7 @@ stringptr* readFromLogFile(int which)
 }
 #endif
 
-void writeToLogFile(const char * msg, ...)
-{
+void writeToLogFile(const char *msg, ...) {
 	va_list arglist;
 
 #ifdef DC
@@ -186,10 +186,10 @@ void writeToLogFile(const char * msg, ...)
 	va_end(arglist);
 	fflush(stdout);
 #else
-	if(openborLog == NULL)
-	{
+	if(openborLog == NULL) {
 		openborLog = OPEN_LOGFILE(OPENBOR_LOG);
-		if(openborLog == NULL) return;
+		if(openborLog == NULL)
+			return;
 	}
 	va_start(arglist, msg);
 	vfprintf(openborLog, msg, arglist);
@@ -198,15 +198,14 @@ void writeToLogFile(const char * msg, ...)
 #endif
 }
 
-void writeToScriptLog(const char *msg)
-{
+void writeToScriptLog(const char *msg) {
 #ifndef DC
 	int disCcWarns;
 
-	if(scriptLog == NULL)
-	{
+	if(scriptLog == NULL) {
 		scriptLog = OPEN_LOGFILE(SCRIPT_LOG);
-		if(scriptLog == NULL) return;
+		if(scriptLog == NULL)
+			return;
 	}
 
 	disCcWarns = fwrite(msg, 1, strlen(msg), scriptLog);
@@ -214,7 +213,7 @@ void writeToScriptLog(const char *msg)
 #endif
 }
 
-void debug_printf(char *format, ...){
+void debug_printf(char *format, ...) {
 	va_list arglist;
 
 	va_start(arglist, format);
@@ -224,80 +223,80 @@ void debug_printf(char *format, ...){
 	debug_time = 0xFFFFFFFF;
 }
 
-void getPakName(char name[256], int type){
+void getPakName(char name[256], int type) {
 
-	int i,x,y;
-	char mod[256] = {""};
+	int i, x, y;
+	char mod[256] = { "" };
 
-	strncpy(mod,packfile,strlen(packfile)-4);
+	strncpy(mod, packfile, strlen(packfile) - 4);
 
-	switch(type){
+	switch (type) {
 		case 0:
-			strncat(mod,".sav",4);
+			strncat(mod, ".sav", 4);
 			break;
 		case 1:
-			strncat(mod,".hi",3);
+			strncat(mod, ".hi", 3);
 			break;
 		case 2:
-			strncat(mod,".scr",4);
+			strncat(mod, ".scr", 4);
 			break;
 		case 3:
-			strncat(mod,".inp",4);
+			strncat(mod, ".inp", 4);
 			break;
 		case 4:
-			strncat(mod,".cfg",4);
+			strncat(mod, ".cfg", 4);
 			break;
 		default:
 			// Loose extension!
 			break;
 	}
 
-	x=0;
-	for(i=0; i<(int)strlen(mod); i++){
-		if((mod[i] == '/') || (mod[i] == '\\')) x = i;
+	x = 0;
+	for(i = 0; i < (int) strlen(mod); i++) {
+		if((mod[i] == '/') || (mod[i] == '\\'))
+			x = i;
 	}
-	y=0;
-	for(i=0; i<(int)strlen(mod); i++){
+	y = 0;
+	for(i = 0; i < (int) strlen(mod); i++) {
 		// For packfiles without '/'
-		if(x == 0){
+		if(x == 0) {
 			name[y] = mod[i];
 			y++;
 		}
 		// For packfiles with '/'
-		if(x != 0 && i > x){
+		if(x != 0 && i > x) {
 			name[y] = mod[i];
 			y++;
 		}
 	}
 }
 
-void screenshot(s_screen *vscreen, unsigned char *pal, int ingame){
-	int	 shotnum = 0;
-	char shotname[128] = {""};
-	char modname[128]  = {""};
+void screenshot(s_screen * vscreen, unsigned char *pal, int ingame) {
+	int shotnum = 0;
+	char shotname[128] = { "" };
+	char modname[128] = { "" };
 
-	getPakName(modname,99);
-		do{
-			sprintf(shotname, "./ScreenShots/%s - %04u.png", modname, shotnum);
-			++shotnum;
-		} while(fileExists(shotname) && shotnum<100);
+	getPakName(modname, 99);
+	do {
+		sprintf(shotname, "./ScreenShots/%s - %04u.png", modname, shotnum);
+		++shotnum;
+	} while(fileExists(shotname) && shotnum < 100);
 
-		if(shotnum<10000) savepng(shotname, vscreen, pal);
-		if(ingame) debug_printf("Saved %s", shotname);
+	if(shotnum < 10000)
+		savepng(shotname, vscreen, pal);
+	if(ingame)
+		debug_printf("Saved %s", shotname);
 }
 
-unsigned readlsb32(const unsigned char *src)
-{
+unsigned readlsb32(const unsigned char *src) {
 	return
-		((((unsigned)(src[0])) & 0xFF) <<  0) |
-		((((unsigned)(src[1])) & 0xFF) <<  8) |
-		((((unsigned)(src[2])) & 0xFF) << 16) |
-		((((unsigned)(src[3])) & 0xFF) << 24);
+	    ((((unsigned) (src[0])) & 0xFF) << 0) |
+	    ((((unsigned) (src[1])) & 0xFF) << 8) |
+	    ((((unsigned) (src[2])) & 0xFF) << 16) | ((((unsigned) (src[3])) & 0xFF) << 24);
 }
 
 // Optimized search in an arranged string table, return the index
-int searchList(const char* list[], const char* value, int length)
-{
+int searchList(const char *list[], const char *value, int length) {
 	int i;
 	int a = 0;
 	int b = length / 2;
@@ -307,54 +306,55 @@ int searchList(const char* list[], const char* value, int length)
 	// We must convert uppercase values to lowercase,
 	// since this is how every command is written in
 	// our source.  Refer to an ASCII Chart
-	if(v >= 0x41 && v <= 0x5A) v += 0x20;
+	if(v >= 0x41 && v <= 0x5A)
+		v += 0x20;
 
 	// Index value equals middle value,
 	// Lets search starting from center.
-	if(v == list[b][0])
-	{
-		if(stricmp(list[b], value) == 0) return b;
+	if(v == list[b][0]) {
+		if(stricmp(list[b], value) == 0)
+			return b;
 
 		// Search Down the List.
-		if(v == list[b-1][0])
-		{
-			for(i=b-1 ; i>=0; i--)
-			{
-				if(stricmp(list[i], value) == 0) return i;
-				if(v != list[i-1][0]) break;
+		if(v == list[b - 1][0]) {
+			for(i = b - 1; i >= 0; i--) {
+				if(stricmp(list[i], value) == 0)
+					return i;
+				if(v != list[i - 1][0])
+					break;
 			}
 		}
-
 		// Search Up the List.
-		if(v == list[b+1][0])
-		{
-			for(i=b+1; i<length; i++)
-			{
-				if(stricmp(list[i], value) == 0) return i;
-				if(v != list[i+1][0]) break;
+		if(v == list[b + 1][0]) {
+			for(i = b + 1; i < length; i++) {
+				if(stricmp(list[i], value) == 0)
+					return i;
+				if(v != list[i + 1][0])
+					break;
 			}
 		}
-
 		// No match, return failure.
 		goto searchListFailed;
 	}
-
 	// Define the starting point.
-	if(v >= list[b+1][0]) a = b+1;
-	else if(v <= list[b-1][0]) c = b-1;
-	else goto searchListFailed;
+	if(v >= list[b + 1][0])
+		a = b + 1;
+	else if(v <= list[b - 1][0])
+		c = b - 1;
+	else
+		goto searchListFailed;
 
 	// Search Up from starting point.
-	for(i=a; i<=c; i++)
-	{
-		if(v == list[i][0])
-		{
-			if(stricmp(list[i], value) == 0) return i;
-			if(v != list[i+1][0]) break;
+	for(i = a; i <= c; i++) {
+		if(v == list[i][0]) {
+			if(stricmp(list[i], value) == 0)
+				return i;
+			if(v != list[i + 1][0])
+				break;
 		}
 	}
 
-searchListFailed:
+	searchListFailed:
 
 	// The search failed!
 	// On five reasons for failure!
@@ -366,20 +366,16 @@ searchListFailed:
 	return -1;
 }
 
-char *commaprint(u64 n)
-{
+char *commaprint(u64 n) {
 	static int comma = '\0';
 	static char retbuf[30];
-	char *p = &retbuf[sizeof(retbuf)-1];
+	char *p = &retbuf[sizeof(retbuf) - 1];
 	int i = 0;
 
-	if(comma == '\0')
-	{
+	if(comma == '\0') {
 		struct lconv *lcp = localeconv();
-		if(lcp != NULL)
-		{
-			if(lcp->thousands_sep != NULL &&
-			   *lcp->thousands_sep != '\0')
+		if(lcp != NULL) {
+			if(lcp->thousands_sep != NULL && *lcp->thousands_sep != '\0')
 				comma = *lcp->thousands_sep;
 			else
 				comma = ',';
@@ -389,7 +385,7 @@ char *commaprint(u64 n)
 	*p = '\0';
 
 	do {
-		if(i%3 == 0 && i != 0)
+		if(i % 3 == 0 && i != 0)
 			*--p = comma;
 		*--p = '0' + n % 10;
 		n /= 10;
@@ -410,33 +406,26 @@ char *commaprint(u64 n)
 	\param curr_size_allocated : current allocated size to the array (in BYTE)
 	\param grow_step : bloc size of expansion of the array (in BYTE)
 */
-void
-Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_size_allocated, int grow_step )
-{
+void Array_Check_Size(const char *f_caller, char **array, int new_size, int *curr_size_allocated, int grow_step) {
 	// Deallocation
-	if( new_size <= 0 )
-	{
-		if( *array != NULL )
-		{
+	if(new_size <= 0) {
+		if(*array != NULL) {
 			free(*array);
 			*array = NULL;
 		}
 		*curr_size_allocated = 0;
 	}
-
 	// First allocation
-	else if( *array == NULL )
-	{
+	else if(*array == NULL) {
 		*curr_size_allocated = grow_step;
-		*array = malloc(*curr_size_allocated );
-		if( *array == NULL)
+		*array = malloc(*curr_size_allocated);
+		if(*array == NULL)
 			shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
-		memset( *array, 0, *curr_size_allocated );
+		memset(*array, 0, *curr_size_allocated);
 		return;
 	}
-
 	// No need to decrease or increase the array
-	else if( new_size > (*curr_size_allocated - grow_step ) && new_size <= *curr_size_allocated )
+	else if(new_size > (*curr_size_allocated - grow_step) && new_size <= *curr_size_allocated)
 		return;
 
 	//-------------------------------------------
@@ -445,19 +434,19 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 	int old_size = *curr_size_allocated;
 
 	// Recompute needed size
-	*curr_size_allocated = ((int)ceil((float)new_size / (float)grow_step)) * grow_step;
+	*curr_size_allocated = ((int) ceil((float) new_size / (float) grow_step)) * grow_step;
 
 	// Alloc a new array
-	void* copy = malloc(*curr_size_allocated );
+	void *copy = malloc(*curr_size_allocated);
 	if(copy == NULL)
 		shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
 
 	// Copy the previous content of the array
-	memcpy(copy, *array, ( (old_size<new_size) ?old_size :new_size) );
+	memcpy(copy, *array, ((old_size < new_size) ? old_size : new_size));
 
 	// Init the new allocations
-	if( old_size < *curr_size_allocated )
-		memset( copy + old_size, 0, *curr_size_allocated - old_size );
+	if(old_size < *curr_size_allocated)
+		memset(copy + old_size, 0, *curr_size_allocated - old_size);
 
 	// Free previous array memory
 	free(*array);
@@ -465,4 +454,3 @@ Array_Check_Size( const char* f_caller, char** array, int new_size, int* curr_si
 	// ReAssign the new allocated array
 	*array = copy;
 }
-

@@ -21,24 +21,25 @@
 #define		FONT_LAYER		0x0FFFFFFF
 
 
-typedef struct{
-	s_sprite *	token[256];
-	int		token_width[256];
-	int		font_loaded;
-}s_font;
+typedef struct {
+	s_sprite *token[256];
+	int token_width[256];
+	int font_loaded;
+} s_font;
 
 s_font fonts[MAX_FONTS];
 
 int font_heights[MAX_FONTS];
 int font_monowidths[MAX_FONTS];
 
-void font_unload(int which){
+void font_unload(int which) {
 	int i;
 
 	which %= MAX_FONTS;
 
-	for(i=0; i<256; i++){
-		if(fonts[which].token[i] != NULL) free(fonts[which].token[i]);
+	for(i = 0; i < 256; i++) {
+		if(fonts[which].token[i] != NULL)
+			free(fonts[which].token[i]);
 		fonts[which].token[i] = NULL;
 	}
 	fonts[which].font_loaded = 0;
@@ -46,7 +47,7 @@ void font_unload(int which){
 
 
 
-int font_load(int which, char *filename, char *packfile, int monospace){
+int font_load(int which, char *filename, char *packfile, int monospace) {
 	int x, y;
 	int index = 0;
 	int size;
@@ -60,33 +61,37 @@ int font_load(int which, char *filename, char *packfile, int monospace){
 
 	font_unload(which);
 
-	if(!loadscreen(filename, packfile, NULL, pixelformat, &screen)) goto err;
-	font_monowidths[which] = tw = screen->width/16;
-	font_heights[which] = th = screen->height/16;
-	if(!(bitmap = allocbitmap(tw,th,pixelformat))) goto err;
+	if(!loadscreen(filename, packfile, NULL, pixelformat, &screen))
+		goto err;
+	font_monowidths[which] = tw = screen->width / 16;
+	font_heights[which] = th = screen->height / 16;
+	if(!(bitmap = allocbitmap(tw, th, pixelformat)))
+		goto err;
 
 	if(bitmap->palette && screen->palette)
 		memcpy(bitmap->palette, screen->palette, PAL_BYTES);
 
 	// grab tokens
-	for(y=0; y<16; y++){
-		for(x=0; x<16; x++){
-			getbitmap(x*tw, y*th, tw,th, bitmap, screen);
+	for(y = 0; y < 16; y++) {
+		for(x = 0; x < 16; x++) {
+			getbitmap(x * tw, y * th, tw, th, bitmap, screen);
 			clipbitmap(bitmap, &cx, NULL, &cy, NULL);
-			if(index>0)  bitmap->palette=NULL;
+			if(index > 0)
+				bitmap->palette = NULL;
 			size = fakey_encodesprite(bitmap);
-			fonts[which].token[index] = (s_sprite*)malloc(size);
-			if(!fonts[which].token[index]){
+			fonts[which].token[index] = (s_sprite *) malloc(size);
+			if(!fonts[which].token[index]) {
 				font_unload(which);
 				goto err;
 			}
-			encodesprite(-cx,-cy, bitmap, fonts[which].token[index]);
-			fonts[which].token_width[index] = monospace?tw:(fonts[which].token[index]->width+(tw/10));
-			if(fonts[which].token_width[index] <= 1) fonts[which].token_width[index] = tw/3;
-			if(index>0)
-			{
-				fonts[which].token[index]->palette = fonts[which].token[0]->palette ;
-				fonts[which].token[index]->pixelformat = screen->pixelformat ;
+			encodesprite(-cx, -cy, bitmap, fonts[which].token[index]);
+			fonts[which].token_width[index] =
+			    monospace ? tw : (fonts[which].token[index]->width + (tw / 10));
+			if(fonts[which].token_width[index] <= 1)
+				fonts[which].token_width[index] = tw / 3;
+			if(index > 0) {
+				fonts[which].token[index]->palette = fonts[which].token[0]->palette;
+				fonts[which].token[index]->pixelformat = screen->pixelformat;
 			}
 			++index;
 		}
@@ -95,7 +100,7 @@ int font_load(int which, char *filename, char *packfile, int monospace){
 	rval = 1;
 	fonts[which].font_loaded = 1;
 
-err:
+	err:
 	freebitmap(bitmap);
 	freescreen(&screen);
 
@@ -104,86 +109,84 @@ err:
 
 static char b[1024];
 
-int font_string_width(int which, char* format, ...)
-{
-	int w=0;
-	char * buf = b;
+int font_string_width(int which, char *format, ...) {
+	int w = 0;
+	char *buf = b;
 	va_list arglist;
 
 	which %= MAX_FONTS;
 
-	if(!fonts[which].font_loaded || !format) return 0;
+	if(!fonts[which].font_loaded || !format)
+		return 0;
 
 	va_start(arglist, format);
 	vsprintf(buf, format, arglist);
 	va_end(arglist);
 
-	while(*buf)
-	{
-	    w += fonts[which].token_width[((int)(*buf)) & 0xFF];
-	    buf++;
+	while(*buf) {
+		w += fonts[which].token_width[((int) (*buf)) & 0xFF];
+		buf++;
 	}
 	return w;
 }
 
-void font_printf(int x, int y, int which, int layeroffset,char *format, ...){
-	char * buf = b;
+void font_printf(int x, int y, int which, int layeroffset, char *format, ...) {
+	char *buf = b;
 	va_list arglist;
 
 	which %= MAX_FONTS;
 
-	if(!fonts[which].font_loaded) return;
+	if(!fonts[which].font_loaded)
+		return;
 
 	va_start(arglist, format);
 	vsprintf(buf, format, arglist);
 	va_end(arglist);
 
-	while(*buf){
-		spriteq_add_frame(x,y, FONT_LAYER + layeroffset, fonts[which].token[((int)(*buf)) & 0xFF], NULL, 0);
-		x += fonts[which].token_width[((int)(*buf)) & 0xFF];
+	while(*buf) {
+		spriteq_add_frame(x, y, FONT_LAYER + layeroffset, fonts[which].token[((int) (*buf)) & 0xFF], NULL, 0);
+		x += fonts[which].token_width[((int) (*buf)) & 0xFF];
 		buf++;
 	}
 }
 
 
 // Print to a screen rather than queueing the sprites
-void screen_printf(s_screen * screen, int x, int y, int which, char *format, ...){
-	char * buf = b;
+void screen_printf(s_screen * screen, int x, int y, int which, char *format, ...) {
+	char *buf = b;
 	va_list arglist;
 	int ox = x;
 
 	which %= MAX_FONTS;
 
-	if(!fonts[which].font_loaded) return;
+	if(!fonts[which].font_loaded)
+		return;
 
 	va_start(arglist, format);
 	vsprintf(buf, format, arglist);
 	va_end(arglist);
 
-	while(*buf){
-		if(*buf>=32)
-		{
-			switch(screen->pixelformat)
-			{
-			case PIXEL_8:
-				putsprite_8(x, y, 0, fonts[which].token[((int)(*buf)) & 0xFF], screen, NULL, NULL);
-				break;
-			case PIXEL_16:
-				putsprite_x8p16(x, y, 0, fonts[which].token[((int)(*buf)) & 0xFF], screen, NULL, NULL);
-				break;
-			case PIXEL_32:
-				putsprite_x8p32(x, y, 0, fonts[which].token[((int)(*buf)) & 0xFF], screen, NULL, NULL);
-				break;
+	while(*buf) {
+		if(*buf >= 32) {
+			switch (screen->pixelformat) {
+				case PIXEL_8:
+					putsprite_8(x, y, 0, fonts[which].token[((int) (*buf)) & 0xFF], screen, NULL,
+						    NULL);
+					break;
+				case PIXEL_16:
+					putsprite_x8p16(x, y, 0, fonts[which].token[((int) (*buf)) & 0xFF], screen,
+							NULL, NULL);
+					break;
+				case PIXEL_32:
+					putsprite_x8p32(x, y, 0, fonts[which].token[((int) (*buf)) & 0xFF], screen,
+							NULL, NULL);
+					break;
 			}
-			x += fonts[which].token_width[((int)(*buf)) & 0xFF];
-		}
-		else if(*buf=='\n'){
+			x += fonts[which].token_width[((int) (*buf)) & 0xFF];
+		} else if(*buf == '\n') {
 			x = ox;
 			y += 10;
 		}
 		buf++;
 	}
 }
-
-
-

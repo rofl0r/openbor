@@ -8,28 +8,24 @@
 
 #include "Stack.h"
 
-void Stack_Push( Stack* stack, void* e)
-{
-  List_Reset(stack);
-  List_InsertBefore(stack, e, NULL );
+void Stack_Push(Stack * stack, void *e) {
+	List_Reset(stack);
+	List_InsertBefore(stack, e, NULL);
 }
 
-void Stack_Pop(Stack* stack )
-{
-  List_Reset(stack);
-  List_Remove(stack);
+void Stack_Pop(Stack * stack) {
+	List_Reset(stack);
+	List_Remove(stack);
 }
 
-void* Stack_Top(const Stack* stack)
-{
-  return List_Retrieve(stack);
+void *Stack_Top(const Stack * stack) {
+	return List_Retrieve(stack);
 }
 
-int Stack_IsEmpty(const Stack* stack)
-{
-  return (List_GetSize(stack)==0);
+int Stack_IsEmpty(const Stack * stack) {
+	return (List_GetSize(stack) == 0);
 }
 
-void Stack_Init(Stack* stack) {
+void Stack_Init(Stack * stack) {
 	List_Init(stack);
 }

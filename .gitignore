@@ -1,0 +1,16 @@
+*~
+releases/*
+*.o
+~.elf
+.svn/
+*.tmp
+OpenBOR
+OpenBOR.exe
+Logs/*
+Paks/*
+Saves/*
+Paks
+
+
+
+

@@ -16,12 +16,11 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 	http://www.gnu.org/licenses/gpl.txt
-*/
-
+*/  
+    
 #ifndef STRISTRI_H
 #define STRISTRI_H
-
-char* stristr(char* haystack, char* needle);
-
-#endif
-
+char *stristr(char *haystack, char *needle);
+
+#endif	/*  */
+    

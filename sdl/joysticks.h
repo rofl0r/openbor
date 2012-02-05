@@ -38,7 +38,7 @@
 #endif
 
 /* Real-Time Joystick Data */
-typedef struct{
+typedef struct {
 	const char *Name;
 	const char *KeyName[JOY_MAX_INPUTS + 1];
 	int Type;
@@ -49,7 +49,7 @@ typedef struct{
 	unsigned Axes;
 	unsigned Buttons;
 	unsigned Data;
-}s_joysticks;
+} s_joysticks;
 s_joysticks joysticks[JOY_LIST_TOTAL];
 
 
@@ -59,8 +59,8 @@ extern const char *MicrosoftKeyName[JOY_NAME_SIZE];
 extern const char *GameparkKeyName[JOY_NAME_SIZE];
 extern const int JoystickBits[JOY_MAX_INPUTS + 1];
 
-const char* PC_GetJoystickKeyName(int portnum, int keynum);
-char* JOY_GetKeyName(int keycode);
+const char *PC_GetJoystickKeyName(int portnum, int keynum);
+char *JOY_GetKeyName(int keycode);
 
 
 #endif

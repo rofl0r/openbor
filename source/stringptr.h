@@ -17,7 +17,7 @@ typedef struct {
 	size_t size;
 } stringptr;
 
-stringptr* new_string(size_t size);
-void free_string(stringptr* string);
+stringptr *new_string(size_t size);
+void free_string(stringptr * string);
 
 #endif
