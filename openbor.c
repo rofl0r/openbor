@@ -4733,6 +4733,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 	modelCommands cmd;
 	modelAttackCommands atk_cmd;
 	s_scripts tempscripts;
+	int *int_ptr;
 
 #ifdef DEBUG
 	printf("load_cached_model: %s, unload: %d\n", name, unload);
@@ -4953,30 +4954,44 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 				case CMD_MODEL_ANIMAL:
 					newchar->animal = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_RIDER:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->rider);
-					break;
-				case CMD_MODEL_KNIFE:
-				case CMD_MODEL_FIREB:
-				case CMD_MODEL_PLAYSHOT:
-				case CMD_MODEL_PLAYSHOTW:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->knife);
-					break;
-				case CMD_MODEL_PLAYSHOTNO:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->pshotno);
-					break;
-				case CMD_MODEL_STAR:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->star);
-					break;
-				case CMD_MODEL_BOMB:
-				case CMD_MODEL_PLAYBOMB:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->bomb);
-					break;
-				case CMD_MODEL_FLASH:	// Now all characters can have their own flash - even projectiles (useful for blood)
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->flash);
-					break;
-				case CMD_MODEL_BFLASH:	// Flash that is spawned if an attack is blocked
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->bflash);
+				case CMD_MODEL_RIDER: case CMD_MODEL_KNIFE: case CMD_MODEL_FIREB:
+				case CMD_MODEL_PLAYSHOT: case CMD_MODEL_PLAYSHOTW: case CMD_MODEL_PLAYSHOTNO:
+				case CMD_MODEL_STAR: case CMD_MODEL_BOMB: case CMD_MODEL_PLAYBOMB:
+				case CMD_MODEL_FLASH: case CMD_MODEL_BFLASH: case CMD_MODEL_HITFLASH:
+				case CMD_MODEL_BLOCKFLASH:
+					switch(cmd) {
+						case CMD_MODEL_RIDER:
+							int_ptr = &newchar->rider;
+							break;
+						case CMD_MODEL_KNIFE: case CMD_MODEL_FIREB:
+						case CMD_MODEL_PLAYSHOT: case CMD_MODEL_PLAYSHOTW:
+							int_ptr = &newchar->knife;
+							break;
+						case CMD_MODEL_PLAYSHOTNO:
+							int_ptr = &newchar->pshotno;
+							break;
+						case CMD_MODEL_STAR:
+							int_ptr = &newchar->star;
+							break;
+						case CMD_MODEL_BOMB: case CMD_MODEL_PLAYBOMB:
+							int_ptr = &newchar->bomb;
+							break;
+						case CMD_MODEL_FLASH:	// Now all characters can have their own flash - even projectiles (useful for blood)
+							int_ptr = &newchar->flash;
+							break;
+						case CMD_MODEL_BFLASH:	// Flash that is spawned if an attack is blocked
+							int_ptr = &newchar->bflash;
+							break;
+						case CMD_MODEL_HITFLASH:
+							int_ptr = &attack.hitflash;
+							break;
+						case CMD_MODEL_BLOCKFLASH:
+							int_ptr = &attack.blockflash;
+							break;
+						default:
+							break;
+					}
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), int_ptr);
 					break;
 				case CMD_MODEL_DUST:	// Spawned when hitting the ground to "kick up dust"
 					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->dust[0]);
@@ -6410,12 +6425,6 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					break;
 				case CMD_MODEL_HITFX:
 					attack.hitsound = sound_load_sample(GET_ARG(1), packfile, 0);
-					break;
-				case CMD_MODEL_HITFLASH:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &attack.hitflash);
-					break;
-				case CMD_MODEL_BLOCKFLASH:
-					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &attack.blockflash);
 					break;
 				case CMD_MODEL_BLOCKFX:
 					attack.blocksound = sound_load_sample(GET_ARG(1), packfile, 0);
