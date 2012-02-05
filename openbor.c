@@ -53,6 +53,20 @@ static const s_videomodes videomodes_init_data[] = {
 	[VTM_960_560] = {960, 540, 320, 40, 522, {0, 0, 0, 0}, 0, 0, 0, 3.f, 2.25f}
 };
 
+s_player_min_max_z_bgheight player_min_max_z_bgheight = {
+	160 , 232, 160
+};
+
+static const s_player_min_max_z_bgheight player_min_max_z_bgheight_init_data[] = {
+	[VTM_320_240] = {160, 232, 160},
+	[VTM_480_272] = {182, 264, 182},
+	[VTM_640_480] = {321, 465, 321},
+	[VTM_720_480] = {321, 465, 321},
+	[VTM_800_480] = {321, 465, 321},
+	[VTM_800_600] = {401, 582, 401},
+	[VTM_960_560] = {362, 524, 362}
+};
+
 int quit_game = 0;
 
 int sprite_map_max_items = 0;
@@ -322,9 +336,6 @@ int                 disablelog          = 0;
 #define PLOG(fmt, args...) do { if(!disablelog) fprintf(stdout, fmt, ## args); } while (0)
 
 int                 currentspawnplayer  = 0;
-int                 PLAYER_MIN_Z        = 160;
-int                 PLAYER_MAX_Z        = 232;
-int                 BGHEIGHT            = 160;
 int                 MAX_WALL_HEIGHT     = 1000;					// Max wall height that an entity can be spawned on
 int                 saveslot            = 0;
 int                 current_palette     = 0;
@@ -21167,8 +21178,7 @@ int choose_mode(int *players)
 	return relback;
 }
 
-void term_videomodes()
-{
+void term_videomodes() {
 	videomodes.hRes = 0;
 	videomodes.vRes = 0;
 	video_set_mode(videomodes);
@@ -21179,8 +21189,7 @@ void term_videomodes()
 }
 
 // Load Video Mode from file
-int init_videomodes(int log)
-{
+int init_videomodes(int log) {
 	int result;
 	char *filename = "data/video.txt";
 	int bits = 8, tmp;
@@ -21273,74 +21282,24 @@ readfile:
 	}
 
 VIDEOMODES:
-	videomodes = videomodes_init_data[videoMode];
-	videomodes.mode    = savedata.screen[videoMode][0];
-	videomodes.filter  = savedata.screen[videoMode][1];
-
-	switch (videoMode)
-	{
-		case VTM_320_240:
-			PLAYER_MIN_Z       = 160;
-			PLAYER_MAX_Z       = 232;
-			BGHEIGHT           = 160;
+	switch (videoMode) {
+		case VTM_320_240: case VTM_480_272: case VTM_640_480: case VTM_720_480: 
+		case VTM_800_480: case VTM_800_600: case VTM_960_560:
 			break;
-		case VTM_480_272:
-			PLAYER_MIN_Z       = 182;
-			PLAYER_MAX_Z       = 264;
-			BGHEIGHT           = 182;
-			break;
-
-		// 640x480 - PC, Dreamcast, Wii
-		case VTM_640_480:
-			PLAYER_MIN_Z       = 321;
-			PLAYER_MAX_Z       = 465;
-			BGHEIGHT           = 321;
-			break;
-
-		// 720x480 - PC, Wii
-		case VTM_720_480:
-			PLAYER_MIN_Z       = 321;
-			PLAYER_MAX_Z       = 465;
-			BGHEIGHT           = 321;
-			break;
-
-		// 800x480 - PC, Wii, Pandora
-		case VTM_800_480:
-			PLAYER_MIN_Z       = 321;
-			PLAYER_MAX_Z       = 465;
-			BGHEIGHT           = 321;
-			break;
-
-		// 800x600 - PC, Dreamcast, Wii
-		case VTM_800_600:
-			PLAYER_MIN_Z       = 401;
-			PLAYER_MAX_Z       = 582;
-			BGHEIGHT           = 401;
-			break;
-
-		// 960x540 - PC, Wii
-		case VTM_960_560:
-			PLAYER_MIN_Z       = 362;
-			PLAYER_MAX_Z       = 524;
-			BGHEIGHT           = 362;
-			break;
-
 		default:
 			shutdown(1, 
 				 "Invalid video mode: %d in 'data/video.txt', supported modes:\n"
-				 "0 - 320x240\n"
-				 "1 - 480x272\n"
-				 "2 - 640x480\n"
-				 "3 - 720x480\n"
-				 "4 - 800x480\n"
-				 "5 - 800x600\n"
-				 "6 - 960x540\n\n", videoMode);
+				 "0 - 320x240\n""1 - 480x272\n""2 - 640x480\n""3 - 720x480\n"
+				 "4 - 800x480\n""5 - 800x600\n""6 - 960x540\n\n", videoMode);
 			break;
 	}
 
-#if SDL || WII
+	videomodes = videomodes_init_data[videoMode];
+	videomodes.mode    = savedata.screen[videoMode][0];
+	videomodes.filter  = savedata.screen[videoMode][1];
+	player_min_max_z_bgheight = player_min_max_z_bgheight_init_data[videoMode];
+	
 	video_stretch(savedata.stretch);
-#endif
 
 	if((vscreen = allocscreen(videomodes.hRes, videomodes.vRes, screenformat)) == NULL) shutdown(1, "Not enough memory!\n");
 	videomodes.pixel = pixelbytes[(int)vscreen->pixelformat];
@@ -21570,7 +21529,6 @@ void keyboard_setup(int player) {
 
 // ----------------------------------------------------------------------------
 
-
 void openborMain(int argc, char** argv)
 {
 	sprite_map = NULL;
@@ -21583,7 +21541,7 @@ void openborMain(int argc, char** argv)
 	int players[MAX_PLAYERS];
 	int i;
 	int argl;
-
+	
 	printf("OpenBoR %s, Compile Date: " __DATE__ "\n\n", VERSION);
 
 	if(argc > 1) {

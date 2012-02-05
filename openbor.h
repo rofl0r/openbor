@@ -186,6 +186,17 @@
 #define     MASK_AIATTACK2        0xFFFF0000
 
 
+typedef struct {
+	short player_min_z;
+	short player_max_z;
+	short bgheight;
+} s_player_min_max_z_bgheight;
+
+extern s_player_min_max_z_bgheight player_min_max_z_bgheight;
+#define PLAYER_MIN_Z (player_min_max_z_bgheight.player_min_z)
+#define PLAYER_MAX_Z (player_min_max_z_bgheight.player_max_z)
+#define BGHEIGHT (player_min_max_z_bgheight.bgheight)
+
 // Note: the minimum Z coordinate of the player is important
 // for several other drawing operations.
 // movement restirctions are here!
