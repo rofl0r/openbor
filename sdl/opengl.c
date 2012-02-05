@@ -263,7 +263,7 @@ int video_gl_set_mode(s_videomodes videomodes)
 error:
 	printf("falling back on SDL video backend\n");
 	if(screen) SDL_FreeAndNullVideoSurface(screen);
-	if(bscreen) { SDL_FreeSurface(bscreen); bscreen=NULL; }
+	if(bscreen) SDL_FreeAndNullVideoSurface(bscreen);
 	opengl = 0;
 	savedata.usegl = 0;
 	return 0;

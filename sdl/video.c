@@ -25,11 +25,15 @@ extern int videoMode;
 #include "../resources/OpenBOR_Icon_32x32_png.h"
 #endif
 
+#define SDL_mutex_lock(X) SDL_mutexP(X)
+#define SDL_mutex_unlock(X) SDL_mutexV(X)
+
 FPSmanager framerate_manager;
 s_videomodes stored_videomodes;
 static SDL_Surface *screen = NULL;
 static SDL_Surface *bscreen = NULL;
 static SDL_Surface *bscreen2 = NULL;
+static SDL_mutex* screens_lock;
 static SDL_Color colors[256];
 static int bytes_per_pixel = 1;
 int stretch = 0;
@@ -37,8 +41,12 @@ int opengl = 0; // OpenGL backend currently in use?
 int nativeWidth, nativeHeight; // monitor resolution used in fullscreen mode
 u8 pDeltaBuffer[480 * 2592];
 
-void initSDL()
-{
+void finishSDL(void) {
+	SDL_DestroyMutex(screens_lock);
+	SDL_Quit();
+}
+
+void initSDL(void) {
 	const SDL_VideoInfo* video_info;
 	int init_flags = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK;
 
@@ -51,13 +59,14 @@ void initSDL()
 		printf("SDL Failed to Init!!!! (%s)\n", SDL_GetError());
 		borExit(0);
 	}
+	screens_lock = SDL_CreateMutex();
 	SDL_ShowCursor(SDL_DISABLE);
-	atexit(SDL_Quit);
+	atexit(finishSDL);
 #ifndef SKIP_CODE
 	SDL_WM_SetCaption("OpenBOR", NULL);
 	SDL_WM_SetIcon((SDL_Surface*)pngToSurface((void*)openbor_icon_32x32_png.data), NULL);
 #endif
-#if WIN || LINUX && !DARWIN && !defined(GLES)
+#if !defined(GLES)
 	if(SDL_GL_LoadLibrary(NULL) < 0)
 	{
 		printf("Warning: couldn't load OpenGL library (%s)\n", SDL_GetError());
@@ -75,13 +84,25 @@ void initSDL()
 
 static unsigned masks[4][4] = {{0,0,0,0},{0x1F,0x07E0,0xF800,0},{0xFF,0xFF00,0xFF0000,0},{0xFF,0xFF00,0xFF0000,0}};
 
+static void lock_screens(void) {
+	while(SDL_mutex_lock(screens_lock) == -1) {
+		printf("warning: couldn't aquire screens_lock\n");
+		SDL_Delay(1);
+	}
+}
+
+static void unlock_screens(void) {
+	SDL_mutex_unlock(screens_lock);
+}
+
 int video_set_mode(s_videomodes videomodes)
 {
 	stored_videomodes = videomodes;
+	lock_screens();
 
 	if(screen) SDL_FreeAndNullVideoSurface(screen);
-	if(bscreen) { SDL_FreeSurface(bscreen); bscreen=NULL; }
-	if(bscreen2) { SDL_FreeSurface(bscreen2); bscreen2=NULL; }
+	if(bscreen) SDL_FreeAndNullVideoSurface(bscreen);
+	if(bscreen2) SDL_FreeAndNullVideoSurface(bscreen2);
 
 	// try OpenGL initialization first
 	if((savedata.usegl || savedata.fullscreen) && video_gl_set_mode(videomodes)) return 1;
@@ -99,22 +120,27 @@ int video_set_mode(s_videomodes videomodes)
 	if(savedata.screen[videoMode][0])
 	{
 		screen = SDL_SetVideoMode(videomodes.hRes*savedata.screen[videoMode][0],videomodes.vRes*savedata.screen[videoMode][0],16,savedata.fullscreen?(SDL_SWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN):(SDL_SWSURFACE|SDL_DOUBLEBUF));
+		if(!screen) {
+			fprintf(stderr, "couldn't get screen!\n");
+			fflush(stderr);
+		}
 		SDL_ShowCursor(SDL_DISABLE);
 		bscreen = SDL_AllocSurface(SDL_SWSURFACE, videomodes.hRes, videomodes.vRes, 8*bytes_per_pixel, masks[bytes_per_pixel-1][0], masks[bytes_per_pixel-1][1], masks[bytes_per_pixel-1][2], masks[bytes_per_pixel-1][3]); // 24bit mask
 		bscreen2 = SDL_AllocSurface(SDL_SWSURFACE, videomodes.hRes+4, videomodes.vRes+8, 16, masks[1][2], masks[1][1], masks[1][0], masks[1][3]);
 		Init_Gfx(565, 16);
 		memset(pDeltaBuffer, 0x00, 1244160);
-		if(bscreen==NULL || bscreen2==NULL) return 0;
+		if(!screen || !bscreen || !bscreen2) goto exit_failure_unlock;
 	}
 	else
 	{
 		if(bytes_per_pixel>1)
 		{
 			bscreen = SDL_AllocSurface(SDL_SWSURFACE, videomodes.hRes, videomodes.vRes, 8*bytes_per_pixel, masks[bytes_per_pixel-1][0], masks[bytes_per_pixel-1][1], masks[bytes_per_pixel-1][2], masks[bytes_per_pixel-1][3]); // 24bit mask
-			if(!bscreen) return 0;
+			if(!bscreen) goto exit_failure_unlock;
 		}
 		screen = SDL_SetVideoMode(videomodes.hRes,videomodes.vRes,8*bytes_per_pixel,savedata.fullscreen?(SDL_SWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN):(SDL_SWSURFACE|SDL_DOUBLEBUF));
 		SDL_ShowCursor(SDL_DISABLE);
+		if(!screen) goto exit_failure_unlock;
 	}
 
 	if(bytes_per_pixel==1)
@@ -122,11 +148,14 @@ int video_set_mode(s_videomodes videomodes)
 		SDL_SetColors(screen,colors,0,256);
 		if(bscreen) SDL_SetColors(bscreen,colors,0,256);
 	}
-
-	if(screen==NULL) return 0;
-
+	
+	unlock_screens();
 	video_clearscreen();
 	return 1;
+	
+	exit_failure_unlock:
+	unlock_screens();
+	return 0;
 }
 
 void video_fullscreen_flip()
@@ -147,11 +176,12 @@ void video_fullscreen_flip()
 		return;
 	}
 
+	lock_screens();
 	// switch between SDL fullscreen and SDL windowed
 	if(screen) {
 		w = screen->w;
 		h = screen->h;
-		SDL_FreeVideoSurface(screen);
+		SDL_FreeAndNullVideoSurface(screen);
 	} else {
 		w = 320;
 		h = 240;
@@ -164,6 +194,7 @@ void video_fullscreen_flip()
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetColors(screen,colors,0,256);
 	if(bscreen) SDL_SetColors(bscreen,colors,0,256);
+	unlock_screens();
 }
 
 //16bit, scale 2x 4x 8x ...
@@ -251,6 +282,7 @@ int video_copy_screen(s_screen* src)
 	if(!width || !height) return 0;
 	h = height;
 
+	lock_screens();
 	if(bscreen)
 	{
 		rectdes.x = rectdes.y = 0;
@@ -314,6 +346,7 @@ int video_copy_screen(s_screen* src)
 		}
 	}
 	SDL_Flip(screen);
+	unlock_screens();
 
 	SDL_framerateDelay(&framerate_manager);
 
@@ -329,6 +362,7 @@ void video_clearscreen()
 		return;
 	}
 
+	lock_screens();
 	gotlock = lock_if_necessary(screen);
 	
 	memset(screen->pixels, 0, screen->pitch*screen->h);
@@ -340,6 +374,7 @@ void video_clearscreen()
 		memset(bscreen->pixels, 0, bscreen->pitch*bscreen->h);
 		if(gotlock) SDL_UnlockSurface(bscreen);
 	}
+	unlock_screens();
 }
 
 void video_stretch(int enable)
@@ -353,7 +388,7 @@ void vga_vwait(void)
 	static int prevtick = 0;
 	int now = SDL_GetTicks();
 	int wait = 1000/60 - (now - prevtick);
-	if (wait>0)
+	if (wait > 0)
 	{
 		SDL_Delay(wait);
 	}
@@ -365,7 +400,7 @@ void vga_setpalette(unsigned char* palette)
 {
 	int i;
 	video_gl_setpalette(palette);
-	for(i=0;i<256;i++){
+	for(i = 0; i < 256; i++){
 		colors[i].r=palette[0];
 		colors[i].g=palette[1];
 		colors[i].b=palette[2];
@@ -373,8 +408,10 @@ void vga_setpalette(unsigned char* palette)
 	}
 	if(!opengl)
 	{
-		SDL_SetColors(screen,colors,0,256);
-		if(bscreen) SDL_SetColors(bscreen,colors,0,256);
+		lock_screens();
+		SDL_SetColors(screen, colors, 0, 256);
+		if(bscreen) SDL_SetColors(bscreen, colors, 0, 256);
+		unlock_screens();
 	}
 }
 
