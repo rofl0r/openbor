@@ -852,7 +852,7 @@ typedef struct {
 	int index;
 	char *name;
 	char *path;		// Path, so scripts can dynamically get files, sprites, sounds, etc.
-	unsigned int score:32;
+	unsigned int score;
 	float stats[20];	// Parameters that do nothing on their own.
 	int health;
 	float scroll;		// Autoscroll like panel entity.
@@ -860,22 +860,22 @@ typedef struct {
 	//unsigned        offscreenkillz;
 	//unsigned        offscreeenkila;
 	int mp;			// mp's variable for mpbar by tails
-	short counter:16;	// counter of weapons by tails
-	unsigned char shootnum:8;	// counter of shots by tails
-	unsigned char reload:8;	// reload max shots by tails
-	char reactive:8;	// Used for setting the "a" at which weapons are spawned
-	char typeshot:8;	// see if weapon is a gun or knife by tails
-	char animal:8;		// see is the weapon is a animal by tails
-	char nolife:8;		// Feb 25, 2005 - Variable flag to show life 0 = no, else yes
+	short counter;	// counter of weapons by tails
+	unsigned char shootnum;	// counter of shots by tails
+	unsigned char reload;	// reload max shots by tails
+	char reactive;	// Used for setting the "a" at which weapons are spawned
+	char typeshot;	// see if weapon is a gun or knife by tails
+	char animal;		// see is the weapon is a animal by tails
+	char nolife;		// Feb 25, 2005 - Variable flag to show life 0 = no, else yes
 	int makeinv;		// Option to spawn player invincible >0 blink <0 noblink
 	int riseinv;		// how many seconds will the character become invincible after rise >0 blink, <0 noblink
-	char dofreeze:8;	// Flag to freeze all enemies/players while special is executed
-	char noquake:8;		// Flag to make the screen shake when entity lands 1 = no, else yes
-	char ground:8;		// Flag to determine if enemy projectiles only hit the enemy when hitting the ground
+	char dofreeze;	// Flag to freeze all enemies/players while special is executed
+	char noquake;		// Flag to make the screen shake when entity lands 1 = no, else yes
+	char ground;		// Flag to determine if enemy projectiles only hit the enemy when hitting the ground
 	int multiple;		// So you can control how many points are given for hitting opponents
-	char bounce:8;		// Flag to determine if bounce/quake is to be used.
-	short type:16;
-	char subtype:8;
+	char bounce;		// Flag to determine if bounce/quake is to be used.
+	short type;
+	char subtype;
 	int icon;
 	int iconpain;		// 20-1-2005   New icons
 	int iconget;		// 20-1-2005   New icons
@@ -884,43 +884,43 @@ typedef struct {
 	int iconmp[3];		// icon for the mpbar 3 levels
 	int parrow[MAX_PLAYERS][3];	// Image to be displayed when player spawns invincible
 	int setlayer;		// Used for forcing enities to be displayed behind
-	short thold:16;		// The entities threshold for block
-	char fmap:8;		// Corresponds to which remap to use for when a character is frozen
+	short thold;		// The entities threshold for block
+	char fmap;		// Corresponds to which remap to use for when a character is frozen
 	char komap[2];		// Remap to use when KO'd
-	char hmap1:8;		//Bottom range of remaps unavailable at select screen.
-	char hmap2:8;		//Top range of remaps unavailable at select screen.
-	char alpha:8;		// New alpha variable to determine if the entity uses alpha transparency
-	char toflip:8;		// Flag to determine if flashes flip or not
-	char shadow:8;
-	char gfxshadow:8;	// use current frame to create a shadow
-	char aironly:8;		// Used to determine if shadows will be shown when jumping only
-	char nomove:8;		// Flag for static enemies
-	char noflip:8;		// Flag to determine if static enemies flip or stay facing the same direction
-	char nodrop:8;		// Flag to determine if enemies can be knocked down
-	char nodieblink:8;	// Flag to determine if blinking while playing die animation
-	char holdblock:8;	// Continue the block animation as long as the player holds the button down
-	char nopassiveblock:8;	// Don't auto block randomly
-	char blockback:8;	// Able to block attacks from behind
-	short blockodds:16;	// Odds that an enemy will block an attack (1 : blockodds)
+	char hmap1;		//Bottom range of remaps unavailable at select screen.
+	char hmap2;		//Top range of remaps unavailable at select screen.
+	char alpha;		// New alpha variable to determine if the entity uses alpha transparency
+	char toflip;		// Flag to determine if flashes flip or not
+	char shadow;
+	char gfxshadow;	// use current frame to create a shadow
+	char aironly;		// Used to determine if shadows will be shown when jumping only
+	char nomove;		// Flag for static enemies
+	char noflip;		// Flag to determine if static enemies flip or stay facing the same direction
+	char nodrop;		// Flag to determine if enemies can be knocked down
+	char nodieblink;	// Flag to determine if blinking while playing die animation
+	char holdblock;	// Continue the block animation as long as the player holds the button down
+	char nopassiveblock;	// Don't auto block randomly
+	char blockback;	// Able to block attacks from behind
+	short blockodds;	// Odds that an enemy will block an attack (1 : blockodds)
 	s_edelay edelay;	// Entity level delay adjustment.
 	float runspeed;		// The speed the character runs at
 	float runjumpheight;	// The height the character jumps when running
 	float runjumpdist;	// The distance the character jumps when running
-	int noatflash:8;	// Flag to determine if attacking characters attack spawns a flash
-	int runupdown:8;	// Flag to determine if a player will continue to run while pressing up or down
-	int runhold:8;		// Flag to determine if a player will continue to run if holding down forward when landing
-	int remove:8;		// Flag to remove a projectile on contact or not
+	char noatflash;	// Flag to determine if attacking characters attack spawns a flash
+	char runupdown;	// Flag to determine if a player will continue to run while pressing up or down
+	char runhold;		// Flag to determine if a player will continue to run if holding down forward when landing
+	char remove;		// Flag to remove a projectile on contact or not
 	float throwheight;	// The height at which an opponent can now be adjusted
 	float throwdist;	// The distance an opponent can now be adjusted
-	short throwframewait:16;	// The frame victim is thrown during ANIM_THROW, added by kbandressen 10/20/06
+	short throwframewait;	// The frame victim is thrown during ANIM_THROW, added by kbandressen 10/20/06
 	int (*special)[MAX_SPECIAL_INPUTS];	// Stores freespecials
-	short specials_loaded:16;	// Stores how many specials have been loaded
-	short valid_special:16;	// Used for setting when a valid special has been found
+	short specials_loaded;	// Stores how many specials have been loaded
+	short valid_special;	// Used for setting when a valid special has been found
 	int diesound;
-	char weapnum:8;
-	char secret:8;
+	char weapnum;
+	char secret;
 	char weaploss[2];	// Determines possibility of losing weapon.
-	char ownweapons:8;	// is the weapon list own or share with others
+	char ownweapons;	// is the weapon list own or share with others
 	int (*weapon)[MAX_WEAPONS];	// weapon model list
 
 	// these are model id of various stuff
@@ -933,69 +933,69 @@ typedef struct {
 	int flash;		// Now each entity can have their own flash
 	int bflash;		// Flash that plays when an attack is blocked
 	int dust[3];		// Dust spawn (0 = Fall land, 1 = Jumpland, 2 = Jumpstart.)
-	short height:16;	// Used to set height of player in pixels
+	short height;	// Used to set height of player in pixels
 	float speed;
 	float grabdistance;	// 30-12-2004   grabdistance varirable adder per character
 	float jumpspeed;	// normal jump foward speed, default to max(1, speed)
 	float jumpheight;	// 28-12-2004   Jump height variable added per character
-	char jumpmovex:8;	// low byte: 0 default 1 flip in air, 2 move in air, 3 flip and move
-	char jumpmovez:8;	// 2nd byte: 0 default 1 zjump with flip(not implemented yet) 2 z jump move in air, 3 1+2
-	char grabfinish:8;	// wait for grab animation to finish before do other actoins
-	char antigrab:8;	// anti-grab factor
+	char jumpmovex;	// low byte: 0 default 1 flip in air, 2 move in air, 3 flip and move
+	char jumpmovez;	// 2nd byte: 0 default 1 zjump with flip(not implemented yet) 2 z jump move in air, 3 1+2
+	char grabfinish;	// wait for grab animation to finish before do other actoins
+	char antigrab;	// anti-grab factor
 	int grabforce;		// grab factor, antigrab - grabforce <= 0 means can grab
-	char facing:8;		// 0 no effect, 1 alway right, 2 always left, 3, affected by level dir
-	char grabback:8;	// Flag to determine if entities grab images display behind opponenets
-	char grabturn:8;
-	char paingrab:8;	// Can only be grabbed when in pain
+	char facing;		// 0 no effect, 1 alway right, 2 always left, 3, affected by level dir
+	char grabback;	// Flag to determine if entities grab images display behind opponenets
+	char grabturn;
+	char paingrab;	// Can only be grabbed when in pain
 	float grabwalkspeed;
-	short throwdamage:16;	// 1-14-05  adjust throw damage
+	short throwdamage;	// 1-14-05  adjust throw damage
 	unsigned char *palette;	// original palette for 32/16bit mode
 	unsigned char *colourmap[MAX_COLOUR_MAPS];
-	char maps_loaded:8;	// Used for player colourmap selecting
-	char unload:8;		// Unload model after level completed?
-	char falldie:8;		// Play die animation?
-	char globalmap:8;	// use global palette for its colour map in 24bit mode
-	char nopain:8;
-	char summonkill:8;	// kill it's summoned entity when died;  0. dont kill 1. kill summoned only 2. kill all spawned entity
-	char combostyle:8;
-	char blockpain:8;
+	char maps_loaded;	// Used for player colourmap selecting
+	char unload;		// Unload model after level completed?
+	char falldie;		// Play die animation?
+	char globalmap;	// use global palette for its colour map in 24bit mode
+	char nopain;
+	char summonkill;	// kill it's summoned entity when died;  0. dont kill 1. kill summoned only 2. kill all spawned entity
+	char combostyle;
+	char blockpain;
 	char atchain[MAX_ATCHAIN];
-	char chainlength:8;
+	char chainlength;
 	s_anim **animation;
-	char credit:8;
-	char escapehits:8;	// Escape spammers!
-	char chargerate:8;	// For the charge animation
-	char guardrate:8;	// Rate for guardpoints recover.
-	char mprate:8;		// For time-based mp recovery.
-	char mpdroprate:8;	// Time based MP loss.
-	char mpstable:8;	// MP stable type.
-	short mpstableval:16;	// MP Stable target.
-	short aggression:16;	// For enemy A.I.
+	char credit;
+	char escapehits;	// Escape spammers!
+	char chargerate;	// For the charge animation
+	char guardrate;	// Rate for guardpoints recover.
+	char mprate;		// For time-based mp recovery.
+	char mpdroprate;	// Time based MP loss.
+	char mpstable;	// MP stable type.
+	short mpstableval;	// MP Stable target.
+	short aggression;	// For enemy A.I.
 	short risetime[2];	// 0 = Rise delay, 1 = Riseattack delay.
-	short sleepwait:16;
-	char riseattacktype:8;
+	short sleepwait;
+	char riseattacktype;
 	int jugglepoints[2];	// juggle points. [0] = current [1] = max total
 	int guardpoints[2];	// guard points. [0] = current [1] = max total
-	char mpswitch:8;	// switch between reduce or gain mp for mpstabletype 4
-	short turndelay:16;	// turn delay
+	char mpswitch;	// switch between reduce or gain mp for mpstabletype 4
+	short turndelay;	// turn delay
 	float lifespan;		// lifespan count down
 	float knockdowncount;	// the knock down count for this entity
 	short stealth[2];	// 0 = Entity's invisibility to AI. 1 = AI ability to see through stealth.
 
 	//---------------new A.I. switches-----------
-	short hostile:16;	// specify hostile types
-	short candamage:16;	// specify types that can be damaged by this entity
-	short projectilehit:16;	// specify types that can be hit by this entity if it is thrown
-	unsigned int aimove:32;	// move style
+	short hostile;	// specify hostile types
+	short candamage;	// specify types that can be damaged by this entity
+	short projectilehit;	// specify types that can be hit by this entity if it is thrown
+	unsigned int aimove;	// move style
 	int sight[6];		// Sight ranges, xmin, xmax, zmin, zmax, amin, amax
-	unsigned int aiattack:32;	// attack/defend style
+	unsigned int aiattack;	// attack/defend style
 
 	//----------------physical system-------------------
 	float antigravity;	//antigravity : gravity * (1- antigravity)
 
 	//--------------new property for endlevel item--------
 	char *branch;		//level branch name
-	char model_flag:8;	//used to judge some copy method when setting new model to an entity
+	char model_flag;	//used to judge some copy method when setting new model to an entity
 
 	float *defense_factors;	//basic defense factors: damage = damage*(1-def)
 	float *defense_pain;	//Pain factor (like nopain) for defense type.
@@ -1010,24 +1010,24 @@ typedef struct {
 
 	// e.g., boss
 	s_barstatus hpbarstatus;
-	short hpx:16;
-	short hpy:16;
-	short iconx:16;
-	short icony:16;
-	short namex:16;
-	short namey:16;
+	short hpx;
+	short hpy;
+	short iconx;
+	short icony;
+	short namex;
+	short namey;
 
 	// movement flags
-	char subject_to_wall:8;
-	char subject_to_platform:8;
-	char subject_to_obstacle:8;
-	char subject_to_hole:8;
-	char subject_to_gravity:8;
-	char subject_to_screen:8;
-	char subject_to_minz:8;
-	char subject_to_maxz:8;
-	char no_adjust_base:8;	// dont change base to 0 automatically
-	char instantitemdeath:8;	// no delay before item suicides
+	char subject_to_wall;
+	char subject_to_platform;
+	char subject_to_obstacle;
+	char subject_to_hole;
+	char subject_to_gravity;
+	char subject_to_screen;
+	char subject_to_minz;
+	char subject_to_maxz;
+	char no_adjust_base;	// dont change base to 0 automatically
+	char instantitemdeath;	// no delay before item suicides
 	char isSubclassed;
 	ModelFreetype freetypes;
 	s_scripts scripts;

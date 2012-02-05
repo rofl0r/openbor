@@ -4904,41 +4904,101 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 				case CMD_MODEL_WEAPONS:
 					lcmHandleCommandWeapons(&arglist, newchar);
 					break;
-				case CMD_MODEL_WEAPNUM:
-					newchar->weapnum = GET_INT_ARG(1);
+				case CMD_MODEL_WEAPNUM: case CMD_MODEL_TYPESHOT: case CMD_MODEL_ANIMAL:
+				case CMD_MODEL_INSTANTITEMDEATH: case CMD_MODEL_SECRET: case CMD_MODEL_MODELFLAG:
+				case CMD_MODEL_BOUNCE: case CMD_MODEL_NOQUAKE: case CMD_MODEL_BLOCKBACK:
+				case CMD_MODEL_NOLIFE: case CMD_MODEL_ANTIGRAB: case CMD_MODEL_GRABBACK:
+				case CMD_MODEL_FALLDIE: case CMD_MODEL_DEATH: case CMD_MODEL_RISEATTACKTYPE:
+				case CMD_MODEL_GRABFINISH: case CMD_MODEL_SHADOW: case CMD_MODEL_GFXSHADOW:
+				case CMD_MODEL_AIRONLY: case CMD_MODEL_FMAP: case CMD_MODEL_TOFLIP:
+				case CMD_MODEL_NODIEBLINK: case CMD_MODEL_HOLDBLOCK: case CMD_MODEL_BLOCKPAIN:
+				case CMD_MODEL_NOPASSIVEBLOCK: case CMD_MODEL_PAINGRAB: case CMD_MODEL_GRABTURN:
+				case CMD_MODEL_NODROP:
+					switch(cmd) {
+						case CMD_MODEL_WEAPNUM: value = &newchar->weapnum; break;
+						case CMD_MODEL_TYPESHOT: value = &newchar->typeshot; break;
+						case CMD_MODEL_ANIMAL: value = &newchar->animal; break;
+						case CMD_MODEL_INSTANTITEMDEATH: value = &newchar->instantitemdeath; break;
+						case CMD_MODEL_SECRET:value = &newchar->secret; break;
+						case CMD_MODEL_MODELFLAG:       //model copy flag
+							value = &newchar->model_flag; break;
+						case CMD_MODEL_BOUNCE: value = &newchar->bounce; break;
+						case CMD_MODEL_NOQUAKE: // Mar 12, 2005 - Flag to determine if entity shakes screen
+							value = &newchar->noquake; break;
+						case CMD_MODEL_BLOCKBACK:       // Flag to determine if attacks can be blocked from behind
+							value = &newchar->blockback; break;
+						case CMD_MODEL_NOLIFE:  // Feb 25, 2005 - Flag to display enemy life or not
+							value = &newchar->nolife; break;
+						case CMD_MODEL_ANTIGRAB:        // a can grab b: a->antigrab - b->grabforce <=0
+							value = &newchar->antigrab; break;
+						case CMD_MODEL_GRABBACK: value = &newchar->grabback; break;
+						case CMD_MODEL_FALLDIE:
+						case CMD_MODEL_DEATH: value = &newchar->falldie; break;
+						case CMD_MODEL_RISEATTACKTYPE: value = &newchar->riseattacktype; break;
+						case CMD_MODEL_GRABFINISH: value = &newchar->grabfinish; break;
+						case CMD_MODEL_SHADOW: value = &newchar->shadow; break;
+						case CMD_MODEL_GFXSHADOW: value = &newchar->gfxshadow; break;
+						case CMD_MODEL_AIRONLY: // Shadows display in air only?
+							value = &newchar->aironly; break;
+						case CMD_MODEL_FMAP:    // Map that corresponds with the remap when a character is frozen
+							value = &newchar->fmap; break;
+						case CMD_MODEL_TOFLIP:  // Flag to determine if flashes images will be flipped or not
+							value = &newchar->toflip; break;
+						case CMD_MODEL_NODIEBLINK:
+							// Added to determine if dying animation blinks or not
+							value = &newchar->nodieblink; break;
+						case CMD_MODEL_HOLDBLOCK: value = &newchar->holdblock; break;
+						case CMD_MODEL_BLOCKPAIN: value = &newchar->blockpain; break;
+						case CMD_MODEL_NOPASSIVEBLOCK: value = &newchar->nopassiveblock; break;
+						case CMD_MODEL_PAINGRAB: value = &newchar->paingrab; break;
+						case CMD_MODEL_GRABTURN: value = &newchar->grabturn; break;
+						case CMD_MODEL_NODROP: value = &newchar->nodrop; break;
+						default: value = NULL; break;
+						
+					}
+					*value = GET_INT_ARG(1);
 					break;
+				/* uns. char */
 				case CMD_MODEL_SHOOTNUM:	//here weapons things like shoot rest type of weapon ect..by tails
 					newchar->shootnum = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_RELOAD:
 					newchar->reload = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_TYPESHOT:
-					newchar->typeshot = GET_INT_ARG(1);
+				
+				/* short */	
+				case CMD_MODEL_THOLD:
+					// Threshold for enemies/players block
+					newchar->thold = GET_INT_ARG(1);
+					break;
+				case CMD_MODEL_THROWFRAMEWAIT:
+					newchar->throwframewait = GET_INT_ARG(1);
+					break;
+				case CMD_MODEL_BLOCKODDS:
+					// Odds that an attack will hit an enemy (1 : blockodds)
+					newchar->blockodds = GET_INT_ARG(1);
+					break;
+				case CMD_MODEL_THROWDAMAGE:
+					newchar->throwdamage = GET_INT_ARG(1);
+					break;
+				case CMD_MODEL_HEIGHT:
+					newchar->height = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_COUNTER:
 					newchar->counter = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_ANIMAL:
-					newchar->animal = GET_INT_ARG(1);
+					
+					
+					
+				/* int */
+				case CMD_MODEL_NOATFLASH:	// Flag to determine if an opponents attack spawns their flash or not
+					newchar->noatflash = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_INSTANTITEMDEATH:
-					newchar->instantitemdeath = GET_INT_ARG(1);
+				case CMD_MODEL_SETLAYER:
+					newchar->setlayer = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_SECRET:
-					newchar->secret = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_MODELFLAG:	//model copy flag
-					newchar->model_flag = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_BOUNCE:
-					newchar->bounce = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_NOQUAKE:	// Mar 12, 2005 - Flag to determine if entity shakes screen
-					newchar->noquake = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_BLOCKBACK:	// Flag to determine if attacks can be blocked from behind
-					newchar->blockback = GET_INT_ARG(1);
+				case CMD_MODEL_GRABFORCE:
+					newchar->grabforce = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_HEALTH:
 					newchar->health = GET_INT_ARG(1);
@@ -4946,91 +5006,16 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 				case CMD_MODEL_MP:	//Left for backward compatability. See mpset. // mp values to put max mp for player by tails
 					newchar->mp = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_NOLIFE:	// Feb 25, 2005 - Flag to display enemy life or not
-					newchar->nolife = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_ANTIGRAB:	// a can grab b: a->antigrab - b->grabforce <=0
-					newchar->antigrab = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_GRABFORCE:
-					newchar->grabforce = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_GRABBACK:
-					newchar->grabback = GET_INT_ARG(1);
-					break;
+					
+					
+					
 				case CMD_MODEL_OFFSCREENKILL:
 					newchar->offscreenkill = GET_INT_ARG(1);
 					break;
-				case CMD_MODEL_FALLDIE:
-				case CMD_MODEL_DEATH:
-					newchar->falldie = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_RISEATTACKTYPE:
-					newchar->riseattacktype = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_HEIGHT:
-					newchar->height = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_GRABFINISH:
-					newchar->grabfinish = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_THROWDAMAGE:
-					newchar->throwdamage = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_SHADOW:
-					newchar->shadow = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_GFXSHADOW:
-					newchar->gfxshadow = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_AIRONLY:	// Shadows display in air only?
-					newchar->aironly = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_FMAP:	// Map that corresponds with the remap when a character is frozen
-					newchar->fmap = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_SETLAYER:
-					newchar->setlayer = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_TOFLIP:	// Flag to determine if flashes images will be flipped or not
-					newchar->toflip = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_NODIEBLINK:
-					// Added to determine if dying animation blinks or not
-					newchar->nodieblink = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_NOATFLASH:	// Flag to determine if an opponents attack spawns their flash or not
-					newchar->noatflash = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_BLOCKODDS:
-					// Odds that an attack will hit an enemy (1 : blockodds)
-					newchar->blockodds = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_HOLDBLOCK:
-					newchar->holdblock = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_BLOCKPAIN:
-					newchar->blockpain = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_NOPASSIVEBLOCK:
-					newchar->nopassiveblock = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_PAINGRAB:
-					newchar->paingrab = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_GRABTURN:
-					newchar->grabturn = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_THROWFRAMEWAIT:
-					newchar->throwframewait = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_NODROP:
-					newchar->nodrop = GET_INT_ARG(1);
-					break;
-				case CMD_MODEL_THOLD:
-					// Threshold for enemies/players block
-					newchar->thold = GET_INT_ARG(1);
-					break;
+					
+				
+					
+					
 				case CMD_MODEL_RIDER: case CMD_MODEL_KNIFE: case CMD_MODEL_FIREB:
 				case CMD_MODEL_PLAYSHOT: case CMD_MODEL_PLAYSHOTW: case CMD_MODEL_PLAYSHOTNO:
 				case CMD_MODEL_STAR: case CMD_MODEL_BOMB: case CMD_MODEL_PLAYBOMB:
