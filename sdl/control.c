@@ -188,34 +188,11 @@ void joystick_scan(int scan)
 		joysticks[i].NumAxes = SDL_JoystickNumAxes(joystick[i]);
 		joysticks[i].NumButtons = SDL_JoystickNumButtons(joystick[i]);
 		joysticks[i].Name = SDL_JoystickName(i);
-#if PSP
-		joysticks[i].Type = JOY_TYPE_SONY;
-		for(j=0; j<JOY_MAX_INPUTS+1; j++)
-		{
-			if(j) joysticks[i].KeyName[j] = SonyKeyName[j + k];
-			else joysticks[i].KeyName[j] = SonyKeyName[j];
-		}
-#elif XBOX
-		joysticks[i].Type = JOY_TYPE_MICROSOFT;
-		for(j=0; j<JOY_MAX_INPUTS+1; j++)
-		{
-			if(j) joysticks[i].KeyName[j] = MicrosoftKeyName[j + k];
-			else joysticks[i].KeyName[j] = MicrosoftKeyName[j];
-		}
-#elif GP2X
-		joysticks[i].Type = JOY_TYPE_GAMEPARK;
-		for(j=0; j<JOY_MAX_INPUTS+1; j++)
-		{
-			if(j) joysticks[i].KeyName[j] = GameparkKeyName[j + k];
-			else joysticks[i].KeyName[j] = GameparkKeyName[j];
-		}
-#else
 		//SDL_JoystickEventState(SDL_IGNORE); // disable joystick events
 		for(j=1; j<JOY_MAX_INPUTS+1; j++)
 		{
 			joysticks[i].KeyName[j] = PC_GetJoystickKeyName(i, j);
 		}
-#endif
 		if(scan != 2)
 		{
 			if(numjoy == 1) printf("%s - %d axes, %d buttons, %d hat(s)\n",
@@ -251,11 +228,7 @@ Then scan for joysticks and update their data.
 void control_init(int joy_enable)
 {
 	int i, j, k;
-#ifdef GP2X
-	usejoy = joy_enable ? joy_enable : 1;
-#else
 	usejoy = joy_enable;
-#endif
 	memset(joysticks, 0, sizeof(s_joysticks) * JOY_LIST_TOTAL);
 	for(i=0, k=0; i<JOY_LIST_TOTAL; i++, k+=JOY_MAX_INPUTS)
 	{

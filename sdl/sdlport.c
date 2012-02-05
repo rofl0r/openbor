@@ -11,18 +11,8 @@
 #include "video.h"
 #include "menu.h"
 
-#ifdef DARWIN
-#include <CoreFoundation/CoreFoundation.h>
-#elif WII
-#include <fat.h>
-#elif WIN
-#undef main
-#endif
-
-#ifdef SDL
 #define appExit exit
 #undef exit
-#endif
 
 char packfile[128] = {"bor.pak"};
 char paksDir[128] = {"Paks"};
@@ -32,15 +22,7 @@ char screenShotsDir[128] = {"ScreenShots"};
 
 void borExit(int reset)
 {
-
-#ifdef GP2X
-	gp2x_end();
-	chdir("/usr/gp2x");
-	execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);
-#else
 	SDL_Delay(1000);
-#endif
-
 	appExit(0);
 }
 
@@ -48,22 +30,6 @@ int main(int argc, char *argv[])
 {
 #ifdef CUSTOM_SIGNAL_HANDLER
 	struct sigaction sigact;
-#endif
-
-#ifdef DARWIN
-	char resourcePath[PATH_MAX];
-	CFBundleRef mainBundle;
-	CFURLRef resourcesDirectoryURL;
-	mainBundle = CFBundleGetMainBundle();
-	resourcesDirectoryURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-	if(!CFURLGetFileSystemRepresentation(resourcesDirectoryURL, true, (UInt8 *) resourcePath, PATH_MAX))
-	{
-		borExit(0);
-	}
-	CFRelease(resourcesDirectoryURL);
-	chdir(resourcePath);
-#elif WII
-	fatInitDefault();
 #endif
 
 #ifdef CUSTOM_SIGNAL_HANDLER
