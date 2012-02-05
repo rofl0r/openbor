@@ -4533,16 +4533,16 @@ s_model *init_model(int cacheindex, int unload) {
 	newchar->isSubclassed = 0;
 	newchar->freetypes = MF_ALL;
 
-	newchar->defense_factors = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_pain = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_knockdown = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_blockpower = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_blockthreshold = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_blockratio = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->defense_blocktype = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
-	newchar->offense_factors = (float *) calloc(1, sizeof(float) * (max_attack_types + 1));
+	newchar->defense_factors = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_pain = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_knockdown = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_blockpower = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_blockthreshold = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_blockratio = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_blocktype = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->offense_factors = (float *) calloc(sizeof(float), (max_attack_types + 1));
 
-	newchar->special = calloc(1, sizeof(*newchar->special) * max_freespecials);
+	newchar->special = calloc(sizeof(*newchar->special), max_freespecials);
 	if(!newchar->special)
 		shutdown(1, (char *) E_OUT_OF_MEMORY);
 
@@ -4613,7 +4613,7 @@ s_model *init_model(int cacheindex, int unload) {
 	newchar->star = -1;
 	newchar->knife = -1;
 
-	newchar->animation = (s_anim **) calloc(1, sizeof(s_anim *) * max_animations);
+	newchar->animation = (s_anim **) calloc(sizeof(s_anim *), max_animations);
 	if(!newchar->animation)
 		shutdown(1, (char *) E_OUT_OF_MEMORY);
 
