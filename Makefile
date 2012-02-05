@@ -25,9 +25,9 @@ INCLUDES        = $(SDKPATH)/include \
                   $(SDKPATH)/include/SDL
 
 ifdef BUILD_DEBUG
-STRIP           = cp $(TARGET) $(TARGET_FINAL)
+STRIP           = mv $(TARGET) $(TARGET_FINAL)
 else
-STRIP           ?= strip $(TARGET) $(TARGET_FINAL)
+STRIP           ?= strip $(TARGET) -o $(TARGET_FINAL)
 endif
 
 
