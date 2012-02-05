@@ -5096,8 +5096,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->guardpoints[1] = atoi(value);
 					break;
 				case CMD_MODEL_DEFENSE:
-					#define tempdef(x, y, z, p, k, b, t, r, e) \
-					x(stricmp(value, #y)==0)\
+					#define tempdef(y, z, p, k, b, t, r, e) \
+					else if (stricmp(value, #y)==0)\
 					{\
 					newchar->z[ATK_##y] = GET_FLOAT_ARG(2);\
 					/*newchar->z[ATK_##y] /= 100;*/\
@@ -5112,21 +5112,22 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					}
 					{
 						value = GET_ARG(1);
-						tempdef(if, NORMAL, defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL2,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL3,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL4,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL5,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL6,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL7,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL8,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL9,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, NORMAL10,  defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, BLAST,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, STEAL,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, BURN,      defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, SHOCK,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(else if, FREEZE,    defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						if(0) ;
+						tempdef(NORMAL,    defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL2,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL3,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL4,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL5,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL6,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL7,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL8,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL9,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(NORMAL10,  defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(BLAST,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(STEAL,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(BURN,      defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(SHOCK,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
+						tempdef(FREEZE,    defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
 						else if(strnicmp(value, "normal", 6)==0)
 						{
 							tempInt = atoi(value+6);
@@ -5156,29 +5157,30 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					#undef tempdef
 					break;
 				case CMD_MODEL_OFFENSE:
-					#define tempoff(x, y, z) \
-					x(stricmp(value, #y)==0)\
+					#define tempoff(y, z) \
+					else if (stricmp(value, #y)==0)\
 					{\
 					newchar->z[ATK_##y] = GET_FLOAT_ARG(2);\
 					/*newchar->z[ATK_##y] /= 100;*/\
 					}
 					{
 						value = GET_ARG(1);
-						tempoff(if,         NORMAL,     offense_factors)
-						tempoff(else if,    NORMAL2,    offense_factors)
-						tempoff(else if,    NORMAL3,    offense_factors)
-						tempoff(else if,    NORMAL4,    offense_factors)
-						tempoff(else if,    NORMAL5,    offense_factors)
-						tempoff(else if,    NORMAL6,    offense_factors)
-						tempoff(else if,    NORMAL7,    offense_factors)
-						tempoff(else if,    NORMAL8,    offense_factors)
-						tempoff(else if,    NORMAL9,    offense_factors)
-						tempoff(else if,    NORMAL10,   offense_factors)
-						tempoff(else if,    BLAST,      offense_factors)
-						tempoff(else if,    STEAL,      offense_factors)
-						tempoff(else if,    BURN,       offense_factors)
-						tempoff(else if,    SHOCK,      offense_factors)
-						tempoff(else if,    FREEZE,     offense_factors)
+						if(0) ; 
+						tempoff(NORMAL,     offense_factors)
+						tempoff(NORMAL2,    offense_factors)
+						tempoff(NORMAL3,    offense_factors)
+						tempoff(NORMAL4,    offense_factors)
+						tempoff(NORMAL5,    offense_factors)
+						tempoff(NORMAL6,    offense_factors)
+						tempoff(NORMAL7,    offense_factors)
+						tempoff(NORMAL8,    offense_factors)
+						tempoff(NORMAL9,    offense_factors)
+						tempoff(NORMAL10,   offense_factors)
+						tempoff(BLAST,      offense_factors)
+						tempoff(STEAL,      offense_factors)
+						tempoff(BURN,       offense_factors)
+						tempoff(SHOCK,      offense_factors)
+						tempoff(FREEZE,     offense_factors)
 						else if(strnicmp(value, "normal", 6)==0)
 						{
 							tempInt = atoi(value+6);
