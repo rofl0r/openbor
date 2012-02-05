@@ -47,6 +47,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+// FIXME wow. this needs to be fixed. does rename every occurence of those variables/functions.
+
 #define		exit				borExit
 #define		time				borTime
 #define		kill				borKill
@@ -571,40 +573,31 @@
 typedef struct
 {
 	unsigned int	compatibleversion:32;
-	short       	gamma:16;
-	short       	brightness:16;
-	char			usesound:8;						// Use SB
+	short		gamma:16;
+	short		brightness:16;
+	char		usesound:8;						// Use SB
 	unsigned short	soundrate:16;					// SB freq
-	short       	soundvol:16;					// SB volume
-	char			usemusic:8;						// Play music
-	short       	musicvol:16;					// Music volume
-	short       	effectvol:16;					// Sound fx volume
-	char			soundbits:8;					// SB bits
-	char			usejoy:8;
-	char			mode:8;							// Mode now saves
-	char			windowpos:8;
-	int				keys[MAX_PLAYERS][12];
-	char			showtitles:8;
-	char			videoNTSC:8;
-	char			screen[7][2];					// Screen Filtering/Scaling Effects
-	char            logo:8;
-	char            uselog:8;
-	char			debuginfo:8;					// FPS, Memory, etc...
-	char			fullscreen:8;					// Window or Full Screen Mode
-	char			stretch:8;						// Stretch (1) or preserve aspect ratio (0) in fullscreen mode
-#if SDL
-	char			usegl:8;						// 1 if OpenGL is preferred over SDL software blitting
-	float			glscale;						// Scale factor for OpenGL
-	char			glfilter:8;						// Simple or bilinear scaling
-#endif
-#if PSP
-	char			pspcpuspeed:8;					// PSP CPU Speed
-	char            overscan[4];                    // Control TV Overscan
-	char            usetv:8;						// Initilize TV at bootup
-#endif
-
+	short		soundvol:16;					// SB volume
+	char		usemusic:8;						// Play music
+	short		musicvol:16;					// Music volume
+	short		effectvol:16;					// Sound fx volume
+	char		soundbits:8;					// SB bits
+	char		usejoy:8;
+	char		mode:8;							// Mode now saves
+	char		windowpos:8;
+	int		keys[MAX_PLAYERS][12];
+	char		showtitles:8;
+	char		videoNTSC:8;
+	char		screen[7][2];					// Screen Filtering/Scaling Effects
+	char		logo:8;
+	char		uselog:8;
+	char		debuginfo:8;					// FPS, Memory, etc...
+	char		fullscreen:8;					// Window or Full Screen Mode
+	char		stretch:8;						// Stretch (1) or preserve aspect ratio (0) in fullscreen mode
+	char		usegl:8;						// 1 if OpenGL is preferred over SDL software blitting
+	float		glscale;						// Scale factor for OpenGL
+	char		glfilter:8;						// Simple or bilinear scaling
 }s_savedata;
-
 
 typedef struct
 {
@@ -1785,12 +1778,33 @@ void soundcard_options();
 void openborMain(int argc, char** argv);
 int getValidInt(char* text, char* file, char* cmd);
 float getValidFloat(char* text, char* file, char* cmd);
+int set_color_correction(int gm, int br);
 
+extern s_videomodes videomodes;
+extern int videoMode;
+extern int current_palette;
+extern unsigned char pal[MAX_PAL_SIZE];
 
-s_savelevel savelevel[MAX_DIFFICULTIES];
-s_savescore savescore;
-s_savedata savedata;
+extern s_savelevel savelevel[MAX_DIFFICULTIES];
+extern s_savescore savescore;
+extern s_savedata savedata;
 
 extern int quit_game;
-
+extern u32 bothkeys;
+extern u32 bothnewkeys;
+extern u32 interval;
+extern s_playercontrols*   playercontrolpointers[];
+extern int SAMPLE_BEEP;
+extern int SAMPLE_BEEP2;
+extern int cheats;
+extern int livescheat;
+extern int creditscheat;
+extern int healthcheat;
+extern int keyscriptrate;
+extern int versusdamage;
+extern int ctrlmaxplayers[MAX_DIFFICULTIES];
+extern int maxplayers[MAX_DIFFICULTIES];
+extern int current_set;
+extern int pause; //FIXME rename to borPause and remove pause macro
+extern int forcecheatsoff;
 #endif
