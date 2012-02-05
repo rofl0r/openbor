@@ -163,8 +163,7 @@ void u16pcpy(unsigned short* pdest, const unsigned char* psrc, unsigned short* p
 void u32revpcpy(unsigned* pdest, const unsigned char* psrc, unsigned* pp, unsigned len);
 void u32pcpy(unsigned* pdest, const unsigned char* psrc, unsigned* pp, unsigned len);
 
-typedef struct
-{
+typedef struct {
 	unsigned char* table;
 	void* fp;
 	unsigned fillcolor;
@@ -181,23 +180,32 @@ typedef struct
 	int shiftx;
 	int centerx;   // shift centerx
 	int centery;   //shift centery
-}s_drawmethod;
+} s_drawmethod;
 
-typedef struct
-{
-	short hRes;        // Horizontal Resolution
-	short vRes;		 // Vertical Resolution
-	short hShift;	     // Offset for X-Axis Text
-	short vShift;	     // Offset for Y-Axis Text
-	short dOffset;	 // Offset for Debug Text
+typedef struct {
+	short hRes;	// Horizontal Resolution
+	short vRes;	// Vertical Resolution
+	short hShift;	// Offset for X-Axis Text
+	short vShift;	// Offset for Y-Axis Text
+	short dOffset;	// Offset for Debug Text
 	short shiftpos[4];
 	char filter;
 	char mode;
 	char pixel;
-	float hScale;    // Multiplier for X-Axis
-	float vScale;    // Multiplier for Y-Axis
+	float hScale;	// Multiplier for X-Axis
+	float vScale;	// Multiplier for Y-Axis
+} s_videomodes;
 
-}s_videomodes;
+typedef enum  {
+	VTM_320_240 = 0,
+	VTM_480_272,
+	VTM_640_480,
+	VTM_720_480,
+	VTM_800_480,
+	VTM_800_600,
+	VTM_960_560,
+	VTM_MAX
+} video_txt_modes;
 
 #if SYMBIAN
 #pragma pack(0)

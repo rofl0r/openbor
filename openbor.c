@@ -41,6 +41,18 @@ s_screen*           bgbuffer            = NULL;
 char                bgbuffer_updated    = 0;
 s_bitmap*           texture             = NULL;
 s_videomodes        videomodes;
+
+static const s_videomodes videomodes_init_data[] = {
+	[VTM_320_240] = {320, 240, 0, 0, 231, {0, 0, 0, 0}, 0, 0, 0, 1.f, 1.f},
+	[VTM_480_272] = {480, 272, 80, 20, 163, {0, 0, 0, 0,}, 0, 0, 0, 1.5f, 1.13f},
+	[VTM_640_480] = {640, 480, 160, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.f, 2.f},
+	[VTM_720_480] = {720, 480, 200, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.25f, 2.f},
+	[VTM_800_480] = {800, 480, 240, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.5f, 2.f},
+	[VTM_800_600] = {800, 600, 240, 44, 580, {0, 0, 0, 0}, 0, 0, 0, 2.5f, 2.5f},
+	[VTM_960_560] = {960, 540, 320, 40, 522, {0, 0, 0, 0}, 0, 0, 0, 3.f, 2.25f}
+};
+
+
 int sprite_map_max_items = 0;
 int cache_map_max_items = 0;
 
@@ -20066,8 +20078,8 @@ void startup(){
 	loadHighScoreFile();
 	clearSavedGame();
 
-	init_videomodes(1);
-	if(!video_set_mode(videomodes)) shutdown(1, "Unable to set video mode: %d x %d!\n", videomodes.hRes, videomodes.vRes);
+	
+	if(!init_videomodes(1)) shutdown(1, "Unable to set video mode: %d x %d!\n", videomodes.hRes, videomodes.vRes);
 
 	printf("Loading menu.txt.............\t");
 	load_menu_txt();
@@ -21295,8 +21307,9 @@ void term_videomodes()
 }
 
 // Load Video Mode from file
-void init_videomodes(int log)
+int init_videomodes(int log)
 {
+	int result;
 	char *filename = "data/video.txt";
 	int bits = 8, tmp;
 	ptrdiff_t pos, len;
@@ -21318,7 +21331,7 @@ readfile:
 	// Read file
 	if(buffer_pakfile(filename, &buf, &size)!=1)
 	{
-		videoMode = 0;
+		videoMode = VTM_320_240;
 		printf("'%s' not found.\n", filename);
 		goto VIDEOMODES;
 	}
@@ -21379,7 +21392,7 @@ readfile:
 					printf("Command '%s' not understood in file '%s'!", command, filename);
 		}
 		// Go to next line
-	pos += getNewLineStart(buf + pos);
+		pos += getNewLineStart(buf + pos);
 	}
 
 	if(buf != NULL){
@@ -21388,129 +21401,68 @@ readfile:
 	}
 
 VIDEOMODES:
+	videomodes = videomodes_init_data[videoMode];
+	videomodes.mode    = savedata.screen[videoMode][0];
+	videomodes.filter  = savedata.screen[videoMode][1];
+
 	switch (videoMode)
 	{
-		// 320x240 - All Platforms
-		case 0:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-			videomodes.hRes    = 320;
-			videomodes.vRes    = 240;
-			videomodes.hScale  = 1;
-			videomodes.vScale  = 1;
-			videomodes.hShift  = 0;
-			videomodes.vShift  = 0;
-			videomodes.dOffset = 231;
+		case VTM_320_240:
 			PLAYER_MIN_Z       = 160;
 			PLAYER_MAX_Z       = 232;
 			BGHEIGHT           = 160;
-	        break;
-
-		// 480x272 - All Platforms
-		case 1:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-	        videomodes.hRes    = 480;
-			videomodes.vRes    = 272;
-			videomodes.hScale  = (float)1.5;
-			videomodes.vScale  = (float)1.13;
-			videomodes.hShift  = 80;
-			videomodes.vShift  = 20;
-			videomodes.dOffset = 263;
+			break;
+		case VTM_480_272:
 			PLAYER_MIN_Z       = 182;
 			PLAYER_MAX_Z       = 264;
 			BGHEIGHT           = 182;
 			break;
 
 		// 640x480 - PC, Dreamcast, Wii
-		case 2:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-	        videomodes.hRes    = 640;
-			videomodes.vRes    = 480;
-			videomodes.hScale  = 2;
-			videomodes.vScale  = 2;
-			videomodes.hShift  = 160;
-			videomodes.vShift  = 35;
-			videomodes.dOffset = 464;
+		case VTM_640_480:
 			PLAYER_MIN_Z       = 321;
 			PLAYER_MAX_Z       = 465;
 			BGHEIGHT           = 321;
 			break;
 
 		// 720x480 - PC, Wii
-		case 3:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-	        videomodes.hRes    = 720;
-			videomodes.vRes    = 480;
-			videomodes.hScale  = 2.25;
-			videomodes.vScale  = 2;
-			videomodes.hShift  = 200;
-			videomodes.vShift  = 35;
-			videomodes.dOffset = 464;
+		case VTM_720_480:
 			PLAYER_MIN_Z       = 321;
 			PLAYER_MAX_Z       = 465;
 			BGHEIGHT           = 321;
 			break;
 
 		// 800x480 - PC, Wii, Pandora
-		case 4:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-			videomodes.hRes    = 800;
-			videomodes.vRes    = 480;
-			videomodes.hScale  = 2.5;
-			videomodes.vScale  = 2;
-			videomodes.hShift  = 240;
-			videomodes.vShift  = 35;
-			videomodes.dOffset = 464;
+		case VTM_800_480:
 			PLAYER_MIN_Z       = 321;
 			PLAYER_MAX_Z       = 465;
 			BGHEIGHT           = 321;
 			break;
 
 		// 800x600 - PC, Dreamcast, Wii
-		case 5:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-			videomodes.hRes    = 800;
-			videomodes.vRes    = 600;
-			videomodes.hScale  = 2.5;
-			videomodes.vScale  = 2.5;
-			videomodes.hShift  = 240;
-			videomodes.vShift  = 44;
-			videomodes.dOffset = 580;
+		case VTM_800_600:
 			PLAYER_MIN_Z       = 401;
 			PLAYER_MAX_Z       = 582;
 			BGHEIGHT           = 401;
 			break;
 
 		// 960x540 - PC, Wii
-		case 6:
-			videomodes.mode    = savedata.screen[videoMode][0];
-			videomodes.filter  = savedata.screen[videoMode][1];
-	        videomodes.hRes    = 960;
-			videomodes.vRes    = 540;
-			videomodes.hScale  = 3;
-			videomodes.vScale  = 2.25;
-			videomodes.hShift  = 320;
-			videomodes.vShift  = 40;
-			videomodes.dOffset = 522;
+		case VTM_960_560:
 			PLAYER_MIN_Z       = 362;
 			PLAYER_MAX_Z       = 524;
 			BGHEIGHT           = 362;
 			break;
 
 		default:
-			shutdown(1, "Invalid video mode: %d in 'data/video.txt', supported modes:\n"
-				        "0 - 320x240\n"
-						"1 - 480x272\n"
-						"2 - 640x480\n"
-						"3 - 720x480\n"
-						"4 - 800x480\n"
-						"5 - 800x600\n"
-						"6 - 960x540\n\n", videoMode);
+			shutdown(1, 
+				 "Invalid video mode: %d in 'data/video.txt', supported modes:\n"
+				 "0 - 320x240\n"
+				 "1 - 480x272\n"
+				 "2 - 640x480\n"
+				 "3 - 720x480\n"
+				 "4 - 800x480\n"
+				 "5 - 800x600\n"
+				 "6 - 960x540\n\n", videoMode);
 			break;
 	}
 
@@ -21520,10 +21472,14 @@ VIDEOMODES:
 
 	if((vscreen = allocscreen(videomodes.hRes, videomodes.vRes, screenformat)) == NULL) shutdown(1, "Not enough memory!\n");
 	videomodes.pixel = pixelbytes[(int)vscreen->pixelformat];
-	video_set_mode(videomodes);
-	clearscreen(vscreen);
-
-	if(log) printf("Initialized video.............\t%dx%d (Mode: %d, Depth: %d Bit)\n\n",videomodes.hRes, videomodes.vRes, videoMode, bits);
+	result = video_set_mode(videomodes);
+	
+	if(result) {
+		clearscreen(vscreen);
+		if(log)
+			printf("Initialized video.............\t%dx%d (Mode: %d, Depth: %d Bit)\n\n",videomodes.hRes, videomodes.vRes, videoMode, bits);
+	}
+	return result;
 }
 
 // ----------------------------------------------------------------------------
@@ -22246,8 +22202,7 @@ void video_options(){
 		_menutext((selector==4), col1, 1, "Video Backend:");
 		_menutext((selector==4), col2, 1, savedata.fullscreen ? "Automatic (%s)" : "%s", opengl ? "OpenGL" : "SDL");
 
-		if(opengl)
-		{
+		if(opengl) {
 			_menutext((selector==5), col1, 2, "Screen:");
 			if(savedata.fullscreen) _menutext((selector==5), col2, 2, "Automatic");
 			else _menutext((selector==5), col2, 2, "%4.2fx - %ix%i", savedata.glscale, (int)(videomodes.hRes*savedata.glscale), (int)(videomodes.vRes*savedata.glscale));
@@ -22255,9 +22210,7 @@ void video_options(){
 			_menutext((selector==6), col1, 3, "Filters:");
 			if(savedata.fullscreen) _menutext((selector==6), col2, 3, "Automatic (Bilinear)");
 			else _menutext((selector==6), col2, 3, "%s", savedata.glscale!=1.0 ? (savedata.glfilter ? "Simple" : "Bilinear") : "Disabled");
-		}
-		else
-		{
+		} else {
 			_menutext((selector==5), col1, 2, "Screen:");
 			if(savedata.screen[videoMode][0]) _menutext((selector==3), col2, 2, "%ix - %ix%i", savedata.screen[videoMode][0], videomodes.hRes*savedata.screen[videoMode][0], videomodes.vRes*savedata.screen[videoMode][0]);
 			else _menutext((selector==5), col2, 2, "Disabled");
@@ -22266,11 +22219,11 @@ void video_options(){
 			_menutext((selector==6), col2, 3, "%s", savedata.screen[videoMode][0]==2 ? GfxBlitterNames[(int)savedata.screen[videoMode][1]] : "Disabled");
 		}
 
-		if(savedata.fullscreen)
-		{
+		if(savedata.fullscreen) {
 			_menutext((selector==7), col1, 4, "Fullscreen Type:");
 			_menutext((selector==7), col2, 4, "%s", savedata.stretch ? "Stretch to Screen" : "Preserve Aspect Ratio");
-		} else if(selector==7) selector = (bothnewkeys & FLAG_MOVEUP) ? 6 : 8;
+		} else if(selector==7) 
+			selector = (bothnewkeys & FLAG_MOVEUP) ? 6 : 8;
 
 		_menutextm((selector==8), 7, 0, "Back");
 		if(selector<0) selector = 8;
@@ -22332,38 +22285,32 @@ void video_options(){
 					set_color_correction(savedata.gamma, savedata.brightness);
 					break;
 				case 5:
-					if(opengl)
-					{
+					if(opengl) {
 						if(savedata.fullscreen) break;
 						savedata.glscale += dir * 0.25;
 						if(savedata.glscale < 0.25) savedata.glscale = 0.25;
 						if(savedata.glscale > 4.00) savedata.glscale = 4.00;
 						video_set_mode(videomodes);
-					}
-					else
-					{
-	    				videomodes.mode += dir * 2;
-					if(videomodes.mode > 4) videomodes.mode = 0;
-					    if(videomodes.mode < 0) videomodes.mode = 4;
-					    savedata.screen[videoMode][0] = videomodes.mode;
+					} else {
+						videomodes.mode += dir * 2;
+						if(videomodes.mode > 4) videomodes.mode = 0;
+						if(videomodes.mode < 0) videomodes.mode = 4;
+						savedata.screen[videoMode][0] = videomodes.mode;
 						video_set_mode(videomodes);
 						change_system_palette(current_palette);
 					}
 					break;
 				case 6:
-					if(opengl)
-					{
+					if(opengl) {
 						if(savedata.fullscreen || (savedata.glscale == 1.0)) break;
 						savedata.glfilter += dir;
 						if(savedata.glfilter < 0) savedata.glfilter = 1;
 						if(savedata.glfilter > 1) savedata.glfilter = 0;
-					}
-					else
-					{
+					} else {
 						if(videomodes.mode!=2) break;
 						videomodes.filter += dir;
 						if(videomodes.filter > BLITTER_MAX - 1) videomodes.filter = 0;
-					    if(videomodes.filter < 0) videomodes.filter = BLITTER_MAX - 1;
+						if(videomodes.filter < 0) videomodes.filter = BLITTER_MAX - 1;
 						savedata.screen[videoMode][1] = videomodes.filter;
 					}
 					break;
