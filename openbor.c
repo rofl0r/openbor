@@ -21365,34 +21365,89 @@ void safe_set(int *arr, int index, int newkey, int oldkey){
 	arr[index] = newkey;
 }
 
-void keyboard_setup(int player){
-	int quit = 0,
-		selector = 0,
-		setting = -1,
-		i, k, ok = 0,
-		disabledkey[12] = {0,0,0,0,0,0,0,0,0,0,0,0},
-		col1 =-8, col2 = 6;
+typedef enum {
+	CB_UP = 0,
+	CB_DOWN,
+	CB_LEFT,
+	CB_RIGHT,
+	CB_ATK1,
+	CB_ATK2,
+	CB_ATK3,
+	CB_ATK4,
+	CB_JUMP,
+	CB_SPECIAL,
+	CB_START,
+	CB_SCREENSHOT,
+	CB_MAX
+} control_buttons;
+
+static const char* default_button_names[] = {
+	[CB_UP] = "Move Up",
+	[CB_DOWN] = "Move Down",
+	[CB_LEFT] = "Move Left",
+	[CB_RIGHT] = "Move Right",
+	[CB_ATK1] = "Attack 1",
+	[CB_ATK2] = "Attack 2",
+	[CB_ATK3] = "Attack 3",
+	[CB_ATK4] = "Attack 4",
+	[CB_JUMP] = "Jump",
+	[CB_SPECIAL] = "Special",
+	[CB_START] = "Start",
+	[CB_SCREENSHOT] = "Screenshot",
+};
+
+static const char* config_button_names[] = {
+	[CB_UP] = "moveup",
+	[CB_DOWN] = "movedown",
+	[CB_LEFT] = "moveleft",
+	[CB_RIGHT] = "moveright",
+	[CB_ATK1] = "attack",
+	[CB_ATK2] = "attack2",
+	[CB_ATK3] = "attack3",
+	[CB_ATK4] = "attack4",
+	[CB_JUMP] = "jump",
+	[CB_SPECIAL] = "special",
+	[CB_START] = "start",
+	[CB_SCREENSHOT] = "screenshot",
+};
+
+static void char_to_lower(char* dst, char* src, size_t maxlen) {
+	unsigned i;
+	for(i = 0; i < maxlen; i++) {
+		dst[i] = tolower(src[i]);
+		if(!src[i]) break;
+	}
+	if(i == maxlen) dst[maxlen - 1] = 0;
+}
+
+static void init_button_names(char** buttonnames) {
+	unsigned i;
+	for (i = 0; i < CB_MAX; i++)
+		buttonnames[i] = (char*) default_button_names[i];
+}
+
+void keyboard_setup(int player) {
+	char lowercase_buf[16];
+	char disabledkey[CB_MAX] = {0};
+	char quit = 0;
+	int selector = 0;
+	int setting = -1;
+	int i, k, ok = 0;
+	int col1 =-8, col2 = 6;
+	
 	ptrdiff_t pos, voffset;
 	size_t size;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN+1] = "";
-	char *buf, *command, *filename = "data/menu.txt",
-	     buttonnames[12][16];
+	char *buf,
+	*command,
+	*filename = "data/menu.txt",
+	custom_button_names[CB_MAX][16],
+	*buttonnames[CB_MAX];
+	
+	init_button_names(buttonnames);
 
 	printf("Loading control settings.......\t");
-
-	strncpy(buttonnames[0], "Move Up", 16);
-	strncpy(buttonnames[1], "Move Down", 16);
-	strncpy(buttonnames[2], "Move Left", 16);
-	strncpy(buttonnames[3], "Move Right", 16);
-	strncpy(buttonnames[4], "Attack 1", 16);
-	strncpy(buttonnames[5], "Attack 2", 16);
-	strncpy(buttonnames[6], "Attack 3", 16);
-	strncpy(buttonnames[7], "Attack 4", 16);
-	strncpy(buttonnames[8], "Jump", 16);
-	strncpy(buttonnames[9], "Special", 16);
-	strncpy(buttonnames[10], "Start", 16);
-	strncpy(buttonnames[11], "Screenshot", 16);
 
 	savesettings();
 	bothnewkeys = 0;
@@ -21405,63 +21460,24 @@ void keyboard_setup(int player){
 			ParseArgs(&arglist,buf+pos,argbuf);
 			command = GET_ARG(0);
 			if(command[0]){
-				if(stricmp(command, "disablekey")==0){
-
-					if(stricmp(GET_ARG(1), "moveup")==0)
-						disabledkey[0] = 1;
-					else if(stricmp(GET_ARG(1), "movedown")==0)
-						disabledkey[1] = 1;
-					else if(stricmp(GET_ARG(1), "moveleft")==0)
-						disabledkey[2] = 1;
-					else if(stricmp(GET_ARG(1), "moveright")==0)
-						disabledkey[3] = 1;
-					else if(stricmp(GET_ARG(1), "attack")==0)
-						disabledkey[4] = 1;
-					else if(stricmp(GET_ARG(1), "attack2") == 0)
-						disabledkey[5] = 1;
-					else if(stricmp(GET_ARG(1), "attack3") == 0)
-						disabledkey[6] = 1;
-					else if(stricmp(GET_ARG(1), "attack4") == 0)
-						disabledkey[7] = 1;
-					else if(stricmp(GET_ARG(1), "jump") == 0)
-						disabledkey[8] = 1;
-					else if(stricmp(GET_ARG(1), "special") == 0)
-						disabledkey[9] = 1;
-					else if(stricmp(GET_ARG(1), "start") == 0)
-						disabledkey[10] = 1;
-					else if(stricmp(GET_ARG(1), "screenshot") == 0)
-						disabledkey[11] = 1;
-				}
-				else if(stricmp(command, "renamekey")==0){
-					if(stricmp(GET_ARG(1), "moveup") == 0)
-						strncpy(buttonnames[0], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "movedown") == 0)
-						strncpy(buttonnames[1], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "moveleft") == 0)
-						strncpy(buttonnames[2], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "moveright") == 0)
-						strncpy(buttonnames[3], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "attack") == 0)
-						strncpy(buttonnames[4], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "attack2") == 0)
-						strncpy(buttonnames[5], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "attack3") == 0)
-						strncpy(buttonnames[6], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "attack4") == 0)
-						strncpy(buttonnames[7], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "jump") == 0)
-						strncpy(buttonnames[8], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "special") == 0)
-						strncpy(buttonnames[9], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "start") == 0)
-						strncpy(buttonnames[10], GET_ARG(2), 16);
-					else if(stricmp(GET_ARG(1), "screenshot") == 0)
-						strncpy(buttonnames[11], GET_ARG(2), 16);
-				}
-				else if(stricmp(command, "fontmonospace")==0){
-					 // here to keep from crashing
-				}
-				else
+				if(stricmp(command, "disablekey")==0) {
+					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+					for(i = 0; i < CB_MAX; i++) {
+						if(!strcmp(lowercase_buf, config_button_names[i])) {
+							disabledkey[i] = 1;
+							break;
+						}
+					}
+				} else if(stricmp(command, "renamekey")==0) {
+					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+					for(i = 0; i < CB_MAX; i++) {
+						if(!strcmp(lowercase_buf, config_button_names[i])) {
+							strncpy(custom_button_names[i], GET_ARG(2), 16);
+							buttonnames[i] = custom_button_names[i];
+							break;
+						}
+					}
+				} else
 					if(command && command[0])
 						printf("Command '%s' not understood in file '%s'!", command, filename);
 
@@ -21480,15 +21496,15 @@ void keyboard_setup(int player){
 	while(!quit){
 		voffset = -6;
 		_menutextm(2, -8, 0, "Player %i", player+1);
-		for(i = 0; i < 12; i++){
+		for(i = 0; i < CB_MAX; i++){
 			  if(!disabledkey[i]){
 					_menutext((selector==i), col1, voffset, "%s", buttonnames[i]);
 					_menutext((selector==i), col2, voffset, "%s", control_getkeyname(savedata.keys[player][i]));
 					voffset++;
 			  }
 		}
-		_menutextm((selector==12), 7, 0, "OK");
-		_menutextm((selector==13), 8, 0, "Cancel");
+		_menutextm((selector == CB_MAX), 7, 0, "OK");
+		_menutextm((selector == CB_MAX + 1), 8, 0, "Cancel");
 		update(0,0);
 
 		if(setting > -1){
@@ -21507,8 +21523,7 @@ void keyboard_setup(int player){
 					bothnewkeys = 0;
 				}
 			}
-		}
-		else{
+		} else {
 			if(bothnewkeys & FLAG_ESC) quit = 1;
 			if(bothnewkeys & FLAG_MOVEUP){
 				do{ if(--selector<0) break; }while(disabledkey[selector]);
@@ -21518,22 +21533,22 @@ void keyboard_setup(int player){
 				do{ if(++selector>11) break; }while(disabledkey[selector]);
 				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol,savedata.effectvol, 100);
 			}
-			if(selector<0) selector = 13;
-			if(selector>13){
+			if(selector < 0) selector = CB_MAX + 1;
+			if(selector > CB_MAX + 1){
 				 selector = 0;
-				 while(disabledkey[selector]) if(++selector>11) break;
+				 while(disabledkey[selector]) if(++selector > (CB_MAX - 1)) break;
 			}
 			if(bothnewkeys & FLAG_ANYBUTTON){
 				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol,savedata.effectvol, 100);
-				if(selector==12) quit = 2;
-				else if(selector==13) quit = 1;
+				if(selector == CB_MAX)
+					quit = 2;
+				else if(selector == CB_MAX + 1)
+					quit = 1;
 				else{
 					setting = selector;
 					ok = savedata.keys[player][setting];
 					savedata.keys[player][setting] = 0;
-#if DOS || SDL || PSP || WII
 					keyboard_getlastkey();
-#endif
 				}
 			}
 		}
