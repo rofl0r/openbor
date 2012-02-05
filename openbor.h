@@ -219,26 +219,26 @@ extern s_player_min_max_z_bgheight player_min_max_z_bgheight;
 #define		GRAB_DIST			36	// Grabbing ents will be placed this far apart.
 #define		GRAB_STALL			(GAME_SPEED * 8 / 10)
 
+typedef enum {
+	ATK_NORMAL = 0,
+	ATK_NORMAL2,
+	ATK_NORMAL3,
+	ATK_NORMAL4,
+	ATK_BLAST,
+	ATK_BURN,
+	ATK_FREEZE,
+	ATK_SHOCK,
+	ATK_STEAL, // Steal opponents life
+	ATK_NORMAL5,
+	ATK_NORMAL6,
+	ATK_NORMAL7,
+	ATK_NORMAL8,
+	ATK_NORMAL9,
+	ATK_NORMAL10,
+	ATK_ITEM,
+	MAX_ATKS
+} attack_types;
 
-
-#define		ATK_NORMAL			0
-#define		ATK_NORMAL2			1
-#define		ATK_NORMAL3			2
-#define		ATK_NORMAL4			3
-#define		ATK_BLAST			4
-#define		ATK_BURN			5
-#define		ATK_FREEZE			6
-#define		ATK_SHOCK			7
-#define		ATK_STEAL			8	// Steal opponents life
-#define		ATK_NORMAL5			9
-#define		ATK_NORMAL6			10
-#define		ATK_NORMAL7			11
-#define		ATK_NORMAL8			12
-#define		ATK_NORMAL9			13
-#define		ATK_NORMAL10		14
-#define		ATK_ITEM		    15
-
-#define     MAX_ATKS            16	// default max attack types
 #define     STA_ATKS            6	// default special attack types: blast burn shock freeze steal
 #define     MAX_DOTS            10	// Max active dot effects.
 

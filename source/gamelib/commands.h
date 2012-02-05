@@ -504,6 +504,26 @@ typedef enum modelCommand {
 
 } modelCommands;
 
+#include "openbor.h"
+
+typedef enum {
+	CMD_MODELATTACK_NORMAL = ATK_NORMAL,
+	CMD_MODELATTACK_NORMAL2 = ATK_NORMAL2,
+	CMD_MODELATTACK_NORMAL3 = ATK_NORMAL3,
+	CMD_MODELATTACK_NORMAL4 = ATK_NORMAL4,
+	CMD_MODELATTACK_NORMAL5 = ATK_NORMAL5,
+	CMD_MODELATTACK_NORMAL6 = ATK_NORMAL6,
+	CMD_MODELATTACK_NORMAL7 = ATK_NORMAL7,
+	CMD_MODELATTACK_NORMAL8 = ATK_NORMAL8,
+	CMD_MODELATTACK_NORMAL9 = ATK_NORMAL9,
+	CMD_MODELATTACK_NORMAL10 = ATK_NORMAL10,
+	CMD_MODELATTACK_BLAST = ATK_BLAST,
+	CMD_MODELATTACK_STEAL = ATK_STEAL,
+	CMD_MODELATTACK_BURN = ATK_BURN,
+	CMD_MODELATTACK_SHOCK = ATK_SHOCK,
+	CMD_MODELATTACK_FREEZE = ATK_FREEZE,
+} modelAttackCommands;
+
 typedef enum {
 	CMD_MODELSTXT_MAXIDLES,
 	CMD_MODELSTXT_MAXWALKS,
@@ -539,6 +559,9 @@ void freeCommandList(List * list);
 
 List *createModelCommandList(void);
 modelCommands getModelCommand(List * list, char *usercommand);
+
+List *createModelAttackCommandList(void);
+modelAttackCommands getModelAttackCommand(List * list, char *usercommand);
 
 List *createModelstxtCommandList(void);
 modelstxtCommands getModelstxtCommand(List * list, char *usercommand);

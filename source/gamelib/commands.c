@@ -15,11 +15,15 @@ void *getCommandlistCommand(List * list, char *usercommand) {
 	if(n)
 		return n->value;
 	fail:
-	return NULL;
+	return (void*) -1;
 }
 
 modelCommands getModelCommand(List * list, char *usercommand) {
 	return (modelCommands) getCommandlistCommand(list, usercommand);
+}
+
+modelAttackCommands getModelAttackCommand(List * list, char *usercommand) {
+	return (modelAttackCommands) getCommandlistCommand(list, usercommand);
 }
 
 modelstxtCommands getModelstxtCommand(List * list, char *usercommand) {
@@ -75,6 +79,29 @@ List *createModelstxtCommandList(void) {
 #undef LIST_ADD
 	return result;
 }
+
+List *createModelAttackCommandList(void) {
+	List *result = prepareList();
+#define LIST_ADD(y,z) List_InsertAfter(result, (void*) y, z)
+	LIST_ADD(CMD_MODELATTACK_NORMAL, "normal");
+	LIST_ADD(CMD_MODELATTACK_NORMAL2, "normal2");
+	LIST_ADD(CMD_MODELATTACK_NORMAL3, "normal3");
+	LIST_ADD(CMD_MODELATTACK_NORMAL4, "normal4");
+	LIST_ADD(CMD_MODELATTACK_NORMAL5, "normal5");
+	LIST_ADD(CMD_MODELATTACK_NORMAL6, "normal6");
+	LIST_ADD(CMD_MODELATTACK_NORMAL7, "normal7");
+	LIST_ADD(CMD_MODELATTACK_NORMAL8, "normal8");
+	LIST_ADD(CMD_MODELATTACK_NORMAL9, "normal9");
+	LIST_ADD(CMD_MODELATTACK_NORMAL10, "normal10");
+	LIST_ADD(CMD_MODELATTACK_BLAST, "blast");
+	LIST_ADD(CMD_MODELATTACK_STEAL, "steal");
+	LIST_ADD(CMD_MODELATTACK_BURN, "burn");
+	LIST_ADD(CMD_MODELATTACK_SHOCK, "shock");
+	LIST_ADD(CMD_MODELATTACK_FREEZE, "freeze");	
+#undef LIST_ADD
+	return result;	
+}
+
 
 List *createModelCommandList(void) {
 	List *result = prepareList();

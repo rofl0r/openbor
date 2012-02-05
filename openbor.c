@@ -75,6 +75,7 @@ int cache_map_max_items = 0;
 
 int startup_done = 0;		// startup is only called when a game is loaded. so when exitting from the menu we need a way to figure out which resources to free.
 List *modelcmdlist = NULL;
+List* modelsattackcmdlist = NULL;
 List *modelstxtcmdlist = NULL;
 List *levelcmdlist = NULL;
 List *levelordercmdlist = NULL;
@@ -4723,6 +4724,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 	    ");\n";
 
 	modelCommands cmd;
+	modelAttackCommands atk_cmd;
 	s_scripts tempscripts;
 
 #ifdef DEBUG
@@ -5096,40 +5098,18 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->guardpoints[1] = atoi(value);
 					break;
 				case CMD_MODEL_DEFENSE:
-					#define tempdef(y, z, p, k, b, t, r, e) \
-					else if (stricmp(value, #y)==0)\
-					{\
-					newchar->z[ATK_##y] = GET_FLOAT_ARG(2);\
-					/*newchar->z[ATK_##y] /= 100;*/\
-					newchar->p[ATK_##y] = GET_FLOAT_ARG(3);\
-					newchar->k[ATK_##y] = GET_FLOAT_ARG(4);\
-					/*newchar->k[ATK_##y] /= 100;*/\
-					newchar->b[ATK_##y] = GET_FLOAT_ARG(5);\
-					newchar->t[ATK_##y] = GET_FLOAT_ARG(6);\
-					newchar->r[ATK_##y] = GET_FLOAT_ARG(7);\
-					/*newchar->r[ATK_##y] /= 100;*/\
-					newchar->e[ATK_##y] = GET_FLOAT_ARG(8);\
-					}
 					{
 						value = GET_ARG(1);
-						if(0) ;
-						tempdef(NORMAL,    defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL2,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL3,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL4,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL5,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL6,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL7,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL8,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL9,   defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(NORMAL10,  defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(BLAST,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(STEAL,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(BURN,      defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(SHOCK,     defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						tempdef(FREEZE,    defense_factors, defense_pain, defense_knockdown, defense_blockpower, defense_blockthreshold, defense_blockratio, defense_blocktype)
-						else if(strnicmp(value, "normal", 6)==0)
-						{
+						atk_cmd = getModelAttackCommand(modelsattackcmdlist, value);
+						if(atk_cmd >= 0) {
+							newchar->defense_factors[atk_cmd] = GET_FLOAT_ARG(2);
+							newchar->defense_pain[atk_cmd] = GET_FLOAT_ARG(3);
+							newchar->defense_knockdown[atk_cmd] = GET_FLOAT_ARG(4);
+							newchar->defense_blockpower[atk_cmd] = GET_FLOAT_ARG(5);
+							newchar->defense_blockthreshold[atk_cmd] = GET_FLOAT_ARG(6);
+							newchar->defense_blockratio[atk_cmd] = GET_FLOAT_ARG(7);
+							newchar->defense_blocktype[atk_cmd] = GET_FLOAT_ARG(8);
+						} else if(strnicmp(value, "normal", 6)==0) {
 							tempInt = atoi(value+6);
 							if(tempInt<11) tempInt = 11;
 							newchar->defense_factors[tempInt+STA_ATKS-1]        = GET_FLOAT_ARG(2);
@@ -5139,9 +5119,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							newchar->defense_blockthreshold[tempInt+STA_ATKS-1] = GET_FLOAT_ARG(6);
 							newchar->defense_blockratio[tempInt+STA_ATKS-1]     = GET_FLOAT_ARG(7);
 							newchar->defense_blocktype[tempInt+STA_ATKS-1]      = GET_FLOAT_ARG(8);
-						}
-						else if(stricmp(value, "ALL")==0)
-						{
+						} else if(stricmp(value, "ALL")==0) {
 							for(i=0;i<max_attack_types;i++)
 							{
 								newchar->defense_factors[i]         = GET_FLOAT_ARG(2);
@@ -5154,49 +5132,24 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							}
 						}
 					}
-					#undef tempdef
 					break;
 				case CMD_MODEL_OFFENSE:
-					#define tempoff(y, z) \
-					else if (stricmp(value, #y)==0)\
-					{\
-					newchar->z[ATK_##y] = GET_FLOAT_ARG(2);\
-					/*newchar->z[ATK_##y] /= 100;*/\
-					}
 					{
 						value = GET_ARG(1);
-						if(0) ; 
-						tempoff(NORMAL,     offense_factors)
-						tempoff(NORMAL2,    offense_factors)
-						tempoff(NORMAL3,    offense_factors)
-						tempoff(NORMAL4,    offense_factors)
-						tempoff(NORMAL5,    offense_factors)
-						tempoff(NORMAL6,    offense_factors)
-						tempoff(NORMAL7,    offense_factors)
-						tempoff(NORMAL8,    offense_factors)
-						tempoff(NORMAL9,    offense_factors)
-						tempoff(NORMAL10,   offense_factors)
-						tempoff(BLAST,      offense_factors)
-						tempoff(STEAL,      offense_factors)
-						tempoff(BURN,       offense_factors)
-						tempoff(SHOCK,      offense_factors)
-						tempoff(FREEZE,     offense_factors)
-						else if(strnicmp(value, "normal", 6)==0)
-						{
+						atk_cmd = getModelAttackCommand(modelsattackcmdlist, value);
+						if(atk_cmd >= 0) {
+							newchar->offense_factors[atk_cmd] = GET_FLOAT_ARG(2);
+						} else if(strnicmp(value, "normal", 6) == 0) {
 							tempInt = atoi(value+6);
 							if(tempInt<11) tempInt = 11;
 							newchar->offense_factors[tempInt+STA_ATKS-1] = GET_FLOAT_ARG(2);
-						}
-						else if(stricmp(value, "ALL")==0)
-						{
+						} else if(stricmp(value, "ALL") == 0) {
 							tempFloat = GET_FLOAT_ARG(2);
-							for(i=0;i<max_attack_types;i++)
-							{
+							for(i=0;i<max_attack_types;i++) {
 								newchar->offense_factors[i] = tempFloat;
 							}
 						}
 					}
-					#undef tempoff
 					break;
 				case CMD_MODEL_HEIGHT:
 					newchar->height = GET_INT_ARG(1);
@@ -20621,6 +20574,8 @@ void borShutdown(const char *caller, int status, char *msg, ...) {
 
 	if(modelcmdlist)
 		freeCommandList(modelcmdlist);	// moved here because list is not initialized if shutdown is initiated from inside the menu
+	if(modelsattackcmdlist)
+		freeCommandList(modelsattackcmdlist);
 	if(modelstxtcmdlist)
 		freeCommandList(modelstxtcmdlist);
 	if(levelcmdlist)
@@ -22301,6 +22256,7 @@ void openborMain(int argc, char **argv) {
 
 	modelcmdlist = createModelCommandList();
 	modelstxtcmdlist = createModelstxtCommandList();
+	modelsattackcmdlist = createModelAttackCommandList();
 	levelcmdlist = createLevelCommandList();
 	levelordercmdlist = createLevelOrderCommandList();
 	createModelList();
