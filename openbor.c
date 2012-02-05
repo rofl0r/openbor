@@ -579,6 +579,14 @@ Script pdie_script[4];      //player death scripts
 extern Script* pcurrentscript;//used by local script functions
 //-------------------------methods-------------------------------
 
+#define		DEFAULT_SHUTDOWN_MESSAGE \
+			"OpenBOR %s, Compile Date: " __DATE__ "\n" \
+			"Presented by Senile Team.\n" \
+			"This Version is unofficial and based on the Senile source code.\n" \
+			"\n" \
+			"Special thanks to SEGA and SNK.\n\n", \
+			VERSION
+			
 void leave_game(void) {
 	shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);	
 }
