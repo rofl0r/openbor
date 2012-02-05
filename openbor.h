@@ -51,7 +51,7 @@
 #define		time				borTime
 #define		kill				borKill
 #define		pause				borPause
-#define		shutdown			borShutdown
+#define		shutdown(ec, fmt, args...)	borShutdown(__FUNCTION__, ec, fmt, ## args)
 
 #define		DEFAULT_SHUTDOWN_MESSAGE \
 			"OpenBOR %s, Compile Date: " __DATE__ "\n" \
@@ -1763,13 +1763,9 @@ void draw_scrolled_bg();
 void update(int ingame, int usevwait);
 void fade_out(int type, int speed);
 void apply_controls();
-#ifndef PSP
 void display_credits(void);
-#endif
-void shutdown(int status, char *msg, ...);
-#ifndef PSP
+void borShutdown(const char* caller, int status, char *msg, ...);
 void guistartup(void);
-#endif
 void startup(void);
 int playgif(char *filename, int x, int y, int noskip);
 void playscene(char *filename);

@@ -19961,13 +19961,11 @@ void display_credits()
 }
 
 
-void shutdown(int status, char *msg, ...)
+void borShutdown(const char* caller, int status, char *msg, ...)
 {
+	PLOG("shutdown called from %s\n", caller);
 	char buf[1024] = "";
 	va_list arglist;
-#if WII
-	int i;
-#endif
 
 	va_start(arglist, msg);
 	vsprintf(buf, msg, arglist);
@@ -20003,10 +20001,7 @@ void shutdown(int status, char *msg, ...)
 	PLOG("..");
 	if(startup_done) freescreen(&background);
 	PLOG("..");
-#if WII
-	if(startup_done) for(i=0; i<MAX_CACHED_BACKGROUNDS; i++) freescreen(&bg_cache[i]);
-	PLOG("..");
-#endif
+
 	if(startup_done) freesprites();
 	PLOG("..");
 	if(startup_done) unload_all_fonts();
@@ -20061,50 +20056,12 @@ void shutdown(int status, char *msg, ...)
 	exit(status);
 }
 
-
-#if XBOX || DC
-void guistartup(){
-	int i;
-
-	if(!font_load(0, "menu/font1", packfile, 0)) shutdown(1, "Unable to load font #1!\n");
-	if(!font_load(1, "menu/font2", packfile, 0)) shutdown(1, "Unable to load font #2!\n");
-	if(!font_load(2, "menu/font3", packfile, 0)) shutdown(1, "Unable to load font #3!\n");
-
-
-	borTimerInit();
-
-	control_init(2);
-	apply_controls();
-
-	init_videomodes(0);
-	if(!video_set_mode(videomodes)) shutdown(1, "Unable to set video mode: %d x %d!\n", videomodes.hRes, videomodes.vRes);
-
-	for(i=0; i<256; i++) neontable[i] = i;
-}
-#endif
-
 void startup(){
 	int i;
 
 	printf("FileCaching System Init......\t");
 	if(pak_init()) printf("Enabled\n");
 	else           printf("Disabled\n");
-
-#if PSP
-	if(savedata.pspcpuspeed<0) savedata.pspcpuspeed = 2;
-	if(savedata.pspcpuspeed>2) savedata.pspcpuspeed = 0;
-	switch(savedata.pspcpuspeed){
-		case 0:
-			scePowerSetClockFrequency(222, 222, 111);
-			break;
-		case 1:
-			scePowerSetClockFrequency(266, 266, 133);
-			break;
-		case 2:
-			scePowerSetClockFrequency(333, 333, 166);
-			break;
-	}
-#endif
 
 	loadHighScoreFile();
 	clearSavedGame();
@@ -20162,12 +20119,6 @@ void startup(){
 	apply_controls();
 	printf("Done!\n");
 
-#if WII
-	printf("Caching backgrounds..........\t");
-	cache_all_backgrounds();
-	printf("Done!\n");
-#endif
-
 	printf("\n\n");
 
 	for(i=0; i<MAX_PAL_SIZE/4; i++) neontable[i] = i;
@@ -20176,12 +20127,6 @@ void startup(){
 	startup_done = 1;
 
 }
-
-
-
-
-
-
 
 // ----------------------------------------------------------------------------
 
@@ -20266,9 +20211,6 @@ int playgif(char *filename, int x, int y, int noskip){
 }
 
 
-
-
-
 void playscene(char *filename)
 {
 	char *buf;
@@ -20315,15 +20257,9 @@ void playscene(char *filename)
 	}
 }
 
-
-
-
 // ----------------------------------------------------------------------------
 
-
-
-
-void gameover(){
+void gameover(void) {
 	int done = 0;
 	char tmpBuff[128] = {""};
 
@@ -20349,8 +20285,6 @@ void gameover(){
 		update(0,0);
 	}
 }
-
-
 
 
 void hallfame(int addtoscore)
@@ -20423,9 +20357,6 @@ void hallfame(int addtoscore)
 	}
 	unload_background();
 }
-
-
-
 
 // Level completed, show bonus stuff
 void showcomplete(int num)
@@ -21456,17 +21387,6 @@ readfile:
 		buf = NULL;
 	}
 
-#if DINGOO || GP2X
-	videoMode = 0;
-#endif
-
-#if SYMBIAN
-	if(videoMode != 0 && videoMode != 2)
-	{
-		videoMode = 0;
-	}
-#endif
-
 VIDEOMODES:
 	switch (videoMode)
 	{
@@ -21606,10 +21526,7 @@ VIDEOMODES:
 	if(log) printf("Initialized video.............\t%dx%d (Mode: %d, Depth: %d Bit)\n\n",videomodes.hRes, videomodes.vRes, videoMode, bits);
 }
 
-
-
 // ----------------------------------------------------------------------------
-
 
 // Set key or button safely (with switching)
 void safe_set(int *arr, int index, int newkey, int oldkey){
@@ -21619,7 +21536,6 @@ void safe_set(int *arr, int index, int newkey, int oldkey){
 	}
 	arr[index] = newkey;
 }
-
 
 void keyboard_setup(int player){
 	int quit = 0,
@@ -21808,7 +21724,6 @@ void keyboard_setup(int player){
 }
 
 
-#ifndef DC
 void movie_options(){
 	int quit = 0;
 	int selector = 1; // 0
@@ -21857,9 +21772,6 @@ void movie_options(){
 	savesettings();
 	bothnewkeys = 0;
 }
-#endif
-
-
 
 void input_options(){
 	int quit = 0;
@@ -21870,21 +21782,13 @@ void input_options(){
 	while(!quit){
 		_menutextm(2, -5, 0, "Control Options");
 
-#if PSP
-		if(savedata.usejoy) _menutext((selector==0), -4, -2, "Analog Pad Enabled");
-		else _menutext((selector==0), -4, -2, "Analog Pad Disabled");
-#elif WII
-		if(savedata.usejoy) _menutext((selector==0), -4, -2, "Nunchuk Analog Enabled");
-		else _menutext((selector==0), -4, -2, "Nunchuk Analog Disabled");
-#else
 		if(savedata.usejoy){
 			_menutext((selector==0),  -4, -2, "GamePads Enabled");
 			if(!control_getjoyenabled()){
 				_menutext((selector==0), 7, -2, " - Device Not Ready");
 			}
-		}
-		else _menutext((selector==0),  -4, -2, "GamePads Disabled");
-#endif
+		} else
+			_menutext((selector==0),  -4, -2, "GamePads Disabled");
 
 		_menutext((selector==1), -4, -1, "Setup Player 1...");
 		_menutext((selector==2), -4, 0, "Setup Player 2...");
@@ -22218,12 +22122,6 @@ void system_options(){
 	int col1 = -8;
 	int col2 = 5;
 
-#if PSP
-	int batteryPercentage = 0;
-	int batteryLifeTime = 0;
-	int externalPower = 0;
-#endif
-
 	bothnewkeys = 0;
 
 	while(!quit){
@@ -22251,29 +22149,7 @@ void system_options(){
 		_menutext((selector==4), col1, 4, "Cheats:");
 		_menutext((selector==4), col2, 4, forcecheatsoff?"Disabled by Mod":(cheats?"On":"Off"));
 
-#ifndef DC
-
 		_menutext((selector==5), col1, 5, "Config Settings");
-
-#endif
-
-#if PSP
-		externalPower = scePowerIsPowerOnline();
-		_menutext((selector==6), col1, 6, "CPU Speed:");
-		_menutext((selector==6), col2, 6, "%d MHz", scePowerGetCpuClockFrequency());
-		if(!externalPower){
-			batteryPercentage = scePowerGetBatteryLifePercent();
-			batteryLifeTime = scePowerGetBatteryLifeTime();
-			_menutext(0, col1, 7, "Battery:");
-			if(batteryPercentage < 0 || batteryLifeTime < 0) _menutext(0, col2, 8, "Calculating...");
-			else _menutext(0, col2, 7, "%d%% - %02d:%02d", batteryPercentage, batteryLifeTime/60,batteryLifeTime-(batteryLifeTime/60*60));
-		}
-		else{
-			_menutext(0, col1, 7, "Charging:");
-			_menutext(0, col2, 7, "%d%% AC Power", scePowerGetBatteryLifePercent());
-		}
-		ret = 7;
-#endif
 
 		_menutextm((selector==ret), 8, 0, "Back");
 
@@ -22325,34 +22201,9 @@ void system_options(){
 				case 4:
 					cheats = !cheats;
 					break;
-
-#ifndef DC
-
 				case 5:
 					config_settings();
 					break;
-
-#endif
-
-#ifdef PSP
-				case 6:
-					savedata.pspcpuspeed += dir;
-					if(savedata.pspcpuspeed<0) savedata.pspcpuspeed = 2;
-					if(savedata.pspcpuspeed>2) savedata.pspcpuspeed = 0;
-					switch(savedata.pspcpuspeed){
-				case 0:
-					scePowerSetClockFrequency(222, 222, 111);
-					break;
-				case 1:
-					scePowerSetClockFrequency(266, 266, 133);
-					break;
-				case 2:
-					scePowerSetClockFrequency(333, 333, 166);
-					break;
-					}
-					break;
-#endif
-
 				default:
 					quit = 1;
 					break;
@@ -22385,24 +22236,6 @@ void video_options(){
 		_menutextm((selector==3), 7, 0, "Back");
 		if(selector<0) selector = 3;
 		if(selector>3) selector = 0;
-#endif
-
-#if XBOX
-		_menutext((selector==3), col1, 0, "Screen Size:");
-		_menutext((selector==3), col2, 0, "Guide R/L Thumbsticks");
-		_menutext((selector==3), col1, 1, "GFX Filters:");
-		_menutext((selector==3), col2, 1, "Press R/L Thumbsticks");
-		_menutextm((selector==4), 7, 0, "Back");
-		if(selector<0) selector = 4;
-		if(selector>4) selector = 0;
-#endif
-
-#if WII
-		_menutext((selector==3), col1, 0, "Display Mode:");
-		_menutext((selector==3), col2, 0, savedata.fullscreen ? "Stretch to Screen" : "Preserve Aspect Ratio");
-		_menutextm((selector==4), 7, 0, "Back");
-		if(selector<0) selector = 4;
-		if(selector>4) selector = 0;
 #endif
 
 #if SDL
@@ -22443,26 +22276,6 @@ void video_options(){
 		if(selector<0) selector = 8;
 		if(selector>8) selector = 0;
 #endif
-#endif
-
-#if PSP
-		_menutext((selector==3), col1, 0, "Screen:");
-		_menutext((selector==3), col2, 0, "%s", displayFormat[(int)videomodes.mode].name);
-		_menutext((selector==4), col1, 1, "Filters:");
-		_menutext((selector==4), col2, 1, "%s", filterName[(int)videomodes.filter]);
-		_menutext((selector==5), col1, 2, "Display:");
-		_menutext((selector==5), col2, 2, "%s", displayName[displayMode]);
-		_menutext((selector>=6 && selector<=9), col1, 3, "Overscan:");
-		_menutext((selector>=6 && selector<=9), col2+1.5, 3, ".");
-		_menutext((selector>=6 && selector<=9), col2+3.5, 3, ".");
-		_menutext((selector>=6 && selector<=9), col2+5.5, 3, ".");
-		_menutext((selector==6), col2, 3, "%02d", savedata.overscan[0]);
-		_menutext((selector==7), col2+2, 3, "%02d", savedata.overscan[1]);
-		_menutext((selector==8), col2+4, 3, "%02d", savedata.overscan[2]);
-		_menutext((selector==9), col2+6, 3, "%02d", savedata.overscan[3]);
-		_menutextm((selector==10), 7, 0, "Back");
-		if(selector<0) selector = 10;
-		if(selector>10) selector = 0;
 #endif
 
 		update(0,0);
@@ -22506,71 +22319,10 @@ void video_options(){
 					break;
 #if SDL || PSP || XBOX || WII
 				case 3:
-#if XBOX
-					update(0,0);
-					xbox_resize();
-#endif
-
-#if WII
-					//video_fullscreen_flip();
-					video_stretch((savedata.stretch ^= 1));
-					break;
-#endif
-
-#if PSP
-					if(videoMode == 0)
-					{   // 320x240
-						videomodes.mode += dir;
-						if(videomodes.mode > PSP_DISPLAY_FORMATS - 1) videomodes.mode = 0;
-						if(videomodes.mode < 0) videomodes.mode = PSP_DISPLAY_FORMATS - 1;
-						savedata.screen[videoMode][0] = videomodes.mode;
-						video_set_mode(videomodes);
-					}
-					break;
-
-				case 4:
-					if(videoMode == 0)
-					{   // 320x240
-						videomodes.filter += dir;
-						if(videomodes.filter > PSP_DISPLAY_FILTERS - 1) videomodes.filter = 0;
-						if(videomodes.filter < 0) videomodes.filter = PSP_DISPLAY_FILTERS - 1;
-						savedata.screen[videoMode][1] = videomodes.filter;
-						video_set_mode(videomodes);
-					}
-					break;
-
-				case 5:
-					displayMode += dir;
-					if(displayMode > PSP_DISPLAY_MODES - 1) displayMode = 0;
-					if(displayMode < 0) displayMode = PSP_DISPLAY_MODES - 1;
-					if(displayMode)
-						setGraphicsTVOverScan(savedata.overscan[0], savedata.overscan[1], savedata.overscan[2], savedata.overscan[3]);
-					else
-						setGraphicsTVOverScan(0, 0, 0, 0);
-					savedata.usetv = displayMode;
-					disableGraphics();
-					initGraphics(savedata.usetv, videomodes.pixel);
-					video_set_mode(videomodes);
-					break;
-				case 6:
-				case 7:
-				case 8:
-				case 9:
-					savedata.overscan[selector-8] += dir;
-					if(savedata.overscan[selector-8] > 99) savedata.overscan[selector-8] = 0;
-					if(savedata.overscan[selector-8] < 0) savedata.overscan[selector-8] = 99;
-					if(displayMode)
-					{
-						setGraphicsTVOverScan(savedata.overscan[0], savedata.overscan[1], savedata.overscan[2], savedata.overscan[3]);
-						video_set_mode(videomodes);
-					}
-					break;
-#endif
 #endif
 
 
 #if SDL
-#ifndef GP2X
 					video_fullscreen_flip();
 					break;
 				case 4:
@@ -22591,14 +22343,8 @@ void video_options(){
 					else
 					{
 	    				videomodes.mode += dir * 2;
-#ifdef WII
-					    // Wii with SDL is limited to 640x480
-						if(videomodes.mode > 2) videomodes.mode = 0;
-					    if(videomodes.mode < 0) videomodes.mode = 2;
-#else
-						if(videomodes.mode > 4) videomodes.mode = 0;
+					if(videomodes.mode > 4) videomodes.mode = 0;
 					    if(videomodes.mode < 0) videomodes.mode = 4;
-#endif
 					    savedata.screen[videoMode][0] = videomodes.mode;
 						video_set_mode(videomodes);
 						change_system_palette(current_palette);
@@ -22624,7 +22370,6 @@ void video_options(){
 				case 7:
 					video_stretch((savedata.stretch ^= 1));
 					break;
-#endif
 #endif
 				default:
 					quit = 1;
@@ -22766,70 +22511,6 @@ void soundcard_options(){
 	bothnewkeys = 0;
 }
 
-#ifdef XBOX
-void display_logfile()
-{
-	int i, j, k;
-	stringptr *logfile = NULL;
-	char textpad[128] = {""};
-	int currentline = 0;
-	int filesize = 0;
-	int done = 0;
-
-	logfile = readFromLogFile(OPENBOR_LOG);
-	if(logfile != NULL)
-	{
-		unload_background();
-		load_background("menu/logview", 0);
-		while(!done)
-		{
-			font_printf(5,3, 1, 0, "Log Viewer");
-			font_printf(259,3, 1, 0, "Quit : Escape");
-			filesize = logfile->size;
-			if(bothkeys & FLAG_MOVEUP)
-			{
-				currentline -= 5;
-				if(currentline < 0) currentline = 0;
-			}
-			if(bothkeys & FLAG_MOVEDOWN)
-			{
-				currentline += 5;
-				if(currentline > filesize) currentline = filesize;
-			}
-			k = 0;
-			j = 2;
-			for(i=currentline; i<filesize; i++)
-			{
-				if(logfile->ptr[i] >= 0x20 && logfile->ptr[i] <= 0x7e)
-				{
-					textpad[k] = logfile->ptr[i];
-					k++;
-				}
-				else if(logfile->ptr[i] == 0x09)
-				{
-					textpad[k+0] = ' '; textpad[k+1] = ' ';
-					textpad[k+2] = ' '; textpad[k+3] = ' ';
-					k+=4;
-				}
-				else
-				{
-					font_printf(5, j*10, 0, 0, "%s", textpad);
-					j++;
-					k=0;
-					strncpy(textpad, "", 128);
-				}
-			}
-			if(bothkeys & FLAG_ESC) done = 1;
-			update(0,0);
-		}
-		free_string(logfile);
-		logfile = NULL;
-		unload_background();
-		load_background("menu/logo", 0);
-	}
-}
-#endif
-
 // ----------------------------------------------------------------------------
 
 
@@ -22846,16 +22527,6 @@ void openborMain(int argc, char** argv)
 	int i;
 	int argl;
 
-#if XBOX
-	int done = 0;
-	char pakname[128] = {""};
-	char listing[32] = {""};
-	int paks = 0;
-	int list = 0;
-	int lOffset=0;
-	u32 menutime = 0;
-#endif
-
 	printf("OpenBoR %s, Compile Date: " __DATE__ "\n\n", VERSION);
 
 	if(argc > 1) {
@@ -22871,91 +22542,6 @@ void openborMain(int argc, char** argv)
 	levelcmdlist = createLevelCommandList();
 	levelordercmdlist = createLevelOrderCommandList();
 	createModelList();
-
-
-#ifdef XBOX
-	loadsettings();
-	paks = findmods();
-	if(paks==1) getBasePath(packfile, paklist[0].filename, 1);
-	else
-	{
-		strcpy(packfile, "d:\\Paks\\menu.pak");
-		guistartup();
-		load_background("menu/logo", 0);
-		while(!done)
-		{
-			if(paks < 1) font_printf(10,24, 1, 0, "No Mods In Paks Folder!");
-			if(bothnewkeys & FLAG_ESC)
-			{
-				disablelog = 1;
-				shutdown(1, "");
-			}
-
-			for(list=0; list<paks; list++)
-			{
-				strncpy(pakname, paklist[list+lOffset].filename,128-strlen(paklist[list+lOffset].filename));
-				if(list<18)
-				{
-					strncpy(listing, "", 32);
-					strncpy(listing, pakname, 31);
-					font_printf(10,24+(11*list), selector==list, 0, "%s", listing);
-				}
-			}
-			if(bothkeys & FLAG_MOVEUP && time >= menutime)
-			{
-				--selector;
-
-				menutime = time + GAME_SPEED/8;
-			}
-			if(bothkeys & FLAG_MOVEDOWN && time >= menutime)
-			{
-				++selector;
-				menutime = time + GAME_SPEED/8;
-			}
-#ifndef DC
-			if(bothkeys & FLAG_SPECIAL) display_logfile();
-#endif
-			if(selector>paks-1) selector=paks-1;
-			if(selector>17)
-			{
-				if((selector+lOffset)<paks) lOffset++;
-				selector=17;
-			}
-			if(selector<0)
-			{
-				selector=0;
-				if(lOffset>0) lOffset--;
-			}
-			if((bothnewkeys&(FLAG_START)) && paks > 1)
-			{
-				strncpy(pakname, paklist[selector+lOffset].filename,128-strlen(paklist[selector+lOffset].filename));
-				getBasePath(packfile, pakname, 1);
-				done = 1;
-			}
-
-			font_printf(5,3, 2, 0, "OpenBoR %s", VERSION);
-			font_printf(265,3, 2, 0, __DATE__);
-			font_printf(197,155, 2, 0, "www.LavaLit.com");
-			font_printf(190,165, 2, 0, "www.SenileTeam.com");
-			font_printf(5,229, 2, 0, "Start : Load");
-			font_printf(259,229, 2, 0, "Quit : Escape");
-
-			if(done) font_printf(215,175, 2, 0, "Loading...");
-			update(0,0);
-		}
-
-		if(paks != 1)
-		{
-			// unload whats been allocated.
-			selector = 0;
-			unload_background();
-			freescreen(vscreen);
-			unload_all_fonts();
-			borTimerExit();
-			control_exit();
-		}
-	}
-#endif
 
 	// Load necessary components.
 	printf("Game Selected: %s\n\n", packfile);
@@ -23020,11 +22606,7 @@ void openborMain(int argc, char** argv)
 		else
 		{
 			_menutextm((selector==0), 2, 0, "Start Game");
-#ifndef DC
 			_menutextm((selector==1), 3, 0, "Movie Mode");
-#else
-			_menutextm((selector==1), 3, 0, "Movie Options(Disabled)");
-#endif
 			_menutextm((selector==2), 4, 0, "Options");
 			_menutextm((selector==3), 5, 0, "How To Play");
 			_menutextm((selector==4), 6, 0, "Hall Of Fame");
@@ -23055,9 +22637,7 @@ void openborMain(int argc, char** argv)
 					if(relback) started = 0;
 					break;
 				case 1:
-#ifndef DC
 					movie_options();
-#endif
 					break;
 				case 2:
 					if(!cheats) options();
