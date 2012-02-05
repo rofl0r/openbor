@@ -52,6 +52,7 @@ static const s_videomodes videomodes_init_data[] = {
 	[VTM_960_560] = {960, 540, 320, 40, 522, {0, 0, 0, 0}, 0, 0, 0, 3.f, 2.25f}
 };
 
+int quit_game = 0;
 
 int sprite_map_max_items = 0;
 int cache_map_max_items = 0;
@@ -577,6 +578,10 @@ Script pdie_script[4];      //player death scripts
 
 extern Script* pcurrentscript;//used by local script functions
 //-------------------------methods-------------------------------
+
+void leave_game(void) {
+	shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);	
+}
 
 void setDrawMethod(s_anim* a, ptrdiff_t index, s_drawmethod* m) {
 	assert(index >= 0);
@@ -9850,6 +9855,7 @@ void update_loading(s_loadingbar* s,  int value, int max) {
 
 	if(ticks - keybtick > 250) {
 		control_update(playercontrolpointers, 1); // Respond to exit and/or fullscreen requests from user/OS
+		if(quit_game) leave_game();
 		keybtick = ticks;
 	}
 
@@ -19502,52 +19508,40 @@ void movie_save(s_playercontrols ** pctrls)
 void inputrefresh()
 {
 	int p;
-
-#ifndef DC
 	int moviestop = 0;
-	if(movieplay)
-	{
+	if(movieplay) {
 		control_update(playercontrolpointers, maxplayers[current_set]);
-		for(p=0; p<maxplayers[current_set]; p++)
-		{
+		if(quit_game) leave_game();
+		for(p=0; p<maxplayers[current_set]; p++) {
 			if(playercontrolpointers[p]->newkeyflags & FLAG_ESC)
 			{
 				moviestop = 1;
 				break;
 			}
 		}
-		if(!moviestop)
-		{
+		if(!moviestop) {
 			movie_update(playercontrolpointers);
 			font_printf(2, 2, 1, 0, "Playing movie, frames: %d/%d", movieloglen + moviebufptr-MOVIEBUF_LEN, movielen);
-		}
-		else
-		{
+		} else {
 			movie_closefile();
 		}
-	}
-	else
-	{
-#endif
+	} else {
 		 control_update(playercontrolpointers, maxplayers[current_set]);
+		 if(quit_game) leave_game();
 		 interval = timer_getinterval(GAME_SPEED); // so interval can be logged into movie
 		 if(interval > GAME_SPEED) interval = GAME_SPEED/GAME_SPEED;
 		 if(interval > GAME_SPEED/4) interval = GAME_SPEED/4;
-
-#ifndef DC
 	}
 
-	if(movielog && !pause)
-	{
+	if(movielog && !pause) {
 		movie_save(playercontrolpointers);
 		font_printf(2, 2, 1, 0, "Recording movie, frames: %d", movieloglen + moviebufptr);
 	}
-#endif
+
 	bothkeys = 0;
 	bothnewkeys = 0;
 
-	for(p=0; p<maxplayers[current_set]; p++)
-	{
+	for(p=0; p<maxplayers[current_set]; p++) {
 		player[p].releasekeys = (playercontrolpointers[p]->keyflags|player[p].keys) - playercontrolpointers[p]->keyflags;
 		player[p].keys = playercontrolpointers[p]->keyflags;
 		player[p].newkeys = playercontrolpointers[p]->newkeyflags;
@@ -19556,15 +19550,12 @@ void inputrefresh()
 
 		bothkeys |= player[p].keys;
 		bothnewkeys |= player[p].newkeys;
-#ifndef DC
 		if(movielog && (bothnewkeys & FLAG_ESC) && !pause)
 		{
 			movie_flushbuf();
 			movie_closefile();
 		}
-#endif
 	}
-
 }
 
 void execute_keyscripts()
@@ -20057,10 +20048,8 @@ void borShutdown(const char* caller, int status, char *msg, ...)
 
 	freefilenamecache();
 
-
 	PLOG("\n**************** Done *****************\n\n");
 
-	PLOG("%s", buf);
 	#ifdef DEBUG
 	assert(status == 0); // this way we can haz backtrace.
 	#endif
@@ -22464,7 +22453,7 @@ void soundcard_options(){
 void openborMain(int argc, char** argv)
 {
 	sprite_map = NULL;
-	int quit = 0;
+	//int quit = 0;
 	int relback = 1;
 	int selector = 0;
 	u32 introtime = 0;
@@ -22521,7 +22510,7 @@ void openborMain(int argc, char** argv)
 	else playscene("data/scenes/logo.txt");
 	clearscreen(background);
 
-	while(!quit)
+	while(!quit_game)
 	{
 		if(time >= introtime)
 		{
@@ -22539,7 +22528,7 @@ void openborMain(int argc, char** argv)
 			started = 0;
 		}
 
-		if(bothnewkeys & FLAG_ESC) quit = 1;
+		if(bothnewkeys & FLAG_ESC) quit_game = 1;
 
 		if(!started)
 		{
@@ -22609,7 +22598,7 @@ void openborMain(int argc, char** argv)
 					relback = 1;
 					break;
 				default:
-					quit = 1;
+					quit_game = 1;
 					break;
 				}
 				introtime = time + GAME_SPEED * 20;
@@ -22643,7 +22632,7 @@ void openborMain(int argc, char** argv)
 		}
 		update(0,0);
 	}
-	shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);
+	leave_game();
 }
 
 #undef GET_ARG

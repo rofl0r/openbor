@@ -1799,4 +1799,6 @@ s_savelevel savelevel[MAX_DIFFICULTIES];
 s_savescore savescore;
 s_savedata savedata;
 
+extern int quit_game;
+
 #endif

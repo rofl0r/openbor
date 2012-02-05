@@ -46,8 +46,8 @@ void getPads(Uint8* keystate)
 				if(lastkey != SDLK_F10) break;
 
 			case SDL_QUIT:
-				shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);
-				break;
+				quit_game = 1;
+				return;
 
 			case SDL_JOYBUTTONUP:
 				for(i=0; i<JOY_LIST_TOTAL; i++)
@@ -340,6 +340,7 @@ void control_update(s_playercontrols ** playercontrols, int numplayers)
 	keystate = SDL_GetKeyState(NULL);
 
 	getPads(keystate);
+	if(quit_game) return;
 	for(player=0; player<numplayers; player++){
 
 		pcontrols = playercontrols[player];
