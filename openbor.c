@@ -4656,6 +4656,13 @@ void update_model_loadflag(s_model * model, char unload) {
 	model->unload = unload;
 }
 
+void lcmSetCachedModelIndexOrMinusOne(char* value, int* dest) {
+	if(stricmp(value, "none") == 0)
+		*dest = -1;
+	else
+		*dest = get_cached_model_index(value);
+}
+
 s_model *load_cached_model(char *name, char *owner, char unload) {
 	s_model *newchar = NULL, *tempmodel = NULL;
 
@@ -4926,11 +4933,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->weapnum = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_PROJECT:	// New projectile subtype
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->project = -1;
-					else
-						newchar->project = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->project);
 					break;
 				case CMD_MODEL_WEAPONS:
 					lcmHandleCommandWeapons(&arglist, newchar);
@@ -4951,74 +4954,34 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->animal = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_RIDER:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->rider = -1;
-					else
-						newchar->rider = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->rider);
 					break;
 				case CMD_MODEL_KNIFE:
 				case CMD_MODEL_FIREB:
 				case CMD_MODEL_PLAYSHOT:
 				case CMD_MODEL_PLAYSHOTW:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->knife = -1;
-					else
-						newchar->knife = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->knife);
 					break;
 				case CMD_MODEL_PLAYSHOTNO:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->pshotno = -1;
-					else
-						newchar->pshotno = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->pshotno);
 					break;
 				case CMD_MODEL_STAR:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->star = -1;
-					else
-						newchar->star = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->star);
 					break;
 				case CMD_MODEL_BOMB:
 				case CMD_MODEL_PLAYBOMB:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->bomb = -1;
-					else
-						newchar->bomb = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->bomb);
 					break;
 				case CMD_MODEL_FLASH:	// Now all characters can have their own flash - even projectiles (useful for blood)
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->flash = -1;
-					else
-						newchar->flash = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->flash);
 					break;
 				case CMD_MODEL_BFLASH:	// Flash that is spawned if an attack is blocked
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->bflash = -1;
-					else
-						newchar->bflash = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->bflash);
 					break;
 				case CMD_MODEL_DUST:	// Spawned when hitting the ground to "kick up dust"
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						newchar->dust[0] = -1;
-					else
-						newchar->dust[0] = get_cached_model_index(value);
-					value = GET_ARG(2);
-					if(stricmp(value, "none") == 0)
-						newchar->dust[1] = -1;
-					else
-						newchar->dust[1] = get_cached_model_index(value);
-					value = GET_ARG(3);
-					if(stricmp(value, "none") == 0)
-						newchar->dust[2] = -1;
-					else
-						newchar->dust[2] = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &newchar->dust[0]);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(2), &newchar->dust[1]);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(3), &newchar->dust[2]);
 					break;
 				case CMD_MODEL_BRANCH:	// for endlevel item's level branch
 					value = GET_ARG(1);
@@ -5895,10 +5858,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							ani_id = ANI_GUARDBREAK;
 						} else if(stricmp(value, "riseb") == 0) {
 							ani_id = ANI_RISEB;
-						}
-
-
-						else if(stricmp(value, "rises") == 0) {
+						} else if(stricmp(value, "rises") == 0) {
 							ani_id = ANI_RISES;
 						} else if(stricmp(value, "rise") == 0) {
 							ani_id = ANI_RISE;	// If no new animation, load fall animation into both "respawn" & "fall"
@@ -6452,18 +6412,10 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					attack.hitsound = sound_load_sample(GET_ARG(1), packfile, 0);
 					break;
 				case CMD_MODEL_HITFLASH:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						attack.hitflash = -1;
-					else
-						attack.hitflash = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &attack.hitflash);
 					break;
 				case CMD_MODEL_BLOCKFLASH:
-					value = GET_ARG(1);
-					if(stricmp(value, "none") == 0)
-						attack.blockflash = -1;
-					else
-						attack.blockflash = get_cached_model_index(value);
+					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), &attack.blockflash);
 					break;
 				case CMD_MODEL_BLOCKFX:
 					attack.blocksound = sound_load_sample(GET_ARG(1), packfile, 0);
