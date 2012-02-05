@@ -5058,7 +5058,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							int_ptr = &attack.hitflash; break;
 						case CMD_MODEL_BLOCKFLASH:
 							int_ptr = &attack.blockflash; break;
-						default: break;
+						default: int_ptr = NULL; break;
 					}
 					lcmSetCachedModelIndexOrMinusOne(GET_ARG(1), int_ptr);
 					break;
@@ -5203,8 +5203,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					break;
 				case CMD_MODEL_RUNNING:
 					// The speed at which the player runs
-					newchar->runspeed = GET_FLOAT_ARG(1);
-					newchar->runspeed /= 10;
+					newchar->runspeed = GET_FLOAT_ARG(1) / 10.f;
 					newchar->runjumpheight = GET_FLOAT_ARG(2);	// The height at which a player jumps when running
 					newchar->runjumpdist = GET_FLOAT_ARG(3);	// The distance a player jumps when running
 					newchar->runupdown = GET_INT_ARG(4);
@@ -5223,8 +5222,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->throwheight = GET_FLOAT_ARG(2);
 					break;
 				case CMD_MODEL_GRABWALK:
-					newchar->grabwalkspeed = GET_FLOAT_ARG(1);
-					newchar->grabwalkspeed /= 10;
+					newchar->grabwalkspeed = GET_FLOAT_ARG(1) / 10.f;
 					if(newchar->grabwalkspeed < 0.5)
 						newchar->grabwalkspeed = 0.5;
 					break;
@@ -5241,26 +5239,27 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newchar->icondie = newchar->icon;
 					newchar->iconget = newchar->icon;
 					break;
-				case CMD_MODEL_ICONPAIN:
-					newchar->iconpain = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
-				case CMD_MODEL_ICONDIE:
-					newchar->icondie = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
-				case CMD_MODEL_ICONGET:
-					newchar->iconget = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
-				case CMD_MODEL_ICONW:
-					newchar->iconw = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
-				case CMD_MODEL_ICONMPHIGH:
-					newchar->iconmp[0] = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
-				case CMD_MODEL_ICONMPHALF:
-					newchar->iconmp[1] = loadsprite(GET_ARG(1), 0, 0, pixelformat);
-					break;
+				case CMD_MODEL_ICONPAIN: case CMD_MODEL_ICONDIE: case CMD_MODEL_ICONGET:
+				case CMD_MODEL_ICONW:  case CMD_MODEL_ICONMPHIGH: case CMD_MODEL_ICONMPHALF:
 				case CMD_MODEL_ICONMPLOW:
-					newchar->iconmp[2] = loadsprite(GET_ARG(1), 0, 0, pixelformat);
+					switch(cmd) {
+						case CMD_MODEL_ICONPAIN:
+							int_ptr = &newchar->iconpain; break;
+						case CMD_MODEL_ICONDIE:
+							int_ptr = &newchar->icondie; break;
+						case CMD_MODEL_ICONGET:
+							int_ptr = &newchar->iconget; break;
+						case CMD_MODEL_ICONW:
+							int_ptr = &newchar->iconw; break;
+						case CMD_MODEL_ICONMPHIGH:
+							int_ptr = &newchar->iconmp[0]; break;
+						case CMD_MODEL_ICONMPHALF:
+							int_ptr = &newchar->iconmp[1]; break;
+						case CMD_MODEL_ICONMPLOW:
+							int_ptr = &newchar->iconmp[2]; break;
+						default: int_ptr = NULL; break;	
+					}
+					*int_ptr = loadsprite(GET_ARG(1), 0, 0, pixelformat);
 					break;
 				case CMD_MODEL_PARROW:
 					// Image that is displayed when player 1 spawns invincible
