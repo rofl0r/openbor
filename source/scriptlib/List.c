@@ -39,6 +39,7 @@ unsigned char strhash(char *s) {
 }
 
 /* add a single node to the hash list */
+#define BUCKET_INIT_NODES_ALLOC 2
 void List_AddHash(List * list, Node * node) {
 #ifdef DEBUG
 	chklist((List *) list);
@@ -56,9 +57,9 @@ void List_AddHash(List * list, Node * node) {
 	h = strhash((char *) node->name);
 	if(!list->buckets[h]) {
 		list->buckets[h] = calloc(1, sizeof(Bucket));
-		list->buckets[h]->nodes = calloc(1, sizeof(Node *) * 8);
+		list->buckets[h]->nodes = calloc(1, sizeof(Node *) * BUCKET_INIT_NODES_ALLOC);
 		assert(list->buckets[h]->nodes != NULL);
-		list->buckets[h]->size = 8;
+		list->buckets[h]->size = BUCKET_INIT_NODES_ALLOC;
 	}
 
 	save = list->buckets[h]->size;
