@@ -42,6 +42,7 @@ List *prepareList(void) {
 	List *result = malloc(sizeof(List));
 	assert(result);
 	List_Init(result);
+	List_Set_UseStrdup(result, 0);
 	return result;
 }
 
