@@ -16,6 +16,10 @@
 #include "List.h"
 #include <assert.h>
 
+void List_Set_UseStrdup(List* list, int use) {
+	list->no_strdup = !use;
+}
+
 #ifdef DEBUG
 void chklist(List * list) {
 	assert(list);
@@ -274,8 +278,10 @@ void List_SetCurrent(List * list, Node * current) {
 void Node_Clear(Node * node) {
 	if(!node)
 		return;
-	if(node->name)
+	if(node->name) {
 		free((void *) node->name);
+		node->name = NULL;
+	}
 }
 
 void List_Init(List * list) {
@@ -293,6 +299,7 @@ void List_Init(List * list) {
 #ifdef DEBUG
 	list->initdone = 1;
 #endif
+	list->no_strdup = 0;
 }
 
 int List_GetNodeIndex(List * list, Node * node) {
@@ -346,12 +353,14 @@ void List_Copy(List * listdest, const List * listsrc) {
 	int i = 0, curr = -1;
 
 	List_Init(listdest);
-	if(lptr == NULL)
+	if(!lptr)
 		return;
 	//create the first Node
 	nptr = (Node *) malloc(sizeof(Node));
+	if(!nptr)
+		return;
 	nptr->value = lptr->value;
-	nptr->name = NAME(lptr->name);
+	nptr->name = (listdest->no_strdup) ? lptr->name : NAME(lptr->name);
 	nptr->prev = NULL;
 	nptr->next = NULL;
 
@@ -399,7 +408,7 @@ void List_Clear(List * list) {
 
 	while(list->current) {
 		list->current = list->current->next;
-		Node_Clear(nptr);
+		if(!list->no_strdup) Node_Clear(nptr);
 		free(nptr);
 		nptr = list->current;
 	}
@@ -434,7 +443,7 @@ void List_InsertBefore(List * list, void *e, char *theName) {
 	assert(nptr != NULL);
 
 	nptr->value = e;
-	nptr->name = NAME(theName);
+	nptr->name = (list->no_strdup) ? theName : NAME(theName);
 
 #ifdef USE_STRING_HASHES
 	List_AddHash(list, nptr);
@@ -479,7 +488,7 @@ void List_InsertAfter(List * list, void *e, char *theName) {
 
 	assert(nptr != NULL);
 	nptr->value = e;
-	nptr->name = NAME(theName);
+	nptr->name = (list->no_strdup) ? theName : NAME(theName);
 
 #ifdef USE_STRING_HASHES
 	List_AddHash(list, nptr);
@@ -522,7 +531,7 @@ void List_Remove(List * list) {
 #ifdef USE_STRING_HASHES
 		List_RemoveHash(list, list->current);
 #endif
-		Node_Clear(list->current);
+		if(!list->no_strdup) Node_Clear(list->current);
 		free(list->current);
 		list->first = list->current = list->last = NULL;
 #ifdef USE_INDEX
@@ -551,7 +560,7 @@ void List_Remove(List * list) {
 		List_RemoveHash(list, list->current);
 #endif
 
-		Node_Clear(list->current);
+		if(!list->no_strdup) Node_Clear(list->current);
 		free(list->current);
 
 		if(list->current == list->last)

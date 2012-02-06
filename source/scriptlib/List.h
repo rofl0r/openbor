@@ -56,7 +56,7 @@
 	  } \
    }
 
-#define NAME(s) ((s==NULL)?NULL:(strcpy((char*)malloc(strlen(s)+1),s)))
+#define NAME(s) ((s)?(strdup(s)):NULL)
 
 typedef struct Node {
 	struct Node *prev;	//pointer to previous Node
@@ -98,9 +98,10 @@ typedef struct List {
 #ifdef DEBUG
 	int initdone;
 #endif
-
+	int no_strdup:1;
 } List;
 
+void List_Set_UseStrdup(List* list, int use);
 void List_SetCurrent(List * list, Node * current);
 void Node_Clear(Node * node);
 void List_Init(List * list);
