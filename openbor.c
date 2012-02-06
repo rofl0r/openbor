@@ -5108,7 +5108,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					{
 						value = GET_ARG(1);
 						atk_cmd = getModelAttackCommand(modelsattackcmdlist, value);
-						if(atk_cmd >= 0) {
+						if((int) atk_cmd >= 0) {
 							newchar->defense_factors[atk_cmd] = GET_FLOAT_ARG(2);
 							newchar->defense_pain[atk_cmd] = GET_FLOAT_ARG(3);
 							newchar->defense_knockdown[atk_cmd] = GET_FLOAT_ARG(4);
