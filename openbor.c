@@ -770,62 +770,12 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 		return 0;
 
 	switch (index) {
-		case _e_count_enemies:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) count_ents(TYPE_ENEMY);
-			break;
-		case _e_count_players:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) count_ents(TYPE_PLAYER);
-			break;
-		case _e_count_npcs:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) count_ents(TYPE_NPC);
-			break;
-		case _e_count_entities:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) ent_count;
-			break;
-		case _e_ent_max:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) ent_max;
-			break;
-		case _e_in_level:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (level == NULL);
-			break;
-		case _e_elapsed_time:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) time;
-			break;
-		case _e_game_speed:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) GAME_SPEED;
-			break;
-		case _e_gfx_y_offset:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) gfx_y_offset;
-			break;
-		case _e_in_selectscreen:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (selectScreen);
-			break;
+			
 		case _e_lasthita:
 			ScriptVariant_ChangeType(var, VT_DECIMAL);
 			var->dblVal = (DOUBLE) (lasthita);
 			break;
-		case _e_lasthitc:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (lasthitc);
-			break;
-		case _e_lasthitt:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (lasthitt);
-			break;
+
 		case _e_lasthitx:
 			ScriptVariant_ChangeType(var, VT_DECIMAL);
 			var->dblVal = (DOUBLE) (lasthitx);
@@ -846,82 +796,12 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 			ScriptVariant_ChangeType(var, VT_DECIMAL);
 			var->dblVal = (DOUBLE) advancey;
 			break;
-		case _e_hResolution:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) videomodes.hRes;
-			break;
-		case _e_vResolution:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) videomodes.vRes;
-			break;
-		case _e_current_set:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (current_set);
-			break;
-		case _e_current_level:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (current_level);
-			break;
-		case _e_current_palette:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (current_palette);
-			break;
-		case _e_current_stage:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (current_stage);
-			break;
-		case _e_levelwidth:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (level->width);
-			break;
-		case _e_levelheight:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (panel_height);
-			break;
+
 		case _e_branchname:
 			ScriptVariant_ChangeType(var, VT_STR);
 			strcpy(StrCache_Get(var->strVal), branch_name);
 			break;
-		case _e_maxentityvars:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) max_entity_vars;
-			break;
-		case _e_maxglobalvars:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) max_global_vars;
-			break;
-		case _e_maxindexedvars:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) max_indexed_vars;
-			break;
-		case _e_maxplayers:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) maxplayers[current_set];
-			break;
-		case _e_maxscriptvars:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) max_script_vars;
-			break;
-		case _e_models_cached:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) models_cached;
-			break;
-		case _e_models_loaded:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) models_loaded;
-			break;
-		case _e_numpalettes:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (level->numpalettes);
-			break;
-		case _e_pixelformat:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) pixelformat;
-			break;
+
 		case _e_player:
 		case _e_player1:
 			ScriptVariant_ChangeType(var, VT_PTR);
@@ -939,54 +819,85 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 			ScriptVariant_ChangeType(var, VT_PTR);
 			var->ptrVal = (VOID *) (player + 3);
 			break;
-		case _e_player_max_z:
+			
+		case _e_count_enemies: case _e_count_players: case _e_count_npcs: case _e_count_entities:
+		case _e_ent_max: case _e_in_level: case _e_elapsed_time: case _e_in_selectscreen: 
+		case _e_lasthitc: case _e_lasthitt: case _e_hResolution: case _e_vResolution: 
+		case _e_current_set: case _e_current_level: case _e_current_palette: case _e_current_stage:
+		case _e_maxentityvars: case _e_maxglobalvars: case _e_maxindexedvars: case _e_maxplayers: 
+		case _e_maxscriptvars: case _e_models_loaded: case _e_numpalettes: case _e_pixelformat: 
+		case _e_player_max_z: case _e_player_min_z: case _e_lightx: case _e_lightz: 
+		case _e_shadowalpha:  case _e_slowmotion: case _e_slowmotion_duration: case _e_game_paused: 
+		case _e_totalram: case _e_freeram: case _e_usedram:
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (PLAYER_MAX_Z);
+			switch (index) {
+				case _e_count_enemies: var->lVal = (LONG) count_ents(TYPE_ENEMY); break;
+				case _e_count_players: var->lVal = (LONG) count_ents(TYPE_PLAYER); break;
+				case _e_count_npcs: var->lVal = (LONG) count_ents(TYPE_NPC); break;
+				case _e_count_entities: var->lVal = (LONG) ent_count; break;
+				case _e_ent_max: var->lVal = (LONG) ent_max; break;
+				case _e_in_level: var->lVal = (LONG) (level == NULL); break;
+				case _e_elapsed_time: var->lVal = (LONG) time; break;
+				case _e_in_selectscreen: var->lVal = (LONG) (selectScreen); break;
+				case _e_lasthitc: var->lVal = (LONG) (lasthitc); break;
+				case _e_lasthitt: var->lVal = (LONG) (lasthitt); break;
+				case _e_hResolution: var->lVal = (LONG) videomodes.hRes; break;
+				case _e_vResolution: var->lVal = (LONG) videomodes.vRes; break;
+				case _e_current_set: var->lVal = (LONG) (current_set); break;
+				case _e_current_level: var->lVal = (LONG) (current_level); break;
+				case _e_current_palette: var->lVal = (LONG) (current_palette); break;
+				case _e_current_stage: var->lVal = (LONG) (current_stage); break;
+				case _e_maxentityvars: var->lVal = (LONG) max_entity_vars; break;
+				case _e_maxglobalvars: var->lVal = (LONG) max_global_vars; break;
+				case _e_maxindexedvars: var->lVal = (LONG) max_indexed_vars; break;
+				case _e_maxplayers: var->lVal = (LONG) maxplayers[current_set]; break;
+				case _e_maxscriptvars: var->lVal = (LONG) max_script_vars; break;
+				case _e_models_cached: var->lVal = (LONG) models_cached; break;
+				case _e_models_loaded: var->lVal = (LONG) models_loaded; break;
+				case _e_numpalettes: var->lVal = (LONG) (level->numpalettes); break;
+				case _e_pixelformat: var->lVal = (LONG) pixelformat; break;			
+				case _e_player_max_z: var->lVal = (LONG) (PLAYER_MAX_Z); break;
+				case _e_player_min_z: var->lVal = (LONG) (PLAYER_MIN_Z); break;
+				case _e_lightx: var->lVal = (LONG) (light[0]); break;
+				case _e_lightz: var->lVal = (LONG) (light[1]); break;
+				case _e_shadowalpha: var->lVal = (LONG) shadowalpha; break;
+				case _e_shadowcolor: var->lVal = (LONG) shadowcolor; break;
+				case _e_slowmotion: var->lVal = (LONG) slowmotion[0]; break;
+				case _e_slowmotion_duration: var->lVal = (LONG) slowmotion[1]; break;
+				case _e_game_paused: var->lVal = (LONG) pause; break;
+				case _e_totalram: var->lVal = 64 * 1024; break;
+				case _e_freeram: var->lVal = 63 * 1024; break;
+				case _e_usedram: var->lVal = 1024; break;
+				default:
+					assert (0); break; 
+			}
 			break;
-		case _e_player_min_z:
+			
+		case _e_game_speed:
+			if(!level)
+				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (PLAYER_MIN_Z);
+			var->lVal = (LONG) GAME_SPEED;
 			break;
-		case _e_lightx:
+		case _e_gfx_y_offset:
+			if(!level)
+				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (light[0]);
+			var->lVal = (LONG) gfx_y_offset;
 			break;
-		case _e_lightz:
+			
+		case _e_levelwidth:
+			if(!level)
+				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (light[1]);
+			var->lVal = (LONG) (level->width);
 			break;
-		case _e_shadowalpha:
+		case _e_levelheight:
+			if(!level)
+				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) shadowalpha;
-			break;
-		case _e_shadowcolor:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) shadowcolor;
-			break;
-		case _e_slowmotion:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) slowmotion[0];
-			break;
-		case _e_slowmotion_duration:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) slowmotion[1];
-			break;
-		case _e_game_paused:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) pause;
-			break;
-		case _e_totalram:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = 64 * 1024;
-			break;
-		case _e_freeram:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = 63 * 1024;
-			break;
-		case _e_usedram:
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = 1024;
-			break;
+			var->lVal = (LONG) (panel_height);
+			break;			
 		default:
 			// We use indices now, but players/modders don't need to be exposed
 			// to that implementation detail, so we write "name" and not "index".
