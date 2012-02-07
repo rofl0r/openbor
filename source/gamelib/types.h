@@ -91,7 +91,6 @@ typedef struct {
 	unsigned char data[ANYNUMBER];
 } s_screen;
 
-
 typedef struct {
 	int width;
 	int height;
@@ -99,7 +98,6 @@ typedef struct {
 	int banked;		// Still unused
 	unsigned char *data;
 } s_vram;
-
 
 typedef struct {
 	int width;
@@ -167,19 +165,19 @@ typedef struct {
 	unsigned char *table;
 	void *fp;
 	unsigned fillcolor;
-	int flag:1;
-	int alpha:8;
-	int remap:8;
-	int flipx:1;
-	int flipy:1;
-	int transbg:1;
-	int fliprotate:1;	// entity only, whether the flip is affected by the entity's facing(not the sprite's flip )
-	int rotate:11;		// 360 degrees
 	int scalex;
 	int scaley;
 	int shiftx;
 	int centerx;		// shift centerx
 	int centery;		//shift centery
+	signed char alpha;
+	signed char remap;
+	int rotate:11; // 360 degrees
+	int flag:1;
+	int flipx:1;
+	int flipy:1;
+	int transbg:1;
+	int fliprotate:1; // entity only, whether the flip is affected by the entity's facing(not the sprite's flip )
 } s_drawmethod;
 
 typedef struct {
