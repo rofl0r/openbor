@@ -401,64 +401,83 @@ int pscore[4][7] = { {0, 0, 0, 0, 0, 0, -1}, {0, 0, 0, 0, 0, 0, -1}, {0, 0, 0, 0
 int pshoot[4][3] = { {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1} };	// Used for customizable player shootnum
 int prush[4][8] = { {0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0} };	// Used for customizable player combo/rush system
 int psmenu[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} };	// Used for customizable player placement in select menu
-int mpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int hpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int ldcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 char musicname[128] = { "" };
 float musicfade[2] = { 0, 0 };
 
 int musicloop = 0;
 u32 musicoffset = 0;
 
+int mpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+int hpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+int ldcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
 s_barstatus loadingbarstatus = {
-	0,			//int          offsetx:16;
-	0,			//int          offsety:16;
-	0,			//int          sizex:16;
-	10,			//int          sizey:16;
-	percentagebar,		//bartype      type:8;
-	horizontalbar,		//barorient    orientation:8;
-	0,			//int          noborder:8;
-	0,			//int          direction:8;
-	0,			//int          barlayer;
-	0,			//int          backlayer;
-	0,			//int          borderlayer;
-	0,			//int          shadowlayer;
-	&ldcolourtable
+	.offsetx = 0,
+	.offsety = 0,
+	.sizex = 0,
+	.sizey = 10,
+	.type = percentagebar,
+	.orientation = horizontalbar,
+	.noborder = 0,
+	.direction = 0,
+	.barlayer = 0,
+	.backlayer = 0,
+	.borderlayer = 0,
+	.shadowlayer = 0,
+	.colourtable = &ldcolourtable,
 };
 
 s_barstatus lbarstatus =	// Used for customizable lifebar size
 {
-	0,			//int          offsetx:16;
-	0,			//int          offsety:16;
-	0,			//int          sizex:16;
-	0,			//int          sizey:16;
-	valuebar,		//bartype      type:8;
-	horizontalbar,		//barorient    orientation:8;
-	0,			//int          noborder:8;
-	0,			//int          direction:8;
-	0,			//int          barlayer;
-	0,			//int          backlayer;
-	0,			//int          borderlayer;
-	0,			//int          shadowlayer;
-	&hpcolourtable
+	.offsetx = 0,
+	.offsety = 0,
+	.sizex = 0,
+	.sizey = 0,
+	.type = valuebar,
+	.orientation = horizontalbar,
+	.noborder = 0,
+	.direction = 0,
+	.barlayer = 0,
+	.backlayer = 0,
+	.borderlayer = 0,
+	.shadowlayer = 0,
+	.colourtable = &hpcolourtable,	
 };
 
 s_barstatus olbarstatus =	// Used for customizable opponent lifebar size
 {
-	0,			//int          offsetx:16;
-	0,			//int          offsety:16;
-	0,			//int          sizex:16;
-	0,			//int          sizey:16;
-	valuebar,		//bartype      type:8;
-	horizontalbar,		//barorient    orientation:8;
-	0,			//int          noborder:8;
-	0,			//int          direction:8;
-	0,			//int          barlayer;
-	0,			//int          backlayer;
-	0,			//int          borderlayer;
-	0,			//int          shadowlayer;
-	&hpcolourtable
+	.offsetx = 0,
+	.offsety = 0,
+	.sizex = 0,
+	.sizey = 0,
+	.type = valuebar,
+	.orientation = horizontalbar,
+	.noborder = 0,
+	.direction = 0,
+	.barlayer = 0,
+	.backlayer = 0,
+	.borderlayer = 0,
+	.shadowlayer = 0,
+	.colourtable = &hpcolourtable,	
 };
+
+s_barstatus mpbarstatus =	// Used for customizable lifebar size
+{
+	.offsetx = 0,
+	.offsety = 0,
+	.sizex = 0,
+	.sizey = 0,
+	.type = valuebar,
+	.orientation = horizontalbar,
+	.noborder = 0,
+	.direction = 0,
+	.barlayer = 0,
+	.backlayer = 0,
+	.borderlayer = 0,
+	.shadowlayer = 0,
+	.colourtable = &mpcolourtable,	
+};
+
 int timeloc[6] = { 0, 0, 0, 0, 0, -1 };	// Used for customizable timeclock location/size
 
 int timeicon = -1;
@@ -498,22 +517,6 @@ int nochipdeath = 0;		// Prevents entities from dying due to chip damage (damage
 int noaircancel = 0;		// Now, you can make jumping attacks uncancellable!
 int nomaxrushreset[5] = { 0, 0, 0, 0, 0 };
 
-s_barstatus mpbarstatus =	// Used for customizable lifebar size
-{
-	0,			//int          offsetx:16;
-	0,			//int          offsety:16;
-	0,			//int          sizex:16;
-	0,			//int          sizey:16;
-	valuebar,		//bartype      type:8;
-	horizontalbar,		//barorient    orientation:8;
-	0,			//int          noborder:8;
-	0,			//int          direction:8;
-	0,			//int          barlayer;
-	0,			//int          backlayer;
-	0,			//int          borderlayer;
-	0,			//int          shadowlayer;
-	&mpcolourtable
-};
 int mpbartext[4] = { -1, 0, 0, 0 };	// Array for adjusting MP status text (font, Xpos, Ypos, Display type).
 int lbartext[4] = { -1, 0, 0, 0 };	// Array for adjusting HP status text (font, Xpos, Ypos, Display type).
 int pmp[4][2] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };	// Used for customizable player mpbar
