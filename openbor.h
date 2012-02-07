@@ -763,19 +763,20 @@ typedef enum {
 } bartype;
 
 typedef struct {
-	short offsetx:16;
-	short offsety:16;
-	short sizex:16;
-	short sizey:16;
-	bartype type:8;
-	barorient orientation:8;
-	char noborder:8;
-	char direction:8;	//0) left to right or botom to top 1) reversed
-	int barlayer:32;
-	int backlayer:32;
-	int borderlayer:32;
-	int shadowlayer:32;
 	int (*colourtable)[11];	//0 default backfill 1-10 foreground colours
+	int barlayer;
+	int backlayer;
+	int borderlayer;
+	int shadowlayer;
+	
+	short offsetx;
+	short offsety;
+	short sizex;
+	short sizey;
+	char noborder:1;
+	char direction:1;	//0) left to right or botom to top 1) reversed
+	bartype type:1;
+	barorient orientation:1;
 } s_barstatus;
 
 typedef enum {
