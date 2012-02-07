@@ -5,6 +5,8 @@
  *
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
+#ifndef MODELS_H
+#define MODELS_H
 
 #include "openbor.h"
 
@@ -17,3 +19,5 @@ s_model *getFirstModel(void);
 s_model *getCurrentModel(void);
 s_model *getNextModel(void);
 int isLastModel(void);
+
+#endif
