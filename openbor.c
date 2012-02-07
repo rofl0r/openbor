@@ -102,44 +102,41 @@ const s_drawmethod plainmethod = {
 
 // unknockdown attack
 const s_attack emptyattack = {
-	0,			// force
-	-1,			// sound
-	-1,			// flash
-	-1,			// blockflash
-	-1,			// blocksound
-	0,			// counter
-	{0,
-	 0,
-	 0,
-	 0,
-	 0},			// coods
-	0,			// nopain/noreflect
-	0,			// noflash
-	0,			// noblock
-	0,			// grab
-	0,			// dir
-	0,			// blast
-	0,			// freeze
-	0,			// steal
-	0,			// map
-	0,			// seal
-	0,			// freezetime
-	0,			// maptime
-	0,			// sealtime
-	0,			// dot
-	0,			// dot index
-	0,			// dot_time
-	0,			// dot_force
-	0,			// dot_rate
-	{0, 0, 0},		// dropv
-	0,			// otg
-	0,			// jugglecost
-	0,			// Guardcost
-	0,			// drop
-	0,			// type
-	0,			// damage on landing
-	0,			// grabdist
-	0,			// pause
+	.attack_force = 0,
+	.hitsound = -1,
+	.hitflash = -1,
+	.blockflash = -1,
+	.blocksound = -1,
+	.counterattack = 0,
+	.attack_coords = {0, 0, 0, 0, 0},
+	.no_pain = 0,
+	.no_flash = 0,
+	.no_block = 0,
+	.grab = 0,
+	.force_direction = 0,
+	.blast = 0,
+	.freeze = 0,
+	.steal = 0,
+	.forcemap = 0,
+	.seal = 0,
+	.freezetime = 0,
+	.maptime = 0,
+	.sealtime = 0,
+	.dot = 0,
+	.dot_index = 0,
+	.dot_time = 0,
+	.dot_force = 0,
+	.dot_rate = 0,
+	.dropv = {0.f, 0.f, 0.f},
+	.otg = 0,
+	.jugglecost = 0,
+	.guardcost = 0,
+	.attack_drop = 0,
+	.attack_type = 0,
+	.damage_on_landing = 0,
+	.grab_distance = 0,
+	.pause_add = 0,
+	.staydown = {0, 0, 0},
 };
 
 char *custScenes = NULL;
