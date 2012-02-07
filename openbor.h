@@ -638,41 +638,45 @@ typedef struct {
 
 
 typedef struct {
-	short attack_force:16;
-	int hitsound;		// Sound effect to be played when attack hits opponent
-	int hitflash;		// Custom flash for each animation, model id
-	int blockflash;		// Custom bflash for each animation, model id
-	int blocksound;		// Custom sound for when an attack is blocked
-	char counterattack:8;
-	short attack_coords[5];	// stick on the only one victim
-	char no_pain:8;
-	char no_flash:8;	// Flag to determine if an attack spawns a flash or not
-	char no_block:8;	// Flag to determine if an attack is blockable (default 0 - blockable)
-	char grab:8;
-	char force_direction:8;	// 0 dont care, 1 same direction as attacker, -1 opposite drection as attacker, 2 right, -2 left
-	char blast:8;
-	char freeze:8;
-	char steal:8;
-	char forcemap:8;
-	char seal:8;
-	int freezetime:32;
-	int maptime:32;
-	int sealtime:32;
+	float dropv[3];		// fly height/x/z if the target is knoced down
+	float grab_distance;	// suck target near by
+
+	int staydown[3];	// [0] = Add to rise delay. [1] = Add to rise attack delay.
+	int freezetime;
+	int maptime;
+	int sealtime;
 	int dot;		//Dot mode.
 	int dot_index;		//Dot index.
 	int dot_time;		//Dot time to expire.
 	int dot_force;		//Dot amount per tick.
 	int dot_rate;		//Dot tick delay.
-	float dropv[3];		// fly height/x/z if the target is knoced down
-	char otg:8;		// Over The Ground. Gives ground projectiles the ability to hit lying ents.
-	short jugglecost:16;	// cost for juggling a falling ent
-	short guardcost:16;	// cost for blocking an attack
-	char attack_drop:8;	// now be a knock-down factor, how many this attack will knock victim down
-	char attack_type:8;
-	char damage_on_landing:8;	// same as throw damage type
-	float grab_distance;	// suck target near by
-	short pause_add:16;	// Flag to determine if an attack adds a pause before updating the animation
-	int staydown[3];	// [0] = Add to rise delay. [1] = Add to rise attack delay.
+	int hitsound;		// Sound effect to be played when attack hits opponent
+	int hitflash;		// Custom flash for each animation, model id
+	int blockflash;		// Custom bflash for each animation, model id
+	int blocksound;		// Custom sound for when an attack is blocked
+
+	short attack_force;
+	short attack_coords[5];	// stick on the only one victim
+	short jugglecost;	// cost for juggling a falling ent
+	short guardcost;	// cost for blocking an attack
+	short pause_add;	// Flag to determine if an attack adds a pause before updating the animation
+	
+	signed char counterattack;
+	signed char no_pain;
+	signed char no_flash;	// Flag to determine if an attack spawns a flash or not
+	signed char no_block;	// Flag to determine if an attack is blockable (default 0 - blockable)
+	signed char grab;
+	signed char force_direction;	// 0 dont care, 1 same direction as attacker, -1 opposite drection as attacker, 2 right, -2 left
+	signed char blast;
+	signed char freeze;
+	signed char steal;
+	signed char forcemap;
+	signed char seal;
+	signed char otg;		// Over The Ground. Gives ground projectiles the ability to hit lying ents.
+	signed char attack_drop;	// now be a knock-down factor, how many this attack will knock victim down
+	signed char attack_type;
+	signed char damage_on_landing;	// same as throw damage type
+	
 } s_attack;
 
 typedef struct {
