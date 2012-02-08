@@ -615,14 +615,11 @@ int sound_play_sample(int samplenum, unsigned int priority, int lvolume, int rvo
 	unsigned int prio_low;
 	int channel;
 
+	if(samplenum < 0 || samplenum >= MAX_SAMPLES || !mixing_inited || !sampledata[samplenum].sampleptr)
+		return -1;
+	
 	if(speed < 1)
 		speed = 100;
-	if(!mixing_inited)
-		return -1;
-	if(samplenum < 0 || samplenum >= MAX_SAMPLES)
-		return -1;
-	if(!sampledata[samplenum].sampleptr)
-		return -1;
 
 	// Try to find unused SFX channel
 	channel = -1;
