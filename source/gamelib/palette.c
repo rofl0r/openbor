@@ -53,31 +53,12 @@ void palette_set_corrected(unsigned char *pal, int gr, int gg, int gb, int br, i
 	unsigned char pal2[768];
 	int i;
 
-	if(gr < -255)
-		gr = -255;
-	else if(gr > 255)
-		gr = 255;
-	if(gg < -255)
-		gg = -255;
-	else if(gg > 255)
-		gg = 255;
-	if(gb < -255)
-		gb = -255;
-	else if(gb > 255)
-		gb = 255;
-
-	if(br < -255)
-		br = -255;
-	else if(br > 255)
-		br = 255;
-	if(bg < -255)
-		bg = -255;
-	else if(bg > 255)
-		bg = 255;
-	if(bb < -255)
-		bb = -255;
-	else if(bb > 255)
-		bb = 255;
+	int_min_max(&gr, -255, 255);
+	int_min_max(&gg, -255, 255);
+	int_min_max(&gb, -255, 255);
+	int_min_max(&br, -255, 255);
+	int_min_max(&bg, -255, 255);
+	int_min_max(&bb, -255, 255);
 
 	for(i = 0; i < 256; i++) {
 		pal2[i * 3] = gbcorrect(pal[i * 3], gr, br);
