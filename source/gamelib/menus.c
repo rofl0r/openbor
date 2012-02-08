@@ -20,13 +20,13 @@ void movie_options(void) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = 2;
@@ -34,8 +34,8 @@ void movie_options(void) {
 			selector = 0;
 		if(bothnewkeys & FLAG_ANYBUTTON) {
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -86,13 +86,13 @@ void input_options(void) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = 5;
@@ -100,8 +100,8 @@ void input_options(void) {
 			selector = 0;
 		if(bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) {
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -151,14 +151,14 @@ void sound_options(void) {
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = 6;
@@ -173,8 +173,8 @@ void sound_options(void) {
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -263,14 +263,14 @@ void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore Op
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 
 		if(selector < 0)
@@ -286,8 +286,8 @@ void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore Op
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -366,14 +366,14 @@ void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 
 		if(selector < 0)
@@ -389,8 +389,8 @@ void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -495,11 +495,11 @@ void system_options(void) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 
 		if(selector < 0)
@@ -513,7 +513,7 @@ void system_options(void) {
 				dir = -1;
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
-			sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -632,13 +632,13 @@ void video_options(void) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) {
 			dir = 0;
@@ -648,8 +648,8 @@ void video_options(void) {
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -767,14 +767,14 @@ void options(void) {
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
 
-			if(SAMPLE_BEEP >= 0)
-				sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep >= 0)
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) {
 			dir = 0;
@@ -784,8 +784,8 @@ void options(void) {
 			else if(bothnewkeys & FLAG_MOVERIGHT)
 				dir = 1;
 
-			if(SAMPLE_BEEP2 >= 0)
-				sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			if(samples.beep2 >= 0)
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			switch (selector) {
 				case 0:
@@ -835,17 +835,17 @@ void soundcard_options(void) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			sound_play_sample(SAMPLE_BEEP, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = 4;
 		selector %= 5;
 		if(bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) {
-			sound_play_sample(SAMPLE_BEEP2, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 			switch (selector) {
 				case 0:
 					if(bothnewkeys & FLAG_MOVELEFT)

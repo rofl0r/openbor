@@ -46,20 +46,6 @@ if(VAR->vt == VT_STR) { \
 }
 
 extern int MAX_WALL_HEIGHT;
-extern int SAMPLE_GO;
-extern int SAMPLE_BEAT;
-extern int SAMPLE_BLOCK;
-extern int SAMPLE_INDIRECT;
-extern int SAMPLE_GET;
-extern int SAMPLE_GET2;
-extern int SAMPLE_FALL;
-extern int SAMPLE_JUMP;
-extern int SAMPLE_PUNCH;
-extern int SAMPLE_1UP;
-extern int SAMPLE_TIMEOVER;
-extern int SAMPLE_BEEP;
-extern int SAMPLE_BEEP2;
-extern int SAMPLE_BIKE;
 extern int current_palette;
 extern s_player player[4];
 extern s_savedata savedata;
@@ -7683,20 +7669,21 @@ void mapstrings_transconst(ScriptVariant ** varlist, int paramCount) {
 		    ICMPCONST(PLAYER_MAX_Z)
 		    ICMPCONST(BGHEIGHT)
 		    ICMPCONST(MAX_WALL_HEIGHT)
-		    ICMPCONST(SAMPLE_GO);
-		ICMPCONST(SAMPLE_BEAT);
-		ICMPCONST(SAMPLE_BLOCK);
-		ICMPCONST(SAMPLE_INDIRECT);
-		ICMPCONST(SAMPLE_GET);
-		ICMPCONST(SAMPLE_GET2);
-		ICMPCONST(SAMPLE_FALL);
-		ICMPCONST(SAMPLE_JUMP);
-		ICMPCONST(SAMPLE_PUNCH);
-		ICMPCONST(SAMPLE_1UP);
-		ICMPCONST(SAMPLE_TIMEOVER);
-		ICMPCONST(SAMPLE_BEEP);
-		ICMPCONST(SAMPLE_BEEP2);
-		ICMPCONST(SAMPLE_BIKE);
+		    // FIXME fix this crap and use old names, i.e. SAMPLE_1UP
+		    ICMPCONST(samples.go);
+		ICMPCONST(samples.beat);
+		ICMPCONST(samples.block);
+		ICMPCONST(samples.indirect);
+		ICMPCONST(samples.get);
+		ICMPCONST(samples.get2);
+		ICMPCONST(samples.fall);
+		ICMPCONST(samples.jump);
+		ICMPCONST(samples.punch);
+		ICMPCONST(samples.oneup);
+		ICMPCONST(samples.timeover);
+		ICMPCONST(samples.beep);
+		ICMPCONST(samples.beep2);
+		ICMPCONST(samples.bike);
 		ICMPCONST(ANI_RISE2);
 		ICMPCONST(ANI_RISE3);
 		ICMPCONST(ANI_RISE4);

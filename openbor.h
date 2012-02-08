@@ -1509,6 +1509,44 @@ typedef struct {
 
 extern s_colors colors;
 
+typedef struct {
+	int go;
+	int beat;
+	int block;
+	int indirect;
+	int get;
+	int get2;
+	int fall;
+	int jump;
+	int punch;
+	int oneup;
+	int timeover;
+	int beep;
+	int beep2;
+	int bike;
+} s_samples;
+
+extern s_samples samples;
+#define s_samples_itemcount 14
+
+typedef struct {
+	char* go;
+	char* beat;
+	char* block;
+	char* indirect;
+	char* get;
+	char* get2;
+	char* fall;
+	char* jump;
+	char* punch;
+	char* oneup;
+	char* timeover;
+	char* beep;
+	char* beep2;
+	char* bike;
+} s_samples_strings;
+
+
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);
 int changesyspropertybyindex(int index, ScriptVariant * value);
@@ -1832,8 +1870,6 @@ extern u32 bothkeys;
 extern u32 bothnewkeys;
 extern u32 interval;
 extern s_playercontrols *playercontrolpointers[];
-extern int SAMPLE_BEEP;
-extern int SAMPLE_BEEP2;
 extern int cheats;
 extern int livescheat;
 extern int creditscheat;
