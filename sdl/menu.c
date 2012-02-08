@@ -25,8 +25,6 @@
 
 #include <dirent.h>
 
-extern int videoMode;
-
 #define RGB32(B,G,R) ((R) | ((G) << 8) | ((B) << 16))
 #define RGB16(B,G,R) ((B&0xF8)<<8) | ((G&0xFC)<<3) | (R>>3)
 #define RGB(B,G,R)   (bpp==16?RGB16(B,G,R):RGB32(B,G,R))

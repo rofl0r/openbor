@@ -454,3 +454,14 @@ void Array_Check_Size(const char *f_caller, char **array, int new_size, int *cur
 	// ReAssign the new allocated array
 	*array = copy;
 }
+
+void char_to_lower(char *dst, char *src, size_t maxlen) {
+	unsigned i;
+	for(i = 0; i < maxlen; i++) {
+		dst[i] = tolower(src[i]);
+		if(!src[i])
+			break;
+	}
+	if(i == maxlen)
+		dst[maxlen - 1] = 0;
+}

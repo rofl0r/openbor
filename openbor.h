@@ -1776,7 +1776,7 @@ float getValidFloat(char *text, char *file, char *cmd);
 int set_color_correction(int gm, int br);
 
 extern s_videomodes videomodes;
-extern int videoMode;
+extern unsigned int videoMode;
 extern int current_palette;
 extern unsigned char pal[MAX_PAL_SIZE];
 

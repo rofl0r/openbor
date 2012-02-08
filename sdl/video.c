@@ -18,8 +18,6 @@
 #include "gfxtypes.h"
 #include "gfx.h"
 
-extern int videoMode;
-
 #ifndef SKIP_CODE
 #include "pngdec.h"
 #include "../resources/OpenBOR_Icon_32x32_png.h"

@@ -546,7 +546,7 @@ int shadowsprites[6] = { -1, -1, -1, -1, -1, -1 };
 int gosprite = -1;
 int golsprite = -1;
 int holesprite = -1;
-int videoMode = 0;
+unsigned int videoMode = 0;
 int scoreformat = 0;		// If set fill score values with 6 Zeros
 
 // Funny neon lights
@@ -21700,18 +21700,51 @@ void term_videomodes() {
 	custModels = NULL;
 }
 
+typedef enum {
+	VTC_VIDEO = 0,
+	VTC_SCENES,
+	VTC_BACKGROUNDS,
+	VTC_LEVELS,
+	VTC_MODELS,
+	VTC_COLOURDEPTH,
+	VTC_FORCEMODE,
+	VTC_MAX
+} VIDEO_TXT_COMMANDS;
+
+static const char* video_txt_commands_strings[] = {
+	[VTC_VIDEO] = "video",
+	[VTC_SCENES] = "scenes",
+	[VTC_BACKGROUNDS] = "backgrounds",
+	[VTC_LEVELS] = "levels",
+	[VTC_MODELS] = "models",
+	[VTC_COLOURDEPTH] = "colourdepth",
+	[VTC_FORCEMODE] = "forcemode",
+};
+
+static char** video_txt_commands_dest[] = {
+	[VTC_VIDEO] = NULL,
+	[VTC_SCENES] = &custScenes,
+	[VTC_BACKGROUNDS] = &custBkgrds,
+	[VTC_LEVELS] = &custLevels,
+	[VTC_MODELS] = &custModels,
+	[VTC_COLOURDEPTH] = NULL,
+	[VTC_FORCEMODE] = NULL,
+};
+
 // Load Video Mode from file
 int init_videomodes(int log) {
 	int result;
 	char *filename = "data/video.txt";
 	int bits = 8, tmp;
-	ptrdiff_t pos, len;
+	ptrdiff_t pos;
 	size_t size;
 	char *buf = NULL;
 	char *command = NULL;
 	char *value = NULL;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
+	char lowercase_buf[16];
+	unsigned i;
 
 	if(log)
 		printf("Initializing video............\n");
@@ -21730,7 +21763,7 @@ int init_videomodes(int log) {
 	}
 
 	printf("Reading video settings from '%s'.\n", filename);
-
+	
 	// Now interpret the contents of buf line by line
 	pos = 0;
 	while(pos < size) {
@@ -21738,46 +21771,34 @@ int init_videomodes(int log) {
 		command = GET_ARG(0);
 
 		if(command && command[0]) {
-			if(stricmp(command, "video") == 0) {
-				videoMode = GET_INT_ARG(1);
-			} else if(stricmp(command, "scenes") == 0) {
-				len = strlen(GET_ARG(1));
-				custScenes = malloc(len + 1);
-				strcpy(custScenes, GET_ARG(1));
-				custScenes[len] = 0;
-			} else if(stricmp(command, "backgrounds") == 0) {
-				len = strlen(GET_ARG(1));
-				custBkgrds = malloc(len + 1);
-				strcpy(custBkgrds, GET_ARG(1));
-				custBkgrds[len] = 0;
-			} else if(stricmp(command, "levels") == 0) {
-				len = strlen(GET_ARG(1));
-				custLevels = malloc(len + 1);
-				strcpy(custLevels, GET_ARG(1));
-				custLevels[len] = 0;
-			} else if(stricmp(command, "models") == 0) {
-				len = strlen(GET_ARG(1));
-				custModels = malloc(len + 1);
-				strcpy(custModels, GET_ARG(1));
-				custModels[len] = 0;
-			} else if(stricmp(command, "colourdepth") == 0) {
-				pixelformat = PIXEL_x8;
-				value = GET_ARG(1);
-				if(stricmp(value, "8bit") == 0) {
-					screenformat = PIXEL_8;
-					pixelformat = PIXEL_8;
-				} else if(stricmp(value, "16bit") == 0) {
-					screenformat = PIXEL_16;
-					bits = 16;
-				} else if(stricmp(value, "32bit") == 0) {
-					screenformat = PIXEL_32;
-					bits = 32;
-				} else if(value[0] == 0)
-					screenformat = PIXEL_32;
-				else
-					shutdown(1, "Screen colour depth can only be either 8bit, 16bit or 32bit.");
-			} else if(stricmp(command, "forcemode") == 0) {
-			} else if(command && command[0])
+			char_to_lower(lowercase_buf, command, sizeof(lowercase_buf));
+			for(i = 0 ; i < VTC_MAX; i++) {
+				if(!strcmp(lowercase_buf, video_txt_commands_strings[i])) {
+					if(video_txt_commands_dest[i])
+						*video_txt_commands_dest[i] = strdup(GET_ARG(1));
+					else if(i == VTC_VIDEO)
+						videoMode = GET_INT_ARG(1);
+					else if(i == VTC_COLOURDEPTH) {
+						pixelformat = PIXEL_x8;
+						value = GET_ARG(1);
+						if(stricmp(value, "8bit") == 0) {
+							screenformat = PIXEL_8;
+							pixelformat = PIXEL_8;
+						} else if(stricmp(value, "16bit") == 0) {
+							screenformat = PIXEL_16;
+							bits = 16;
+						} else if(stricmp(value, "32bit") == 0) {
+							screenformat = PIXEL_32;
+							bits = 32;
+						} else if(value[0] == 0)
+							screenformat = PIXEL_32;
+						else
+							shutdown(1, "Screen colour depth can only be either 8bit, 16bit or 32bit.");
+					}
+					break;
+				}
+			}
+			if(i == VTC_MAX)
 				printf("Command '%s' not understood in file '%s'!", command, filename);
 		}
 		// Go to next line
@@ -21790,22 +21811,11 @@ int init_videomodes(int log) {
 	}
 
 	VIDEOMODES:
-	switch (videoMode) {
-		case VTM_320_240:
-		case VTM_480_272:
-		case VTM_640_480:
-		case VTM_720_480:
-		case VTM_800_480:
-		case VTM_800_600:
-		case VTM_960_560:
-			break;
-		default:
-			shutdown(1,
-				 "Invalid video mode: %d in 'data/video.txt', supported modes:\n"
-				 "0 - 320x240\n" "1 - 480x272\n" "2 - 640x480\n" "3 - 720x480\n"
-				 "4 - 800x480\n" "5 - 800x600\n" "6 - 960x540\n\n", videoMode);
-			break;
-	}
+	if(videoMode >= VTM_MAX)
+		shutdown(1,
+				"Invalid video mode: %d in 'data/video.txt', supported modes:\n"
+				"0 - 320x240\n" "1 - 480x272\n" "2 - 640x480\n" "3 - 720x480\n"
+				"4 - 800x480\n" "5 - 800x600\n" "6 - 960x540\n\n", videoMode);
 
 	videomodes = videomodes_init_data[videoMode];
 	videomodes.mode = savedata.screen[videoMode][0];
@@ -21885,17 +21895,6 @@ static const char *config_button_names[] = {
 	[CB_START] = "start",
 	[CB_SCREENSHOT] = "screenshot",
 };
-
-static void char_to_lower(char *dst, char *src, size_t maxlen) {
-	unsigned i;
-	for(i = 0; i < maxlen; i++) {
-		dst[i] = tolower(src[i]);
-		if(!src[i])
-			break;
-	}
-	if(i == maxlen)
-		dst[maxlen - 1] = 0;
-}
 
 static void init_button_names(char **buttonnames) {
 	unsigned i;
