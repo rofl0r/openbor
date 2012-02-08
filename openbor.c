@@ -20115,39 +20115,26 @@ int set_color_correction(int gm, int br) {
 		return 0;
 }
 
+static void max_plus_minus255(int* value) {
+	if(*value < -255) 
+		*value = 255;
+	else if(*value > 255)
+		*value = 255;
+}
+
 // copied from palette.c, seems it works well
 static void _fade_screen(s_screen * screen, int gr, int gg, int gb, int br, int bg, int bb) {
 	int i, len = screen->width * screen->height;
 	int pb = pixelbytes[(int) screenformat];
 	unsigned c, r, g, b;
 
-
-	if(gr < -255)
-		gr = -255;
-	else if(gr > 255)
-		gr = 255;
-	if(gg < -255)
-		gg = -255;
-	else if(gg > 255)
-		gg = 255;
-	if(gb < -255)
-		gb = -255;
-	else if(gb > 255)
-		gb = 255;
-
-	if(br < -255)
-		br = -255;
-	else if(br > 255)
-		br = 255;
-	if(bg < -255)
-		bg = -255;
-	else if(bg > 255)
-		bg = 255;
-	if(bb < -255)
-		bb = -255;
-	else if(bb > 255)
-		bb = 255;
-
+	max_plus_minus255(&gr);
+	max_plus_minus255(&gg);
+	max_plus_minus255(&gb);
+	max_plus_minus255(&br);
+	max_plus_minus255(&bg);
+	max_plus_minus255(&bb);
+	
 	if(pb == 2)
 		for(i = 0; i < len; i++) {
 			c = ((unsigned short *) screen->data)[i];
@@ -20156,7 +20143,8 @@ static void _fade_screen(s_screen * screen, int gr, int gg, int gb, int br, int 
 			r = (c & 0x1F) * 0xFF / 0x1F;
 			((unsigned short *) screen->data)[i] =
 			    colour16(gbcorrect(r, gr, br), gbcorrect(g, gg, bg), gbcorrect(b, gb, bb));
-	} else
+		}
+	else
 		for(i = 0; i < len; i++) {
 			screen->data[i * pb] = gbcorrect(screen->data[i * pb], gr, br);
 			screen->data[i * pb + 1] = gbcorrect(screen->data[i * pb + 1], gg, bg);
