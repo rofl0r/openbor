@@ -685,14 +685,8 @@ void sound_stopall_sample() {
 void sound_volume_sample(int channel, int lvolume, int rvolume) {
 	if(channel < 0 || channel >= max_channels)
 		return;
-	if(lvolume < 0)
-		lvolume = 0;
-	if(rvolume < 0)
-		rvolume = 0;
-	if(lvolume > MAXVOLUME)
-		lvolume = MAXVOLUME;
-	if(rvolume > MAXVOLUME)
-		rvolume = MAXVOLUME;
+	int_min_max(&lvolume, 0, MAXVOLUME);
+	int_min_max(&rvolume, 0, MAXVOLUME);
 	vchannel[channel].volume[0] = lvolume;
 	vchannel[channel].volume[1] = rvolume;
 }
