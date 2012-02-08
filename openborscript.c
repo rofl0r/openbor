@@ -8288,7 +8288,6 @@ HRESULT openbor_changelight(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 // alpha default to 2, <=0 means no alpha effect
 HRESULT openbor_changeshadowcolor(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG c, a;
-	extern int shadowcolor;
 	extern int shadowalpha;
 
 	*pretvar = NULL;
@@ -8298,7 +8297,7 @@ HRESULT openbor_changeshadowcolor(ScriptVariant ** varlist, ScriptVariant ** pre
 	if(FAILED(ScriptVariant_IntegerValue(varlist[0], &c)))
 		goto changeshadowcolor_error;
 
-	shadowcolor = (int) c;
+	colors.shadow = (int) c;
 
 	if(paramCount > 1) {
 		if(FAILED(ScriptVariant_IntegerValue(varlist[1], &a)))

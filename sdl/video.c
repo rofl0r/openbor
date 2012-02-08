@@ -32,7 +32,7 @@ static SDL_Surface *screen = NULL;
 static SDL_Surface *bscreen = NULL;
 static SDL_Surface *bscreen2 = NULL;
 static SDL_mutex *screens_lock;
-static SDL_Color colors[256];
+static SDL_Color sdl_colors[256];
 static int bytes_per_pixel = 1;
 int stretch = 0;
 int opengl = 0;			// OpenGL backend currently in use?
@@ -154,9 +154,9 @@ int video_set_mode(s_videomodes videomodes) {
 	}
 
 	if(bytes_per_pixel == 1) {
-		SDL_SetColors(screen, colors, 0, 256);
+		SDL_SetColors(screen, sdl_colors, 0, 256);
 		if(bscreen)
-			SDL_SetColors(bscreen, colors, 0, 256);
+			SDL_SetColors(bscreen, sdl_colors, 0, 256);
 	}
 
 	unlock_screens();
@@ -211,9 +211,9 @@ void video_fullscreen_flip() {
 				     fullscreen ? (SDL_SWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN) : (SDL_SWSURFACE |
 												      SDL_DOUBLEBUF));
 	SDL_ShowCursor(SDL_DISABLE);
-	SDL_SetColors(screen, colors, 0, 256);
+	SDL_SetColors(screen, sdl_colors, 0, 256);
 	if(bscreen)
-		SDL_SetColors(bscreen, colors, 0, 256);
+		SDL_SetColors(bscreen, sdl_colors, 0, 256);
 	unlock_screens();
 }
 
@@ -416,16 +416,16 @@ void vga_setpalette(unsigned char *palette) {
 	int i;
 	video_gl_setpalette(palette);
 	for(i = 0; i < 256; i++) {
-		colors[i].r = palette[0];
-		colors[i].g = palette[1];
-		colors[i].b = palette[2];
+		sdl_colors[i].r = palette[0];
+		sdl_colors[i].g = palette[1];
+		sdl_colors[i].b = palette[2];
 		palette += 3;
 	}
 	if(!opengl) {
 		lock_screens();
-		SDL_SetColors(screen, colors, 0, 256);
+		SDL_SetColors(screen, sdl_colors, 0, 256);
 		if(bscreen)
-			SDL_SetColors(bscreen, colors, 0, 256);
+			SDL_SetColors(bscreen, sdl_colors, 0, 256);
 		unlock_screens();
 	}
 }

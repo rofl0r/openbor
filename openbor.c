@@ -186,7 +186,6 @@ int lasthitc;			//Last hit confirm (i.e. if engine hit code will be used).
 // used by gfx shadow
 int light[2] = { 0, 0 };
 
-int shadowcolor = 0;
 int shadowalpha = BLEND_MULTIPLY + 1;
 
 u32 interval = 0;
@@ -528,17 +527,8 @@ int same[MAX_DIFFICULTIES];	// ltb 1-13-05   sameplayer
 int z_coords[3] = { 0, 0, 0 };	// Used for setting customizable walkable area
 int rush[6] = { 0, 2, 3, 3, 3, 3 };
 
-int color_black = 0;
-int color_red = 0;
-int color_orange = 0;
-int color_yellow = 0;
-int color_white = 0;
-int color_blue = 0;
-int color_green = 0;
-int color_pink = 0;
-int color_purple = 0;
-int color_magic = 0;
-int color_magic2 = 0;
+s_colors colors = {0};
+
 int lifebarfgalpha = 0;
 int lifebarbgalpha = 2;
 int shadowsprites[6] = { -1, -1, -1, -1, -1, -1 };
@@ -861,7 +851,7 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 				case _e_lightx: var->lVal = (LONG) (light[0]); break;
 				case _e_lightz: var->lVal = (LONG) (light[1]); break;
 				case _e_shadowalpha: var->lVal = (LONG) shadowalpha; break;
-				case _e_shadowcolor: var->lVal = (LONG) shadowcolor; break;
+				case _e_shadowcolor: var->lVal = (LONG) colors.shadow; break;
 				case _e_slowmotion: var->lVal = (LONG) slowmotion[0]; break;
 				case _e_slowmotion_duration: var->lVal = (LONG) slowmotion[1]; break;
 				case _e_game_paused: var->lVal = (LONG) pause; break;
@@ -2714,26 +2704,56 @@ void lifebar_colors() {
 	int pos;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
-
+	char lowercase_buf[16];
+	unsigned i;
 
 	char *command;
 
 	if(buffer_pakfile(filename, &buf, &size) != 1) {
-		color_black = 0;
-		color_red = 0;
-		color_orange = 0;
-		color_yellow = 0;
-		color_white = 0;
-		color_blue = 0;
-		color_green = 0;
-		color_pink = 0;
-		color_purple = 0;
-		color_magic = 0;
-		color_magic2 = 0;
-		shadowcolor = 0;
+		memset(&colors, 0, sizeof(colors));
 		shadowalpha = BLEND_MULTIPLY + 1;
 		return;
 	}
+	
+	typedef enum {
+		LTC_BLACKBOX = 0,
+		LTC_WHITEBOX,
+		LTC_COLOR25,
+		LTC_COLOR50,
+		LTC_COLOR100,
+		LTC_COLOR200,
+		LTC_COLOR300,
+		LTC_COLOR400,
+		LTC_COLOR500,
+		LTC_SHADOWCOLOR,
+		LTC_MAX
+	} lifebar_txt_commands;
+	
+	static const char* lifebar_txt_commands_strings[] = {
+		[LTC_BLACKBOX] = "blackbox",
+		[LTC_WHITEBOX] = "whitebox",
+		[LTC_COLOR25] = "color25",
+		[LTC_COLOR50] = "color50",
+		[LTC_COLOR100] = "color100",
+		[LTC_COLOR200] = "color200",
+		[LTC_COLOR300] = "color300",
+		[LTC_COLOR400] = "color400",
+		[LTC_COLOR500] = "color500",
+		[LTC_SHADOWCOLOR] = "shadowcolor",
+	};
+	
+	static int* lifebar_txt_commands_destcolor[] = {
+		[LTC_BLACKBOX] = &colors.black,
+		[LTC_WHITEBOX] = &colors.white,
+		[LTC_COLOR25] = &colors.red,
+		[LTC_COLOR50] = &colors.yellow,
+		[LTC_COLOR100] = &colors.green,
+		[LTC_COLOR200] = &colors.blue,
+		[LTC_COLOR300] = &colors.orange,
+		[LTC_COLOR400] = &colors.pink,
+		[LTC_COLOR500] = &colors.purple,
+		[LTC_SHADOWCOLOR] = &colors.shadow,
+	};
 
 	pos = 0;
 	colorbars = 1;
@@ -2741,36 +2761,20 @@ void lifebar_colors() {
 		ParseArgs(&arglist, buf + pos, argbuf);
 		command = GET_ARG(0);
 		if(command && command[0]) {
-			if(stricmp(command, "blackbox") == 0)
-				color_black = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "whitebox") == 0)
-				color_white = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color300") == 0)
-				color_orange = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color25") == 0)
-				color_red = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color50") == 0)
-				color_yellow = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color100") == 0)
-				color_green = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color200") == 0)
-				color_blue = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color400") == 0)
-				color_pink = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "color500") == 0)
-				color_purple = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			//magic bars color declarations by tails
-			else if(stricmp(command, "colormagic") == 0)
-				color_magic = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "colormagic2") == 0)
-				color_magic2 = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			//end of magic bars color declarations by tails
-			else if(stricmp(command, "shadowcolor") == 0)
-				shadowcolor = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
-			else if(stricmp(command, "shadowalpha") == 0)	//gfxshadow alpha
-				shadowalpha = GET_INT_ARG(1);
-			else if(command && command[0])
-				printf("Warning: Unknown command in lifebar.txt: '%s'.\n", command);
+			char_to_lower(lowercase_buf, command, sizeof(lowercase_buf));
+			for(i = 0; i < LTC_MAX; i++) {
+				if(!strcmp(lowercase_buf, lifebar_txt_commands_strings[i])) {
+					*(lifebar_txt_commands_destcolor[i]) = _makecolour(GET_INT_ARG(1), GET_INT_ARG(2), GET_INT_ARG(3));
+					break;
+				}
+			}
+			if(i == LTC_MAX) {
+				if(!strcmp(lowercase_buf, "shadowalpha"))	//gfxshadow alpha
+					shadowalpha = GET_INT_ARG(1);
+				else
+					printf("Warning: Unknown command in lifebar.txt: '%s'.\n", command);
+				
+			}
 		}
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
@@ -2785,29 +2789,29 @@ void lifebar_colors() {
 
 
 void init_colourtable() {
-	mpcolourtable[0] = color_magic2;
-	mpcolourtable[1] = color_magic;
-	mpcolourtable[2] = color_magic;
-	mpcolourtable[3] = color_magic;
-	mpcolourtable[4] = color_magic2;
-	mpcolourtable[5] = color_magic;
-	mpcolourtable[6] = color_magic2;
-	mpcolourtable[7] = color_magic;
-	mpcolourtable[8] = color_magic2;
-	mpcolourtable[9] = color_magic;
-	mpcolourtable[10] = color_magic2;
+	mpcolourtable[0] = colors.magic2;
+	mpcolourtable[1] = colors.magic;
+	mpcolourtable[2] = colors.magic;
+	mpcolourtable[3] = colors.magic;
+	mpcolourtable[4] = colors.magic2;
+	mpcolourtable[5] = colors.magic;
+	mpcolourtable[6] = colors.magic2;
+	mpcolourtable[7] = colors.magic;
+	mpcolourtable[8] = colors.magic2;
+	mpcolourtable[9] = colors.magic;
+	mpcolourtable[10] = colors.magic2;
 
-	hpcolourtable[0] = color_purple;
-	hpcolourtable[1] = color_red;
-	hpcolourtable[2] = color_yellow;
-	hpcolourtable[3] = color_green;
-	hpcolourtable[4] = color_blue;
-	hpcolourtable[5] = color_orange;
-	hpcolourtable[6] = color_pink;
-	hpcolourtable[7] = color_purple;
-	hpcolourtable[8] = color_black;
-	hpcolourtable[9] = color_white;
-	hpcolourtable[10] = color_white;
+	hpcolourtable[0] = colors.purple;
+	hpcolourtable[1] = colors.red;
+	hpcolourtable[2] = colors.yellow;
+	hpcolourtable[3] = colors.green;
+	hpcolourtable[4] = colors.blue;
+	hpcolourtable[5] = colors.orange;
+	hpcolourtable[6] = colors.pink;
+	hpcolourtable[7] = colors.purple;
+	hpcolourtable[8] = colors.black;
+	hpcolourtable[9] = colors.white;
+	hpcolourtable[10] = colors.white;
 
 	memcpy(ldcolourtable, hpcolourtable, 11 * sizeof(int));
 }
@@ -2832,30 +2836,30 @@ void load_background(char *filename, int createtables) {
 	}
 
 	lifebar_colors();
-	if(!color_black)
-		color_black = _makecolour(0, 0, 0);	// black boxes 500-600HP
-	if(!color_red)
-		color_red = _makecolour(255, 0, 0);	// 1% - 25% Full Health
-	if(!color_orange)
-		color_orange = _makecolour(255, 150, 0);	// 200-300HP
-	if(!color_yellow)
-		color_yellow = _makecolour(0xF8, 0xB8, 0x40);	// 26%-50% Full health
-	if(!color_white)
-		color_white = _makecolour(255, 255, 255);	// white boxes 600+ HP
-	if(!color_blue)
-		color_blue = _makecolour(0, 0, 255);	// 100-200 HP
-	if(!color_green)
-		color_green = _makecolour(0, 255, 0);	// 51% - 100% full health
-	if(!color_pink)
-		color_pink = _makecolour(255, 0, 255);	// 300-400HP
-	if(!color_purple)
-		color_purple = _makecolour(128, 48, 208);	// transbox 400-500HP
-	if(!color_magic)
-		color_magic = _makecolour(98, 180, 255);	// 1st magic bar color by tails
-	if(!color_magic2)
-		color_magic2 = _makecolour(24, 48, 143);	// 2sec magic bar color by tails
-	if(!shadowcolor)
-		shadowcolor = _makecolour(64, 64, 64);
+	if(!colors.black)
+		colors.black = _makecolour(0, 0, 0);	// black boxes 500-600HP
+	if(!colors.red)
+		colors.red = _makecolour(255, 0, 0);	// 1% - 25% Full Health
+	if(!colors.orange)
+		colors.orange = _makecolour(255, 150, 0);	// 200-300HP
+	if(!colors.yellow)
+		colors.yellow = _makecolour(0xF8, 0xB8, 0x40);	// 26%-50% Full health
+	if(!colors.white)
+		colors.white = _makecolour(255, 255, 255);	// white boxes 600+ HP
+	if(!colors.blue)
+		colors.blue = _makecolour(0, 0, 255);	// 100-200 HP
+	if(!colors.green)
+		colors.green = _makecolour(0, 255, 0);	// 51% - 100% full health
+	if(!colors.pink)
+		colors.pink = _makecolour(255, 0, 255);	// 300-400HP
+	if(!colors.purple)
+		colors.purple = _makecolour(128, 48, 208);	// transbox 400-500HP
+	if(!colors.magic)
+		colors.magic = _makecolour(98, 180, 255);	// 1st magic bar color by tails
+	if(!colors.magic2)
+		colors.magic2 = _makecolour(24, 48, 143);	// 2sec magic bar color by tails
+	if(!colors.shadow)
+		colors.shadow = _makecolour(64, 64, 64);
 	init_colourtable();
 
 	video_clearscreen();
@@ -9762,12 +9766,12 @@ void bar(int x, int y, int value, int maxvalue, s_barstatus * pstatus) {
 			(*pstatus->colourtable)[colourindex], 0);
 
 	if(pstatus->noborder == 0) {
-		spriteq_add_line(x, y, x + bkw + 1, y, HUD_Z + 3 + pstatus->borderlayer, color_white, 0);	//Top border.
-		spriteq_add_line(x, y + bkh + 1, x + bkw + 1, y + bkh + 1, HUD_Z + 3 + pstatus->borderlayer, color_white, 0);	//Bottom border.
-		spriteq_add_line(x, y + 1, x, y + bkh, HUD_Z + 3 + pstatus->borderlayer, color_white, 0);	//Left border.
-		spriteq_add_line(x + bkw + 1, y + 1, x + bkw + 1, y + bkh, HUD_Z + 3 + pstatus->borderlayer, color_white, 0);	//Right border.
-		spriteq_add_line(x, y + bkh + 2, x + bkw + 1, y + bkh + 2, HUD_Z + pstatus->borderlayer, color_black, 0);	//Bottom shadow.
-		spriteq_add_line(x + bkw + 2, y + 1, x + bkw + 2, y + bkh + 2, HUD_Z + pstatus->borderlayer, color_black, 0);	//Right shadow.
+		spriteq_add_line(x, y, x + bkw + 1, y, HUD_Z + 3 + pstatus->borderlayer, colors.white, 0);	//Top border.
+		spriteq_add_line(x, y + bkh + 1, x + bkw + 1, y + bkh + 1, HUD_Z + 3 + pstatus->borderlayer, colors.white, 0);	//Bottom border.
+		spriteq_add_line(x, y + 1, x, y + bkh, HUD_Z + 3 + pstatus->borderlayer, colors.white, 0);	//Left border.
+		spriteq_add_line(x + bkw + 1, y + 1, x + bkw + 1, y + bkh, HUD_Z + 3 + pstatus->borderlayer, colors.white, 0);	//Right border.
+		spriteq_add_line(x, y + bkh + 2, x + bkw + 1, y + bkh + 2, HUD_Z + pstatus->borderlayer, colors.black, 0);	//Bottom shadow.
+		spriteq_add_line(x + bkw + 2, y + 1, x + bkw + 2, y + bkh + 2, HUD_Z + pstatus->borderlayer, colors.black, 0);	//Right shadow.
 	}
 }
 
@@ -10277,28 +10281,28 @@ void drawstatus() {
 	{
 		spriteq_add_line(videomodes.hShift + timeloc[0], savedata.windowpos + timeloc[1],
 				 videomodes.hShift + timeloc[0] + timeloc[2], savedata.windowpos + timeloc[1], HUD_Z,
-				 color_black, 0);
+				 colors.black, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0], savedata.windowpos + timeloc[1],
 				 videomodes.hShift + timeloc[0], savedata.windowpos + timeloc[1] + timeloc[3], HUD_Z,
-				 color_black, 0);
+				 colors.black, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0] + timeloc[2], savedata.windowpos + timeloc[1],
 				 videomodes.hShift + timeloc[0] + timeloc[2],
-				 savedata.windowpos + timeloc[1] + timeloc[3], HUD_Z, color_black, 0);
+				 savedata.windowpos + timeloc[1] + timeloc[3], HUD_Z, colors.black, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0], savedata.windowpos + timeloc[1] + timeloc[3],
 				 videomodes.hShift + timeloc[0] + timeloc[2],
-				 savedata.windowpos + timeloc[1] + timeloc[3], HUD_Z, color_black, 0);
+				 savedata.windowpos + timeloc[1] + timeloc[3], HUD_Z, colors.black, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0] - 1, savedata.windowpos + timeloc[1] - 1,
 				 videomodes.hShift + timeloc[0] + timeloc[2] - 1, savedata.windowpos + timeloc[1] - 1,
-				 HUD_Z + 1, color_white, 0);
+				 HUD_Z + 1, colors.white, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0] - 1, savedata.windowpos + timeloc[1] - 1,
 				 videomodes.hShift + timeloc[0] - 1, savedata.windowpos + timeloc[1] + timeloc[3] - 1,
-				 HUD_Z + 1, color_white, 0);
+				 HUD_Z + 1, colors.white, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0] + timeloc[2] - 1, savedata.windowpos + timeloc[1] - 1,
 				 videomodes.hShift + timeloc[0] + timeloc[2] - 1,
-				 savedata.windowpos + timeloc[1] + timeloc[3] - 1, HUD_Z + 1, color_white, 0);
+				 savedata.windowpos + timeloc[1] + timeloc[3] - 1, HUD_Z + 1, colors.white, 0);
 		spriteq_add_line(videomodes.hShift + timeloc[0] - 1, savedata.windowpos + timeloc[1] + timeloc[3] - 1,
 				 videomodes.hShift + timeloc[0] + timeloc[2] - 1,
-				 savedata.windowpos + timeloc[1] + timeloc[3] - 1, HUD_Z + 1, color_white, 0);
+				 savedata.windowpos + timeloc[1] + timeloc[3] - 1, HUD_Z + 1, colors.white, 0);
 	}
 }
 
@@ -13031,7 +13035,7 @@ void display_ents() {
 				if(e->modeldata.gfxshadow == 1 && f < sprites_loaded)	//gfx shadow
 				{
 					useshadow = (e->animation->shadow ? e->animation->shadow[e->animpos] : 1)
-					    && shadowcolor && light[1];
+					    && colors.shadow && light[1];
 					//printf("\n %d, %d, %d\n", shadowcolor, light[0], light[1]);
 					if(useshadow && e->a >= 0
 					   && (!e->modeldata.aironly || (e->modeldata.aironly && inair(e)))) {
@@ -13083,7 +13087,7 @@ void display_ents() {
 								sy -= e->animation->shadow_coords[e->animpos][1];
 							}
 							shadowmethod = plainmethod;
-							shadowmethod.fillcolor = (shadowcolor > 0 ? shadowcolor : 0);
+							shadowmethod.fillcolor = (colors.shadow > 0 ? colors.shadow : 0);
 							shadowmethod.alpha = shadowalpha;
 							shadowmethod.scalex = drawmethod->scalex;
 							shadowmethod.flipx = drawmethod->flipx;
@@ -19207,11 +19211,11 @@ void update_scroller() {
 				light[0] = level->spawnpoints[current_spawn].light[0];
 				light[1] = level->spawnpoints[current_spawn].light[1];
 			} else if(level->spawnpoints[current_spawn].shadowcolor) {	// change color for gfxshadow
-				shadowcolor = level->spawnpoints[current_spawn].shadowcolor;
-				if(shadowcolor == -1)
-					shadowcolor = 0;
-				else if(shadowcolor == -2)
-					shadowcolor = -1;
+				colors.shadow = level->spawnpoints[current_spawn].shadowcolor;
+				if(colors.shadow == -1)
+					colors.shadow = 0;
+				else if(colors.shadow == -2)
+					colors.shadow = -1;
 			} else if(level->spawnpoints[current_spawn].shadowalpha) {	// change color for gfxshadow
 				shadowalpha = level->spawnpoints[current_spawn].shadowalpha;
 				if(shadowalpha == -1)
@@ -21375,12 +21379,12 @@ int choose_difficulty() {
 
 			//draw the scroll bar
 			if(num_difficulties > maxdisplay) {
-				spriteq_add_box(barx, bary, barw, barh, 0, color_black, 0);	//outerbox
-				spriteq_add_line(barx, bary, barx + 8, bary, 1, color_white, 0);
-				spriteq_add_line(barx, bary, barx, bary + barh, 1, color_white, 0);
-				spriteq_add_line(barx + 8, bary, barx + 8, bary + barh, 1, color_white, 0);
-				spriteq_add_line(barx, bary + barh, barx + 8, bary + barh, 1, color_white, 0);
-				spriteq_add_box(barx + 1, bary + selector * (barh - 3) / num_difficulties, 7, 3, 2, color_white, 0);	//slider
+				spriteq_add_box(barx, bary, barw, barh, 0, colors.black, 0);	//outerbox
+				spriteq_add_line(barx, bary, barx + 8, bary, 1, colors.white, 0);
+				spriteq_add_line(barx, bary, barx, bary + barh, 1, colors.white, 0);
+				spriteq_add_line(barx + 8, bary, barx + 8, bary + barh, 1, colors.white, 0);
+				spriteq_add_line(barx, bary + barh, barx + 8, bary + barh, 1, colors.white, 0);
+				spriteq_add_box(barx + 1, bary + selector * (barh - 3) / num_difficulties, 7, 3, 2, colors.white, 0);	//slider
 			}
 		}
 

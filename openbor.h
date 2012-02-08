@@ -1466,6 +1466,23 @@ typedef struct ArgList {
 	char *args[18];
 } ArgList;
 
+typedef struct {
+	int black;
+	int red;
+	int orange;
+	int yellow;
+	int white;
+	int blue;
+	int green;
+	int pink;
+	int purple;
+	int magic;
+	int magic2;
+	int shadow;
+} s_colors;
+
+extern s_colors colors;
+
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);
 int changesyspropertybyindex(int index, ScriptVariant * value);
