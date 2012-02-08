@@ -19691,19 +19691,19 @@ void draw_scrolled_bg() {
 	static int oldpal = 0;
 	static int neon_count = 0;
 	static int rockpos = 0;
-	static int rockoffssine[32] = {
+	static const char rockoffssine[32] = {
 		2, 2, 3, 4, 5, 6, 7, 7,
 		8, 8, 9, 9, 9, 9, 8, 8,
 		7, 7, 6, 5, 4, 3, 2, 2,
 		1, 1, 0, 0, 0, 0, 1, 1
 	};			// normal rock
-	static int rockoffsshake[32] = {
+	static const char rockoffsshake[32] = {
 		2, 2, 2, 2, 2, 2, 2, 2,
 		2, 2, 0, 4, 2, 0, 4, 2,
 		2, 2, 2, 2, 2, 2, 2, 2,
 		2, 2, 0, 4, 2, 0, 4, 2,
 	};			// slow, constant jarring rock, like on a train
-	static int rockoffsrumble[32] = {
+	static const char rockoffsrumble[32] = {
 		2, 2, 3, 3, 2, 2, 3, 3,
 		2, 2, 3, 3, 2, 3, 2, 3,
 		2, 2, 3, 3, 2, 2, 3, 3,
