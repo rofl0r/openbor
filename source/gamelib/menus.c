@@ -107,17 +107,8 @@ void input_options(void) {
 				case 0:
 					control_usejoy((savedata.usejoy ^= 1));
 					break;
-				case 1:
-					keyboard_setup(0);
-					break;
-				case 2:
-					keyboard_setup(1);
-					break;
-				case 3:
-					keyboard_setup(2);
-					break;
-				case 4:
-					keyboard_setup(3);
+				case 1: case 2: case 3: case 4:
+					keyboard_setup(selector -1);
 					break;
 				default:
 					quit = (bothnewkeys & FLAG_ANYBUTTON);
