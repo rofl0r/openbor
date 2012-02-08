@@ -17405,70 +17405,44 @@ void player_preinput() {
 		FLAG_SPECIAL,
 	};
 	static const int max_check_flags = 6;
+	
+	static const int check_flags2[] = {
+		FLAG_MOVEUP,
+		FLAG_MOVEDOWN,
+		FLAG_MOVELEFT,
+		FLAG_MOVERIGHT,
+	};
+	static const int max_check_flags2 = 4;
+	for(i = 0 ; i < max_check_flags2; i++) {
+		if(player[(int) self->playerindex].playkeys & check_flags2[i]) {
+			player[(int) self->playerindex].playkeys -= check_flags2[i];
+			self->lastdir = check_flags2[i] == FLAG_MOVEUP || check_flags2[i] == FLAG_MOVEDOWN ? 0 : check_flags2[i];
+			
+			if(self->lastdir) {
+				if(!self->direction && check_combo(FLAG_FORWARD))
+					++self->movestep;	// Check direction to distinguish forward/backward movements
+				else if(self->direction && check_combo(FLAG_BACKWARD))
+					++self->movestep;	// Check direction to distinguish forward/backward movements
+				else
+					self->movestep = 0;
 
-	if(player[(int) self->playerindex].playkeys & FLAG_MOVEUP) {
-		player[(int) self->playerindex].playkeys -= FLAG_MOVEUP;
-		self->lastdir = 0;
-
-		if(check_combo(FLAG_MOVEUP))
-			++self->movestep;	// Check the combo and increase movestep if valid
-		else
-			self->movestep = 0;
-
-		self->lastmove = FLAG_MOVEUP;
-		self->movetime = time + (GAME_SPEED / 4);
-		return;
-	}
-	if(player[(int) self->playerindex].playkeys & FLAG_MOVEDOWN) {
-		player[(int) self->playerindex].playkeys -= FLAG_MOVEDOWN;
-		self->lastdir = 0;
-
-		if(check_combo(FLAG_MOVEDOWN))
-			++self->movestep;	// Check the combo and increase movestep if valid
-		else
-			self->movestep = 0;
-
-		self->lastmove = FLAG_MOVEDOWN;
-		self->movetime = time + (GAME_SPEED / 4);
-		return;
-	}
-	if((player[(int) self->playerindex].playkeys & FLAG_MOVELEFT)) {
-		player[(int) self->playerindex].playkeys -= FLAG_MOVELEFT;
-		self->lastdir = FLAG_MOVELEFT;
-
-		if(!self->direction && check_combo(FLAG_FORWARD))
-			++self->movestep;	// Check direction to distinguish forward/backward movements
-		else if(self->direction && check_combo(FLAG_BACKWARD))
-			++self->movestep;	// Check direction to distinguish forward/backward movements
-		else
-			self->movestep = 0;
-
-		if(self->direction)
-			self->lastmove = FLAG_BACKWARD;
-		else
-			self->lastmove = FLAG_FORWARD;
-
-		self->movetime = time + (GAME_SPEED / 4);
-		return;
-	}
-	if((player[(int) self->playerindex].playkeys & FLAG_MOVERIGHT)) {
-		player[(int) self->playerindex].playkeys -= FLAG_MOVERIGHT;
-		self->lastdir = FLAG_MOVERIGHT;
-
-		if(!self->direction && check_combo(FLAG_BACKWARD))
-			++self->movestep;	// Check direction to distinguish forward/backward movements
-		else if(self->direction && check_combo(FLAG_FORWARD))
-			++self->movestep;	// Check direction to distinguish forward/backward movements
-		else
-			self->movestep = 0;
-
-		if(!self->direction)
-			self->lastmove = FLAG_BACKWARD;
-		else
-			self->lastmove = FLAG_FORWARD;
-
-		self->movetime = time + (GAME_SPEED / 4);
-		return;
+				if(self->direction)
+					self->lastmove = FLAG_BACKWARD;
+				else
+					self->lastmove = FLAG_FORWARD;
+				
+			} else {
+				if(check_combo(check_flags2[i]))
+					++self->movestep;	// Check the combo and increase movestep if valid
+				else
+					self->movestep = 0;
+				
+				self->lastmove = check_flags2[i];
+			}
+			self->movetime = time + (GAME_SPEED / 4);
+			return;
+			
+		}
 	}
 	// OX Cancel checking.
 
