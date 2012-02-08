@@ -1231,6 +1231,12 @@ typedef struct {
 	s_sprite *sprite_screen;
 } s_panel;
 
+typedef struct {
+	char *sprite_normal;
+	char *sprite_neon;
+	char *sprite_screen;
+} s_panel_filenames;
+
 typedef struct s_spawn_script_cache_node {
 	char *filename;
 	Script *cached_spawn_script;
@@ -1546,7 +1552,7 @@ void unload_texture();
 void load_texture(char *filename);
 void freepanels();
 s_sprite *loadpanel2(char *filename);
-int loadpanel(char *filename_normal, char *filename_neon, char *filename_screen);
+int loadpanel(s_panel_filenames*);
 int loadfrontpanel(char *filename);
 void resourceCleanUp(void);
 void freesprites();

@@ -3126,36 +3126,37 @@ s_sprite *loadpanel2(char *filename) {
 
 
 
-int loadpanel(char *filename_normal, char *filename_neon, char *filename_screen) {
+int loadpanel(s_panel_filenames* filenames_s) {
 
-	int i = 0;
+	int i, loaded = 0;
+	char** filenames = (char**) filenames_s;
+	s_sprite** sprites = (s_sprite**) &panels[panels_loaded];
 
 	if(panels_loaded >= MAX_PANELS)
 		return 0;
+	
+	// check in case someone changes the order of s_panel
+	assert(&sprites[1] == &panels[panels_loaded].sprite_neon); 
+	assert(&sprites[2] == &panels[panels_loaded].sprite_screen);
+	
+	for (i = 0; i < 3; i++) {
+		if(stricmp(filenames[i], "none") != 0 && *filenames[i]) {
+			sprites[i] = loadpanel2(filenames[i]);
+			if(!sprites[i]) return 0;
+			loaded = 1;
+			if(i == 1) {
+				//neon
+				if(sprites[i]->palette)	// under 24bit mode, copy the palette
+					memcpy(neontable, sprites[i]->palette, PAL_BYTES);
+			} else if (i == 2) {
+				// screen
+				if(!blendfx_is_set)
+					blendfx[BLEND_SCREEN] = 1;
+			}
+		}
+	}
 
-	if(stricmp(filename_normal, "none") != 0 && *filename_normal) {
-		panels[panels_loaded].sprite_normal = loadpanel2(filename_normal);
-		if(panels[panels_loaded].sprite_normal == NULL)
-			return 0;
-		i++;
-	}
-	if(stricmp(filename_neon, "none") != 0 && *filename_neon) {
-		panels[panels_loaded].sprite_neon = loadpanel2(filename_neon);
-		if(panels[panels_loaded].sprite_neon == NULL)
-			return 0;
-		if(panels[panels_loaded].sprite_neon->palette)	// under 24bit mode, copy the palette
-			memcpy(neontable, panels[panels_loaded].sprite_neon->palette, PAL_BYTES);
-		i++;
-	}
-	if(stricmp(filename_screen, "none") != 0 && *filename_screen) {
-		panels[panels_loaded].sprite_screen = loadpanel2(filename_screen);
-		if(panels[panels_loaded].sprite_screen == NULL)
-			return 0;
-		else if(blendfx_is_set == 0)
-			blendfx[BLEND_SCREEN] = 1;
-		i++;
-	}
-	if(i < 1)
+	if(!loaded)
 		return 0;	// Nothing was loaded!
 
 	++panels_loaded;
@@ -8817,6 +8818,7 @@ void load_level(char *filename) {
 	char *errormessage = NULL;
 	char *scriptname = NULL;
 	Script *tempscript = NULL;
+	s_panel_filenames panel_filenames;
 
 	unload_level();
 
@@ -9211,7 +9213,10 @@ void load_level(char *filename) {
 					shutdown(1, "Unable to load '%s'!", value);
 				break;
 			case CMD_LEVEL_PANEL:
-				if(!loadpanel(GET_ARG(1), GET_ARG(2), GET_ARG(3))) {
+				panel_filenames.sprite_normal = GET_ARG(1);
+				panel_filenames.sprite_neon = GET_ARG(2);
+				panel_filenames.sprite_screen = GET_ARG(3);
+				if(!loadpanel(&panel_filenames)) {
 					printf("loadpanel :%s :%s :%s failed\n", GET_ARG(1), GET_ARG(2), GET_ARG(3));
 					errormessage = "Panel load error!";
 					goto lCleanup;
