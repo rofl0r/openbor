@@ -925,6 +925,10 @@ List *createScriptConstantsCommandList(void) {
 	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_RISEATTACK10, "ani_riseattack10");
 	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_RISEATTACKB, "ani_riseattackb");
 	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_RISEATTACKS, "ani_riseattacks");
+	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_FOLLOW, "ani_follow");
+	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_FREESPECIAL, "ani_freespecial");
+	LIST_ADD(CMD_SCRIPT_CONSTANT_ANI_ATTACK, "ani_attack");
+
 #undef LIST_ADD
 	return result;
 }

@@ -7748,11 +7748,50 @@ void mapstrings_transconst(ScriptVariant ** varlist, int paramCount) {
 
 #undef ICMPCONST
 
+#define ani_num_translations 13
+
+static const int ani_translate[] = {
+	CMD_SCRIPT_CONSTANT_ANI_DOWN,
+	CMD_SCRIPT_CONSTANT_ANI_UP,
+	CMD_SCRIPT_CONSTANT_ANI_BACKWALK,
+	CMD_SCRIPT_CONSTANT_ANI_WALK,
+	CMD_SCRIPT_CONSTANT_ANI_IDLE,
+	CMD_SCRIPT_CONSTANT_ANI_FALL,
+	CMD_SCRIPT_CONSTANT_ANI_ATTACK,
+	CMD_SCRIPT_CONSTANT_ANI_FOLLOW,
+	CMD_SCRIPT_CONSTANT_ANI_RISE,
+	CMD_SCRIPT_CONSTANT_ANI_RISEATTACK,
+	CMD_SCRIPT_CONSTANT_ANI_PAIN,
+	CMD_SCRIPT_CONSTANT_ANI_DIE,
+	CMD_SCRIPT_CONSTANT_ANI_FREESPECIAL,
+};
+
+static int** ani_targets[] = {
+	&animdowns,
+	&animups,
+	&animbackwalks,
+	&animwalks,
+	&animidles,
+	&animfalls,
+	&animattacks,
+	&animfollows,
+	&animrises,
+	&animriseattacks,
+	&animpains,
+	&animdies,
+	&animspecials,
+};
+
 //openborconstant(constname);
 //translate a constant by string, used to retrieve a constant or macro of openbor
 HRESULT openbor_transconst(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *constname = NULL;
 	int temp;
+	char const_name_cp[64];
+	unsigned got_num = 0, l;
+	int check_type;
+	scriptConstantsCommands cmd;
+
 
 	if(paramCount < 1) {
 		*pretvar = NULL;
@@ -7772,97 +7811,71 @@ HRESULT openbor_transconst(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 	}
 	// if we get to this point, it's a dynamic animation id
 	constname = StrCache_Get(varlist[0]->strVal);
+	for(l = 0; l < sizeof(const_name_cp) - 1; l++) {
+		switch(constname[l]) {
+			case '0': case '1': case '2':
+			case '3': case '4': case '5':
+			case '6': case '7': case '8':
+			case '9':
+				got_num = l;
+				const_name_cp[l] = constname[l];
+				break;
+			case 0: 
+				const_name_cp[l] = constname[l];
+				goto out_1;
+			default:
+				const_name_cp[l] = constname[l];
+				break;
+		}
+	}
+	out_1:
+	
+	if(got_num && got_num == l - 1) {
+		if(isdigit(constname[got_num -1])) got_num--;
+		const_name_cp[got_num] = 0;
+		cmd = getScriptConstantsCommand(scriptConstantsCommandList, const_name_cp);
+		
+		temp = atoi(constname + got_num);
+		switch(cmd) {
+			case CMD_SCRIPT_CONSTANT_ANI_DOWN:
+			case CMD_SCRIPT_CONSTANT_ANI_UP:
+			case CMD_SCRIPT_CONSTANT_ANI_BACKWALK:
+			case CMD_SCRIPT_CONSTANT_ANI_WALK:
+			case CMD_SCRIPT_CONSTANT_ANI_IDLE:
+			case CMD_SCRIPT_CONSTANT_ANI_FALL:
+			case CMD_SCRIPT_CONSTANT_ANI_ATTACK:
+			case CMD_SCRIPT_CONSTANT_ANI_FOLLOW:
+				check_type = 0;
+				break;
+			case CMD_SCRIPT_CONSTANT_ANI_RISE:
+			case CMD_SCRIPT_CONSTANT_ANI_RISEATTACK:
+			case CMD_SCRIPT_CONSTANT_ANI_PAIN:
+			case CMD_SCRIPT_CONSTANT_ANI_DIE:
+				check_type = 1;
+				break;
+			case CMD_SCRIPT_CONSTANT_ANI_FREESPECIAL:
+				check_type = 2;
+				break;
+			default:
+				check_type = -1;
+				break;
+		}
+		if(check_type >= 0) {
+			for(l = 0; l < ani_num_translations; l++)
+				if(ani_translate[l] == cmd) {
+					if(check_type == 1) {
+						if(temp < MAX_ATKS - STA_ATKS + 1)
+							temp = MAX_ATKS - STA_ATKS + 1;	// just in case
+					} else if(check_type == 2) {
+						if(temp < 1)
+							temp = 1;
+					}
+					(*pretvar)->lVal = (LONG) ((*ani_targets[l])[temp - 1]);
+					return S_OK;
+				}
+		}
+	}
 
-	// for the extra animation ids
-	// for the extra animation ids
-	if(strnicmp(constname, "ANI_DOWN", 8) == 0 && constname[8] >= '1')	// new down walk?
-	{
-		temp = atoi(constname + 8);
-		(*pretvar)->lVal = (LONG) (animdowns[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_UP", 8) == 0 && constname[8] >= '1')	// new up walk?
-	{
-		temp = atoi(constname + 8);
-		(*pretvar)->lVal = (LONG) (animups[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_BACKWALK", 8) == 0 && constname[8] >= '1')	// new backwalk?
-	{
-		temp = atoi(constname + 8);
-		(*pretvar)->lVal = (LONG) (animbackwalks[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_WALK", 8) == 0 && constname[8] >= '1')	// new Walk?
-	{
-		temp = atoi(constname + 8);
-		(*pretvar)->lVal = (LONG) (animwalks[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_IDLE", 8) == 0 && constname[8] >= '1')	// new idle?
-	{
-		temp = atoi(constname + 8);
-		(*pretvar)->lVal = (LONG) (animidles[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_FALL", 8) == 0 && constname[8] >= '1' && constname[8] <= '9')	// new fall?
-	{
-		temp = atoi(constname + 8);	// so must be greater than 10
-		if(temp < MAX_ATKS - STA_ATKS + 1)
-			temp = MAX_ATKS - STA_ATKS + 1;	// just in case
-		(*pretvar)->lVal = (LONG) (animfalls[temp + STA_ATKS - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_RISE", 8) == 0 && constname[8] >= '1' && constname[8] <= '9')	// new fall?
-	{
-		temp = atoi(constname + 8);
-		if(temp < MAX_ATKS - STA_ATKS + 1)
-			temp = MAX_ATKS - STA_ATKS + 1;	// just in case
-		(*pretvar)->lVal = (LONG) (animrises[temp + STA_ATKS - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_RISEATTACK", 14) == 0 && constname[14] >= '1' && constname[14] <= '9')	// new fall?
-	{
-		temp = atoi(constname + 14);
-		if(temp < MAX_ATKS - STA_ATKS + 1)
-			temp = MAX_ATKS - STA_ATKS + 1;	// just in case
-		(*pretvar)->lVal = (LONG) (animriseattacks[temp + STA_ATKS - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_PAIN", 8) == 0 && constname[8] >= '1' && constname[8] <= '9')	// new fall?
-	{
-		temp = atoi(constname + 8);	// so must be greater than 10
-		if(temp < MAX_ATKS - STA_ATKS + 1)
-			temp = MAX_ATKS - STA_ATKS + 1;	// just in case
-		(*pretvar)->lVal = (LONG) (animpains[temp + STA_ATKS - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_DIE", 7) == 0 && constname[7] >= '1' && constname[7] <= '9')	// new fall?
-	{
-		temp = atoi(constname + 7);	// so must be greater than 10
-		if(temp < MAX_ATKS - STA_ATKS + 1)
-			temp = MAX_ATKS - STA_ATKS + 1;	// just in case
-		(*pretvar)->lVal = (LONG) (animdies[temp + STA_ATKS - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_ATTACK", 10) == 0 && constname[10] >= '1' && constname[10] <= '9') {
-		temp = atoi(constname + 10);
-		(*pretvar)->lVal = (LONG) (animattacks[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_FOLLOW", 10) == 0 && constname[10] >= '1' && constname[10] <= '9') {
-		temp = atoi(constname + 10);
-		(*pretvar)->lVal = (LONG) (animfollows[temp - 1]);
-		return S_OK;
-	}
-	if(strnicmp(constname, "ANI_FREESPECIAL", 15) == 0
-	   && (!constname[15] || (constname[15] >= '1' && constname[15] <= '9'))) {
-		temp = atoi(constname + 15);
-		if(temp < 1)
-			temp = 1;
-		(*pretvar)->lVal = (LONG) (animspecials[temp - 1]);
-		return S_OK;
-	}
 	ScriptVariant_Clear(*pretvar);
 	return S_OK;
 }
