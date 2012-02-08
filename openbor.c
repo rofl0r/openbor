@@ -10192,8 +10192,7 @@ void predrawstatus() {
 
 				if(gosound == 0) {
 
-					if(samples.go >= 0)
-						sound_play_sample(samples.go, 0, savedata.effectvol, savedata.effectvol, 100);	// 26-12-2004 Play go sample as arrow flashes
+					sound_play_sample(samples.go, 0, savedata.effectvol, savedata.effectvol, 100);	// 26-12-2004 Play go sample as arrow flashes
 
 					gosound = 1;	// 26-12-2004 Sets sample as already played - stops sample repeating too much
 				}
@@ -10203,8 +10202,7 @@ void predrawstatus() {
 
 				if(gosound == 0) {
 
-					if(samples.go >= 0)
-						sound_play_sample(samples.go, 0, savedata.effectvol, savedata.effectvol, 100);	// 26-12-2004 Play go sample as arrow flashes
+					sound_play_sample(samples.go, 0, savedata.effectvol, savedata.effectvol, 100);	// 26-12-2004 Play go sample as arrow flashes
 
 					gosound = 1;	// 26-12-2004 Sets sample as already played - stops sample repeating too much
 				}
@@ -10366,8 +10364,7 @@ void addscore(int playerindex, int add) {
 
 	while(s > next1up) {
 
-		if(samples.oneup >= 0)
-			sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
 
 		player[playerindex].lives++;
 		next1up += lifescore;
@@ -10890,7 +10887,7 @@ void update_frame(entity * ent, int f) {
 		}
 	}
 
-	if(self->animation->soundtoplay && self->animation->soundtoplay[f] >= 0)
+	if(self->animation->soundtoplay)
 		sound_play_sample(self->animation->soundtoplay[f], 0, savedata.effectvol, savedata.effectvol, 100);
 
 	if(self->animation->jumpframe == f) {
@@ -12094,22 +12091,22 @@ void do_attack(entity * e) {
 		if(didblock) {
 			if(attack->blocksound >= 0)
 				sound_play_sample(attack->blocksound, 0, savedata.effectvol, savedata.effectvol, 100);	// New custom block sound effect
-			else if(samples.block >= 0)
+			else
 				sound_play_sample(samples.block, 0, savedata.effectvol, savedata.effectvol, 100);	// Default block sound effect
-		} else if(e->projectile > 0 && samples.indirect >= 0)
+		} else if(e->projectile > 0)
 			sound_play_sample(samples.indirect, 0, savedata.effectvol, savedata.effectvol, 100);
 		else {
 			if(noslowfx) {
 				if(attack->hitsound >= 0)
 					sound_play_sample(attack->hitsound, 0, savedata.effectvol, savedata.effectvol,
 							  100);
-				else if(samples.beat >= 0)
+				else 
 					sound_play_sample(samples.beat, 0, savedata.effectvol, savedata.effectvol, 100);
 			} else {
 				if(attack->hitsound >= 0)
 					sound_play_sample(attack->hitsound, 0, savedata.effectvol, savedata.effectvol,
 							  105 - force);
-				else if(samples.beat >= 0)
+				else
 					sound_play_sample(samples.beat, 0, savedata.effectvol, savedata.effectvol,
 							  105 - force);
 			}
@@ -12189,8 +12186,7 @@ void check_gravity() {
 					toss(self, (-self->tossv) / self->animation->bounce);
 					if(!self->modeldata.noquake)
 						level->quake = 4;	// Don't shake if specified
-					if(samples.fall >= 0)
-						sound_play_sample(samples.fall, 0, savedata.effectvol,
+					sound_play_sample(samples.fall, 0, savedata.effectvol,
 								  savedata.effectvol, 100);
 					if(self->modeldata.type == TYPE_PLAYER)
 						control_rumble(self->playerindex, 100 * (int) self->tossv / 2);
@@ -14253,8 +14249,7 @@ void checkdeath() {
 	self->nograb = 1;
 	self->idling = 0;
 
-	if(self->modeldata.diesound >= 0)
-		sound_play_sample(self->modeldata.diesound, 0, savedata.effectvol, savedata.effectvol, 100);
+	sound_play_sample(self->modeldata.diesound, 0, savedata.effectvol, savedata.effectvol, 100);
 
 	// drop item
 	if(self->item && count_ents(TYPE_PLAYER) > self->itemplayer_count) {	//4player
@@ -15807,7 +15802,7 @@ void common_pickupitem(entity * other) {
 			if(self->health > self->modeldata.health)
 				self->health = self->modeldata.health;
 			other->health = 0;
-			//if(SAMPLE_GET >= 0) sound_play_sample(SAMPLE_GET, 0, savedata.effectvol,savedata.effectvol, 100);
+			//sound_play_sample(SAMPLE_GET, 0, savedata.effectvol,savedata.effectvol, 100);
 		}
 		// else if, TODO: other effects
 		// kill that item
@@ -16102,8 +16097,7 @@ int biker_move() {
 		self->direction = !self->direction;
 		self->attack_id = 0;
 		self->z = (float) (PLAYER_MIN_Z + randf((float) (PLAYER_MAX_Z - PLAYER_MIN_Z)));
-		if(samples.bike >= 0)
-			sound_play_sample(samples.bike, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.bike, 0, savedata.effectvol, savedata.effectvol, 100);
 		if(self->modeldata.speed)
 			self->xdir = (self->direction) ? (self->modeldata.speed) : (-self->modeldata.speed);
 		else
@@ -16237,8 +16231,7 @@ int bomb_move() {
 	self->base = self->a;
 	self->xdir = self->zdir = 0;
 
-	if(self->modeldata.diesound >= 0)
-		sound_play_sample(self->modeldata.diesound, 0, savedata.effectvol, savedata.effectvol, 100);
+	sound_play_sample(self->modeldata.diesound, 0, savedata.effectvol, savedata.effectvol, 100);
 
 	if(self->toexplode == 2 && validanim(self, ANI_ATTACK2)) {
 		ent_set_anim(self, ANI_ATTACK2, 0);	// If bomb never reaces the ground, play this
@@ -16668,8 +16661,7 @@ void tryjump(float jumpv, float jumpx, float jumpz, int jumpid) {
 void dojump(float jumpv, float jumpx, float jumpz, int jumpid) {
 	entity *dust;
 
-	if(samples.jump >= 0)
-		sound_play_sample(samples.jump, 0, savedata.effectvol, savedata.effectvol, 100);
+	sound_play_sample(samples.jump, 0, savedata.effectvol, savedata.effectvol, 100);
 
 	//Spawn jumpstart dust.
 	if(self->modeldata.dust[2] >= 0) {
@@ -16820,20 +16812,16 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 			self->weapent->modeldata.shootnum += other->modeldata.reload;
 			if(self->weapent->modeldata.shootnum > self->weapent->modeldata.shootnum)
 				self->weapent->modeldata.shootnum = self->weapent->modeldata.shootnum;
-			if(samples.get >= 0)
-				sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
 		} else {
 			addscore(self->playerindex, other->modeldata.score);
-			if(samples.get2 >= 0)
-				sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 	}
 	//end of weapons items section
 	else if(other->modeldata.score) {
 		addscore(self->playerindex, other->modeldata.score);
-
-		if(samples.get2 >= 0)
-			sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->health) {
 		self->health += other->health;
 
@@ -16841,9 +16829,7 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 			self->health = self->modeldata.health;
 
 		other->health = 0;
-
-		if(samples.get >= 0)
-			sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.mp) {
 		self->mp += other->modeldata.mp;
 
@@ -16855,20 +16841,15 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 	} else if(stricmp(other->modeldata.name, "Time") == 0) {
 		timeleft = level->settime * COUNTER_SPEED;	// Feb 24, 2005 - This line moved here to set custom time
 
-		if(samples.get2 >= 0)
-			sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.makeinv) {	// Mar 2, 2005 - New item makes player invincible
 		self->invincible = 1;
 		self->invinctime = time + ABS(other->modeldata.makeinv);
 		self->blink = (other->modeldata.makeinv > 0);
-
-		if(samples.get2 >= 0)
-			sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.smartbomb) {	// Damages everything on the screen
 		smart_bomb(self, other->modeldata.smartbomb);
-
-		if(samples.get2 >= 0)
-			sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.subtype == SUBTYPE_WEAPON) {
 		dropweapon(0);
 		self->weapent = other;
@@ -16884,28 +16865,24 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 		if(!other->modeldata.typeshot && self->modeldata.typeshot)
 			other->modeldata.typeshot = 1;
 
-		if(samples.get >= 0)
-			sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.subtype == SUBTYPE_PROJECTILE) {
 		dropweapon(0);
 		self->weapent = other;
 
-		if(samples.get >= 0)
-			sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.get, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.credit) {
 		if(!noshare)
 			credits++;
 		else
 			player[(int) self->playerindex].credits++;
 
-		if(samples.oneup >= 0)
-			sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else {
 		// Must be a 1up then.
 		player[(int) self->playerindex].lives++;
 
-		if(samples.oneup >= 0)
-			sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.oneup, 0, savedata.effectvol, savedata.effectvol, 100);
 	}
 
 	if(other->modeldata.subtype != SUBTYPE_WEAPON && other->modeldata.subtype != SUBTYPE_PROJECTILE) {
@@ -17735,8 +17712,7 @@ void player_think() {
 					     animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1],
 					     0);
 
-			if(samples.punch >= 0)
-				sound_play_sample(samples.punch, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.punch, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			self->stalltime = 0;
 			self->takeaction = common_attack_proc;
@@ -17824,7 +17800,7 @@ void player_think() {
 			ent_set_anim(self, ANI_THROWATTACK, 0);
 			self->takeaction = common_attack_proc;
 		} else if(perform_atchain()) {
-			if(samples.punch >= 0 && self->attacking)
+			if(self->attacking)
 				sound_play_sample(samples.punch, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 
@@ -19123,8 +19099,7 @@ void time_over() {
 			}
 		}
 
-		if(samples.timeover >= 0)
-			sound_play_sample(samples.timeover, 0, savedata.effectvol, savedata.effectvol, 100);
+		sound_play_sample(samples.timeover, 0, savedata.effectvol, savedata.effectvol, 100);
 
 		timeleft = level->settime * COUNTER_SPEED;	// Feb 24, 2005 - This line moved here to set custom time
 		if(!endgame)
@@ -21062,12 +21037,10 @@ int selectplayer(int *players, char *filename) {
 					player[i].playkeys = 0;
 					ent_set_colourmap(example[i], cmap[i]);
 
-					if(samples.beep >= 0)
-						sound_play_sample(samples.beep, 0, savedata.effectvol,
+					sound_play_sample(samples.beep, 0, savedata.effectvol,
 								  savedata.effectvol, 100);
 				} else if(player[i].newkeys & FLAG_MOVELEFT && example[i]) {
-					if(samples.beep >= 0)
-						sound_play_sample(samples.beep, 0, savedata.effectvol,
+					sound_play_sample(samples.beep, 0, savedata.effectvol,
 								  savedata.effectvol, 100);
 					ent_set_model(example[i], prevplayermodel(example[i]->model)->name);
 					cmap[i] = i;
@@ -21083,8 +21056,7 @@ int selectplayer(int *players, char *filename) {
 					ent_set_colourmap(example[i], cmap[i]);
 					tperror = 0;
 				} else if(player[i].newkeys & FLAG_MOVERIGHT && example[i]) {
-					if(samples.beep >= 0)
-						sound_play_sample(samples.beep, 0, savedata.effectvol,
+					sound_play_sample(samples.beep, 0, savedata.effectvol,
 								  savedata.effectvol, 100);
 					ent_set_model(example[i], nextplayermodel(example[i]->model)->name);
 					cmap[i] = i;
@@ -21130,9 +21102,7 @@ int selectplayer(int *players, char *filename) {
 
 					ent_set_colourmap(example[i], cmap[i]);
 				} else if((player[i].newkeys & FLAG_ANYBUTTON) && example[i]) {
-
-					if(samples.beep2 >= 0)
-						sound_play_sample(samples.beep2, 0, savedata.effectvol,
+					sound_play_sample(samples.beep2, 0, savedata.effectvol,
 								  savedata.effectvol, 100);
 					strcpy(player[i].name, example[i]->modeldata.name);
 					player[i].colourmap = cmap[i];
@@ -21393,13 +21363,11 @@ int choose_difficulty() {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			if(samples.beep >= 0)
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			if(samples.beep >= 0)
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = num_difficulties;
@@ -21409,8 +21377,7 @@ int choose_difficulty() {
 
 		if(bothnewkeys & FLAG_ANYBUTTON) {
 
-			if(samples.beep2 >= 0)
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 
 			if(selector == num_difficulties)
 				quit = 1;
@@ -21554,13 +21521,11 @@ int choose_mode(int *players) {
 			quit = 1;
 		if(bothnewkeys & FLAG_MOVEUP) {
 			--selector;
-			if(samples.beep >= 0)
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(bothnewkeys & FLAG_MOVEDOWN) {
 			++selector;
-			if(samples.beep >= 0)
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 		}
 		if(selector < 0)
 			selector = 2;
@@ -21568,8 +21533,7 @@ int choose_mode(int *players) {
 			selector = 0;
 
 		if(bothnewkeys & FLAG_ANYBUTTON) {
-			if(samples.beep2 >= 0)
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
+			sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 			switch (selector) {
 				case 0:
 					status = choose_difficulty();
@@ -22067,17 +22031,14 @@ void openborMain(int argc, char **argv) {
 
 			if(bothnewkeys & FLAG_MOVEUP) {
 				--selector;
-				if(samples.beep >= 0)
-					sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 			}
 			if(bothnewkeys & FLAG_MOVEDOWN) {
 				++selector;
-				if(samples.beep >= 0)
-					sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
 			}
 			if(bothnewkeys & (FLAG_ANYBUTTON)) {
-				if(samples.beep2 >= 0)
-					sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
+				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 				switch (selector) {
 					case 0:
 						for(i = 0; i < MAX_PLAYERS; i++)
