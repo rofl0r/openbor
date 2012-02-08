@@ -20022,25 +20022,18 @@ int set_color_correction(int gm, int br) {
 		return 0;
 }
 
-static void max_plus_minus255(int* value) {
-	if(*value < -255) 
-		*value = 255;
-	else if(*value > 255)
-		*value = 255;
-}
-
 // copied from palette.c, seems it works well
 static void _fade_screen(s_screen * screen, int gr, int gg, int gb, int br, int bg, int bb) {
 	int i, len = screen->width * screen->height;
 	int pb = pixelbytes[(int) screenformat];
 	unsigned c, r, g, b;
 
-	max_plus_minus255(&gr);
-	max_plus_minus255(&gg);
-	max_plus_minus255(&gb);
-	max_plus_minus255(&br);
-	max_plus_minus255(&bg);
-	max_plus_minus255(&bb);
+	int_min_max(&gr, -255, 255);
+	int_min_max(&gg, -255, 255);
+	int_min_max(&gb, -255, 255);
+	int_min_max(&br, -255, 255);
+	int_min_max(&bg, -255, 255);
+	int_min_max(&bb, -255, 255);
 	
 	if(pb == 2)
 		for(i = 0; i < len; i++) {
