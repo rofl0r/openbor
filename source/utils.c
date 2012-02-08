@@ -465,3 +465,10 @@ void char_to_lower(char *dst, char *src, size_t maxlen) {
 	if(i == maxlen)
 		dst[maxlen - 1] = 0;
 }
+
+void int_min_max(int* candidate, int min, int max) {
+	if(*candidate < min)
+		*candidate = min;
+	else if (*candidate > max)
+		*candidate = max;
+}
