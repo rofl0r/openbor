@@ -2816,8 +2816,30 @@ void init_colourtable() {
 	memcpy(ldcolourtable, hpcolourtable, 11 * sizeof(int));
 }
 
+static void set_color_if_empty(int* color, s_rgb* rgb) {
+	 if(!*color) *color = _makecolour(rgb->r, rgb->g, rgb->b);
+}
+
+static const s_colors_rgb default_colors = {
+	.black = {0, 0, 0},
+	.red = {255, 0, 0},	// 1% - 25% Full Health
+	.orange = {255, 150, 0},	// 200-300HP
+	.yellow = {0xF8, 0xB8, 0x40},	// 26%-50% Full health
+	.white = {255, 255, 255},	// white boxes 600+ HP
+	.blue = {0, 0, 255},	// 100-200 HP
+	.green = {0, 255, 0},	// 51% - 100% full health
+	.pink = {255, 0, 255},	// 300-400HP
+	.purple = {128, 48, 208},	// transbox 400-500HP
+	.magic = {98, 180, 255},	// 1st magic bar color by tails
+	.magic2 = {24, 48, 143},	// 2sec magic bar color by tails
+	.shadow = {64, 64, 64},
+};
+
 void load_background(char *filename, int createtables) {
 	//if(pixelformat!=PIXEL_8) createtables = 0;
+	unsigned i;
+	int *color_array = (int*) &colors;
+	s_rgb* default_colors_array = (s_rgb*) &default_colors;
 	unload_background();
 	
 	switch(pixelformat) {
@@ -2836,30 +2858,9 @@ void load_background(char *filename, int createtables) {
 	}
 
 	lifebar_colors();
-	if(!colors.black)
-		colors.black = _makecolour(0, 0, 0);	// black boxes 500-600HP
-	if(!colors.red)
-		colors.red = _makecolour(255, 0, 0);	// 1% - 25% Full Health
-	if(!colors.orange)
-		colors.orange = _makecolour(255, 150, 0);	// 200-300HP
-	if(!colors.yellow)
-		colors.yellow = _makecolour(0xF8, 0xB8, 0x40);	// 26%-50% Full health
-	if(!colors.white)
-		colors.white = _makecolour(255, 255, 255);	// white boxes 600+ HP
-	if(!colors.blue)
-		colors.blue = _makecolour(0, 0, 255);	// 100-200 HP
-	if(!colors.green)
-		colors.green = _makecolour(0, 255, 0);	// 51% - 100% full health
-	if(!colors.pink)
-		colors.pink = _makecolour(255, 0, 255);	// 300-400HP
-	if(!colors.purple)
-		colors.purple = _makecolour(128, 48, 208);	// transbox 400-500HP
-	if(!colors.magic)
-		colors.magic = _makecolour(98, 180, 255);	// 1st magic bar color by tails
-	if(!colors.magic2)
-		colors.magic2 = _makecolour(24, 48, 143);	// 2sec magic bar color by tails
-	if(!colors.shadow)
-		colors.shadow = _makecolour(64, 64, 64);
+	for(i = 0; i < s_colors_itemcount; i++) {
+		set_color_if_empty(&color_array[i], &default_colors_array[i]);
+	}
 	init_colourtable();
 
 	video_clearscreen();

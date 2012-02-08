@@ -1486,6 +1486,26 @@ typedef struct {
 	int magic2;
 	int shadow;
 } s_colors;
+#define s_colors_itemcount 12
+
+typedef struct {
+	int r; int g; int b;
+} s_rgb;
+
+typedef struct {
+	s_rgb black;
+	s_rgb red;
+	s_rgb orange;
+	s_rgb yellow;
+	s_rgb white;
+	s_rgb blue;
+	s_rgb green;
+	s_rgb pink;
+	s_rgb purple;
+	s_rgb magic;
+	s_rgb magic2;
+	s_rgb shadow;	
+} s_colors_rgb;
 
 extern s_colors colors;
 
