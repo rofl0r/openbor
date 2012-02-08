@@ -3380,6 +3380,7 @@ void load_menu_txt() {
 	size_t size;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
+	unsigned i;
 
 	// Read file
 	if(buffer_pakfile(filename, &buf, &size) != 1) {
@@ -3391,30 +3392,18 @@ void load_menu_txt() {
 		ParseArgs(&arglist, buf + pos, argbuf);
 		command = GET_ARG(0);
 		if(command && command[0]) {
-			if(stricmp(command, "disablekey") == 0) {
-				// here to keep from crashing
-			} else if(stricmp(command, "renamekey") == 0) {
-				// here to keep from crashing
-			} else if(stricmp(command, "fontmonospace") == 0) {
-				fontmonospace[0] = GET_INT_ARG(1);
-				fontmonospace[1] = GET_INT_ARG(2);
-				fontmonospace[2] = GET_INT_ARG(3);
-				fontmonospace[3] = GET_INT_ARG(4);
-				fontmonospace[4] = GET_INT_ARG(5);
-				fontmonospace[5] = GET_INT_ARG(6);
-				fontmonospace[6] = GET_INT_ARG(7);
-				fontmonospace[7] = GET_INT_ARG(8);
-			} else if(command && command[0])
+			if(stricmp(command, "fontmonospace") == 0) {
+				for(i = 0; i < 8; i++)
+					fontmonospace[i] = GET_INT_ARG(i+1);
+			} else
 				printf("Command '%s' not understood in file '%s'!", command, filename);
 		}
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
 	}
 
-	if(buf != NULL) {
+	if(buf != NULL)
 		free(buf);
-		buf = NULL;
-	}
 }
 
 int load_special_sounds() {
