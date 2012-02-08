@@ -1546,6 +1546,7 @@ typedef struct {
 	char* bike;
 } s_samples_strings;
 
+extern List *scriptConstantsCommandList;
 
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);

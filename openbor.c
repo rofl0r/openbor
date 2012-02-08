@@ -79,6 +79,7 @@ List* modelsattackcmdlist = NULL;
 List *modelstxtcmdlist = NULL;
 List *levelcmdlist = NULL;
 List *levelordercmdlist = NULL;
+List *scriptConstantsCommandList = NULL;
 
 const s_drawmethod plainmethod = {
 	.table = NULL,
@@ -20288,6 +20289,8 @@ void borShutdown(const char *caller, int status, char *msg, ...) {
 		freeCommandList(levelcmdlist);
 	if(levelordercmdlist)
 		freeCommandList(levelordercmdlist);
+	if(scriptConstantsCommandList)
+		freeCommandList(scriptConstantsCommandList);
 
 	freeModelList();
 
@@ -21951,6 +21954,7 @@ void openborMain(int argc, char **argv) {
 	modelsattackcmdlist = createModelAttackCommandList();
 	levelcmdlist = createLevelCommandList();
 	levelordercmdlist = createLevelOrderCommandList();
+	scriptConstantsCommandList = createScriptConstantsCommandList();
 	createModelList();
 
 	// Load necessary components.

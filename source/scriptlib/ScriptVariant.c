@@ -117,6 +117,10 @@ void ScriptVariant_Init(ScriptVariant * var) {
 	var->vt = VT_EMPTY;
 }
 
+VARTYPE ScriptVariant_GetType(ScriptVariant * var) {
+	return var->vt;
+}
+
 void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
 	if(var->vt == cvt)
 		return;
