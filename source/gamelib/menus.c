@@ -307,7 +307,7 @@ void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore Op
 				case 1:
 					loadfromdefault();
 					//shutdown(2, "\nSettings Loaded From Default.cfg. Restart Required.\n\n");
-					init_videomodes(0);
+					init_videomodes();
 					SB_setvolume(SB_VOICEVOL, savedata.soundvol);
 					sound_volume_music(savedata.musicvol, savedata.musicvol);
 					loaded = 1;
@@ -315,7 +315,7 @@ void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore Op
 				case 2:
 					clearsettings();
 					//shutdown(2, "\nSettings Loaded From Default.cfg. Restart Required.\n\n");
-					init_videomodes(0);
+					init_videomodes();
 					SB_setvolume(SB_VOICEVOL, savedata.soundvol);
 					sound_volume_music(savedata.musicvol, savedata.musicvol);
 					restored = 1;

@@ -1758,7 +1758,7 @@ void playgame(int *players, unsigned which_set, int useSavedGame);
 int choose_difficulty();
 int load_saved_game();
 void term_videomodes();
-int init_videomodes(int log);
+int init_videomodes(void);
 void safe_set(int *arr, int index, int newkey, int oldkey);
 void keyboard_setup(int player);
 void input_options();

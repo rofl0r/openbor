@@ -2815,24 +2815,20 @@ void init_colourtable() {
 void load_background(char *filename, int createtables) {
 	//if(pixelformat!=PIXEL_8) createtables = 0;
 	unload_background();
-
-	if(pixelformat == PIXEL_8) {
-		if(!loadscreen(filename, packfile, pal, PIXEL_8, &background)) {
-			shutdown(1, "Error loading background (PIXEL_8) file '%s'", filename);
-		}
-	} else if(pixelformat == PIXEL_x8) {
-		if(!loadscreen(filename, packfile, NULL, PIXEL_x8, &background)) {
-			shutdown(1, "Error loading background (PIXEL_x8) file '%s'", filename);
-		}
-		memcpy(pal, background->palette, PAL_BYTES);
-	} else {
-		shutdown(1, "Error loading background, Unknown Pixel Format!\n");
+	
+	switch(pixelformat) {
+		case PIXEL_8: case PIXEL_x8:
+			if(!loadscreen(filename, packfile, pixelformat == PIXEL_8 ? pal : NULL, pixelformat, &background))
+				shutdown(1, "Error loading background, file '%s'", filename);
+			break;
+		default:
+			shutdown(1, "Error loading background, Unknown Pixel Format %d, file %s!\n", pixelformat, filename);
 	}
-
+	
 	if(createtables) {
 		standard_palette(0);
 		if(!create_blending_tables(pal, blendings, blendfx))
-			shutdown(1, "Failed to create colour conversion tables! (Out of memory?)");
+			shutdown(1, (char*) E_OUT_OF_MEMORY);
 	}
 
 	lifebar_colors();
@@ -2913,7 +2909,7 @@ void load_cached_background(char *filename, int createtables) {
 	if(createtables) {
 		standard_palette(0);
 		if(!create_blending_tables(pal, blendings, blendfx))
-			shutdown(1, "Failed to create colour conversion tables! (Out of memory?)");
+			shutdown(1, (char*) E_OUT_OF_MEMORY);
 	}
 
 	video_clearscreen();
@@ -3293,7 +3289,7 @@ int loadsprite(char *filename, int ofsx, int ofsy, int bmpformat) {
 	curr->filename = malloc(len + 1);
 	if(curr == NULL || curr->sprite == NULL || curr->filename == NULL) {
 		freebitmap(bitmap);
-		shutdown(1, "loadsprite() Out of memory!\n");
+		shutdown(1, (char*) E_OUT_OF_MEMORY);
 	}
 	memcpy(curr->filename, filename, len);
 	curr->filename[len] = 0;
@@ -5515,7 +5511,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						// Create new animation
 						newanim = alloc_anim();
 						if(!newanim) {
-							shutdownmessage = "Not enough memory for animations!";
+							shutdownmessage = (char*) E_OUT_OF_MEMORY;
 							goto lCleanup;
 						}
 						newanim->model_index = newchar->index;
@@ -8846,14 +8842,14 @@ void load_level(char *filename) {
 
 	level = calloc(1, sizeof(s_level));
 	if(!level) {
-		errormessage = "load_level() #1 FATAL: Out of memory!";
+		errormessage = (char*) E_OUT_OF_MEMORY;
 		goto lCleanup;
 	}
 	len = strlen(filename);
 	level->name = malloc(len + 1);
 
 	if(!level->name) {
-		errormessage = "load_level() #1 FATAL: Out of memory!";
+		errormessage = (char*) E_OUT_OF_MEMORY;
 		goto lCleanup;
 	}
 	strcpy(level->name, filename);
@@ -9313,8 +9309,7 @@ void load_level(char *filename) {
 				if(!load_palette(level->palettes[level->numpalettes], GET_ARG(1)) ||
 				   !create_blending_tables(level->palettes[level->numpalettes],
 							   level->blendings[level->numpalettes], usemap)) {
-					errormessage =
-					    "Failed to create colour conversion tables for level! (Out of memory?)";
+					errormessage = (char*) E_OUT_OF_MEMORY;
 					goto lCleanup;
 				}
 				level->numpalettes++;
@@ -20432,7 +20427,7 @@ void startup() {
 	clearSavedGame();
 
 
-	if(!init_videomodes(1))
+	if(!init_videomodes())
 		shutdown(1, "Unable to set video mode: %d x %d!\n", videomodes.hRes, videomodes.vRes);
 
 	printf("Loading menu.txt.............\t");
@@ -20481,7 +20476,7 @@ void startup() {
 
 	printf("Object engine init...........\t");
 	if(!alloc_ents())
-		shutdown(1, "Not enough memory for game objects!\n");
+		shutdown(1, (char*) E_OUT_OF_MEMORY);
 	printf("Done!\n");
 
 	printf("Input init...................\t");
@@ -20518,7 +20513,7 @@ int playgif(char *filename, int x, int y, int noskip) {
 	s_screen *tempbg = background;
 	background = allocscreen(videomodes.hRes, videomodes.vRes, pixelformat);
 	if(background == NULL)
-		shutdown(1, "Out of memory! Function Call 'ShowComplete'");
+		shutdown(1, (char*) E_OUT_OF_MEMORY);
 	clearscreen(background);
 	standard_palette(1);
 
@@ -21732,7 +21727,7 @@ static char** video_txt_commands_dest[] = {
 };
 
 // Load Video Mode from file
-int init_videomodes(int log) {
+int init_videomodes(void) {
 	int result;
 	char *filename = "data/video.txt";
 	int bits = 8, tmp;
@@ -21746,8 +21741,7 @@ int init_videomodes(int log) {
 	char lowercase_buf[16];
 	unsigned i;
 
-	if(log)
-		printf("Initializing video............\n");
+	printf("Initializing video............\n");
 
 	// Use an alternative video.txt if there is one.  Some of these are long filenames; create your PAKs with borpak and you'll be fine.
 #define tryfile(X) if((tmp=openpackfile(X,packfile))!=-1) { closepackfile(tmp); filename=X; goto readfile; }
@@ -21825,15 +21819,14 @@ int init_videomodes(int log) {
 	video_stretch(savedata.stretch);
 
 	if((vscreen = allocscreen(videomodes.hRes, videomodes.vRes, screenformat)) == NULL)
-		shutdown(1, "Not enough memory!\n");
+		shutdown(1, (char*) E_OUT_OF_MEMORY);
 	videomodes.pixel = pixelbytes[(int) vscreen->pixelformat];
 	result = video_set_mode(videomodes);
 
 	if(result) {
 		clearscreen(vscreen);
-		if(log)
-			printf("Initialized video.............\t%dx%d (Mode: %d, Depth: %d Bit)\n\n", videomodes.hRes,
-			       videomodes.vRes, videoMode, bits);
+		printf("Initialized video.............\t%dx%d (Mode: %d, Depth: %d Bit)\n\n", videomodes.hRes,
+		       videomodes.vRes, videoMode, bits);
 	}
 	return result;
 }
