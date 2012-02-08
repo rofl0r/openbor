@@ -17395,6 +17395,16 @@ void player_charge_check() {
 void player_preinput() {
 	float altdiff;		// Used to check that
 	int notinair;		// entity is not in the air
+	int i;
+	static const int check_flags[] = {
+		FLAG_ATTACK,
+		FLAG_ATTACK2,
+		FLAG_ATTACK3,
+		FLAG_ATTACK4,
+		FLAG_JUMP,
+		FLAG_SPECIAL,
+	};
+	static const int max_check_flags = 6;
 
 	if(player[(int) self->playerindex].playkeys & FLAG_MOVEUP) {
 		player[(int) self->playerindex].playkeys -= FLAG_MOVEUP;
@@ -17466,42 +17476,13 @@ void player_preinput() {
 	notinair = (self->landed_on_platform ? altdiff < 5 : altdiff < 2);
 
 	if(self->attacking && self->animation->cancel == 3 && notinair) {
-		if((player[(int) self->playerindex].playkeys & FLAG_ATTACK) && check_combo(FLAG_ATTACK)) {
-			player[(int) self->playerindex].playkeys -= FLAG_ATTACK;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
-		if((player[(int) self->playerindex].playkeys & FLAG_JUMP) && check_combo(FLAG_JUMP)) {
-			player[(int) self->playerindex].playkeys -= FLAG_JUMP;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
-		if((player[(int) self->playerindex].playkeys & FLAG_SPECIAL) && check_combo(FLAG_SPECIAL)) {
-			player[(int) self->playerindex].playkeys -= FLAG_SPECIAL;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
-		if((player[(int) self->playerindex].playkeys & FLAG_ATTACK2) && check_combo(FLAG_ATTACK2)) {
-			player[(int) self->playerindex].playkeys -= FLAG_ATTACK2;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
-		if((player[(int) self->playerindex].playkeys & FLAG_ATTACK3) && check_combo(FLAG_ATTACK3)) {
-			player[(int) self->playerindex].playkeys -= FLAG_ATTACK3;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
-		if((player[(int) self->playerindex].playkeys & FLAG_ATTACK4) && check_combo(FLAG_ATTACK4)) {
-			player[(int) self->playerindex].playkeys -= FLAG_ATTACK4;
-			self->attacking = 1;
-			self->takeaction = common_attack_proc;
-			return;
-		}
+		for(i = 0; i < max_check_flags; i++) 
+			if((player[(int) self->playerindex].playkeys & check_flags[i]) && check_combo(check_flags[i])) {
+				player[(int) self->playerindex].playkeys -= check_flags[i];
+				self->attacking = 1;
+				self->takeaction = common_attack_proc;
+				return;
+			}
 	}
 	// End cancel checking.
 }
