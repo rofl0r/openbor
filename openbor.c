@@ -18514,56 +18514,40 @@ void anything_walk() {
 
 entity *knife_spawn(char *name, int index, float x, float z, float a, int direction, int type, int map) {
 	entity *e = NULL;
+	float dest_a = a;
+	int dest_index = -1;
+	char dest_ptype = 0;
+	char* dest_name = NULL;
 
 	if(self->weapent && self->weapent->modeldata.project >= 0) {
-		e = spawn(x, z, a, direction, NULL, self->weapent->modeldata.project, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_index = self->weapent->modeldata.project;
 	} else if(self->animation->custknife >= 0) {
-		e = spawn(x, z, a, direction, NULL, self->animation->custknife, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_index = self->animation->custknife;
 	} else if(self->animation->custpshotno >= 0) {
-		e = spawn(x, z, 0, direction, NULL, self->animation->custpshotno, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 1;
-		e->a = 0;
+		dest_index = self->animation->custpshotno;
+		dest_a = 0;
+		dest_ptype = 1;
 	} else if(self->modeldata.knife >= 0) {
-		e = spawn(x, z, a, direction, NULL, self->modeldata.knife, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_index = self->modeldata.knife;
 	} else if(self->modeldata.pshotno >= 0) {
-		e = spawn(x, z, 0, direction, NULL, self->modeldata.pshotno, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 1;
-		e->a = 0;
+		dest_index = self->modeldata.pshotno;
+		dest_a = 0;
+		dest_ptype = 1;
 	} else if(index >= 0 || name) {
-		e = spawn(x, z, a, direction, name, index, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_index = index;
+		dest_name = name;
 	} else if(type) {
-		e = spawn(x, z, a, direction, "Shot", -1, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_name = "Shot";
 	} else {		/* if(!type) */
-		e = spawn(x, z, a, direction, "Knife", -1, NULL);
-		if(!e)
-			return NULL;
-		e->ptype = 0;
-		e->a = a;
+		dest_name = "Knife";
 	}
+	e = spawn(x, z, dest_a, direction, dest_name, dest_index, NULL);
+	if(!e)
+		return NULL;
+	e->ptype = dest_ptype;
+	e->a = dest_a;
+
+	
 
 	if(e == NULL)
 		return NULL;
