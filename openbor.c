@@ -1184,6 +1184,21 @@ static const s_script_args init_script_args_default = {
 	.blocked = {VT_EMPTY, 0},
 };
 
+static const s_script_args init_script_args_only_ent = {
+	.ent = {VT_PTR, 0},
+	.other = {VT_EMPTY, 0},
+	.force = {VT_EMPTY, 0},
+	.drop = {VT_EMPTY, 0},
+	.type = {VT_EMPTY, 0},
+	.noblock = {VT_EMPTY, 0},
+	.guardcost = {VT_EMPTY, 0},
+	.jugglecost = {VT_EMPTY, 0},
+	.pauseadd = {VT_EMPTY, 0},
+	.which = {VT_EMPTY, 0},
+	.atkid = {VT_EMPTY, 0},
+	.blocked = {VT_EMPTY, 0},
+};
+
 static void execute_script_default(s_script_args* args, Script* dest_script) {
 	ScriptVariant tempvar;
 	Script *ptempscript = pcurrentscript;
@@ -1343,6 +1358,110 @@ void execute_didhit_script(entity * ent, entity * other, int force, int drop, in
 	execute_didhit_script_i(&script_args);
 }
 
+static void execute_onblocks_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblocks_script);
+}
+static void execute_onblockz_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblockz_script);
+}
+static void execute_onmovex_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onmovex_script);
+}
+static void execute_onmovez_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onmovez_script);
+}
+static void execute_onmovea_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onmovea_script);
+}
+static void execute_onkill_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onkill_script);
+}
+static void execute_updateentity_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.update_script);
+}
+static void execute_think_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.think_script);
+}
+static void execute_onspawn_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onspawn_script);
+}
+
+void execute_onblocks_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onblocks_script_i(&script_args);
+}
+
+void execute_onblockz_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onblockz_script_i(&script_args);
+}
+
+void execute_onmovex_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onmovex_script_i(&script_args);
+}
+
+void execute_onmovez_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onmovez_script_i(&script_args);
+}
+
+void execute_onmovea_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onmovea_script_i(&script_args);
+}
+
+void execute_onkill_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onkill_script_i(&script_args);
+}
+
+void execute_updateentity_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_updateentity_script_i(&script_args);
+}
+
+void execute_think_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_think_script_i(&script_args);
+}
+
+void execute_onspawn_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	execute_onspawn_script_i(&script_args);
+}
+
+void execute_entity_key_script(entity * ent) {
+	ScriptVariant tempvar;
+	Script *ptempscript;
+	if(!ent)
+		return;
+	ptempscript = pcurrentscript;
+	if(Script_IsInitialized(ent->scripts.key_script)) {
+		ScriptVariant_Init(&tempvar);
+		ScriptVariant_ChangeType(&tempvar, VT_PTR);
+		tempvar.ptrVal = (VOID *) ent;
+		Script_Set_Local_Variant("self", &tempvar);
+		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
+		tempvar.lVal = (LONG) ent->playerindex;
+		Script_Set_Local_Variant("player", &tempvar);
+		Script_Execute(ent->scripts.key_script);
+		//clear to save variant space
+		ScriptVariant_Clear(&tempvar);
+		Script_Set_Local_Variant("self", &tempvar);
+		Script_Set_Local_Variant("player", &tempvar);
+	}
+	pcurrentscript = ptempscript;
+}
 
 void execute_onpain_script(entity * ent, int iType, int iReset) {
 	ScriptVariant tempvar;
@@ -1362,23 +1481,6 @@ void execute_onpain_script(entity * ent, int iType, int iReset) {
 		Script_Set_Local_Variant("self", &tempvar);
 		Script_Set_Local_Variant("type", &tempvar);
 		Script_Set_Local_Variant("reset", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_onblocks_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onblocks_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onblocks_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
 	}
 	pcurrentscript = ptempscript;
 }
@@ -1430,22 +1532,6 @@ void execute_onblocko_script(entity * ent, entity * other) {
 	pcurrentscript = ptempscript;
 }
 
-void execute_onblockz_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onblockz_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onblockz_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
 
 void execute_onblocka_script(entity * ent, entity * other) {
 	ScriptVariant tempvar;
@@ -1462,146 +1548,6 @@ void execute_onblocka_script(entity * ent, entity * other) {
 		ScriptVariant_Clear(&tempvar);
 		Script_Set_Local_Variant("self", &tempvar);
 		Script_Set_Local_Variant("obstacle", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_onmovex_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onmovex_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onmovex_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_onmovez_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onmovez_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onmovez_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_onmovea_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onmovea_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onmovea_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-
-void execute_onkill_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onkill_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onkill_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_updateentity_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.update_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.update_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_think_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.think_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.think_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-
-void execute_onspawn_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onspawn_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Execute(ent->scripts.onspawn_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_entity_key_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript;
-	if(!ent)
-		return;
-	ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.key_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) ent->playerindex;
-		Script_Set_Local_Variant("player", &tempvar);
-		Script_Execute(ent->scripts.key_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("player", &tempvar);
 	}
 	pcurrentscript = ptempscript;
 }
