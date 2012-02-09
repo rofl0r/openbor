@@ -5,7 +5,7 @@ OpenBOR is a continuation of the Beats Of Rage 2D game engine, which was origina
 created by the wonderful folks over at http://www.senileteam.com.
 
 
-History
+History and Future
 ----------------------
 In 2004, Senile Team released Beats of Rage, a free beat-'em-up for DOS inspired 
 by SEGA's Streets of Rage series and using sprites from SNK Playmore's King of 
@@ -17,21 +17,70 @@ In 2005, Kirby2000 asked Senile Team to open the source code to BOR.  They
 agreed, and OpenBOR was born.  Development on the engine was continued by the 
 community, and still is to this day.
 
+This led to some achievements such as a port to SDL, 
+but also to tons of half-baked features.
+
+Some really untalented coders started shitting all over the source code.
+copy and paste all over, and tons of clueless code.
+
+despite that, the community created some really nice mods, which partially 
+depend on those new features.
+
+in 2011, rofl0r aka anallyst joined the OpenBOR crew and started cleaning up the
+code (~ SVN rev 2900+).
+together with an efficient re-implementation of the previously used single-
+linked list to a hash-backed double-linked list, this resulted in major speed gains.
+waiting times for loading a level have been reduced around 100 times through this
+effort (if you dont believe it, compare how long it takes to load 
+"contra - locked and loaded" on the official build ~2800 vs ~3300). 
+after a while one of the "OpenBOR team" members got jealous on anallyst's 
+skills and started vandalizing his code.
+also one of the forum admins started to become a "coder" and implemented random
+features for his WIP mod (which is not released up to this day...a year later) in
+a kamikaze style. i can't remember a single commit he made which properly encapsulated
+one logical change instead of dozens, and didnt introduce a number of bugs.
+needless to say that cooperating in such a hostile environment gets tiring soon.
+
+this is when this fork was created.
+
+shortly after anallyst left the OpenBOR crew (~ SVN rev 3320), utunnels, the god of 
+copypasta came back and continued his unholy and untalented code rape. 
+you can be sure that the current OpenBOR SVN trunk is totally borked and full of bugs.
+
+
+the main repo was checked in 2012, and the only notable change (screenshot engine
+changed from PCX to PNG backend) was merged back into this fork.
+all other changes in the official repo are new features for two not yet released 
+mods which the authors of those changes intend to create...
+
+in the beginning of 2012, anallyst started another major cleanup effort.
+he ripped off all platform-specific code and code duplication,
+decreasing the size of the executable from 1.2MB to 750KB as of 09 Feb 2012.
+(-Os -flto -fwhole-program)
+
+the goal of this fork is to cleanup the code to a sane level, and then start
+implementation of a LUA script engine, which should replace the current 
+Pseudo-C script engine, which is incredibly slow, ugly and badly designed.
+Once that's done it should be straightforward to translate the notable Mods which use
+the scripting system to lua.
 
 Available Platforms
 ----------------------
 OpenBOR has a very modular and portable design inherited from Beats of Rage. Ports 
 to the following platforms are currently supported:
 
-* Windows
 * Linux
-* Mac OS X
-* Wii
-* PSP
-* Dreamcast
-* GP2X
-* GP2X Wiz
-* Dingoo a320
+* POSIX compliant systems with an SDL port.
+* Windows using MINGW ?
+
+i don't see much sense in adding all kinds of hacks for hacked consoles.
+why hacking consoles at all ? you shouldn't give your money to big evil corporations
+like SONY which create proprietary devices, and then try to run your own code
+on them. 
+this is how you support proprietary, black-boxed systems and evil companies.
+instead you should give your money to projects aimed at homebrew development.
+examples: dingoo, gp2x, and anything that runs linux on it and gives you full
+access to the underlying hardware as well as a SDK.
 
 In addition to the above, the original Beats of Rage engine (downloadable from 
 the Senile Team website) is available for the following platforms:
@@ -43,18 +92,10 @@ the Senile Team website) is available for the following platforms:
 * Palmtop
 
 
-Source Code
+
+OpenBOR Hall of Shame
 ----------------------
-svn checkout https://lavalit.com/svn/openbor/trunk openbor
 
-You may get a security warning from your Subversion client.  This is because 
-LavaLit signs its own SSL certificate, and it can be safely ignored.  If you get 
-a *fatal* error, you should upgrade to a newer version of the Neon HTTP library. 
-This bug is fixed in neon 0.29.5 (released October 14, 2010).
-
-
-OpenBOR Team
-----------------------
 SumolX (2006-2011)
 Project Manager, Lead Programmer, Known for porting PSP, PS3, Linux, Wii, GP2X and 
 maintaining all other platforms and code base.
@@ -124,22 +165,6 @@ Senile Team (original authors of Beats of Rage) - http://www.senileteam.com
 OpenBOR File Layout
 ----------------------
 
-***********************************************************************************
-*                                     Windows                                     *
-***********************************************************************************
-
--> OpenBOR/
-      |
-      -> OpenBOR.exe
-      -> Paks/
-      -> ScreenShots/
-      -> Logs/
-      -> Saves/      
-
-
-***********************************************************************************
-*                                     Linux                                       *
-***********************************************************************************
 
 -> OpenBOR/
       |
@@ -150,84 +175,4 @@ OpenBOR File Layout
       -> Logs/
       -> Saves/
       
-
-***********************************************************************************
-*                                       Wii                                       *
-***********************************************************************************
-
--> apps/
-      | 
-      ->OpenBOR/
-          |
-          -> boot.dol
-          -> meta.xml
-          -> icon.png
-          -> Paks/
-          -> ScreenShots/
-          -> Logs/
-          -> Saves/
-
-
-***********************************************************************************
-*                                   Dreamcast                                     *
-***********************************************************************************
-
--> 1st_READ.bin
-   bor.pak
-
-
-
-***********************************************************************************
-*                             PSP 3.71 m33-4 Required                             *
-***********************************************************************************
-
--> ms0:/PSP/GAME/OpenBOR/
-                    |
-                    -> EBOOT.PBP
-                    |
-                    -> Images/
-                    |     |
-                    |     -> Menu.png
-                    |
-                    -> Modules/
-                    |     |
-                    |     -> ctrlhook.prx
-                    |     -> dvemgr.prx
-                    |     -> exception.prx
-                    |
-                    -> Logs/
-                    -> Saves/
-
-
-***********************************************************************************
-*                                 GamePark GP2X                                   *
-***********************************************************************************
-
--> OpenBOR/
-      |
-      -> OpenBOR.gpe
-      -> mmuhack.o
-      |
-      -> Paks/
-      -> ScreenShots/
-      -> Logs/
-      -> Saves/
-
-
-***********************************************************************************
-*                                       XBOX                                      *
-***********************************************************************************
-
--> OpenBOR/
-      |
-      -> default.xbe
-      |
-      -> Paks/
-      |     |
-      |     -> menu.pak
-      |
-      -> ScreenShots/
-      -> Logs/
-      -> Saves/
-
 
