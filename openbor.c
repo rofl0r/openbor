@@ -13210,34 +13210,17 @@ entity *normal_find_target(int anim) {
 		   && !ent_list[i]->dead	//must be alive
 		   && diff(ent_list[i]->x, self->x) + diff(ent_list[i]->z, self->z) >= min && diff(ent_list[i]->x, self->x) + diff(ent_list[i]->z, self->z) <= max && ent_list[i]->modeldata.stealth[0] <= self->modeldata.stealth[1]	//Stealth factor less then perception factor (allows invisibility).
 		    ) {
-			if(index < 0 || (index >= 0 && (!ent_list[index]->animation->vulnerable[ent_list[index]->animpos] || ent_list[index]->invincible == 1)) || ((self->x < ent_list[i]->x) == (self->direction) &&	// don't turn to the one on the back
-																				    diff
-																				    (ent_list
-																				     [i]->
-																				     x,
-																				     self->
-																				     x)
-																				    +
-																				    diff
-																				    (ent_list
-																				     [i]->
-																				     z,
-																				     self->
-																				     z)
-																				    <
-																				    diff
-																				    (ent_list
-																				     [index]->
-																				     x,
-																				     self->
-																				     x)
-																				    +
-																				    diff
-																				    (ent_list
-																				     [index]->
-																				     z,
-																				     self->
-																				     z)))
+			if(index < 0 || 
+				(index >= 0 &&
+					(!ent_list[index]->animation->vulnerable[ent_list[index]->animpos] ||
+					 ent_list[index]->invincible == 1
+					)
+				) || (
+					(self->x < ent_list[i]->x) == (self->direction) && // don't turn to the one on the back
+					diff(ent_list[i]->x, self->x) + diff(ent_list[i]->z, self->z) 
+					< diff(ent_list[index]->x, self->x) + diff(ent_list[index]->z, self->z)
+				)
+			)
 				index = i;
 		}
 	}
