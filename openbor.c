@@ -850,32 +850,18 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 					assert (0); break; 
 			}
 			break;
-			
-		case _e_game_speed:
+		
+		case _e_game_speed: case _e_gfx_y_offset: case _e_levelwidth: case _e_levelheight:
 			if(!level)
 				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) GAME_SPEED;
-			break;
-		case _e_gfx_y_offset:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) gfx_y_offset;
-			break;
-			
-		case _e_levelwidth:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (level->width);
-			break;
-		case _e_levelheight:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_INTEGER);
-			var->lVal = (LONG) (panel_height);
-			break;			
+			switch (index) {
+				case _e_game_speed: var->lVal = (LONG) GAME_SPEED; break;
+				case _e_gfx_y_offset: var->lVal = (LONG) gfx_y_offset; break;
+				case _e_levelwidth: var->lVal = (LONG) (level->width); break;
+				case _e_levelheight: var->lVal = (LONG) (panel_height); break;
+				default: assert(0); break;
+			}
 		default:
 			// We use indices now, but players/modders don't need to be exposed
 			// to that implementation detail, so we write "name" and not "index".
