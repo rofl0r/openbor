@@ -11150,20 +11150,11 @@ int checkhit(entity * attacker, entity * target, int counter) {
 	if(debug_coords[1][1] > debug_coords[0][3])
 		return 0;
 
-
 	// Find center of attack area
-	leftleast = debug_coords[0][0];
-	if(leftleast < debug_coords[1][0])
-		leftleast = debug_coords[1][0];
-	topleast = debug_coords[0][1];
-	if(topleast < debug_coords[1][1])
-		topleast = debug_coords[1][1];
-	rightleast = debug_coords[0][2];
-	if(rightleast > debug_coords[1][2])
-		rightleast = debug_coords[1][2];
-	bottomleast = debug_coords[0][3];
-	if(bottomleast > debug_coords[1][3])
-		bottomleast = debug_coords[1][3];
+	leftleast = MAX(debug_coords[0][0], debug_coords[1][0]);
+	topleast = MAX(debug_coords[0][1], debug_coords[1][1]);
+	rightleast = MIN(debug_coords[0][2], debug_coords[1][2]);
+	bottomleast = MIN(debug_coords[0][3], debug_coords[1][3]);
 
 	medx = (float) (leftleast + rightleast) / 2;
 	medy = (float) (topleast + bottomleast) / 2;
