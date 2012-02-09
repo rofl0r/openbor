@@ -594,6 +594,16 @@ void leave_game(void) {
 	shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);
 }
 
+static void setDestIfDestNeg_int(int* dest, int source) {
+	if(*dest < 0) *dest = source;
+}
+static void setDestIfDestNeg_short(short* dest, short source) {
+	if(*dest < 0) *dest = source;
+}
+static void setDestIfDestNeg_char(char* dest, char source) {
+	if(*dest < 0) *dest = source;
+}
+
 void setDrawMethod(s_anim * a, ptrdiff_t index, s_drawmethod * m) {
 	assert(index >= 0);
 	assert(a != NULL);
@@ -10722,36 +10732,21 @@ void ent_set_colourmap(entity * ent, unsigned int which) {
 
 // used by ent_set_model
 void ent_copy_uninit(entity * ent, s_model * oldmodel) {
-	if(ent->modeldata.multiple < 0)
-		ent->modeldata.multiple = oldmodel->multiple;
-	if(ent->modeldata.subject_to_wall < 0)
-		ent->modeldata.subject_to_wall = oldmodel->subject_to_wall;
-	if(ent->modeldata.subject_to_platform < 0)
-		ent->modeldata.subject_to_platform = oldmodel->subject_to_platform;
-	if(ent->modeldata.subject_to_obstacle < 0)
-		ent->modeldata.subject_to_obstacle = oldmodel->subject_to_obstacle;
-	if(ent->modeldata.subject_to_hole < 0)
-		ent->modeldata.subject_to_hole = oldmodel->subject_to_hole;
-	if(ent->modeldata.subject_to_gravity < 0)
-		ent->modeldata.subject_to_gravity = oldmodel->subject_to_gravity;
-	if(ent->modeldata.subject_to_screen < 0)
-		ent->modeldata.subject_to_screen = oldmodel->subject_to_screen;
-	if(ent->modeldata.subject_to_minz < 0)
-		ent->modeldata.subject_to_minz = oldmodel->subject_to_minz;
-	if(ent->modeldata.subject_to_maxz < 0)
-		ent->modeldata.subject_to_maxz = oldmodel->subject_to_maxz;
-	if(ent->modeldata.no_adjust_base < 0)
-		ent->modeldata.no_adjust_base = oldmodel->no_adjust_base;
-	if(ent->modeldata.aimove < 0)
-		ent->modeldata.aimove = oldmodel->aimove;
-	if(ent->modeldata.aiattack < 0)
-		ent->modeldata.aiattack = oldmodel->aiattack;
-	if(ent->modeldata.hostile < 0)
-		ent->modeldata.hostile = oldmodel->hostile;
-	if(ent->modeldata.candamage < 0)
-		ent->modeldata.candamage = oldmodel->candamage;
-	if(ent->modeldata.projectilehit < 0)
-		ent->modeldata.projectilehit = oldmodel->projectilehit;
+	setDestIfDestNeg_int(&ent->modeldata.multiple, oldmodel->multiple);
+	setDestIfDestNeg_int((int*)&ent->modeldata.aimove, oldmodel->aimove);
+	setDestIfDestNeg_int((int*)&ent->modeldata.aiattack, oldmodel->aiattack);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_wall, oldmodel->subject_to_wall);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_platform, oldmodel->subject_to_platform);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_obstacle, oldmodel->subject_to_obstacle);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_hole, oldmodel->subject_to_hole);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_gravity, oldmodel->subject_to_gravity);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_screen, oldmodel->subject_to_screen);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_minz, oldmodel->subject_to_minz);
+	setDestIfDestNeg_char(&ent->modeldata.subject_to_maxz, oldmodel->subject_to_maxz);
+	setDestIfDestNeg_char(&ent->modeldata.no_adjust_base, oldmodel->no_adjust_base);
+	setDestIfDestNeg_short(&ent->modeldata.hostile, oldmodel->hostile);
+	setDestIfDestNeg_short(&ent->modeldata.candamage, oldmodel->candamage);
+	setDestIfDestNeg_short(&ent->modeldata.projectilehit, oldmodel->projectilehit);
 	if(!ent->modeldata.health)
 		ent->modeldata.health = oldmodel->health;
 	if(!ent->modeldata.mp)
@@ -13070,13 +13065,6 @@ int set_pain(entity * iPain, int type, int reset) {
 
 	execute_onpain_script(iPain, type, reset);
 	return 1;
-}
-
-static void setDestIfDestNeg_int(int* dest, int source) {
-	if(*dest < 0) *dest = source;
-}
-static void setDestIfDestNeg_char(char* dest, char source) {
-	if(*dest < 0) *dest = source;
 }
 
 //change model, anim_flag 1: reset animation 0: use original animation
