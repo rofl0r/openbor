@@ -1547,6 +1547,42 @@ typedef struct {
 } s_samples_strings;
 
 extern List *scriptConstantsCommandList;
+typedef struct {
+	VARTYPE vt;
+	intptr_t value;
+} s_script_args_tuple;
+
+typedef struct {
+	s_script_args_tuple ent;
+	s_script_args_tuple other;
+	s_script_args_tuple force;
+	s_script_args_tuple drop;
+	s_script_args_tuple type;
+	s_script_args_tuple noblock;
+	s_script_args_tuple guardcost;
+	s_script_args_tuple jugglecost;
+	s_script_args_tuple pauseadd;
+	s_script_args_tuple which;
+	s_script_args_tuple atkid;
+	s_script_args_tuple blocked;
+} s_script_args;
+#define s_script_args_membercount 12
+
+typedef struct {
+	char* ent;
+	char* other;
+	char* force;
+	char* drop;
+	char* type;
+	char* noblock;
+	char* guardcost;
+	char* jugglecost;
+	char* pauseadd;
+	char* which;
+	char* atkid;
+	char* blocked;
+	
+} s_script_args_names;
 
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);

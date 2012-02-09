@@ -1154,47 +1154,195 @@ void execute_animation_script(entity * ent) {
 	pcurrentscript = ptempscript;
 }
 
-void execute_takedamage_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			       int jugglecost, int pauseadd) {
+static const s_script_args_names script_args_names = {
+	.ent = "self",
+	.other = "attacker",
+	.force = "damage",
+	.drop = "drop",
+	.type = "attacktype",
+	.noblock = "noblock",
+	.guardcost = "guardcost",
+	.jugglecost = "jugglecost",
+	.pauseadd = "pauseadd",
+	.which = "which",
+	.atkid = "attackid",
+	.blocked = "blocked"
+};
+
+static const s_script_args init_script_args_default = {
+	.ent = {VT_PTR, 0},
+	.other = {VT_PTR, 0},
+	.force = {VT_INTEGER, 0},
+	.drop = {VT_INTEGER, 0},
+	.type = {VT_INTEGER, 0},
+	.noblock = {VT_INTEGER, 0},
+	.guardcost = {VT_INTEGER, 0},
+	.jugglecost = {VT_INTEGER, 0},
+	.pauseadd = {VT_INTEGER, 0},
+	.which = {VT_EMPTY, 0},
+	.atkid = {VT_EMPTY, 0},
+	.blocked = {VT_EMPTY, 0},
+};
+
+static void execute_script_default(s_script_args* args, Script* dest_script) {
 	ScriptVariant tempvar;
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.takedamage_script)) {
+	s_script_args_tuple* tuples = (s_script_args_tuple*) args;
+	char** names = (char**) &script_args_names;
+	unsigned i;
+	if(Script_IsInitialized(dest_script)) {
 		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("attacker", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Execute(ent->scripts.takedamage_script);
+		for(i = 0; i < s_script_args_membercount; i++) {
+			if(tuples[i].vt != VT_EMPTY) {
+				ScriptVariant_ChangeType(&tempvar, tuples[i].vt);
+				switch(tuples[i].vt) {
+					case VT_PTR:
+						tempvar.ptrVal = (VOID *) tuples[i].value;
+						break;
+					case VT_INTEGER:
+						tempvar.lVal = (LONG) tuples[i].value;
+						break;
+					default:
+						assert(0);
+				}
+				Script_Set_Local_Variant(names[i], &tempvar);
+			}
+		}
+		
+		Script_Execute(dest_script);
 		//clear to save variant space
 		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("attacker", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
+		
+		for(i = 0; i < s_script_args_membercount; i++) {
+			if(tuples[i].vt != VT_EMPTY) 
+				Script_Set_Local_Variant(names[i], &tempvar);
+		}
 	}
 	pcurrentscript = ptempscript;
 }
+
+static void execute_takedamage_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.takedamage_script);
+}
+
+static void execute_onfall_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onfall_script);
+}
+
+static void execute_ondeath_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.ondeath_script);
+}
+
+static void execute_didblock_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.didblock_script);
+}
+
+static void execute_ondoattack_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.ondoattack_script);
+}
+
+static void execute_didhit_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.didhit_script);
+}
+
+void execute_takedamage_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			       int jugglecost, int pauseadd) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	execute_takedamage_script_i(&script_args);
+}
+
+void execute_ondeath_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			    int jugglecost, int pauseadd) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	execute_ondeath_script_i(&script_args);
+}
+void execute_onfall_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			   int jugglecost, int pauseadd) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	execute_onfall_script_i(&script_args);
+}
+
+void execute_didblock_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			     int jugglecost, int pauseadd) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	execute_didblock_script_i(&script_args);
+}
+void execute_ondoattack_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			       int jugglecost, int pauseadd, int iWhich, int iAtkID) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	
+	script_args.which.vt = VT_INTEGER;
+	script_args.atkid.vt = VT_INTEGER;
+	
+	script_args.which.value = iWhich;
+	script_args.atkid.value = iAtkID;
+	
+	execute_ondoattack_script_i(&script_args);
+}
+void execute_didhit_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
+			   int jugglecost, int pauseadd, int blocked) {
+	s_script_args script_args = init_script_args_default;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.other.value = (intptr_t) other;
+	script_args.force.value = force;
+	script_args.drop.value = drop;
+	script_args.type.value = type;
+	script_args.noblock.value = noblock;
+	script_args.guardcost.value = guardcost;
+	script_args.jugglecost.value = jugglecost;
+	script_args.pauseadd.value = pauseadd;
+	
+	script_args.blocked.vt = VT_INTEGER;
+	script_args.blocked.value = blocked;
+	
+	execute_didhit_script_i(&script_args);
+}
+
 
 void execute_onpain_script(entity * ent, int iType, int iReset) {
 	ScriptVariant tempvar;
@@ -1214,48 +1362,6 @@ void execute_onpain_script(entity * ent, int iType, int iReset) {
 		Script_Set_Local_Variant("self", &tempvar);
 		Script_Set_Local_Variant("type", &tempvar);
 		Script_Set_Local_Variant("reset", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_onfall_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			   int jugglecost, int pauseadd) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onfall_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("attacker", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Execute(ent->scripts.onfall_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("attacker", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
 	}
 	pcurrentscript = ptempscript;
 }
@@ -1411,47 +1517,6 @@ void execute_onmovea_script(entity * ent) {
 	pcurrentscript = ptempscript;
 }
 
-void execute_ondeath_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			    int jugglecost, int pauseadd) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.ondeath_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("attacker", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Execute(ent->scripts.ondeath_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("attacker", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
 
 void execute_onkill_script(entity * ent) {
 	ScriptVariant tempvar;
@@ -1465,96 +1530,6 @@ void execute_onkill_script(entity * ent) {
 		//clear to save variant space
 		ScriptVariant_Clear(&tempvar);
 		Script_Set_Local_Variant("self", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_didblock_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			     int jugglecost, int pauseadd) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.didblock_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("attacker", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Execute(ent->scripts.didblock_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("attacker", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
-void execute_ondoattack_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			       int jugglecost, int pauseadd, int iWhich, int iAtkID) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.ondoattack_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("other", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		tempvar.lVal = (LONG) iWhich;
-		Script_Set_Local_Variant("which", &tempvar);
-		tempvar.lVal = (LONG) iAtkID;
-		Script_Set_Local_Variant("attackid", &tempvar);
-		Script_Execute(ent->scripts.ondoattack_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("other", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Set_Local_Variant("which", &tempvar);
-		Script_Set_Local_Variant("attackid", &tempvar);
 	}
 	pcurrentscript = ptempscript;
 }
@@ -1591,50 +1566,6 @@ void execute_think_script(entity * ent) {
 	pcurrentscript = ptempscript;
 }
 
-void execute_didhit_script(entity * ent, entity * other, int force, int drop, int type, int noblock, int guardcost,
-			   int jugglecost, int pauseadd, int blocked) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.didhit_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("damagetaker", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) force;
-		Script_Set_Local_Variant("damage", &tempvar);
-		tempvar.lVal = (LONG) drop;
-		Script_Set_Local_Variant("drop", &tempvar);
-		tempvar.lVal = (LONG) type;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) noblock;
-		Script_Set_Local_Variant("noblock", &tempvar);
-		tempvar.lVal = (LONG) guardcost;
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		tempvar.lVal = (LONG) jugglecost;
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		tempvar.lVal = (LONG) pauseadd;
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		tempvar.lVal = (LONG) blocked;
-		Script_Set_Local_Variant("blocked", &tempvar);
-		Script_Execute(ent->scripts.didhit_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("damagetaker", &tempvar);
-		Script_Set_Local_Variant("damage", &tempvar);
-		Script_Set_Local_Variant("drop", &tempvar);
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		Script_Set_Local_Variant("noblock", &tempvar);
-		Script_Set_Local_Variant("guardcost", &tempvar);
-		Script_Set_Local_Variant("jugglecost", &tempvar);
-		Script_Set_Local_Variant("pauseadd", &tempvar);
-		Script_Set_Local_Variant("blocked", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
 
 void execute_onspawn_script(entity * ent) {
 	ScriptVariant tempvar;
@@ -11729,9 +11660,13 @@ void do_attack(entity * e) {
 		{
 			temp = self;
 			self = ent_list[i];
-
-			execute_ondoattack_script(self, e, force, attack->attack_drop, attack->attack_type, attack->no_block, attack->guardcost, attack->jugglecost, attack->pause_add, 0, current_attack_id);	//Execute on defender.
-			execute_ondoattack_script(e, self, force, attack->attack_drop, attack->attack_type, attack->no_block, attack->guardcost, attack->jugglecost, attack->pause_add, 1, current_attack_id);	//Execute on attacker.
+			
+			//Execute on defender.
+			execute_ondoattack_script(self, e, force, attack->attack_drop, attack->attack_type, attack->no_block,
+						  attack->guardcost, attack->jugglecost, attack->pause_add, 0, current_attack_id);
+			//Execute on attacker.
+			execute_ondoattack_script(e, self, force, attack->attack_drop, attack->attack_type, attack->no_block,
+						  attack->guardcost, attack->jugglecost, attack->pause_add, 1, current_attack_id);
 
 			if(!lasthitc) {
 				return;
