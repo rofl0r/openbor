@@ -472,3 +472,10 @@ void int_min_max(int* candidate, int min, int max) {
 	else if (*candidate > max)
 		*candidate = max;
 }
+
+void short_min_max(short* candidate, short min, short max) {
+	if(*candidate < min)
+		*candidate = min;
+	else if (*candidate > max)
+		*candidate = max;
+}
