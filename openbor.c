@@ -1025,6 +1025,42 @@ void init_scripts() {
 		Script_Init(&pdie_script[i], "die", 1);
 }
 
+typedef struct {
+	Script* script;
+	char* path;
+} s_script_and_path;
+
+static const s_script_and_path script_and_path[] = {
+	{&update_script, "data/scripts/update.c"},
+	{&updated_script, "data/scripts/updated.c"},
+	{&level_script, "data/scripts/level.c"},
+	{&endlevel_script, "data/scripts/endlevel.c"},
+	{&key_script_all, "data/scripts/keyall.c"},
+	{&timetick_script, "data/scripts/timetick.c"},
+	{&score_script[0], "data/scripts/score1.c"},
+	{&score_script[1], "data/scripts/score2.c"},
+	{&score_script[2], "data/scripts/score3.c"},
+	{&score_script[3], "data/scripts/score4.c"},
+	{&key_script[0], "data/scripts/key1.c"},
+	{&key_script[1], "data/scripts/key2.c"},
+	{&key_script[2], "data/scripts/key3.c"},
+	{&key_script[3], "data/scripts/key4.c"},
+	{&join_script[0], "data/scripts/join1.c"},
+	{&join_script[1], "data/scripts/join2.c"},
+	{&join_script[2], "data/scripts/join3.c"},
+	{&join_script[3], "data/scripts/join4.c"},
+	{&respawn_script[0], "data/scripts/respawn1.c"},
+	{&respawn_script[1], "data/scripts/respawn2.c"},
+	{&respawn_script[2], "data/scripts/respawn3.c"},
+	{&respawn_script[3], "data/scripts/respawn4.c"},
+	{&pdie_script[0], "data/scripts/die1.c"},
+	{&pdie_script[1], "data/scripts/die2.c"},
+	{&pdie_script[2], "data/scripts/die3.c"},
+	{&pdie_script[3], "data/scripts/die4.c"},
+};
+
+#define script_and_path_itemcount ARRAY_SIZE(script_and_path)
+
 // This method is called once when the engine starts, do not use it multiple times
 // It should be calld after load_script_setting
 void load_scripts() {
@@ -1032,74 +1068,11 @@ void load_scripts() {
 	init_scripts();
 	//Script_Clear's second parameter set to 2, because the script fails to load,
 	//and will never have another chance to be loaded, so just clear the variable list in it
-	if(!load_script(&update_script, "data/scripts/update.c"))
-		Script_Clear(&update_script, 2);
-	if(!load_script(&updated_script, "data/scripts/updated.c"))
-		Script_Clear(&updated_script, 2);
-	if(!load_script(&level_script, "data/scripts/level.c"))
-		Script_Clear(&level_script, 2);
-	if(!load_script(&endlevel_script, "data/scripts/endlevel.c"))
-		Script_Clear(&endlevel_script, 2);
-	if(!load_script(&key_script_all, "data/scripts/keyall.c"))
-		Script_Clear(&key_script_all, 2);
-	if(!load_script(&timetick_script, "data/scripts/timetick.c"))
-		Script_Clear(&timetick_script, 2);
-	if(!load_script(&score_script[0], "data/scripts/score1.c"))
-		Script_Clear(&score_script[0], 2);
-	if(!load_script(&score_script[1], "data/scripts/score2.c"))
-		Script_Clear(&score_script[1], 2);
-	if(!load_script(&score_script[2], "data/scripts/score3.c"))
-		Script_Clear(&score_script[2], 2);
-	if(!load_script(&score_script[3], "data/scripts/score4.c"))
-		Script_Clear(&score_script[3], 2);
-	if(!load_script(&key_script[0], "data/scripts/key1.c"))
-		Script_Clear(&key_script[0], 2);
-	if(!load_script(&key_script[1], "data/scripts/key2.c"))
-		Script_Clear(&key_script[1], 2);
-	if(!load_script(&key_script[2], "data/scripts/key3.c"))
-		Script_Clear(&key_script[2], 2);
-	if(!load_script(&key_script[3], "data/scripts/key4.c"))
-		Script_Clear(&key_script[3], 2);
-	if(!load_script(&join_script[0], "data/scripts/join1.c"))
-		Script_Clear(&join_script[0], 2);
-	if(!load_script(&join_script[1], "data/scripts/join2.c"))
-		Script_Clear(&join_script[1], 2);
-	if(!load_script(&join_script[2], "data/scripts/join3.c"))
-		Script_Clear(&join_script[2], 2);
-	if(!load_script(&join_script[3], "data/scripts/join4.c"))
-		Script_Clear(&join_script[3], 2);
-	if(!load_script(&respawn_script[0], "data/scripts/respawn1.c"))
-		Script_Clear(&respawn_script[0], 2);
-	if(!load_script(&respawn_script[1], "data/scripts/respawn2.c"))
-		Script_Clear(&respawn_script[1], 2);
-	if(!load_script(&respawn_script[2], "data/scripts/respawn3.c"))
-		Script_Clear(&respawn_script[2], 2);
-	if(!load_script(&respawn_script[3], "data/scripts/respawn4.c"))
-		Script_Clear(&respawn_script[3], 2);
-	if(!load_script(&pdie_script[0], "data/scripts/die1.c"))
-		Script_Clear(&pdie_script[0], 2);
-	if(!load_script(&pdie_script[1], "data/scripts/die2.c"))
-		Script_Clear(&pdie_script[1], 2);
-	if(!load_script(&pdie_script[2], "data/scripts/die3.c"))
-		Script_Clear(&pdie_script[2], 2);
-	if(!load_script(&pdie_script[3], "data/scripts/die4.c"))
-		Script_Clear(&pdie_script[3], 2);
-	Script_Compile(&update_script);
-	Script_Compile(&updated_script);
-	Script_Compile(&level_script);
-	Script_Compile(&endlevel_script);
-	Script_Compile(&key_script_all);
-	Script_Compile(&timetick_script);
-	for(i = 0; i < 4; i++)
-		Script_Compile(&score_script[i]);
-	for(i = 0; i < 4; i++)
-		Script_Compile(&key_script[i]);
-	for(i = 0; i < 4; i++)
-		Script_Compile(&join_script[i]);
-	for(i = 0; i < 4; i++)
-		Script_Compile(&respawn_script[i]);
-	for(i = 0; i < 4; i++)
-		Script_Compile(&pdie_script[i]);
+	for (i = 0; i < script_and_path_itemcount; i++) {
+		if(!load_script(script_and_path[i].script, script_and_path[i].path))
+			Script_Clear(script_and_path[i].script, 2);
+		Script_Compile(script_and_path[i].script);
+	}
 }
 
 // This method is called once when the engine is shutting down, do not use it multiple times

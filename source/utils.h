@@ -16,6 +16,7 @@
 # define PDEBUG(fmt, args...)
 #endif
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 // *** INCLUDES ***
 #include "types.h"
