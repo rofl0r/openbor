@@ -1819,7 +1819,6 @@ void clearsettings() {
 
 
 void savesettings() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1832,11 +1831,9 @@ void savesettings() {
 		return;
 	disCcWarns = fwrite(&savedata, 1, sizeof(s_savedata), handle);
 	fclose(handle);
-#endif
 }
 
 void saveasdefault() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1847,12 +1844,10 @@ void saveasdefault() {
 		return;
 	disCcWarns = fwrite(&savedata, 1, sizeof(s_savedata), handle);
 	fclose(handle);
-#endif
 }
 
 
 void loadsettings() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1872,13 +1867,9 @@ void loadsettings() {
 	fclose(handle);
 	if(savedata.compatibleversion != COMPATIBLEVERSION)
 		clearsettings();
-#else
-	clearsettings();
-#endif
 }
 
 void loadfromdefault() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1892,13 +1883,7 @@ void loadfromdefault() {
 	fclose(handle);
 	if(savedata.compatibleversion != COMPATIBLEVERSION)
 		clearsettings();
-#else
-	clearsettings();
-#endif
 }
-
-
-
 
 void clearSavedGame() {
 	int i;
@@ -1920,7 +1905,6 @@ void clearHighScore() {
 }
 
 void saveGameFile() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1934,12 +1918,10 @@ void saveGameFile() {
 		return;
 	disCcWarns = fwrite(&savelevel, sizeof(s_savelevel), MAX_DIFFICULTIES, handle);
 	fclose(handle);
-#endif
 }
 
 
 int loadGameFile() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	int i;
@@ -1957,15 +1939,10 @@ int loadGameFile() {
 		if(savelevel[i].compatibleversion != CV_SAVED_GAME)
 			clearSavedGame();
 	return 1;
-#else
-	clearSavedGame();
-	return 0;
-#endif
 }
 
 
 void saveHighScoreFile() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1978,12 +1955,9 @@ void saveHighScoreFile() {
 		return;
 	disCcWarns = fwrite(&savescore, 1, sizeof(s_savescore), handle);
 	fclose(handle);
-#endif
 }
 
-
 void loadHighScoreFile() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1999,14 +1973,9 @@ void loadHighScoreFile() {
 	fclose(handle);
 	if(savescore.compatibleversion != CV_HIGH_SCORE)
 		clearHighScore();
-#else
-	clearHighScore();
-#endif
 }
 
-
 void saveScriptFile() {
-#ifndef DC
 	int disCcWarns;
 	FILE *handle = NULL;
 	int i, l, c;
@@ -2039,12 +2008,10 @@ void saveScriptFile() {
 	disCcWarns = fwrite(indexed_var_list + i, sizeof(ScriptVariant), max_indexed_vars, handle);
 	CLOSEF:
 	fclose(handle);
-#endif
 }
 
 
 void loadScriptFile() {
-#ifndef DC
 	int disCcWarns;
 
 	size_t size;
@@ -2088,7 +2055,6 @@ void loadScriptFile() {
 		size = sizeof(ScriptVariant) * max_indexed_vars;
 	disCcWarns = fread(indexed_var_list, size, 1, handle);
 	fclose(handle);
-#endif
 }
 
 // ----------------------- Sound ------------------------------
@@ -19820,9 +19786,7 @@ void update(int ingame, int usevwait) {
 	}
 
 	if(ingame == 1 &&
-#ifndef DC
 	   !movieplay &&
-#endif
 	   !pause && !nopause &&
 	   ((player[0].ent && (player[0].newkeys & FLAG_START)) ||
 	    (player[1].ent && (player[1].newkeys & FLAG_START)) ||
