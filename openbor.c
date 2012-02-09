@@ -886,61 +886,30 @@ int changesyspropertybyindex(int index, ScriptVariant * value) {
 	};
 
 	switch (index) {
-		case _csv_elapsed_time:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				time = (int) ltemp;
-			break;
-		case _csv_levelpos:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				level->pos = (int) ltemp;
-			break;
-		case _csv_xpos:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				advancex = (float) ltemp;
-			break;
-		case _csv_ypos:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				advancey = (float) ltemp;
-			break;
-		case _csv_scrollminz:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				scrollminz = (float) ltemp;
-			break;
-		case _csv_scrollmaxz:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				scrollmaxz = (float) ltemp;
-			break;
-		case _csv_blockade:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				blockade = (float) ltemp;
-			break;
-		case _csv_slowmotion:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				slowmotion[0] = (unsigned char) ltemp;
-			break;
-		case _csv_slowmotion_duration:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				slowmotion[1] = (unsigned char) ltemp;
-			break;
-		case _csv_lasthitx:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				lasthitx = (float) ltemp;
-			break;
-		case _csv_lasthita:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				lasthita = (float) ltemp;
-			break;
-		case _csv_lasthitc:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				lasthitc = (int) ltemp;
-			break;
-		case _csv_lasthitz:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				lasthitz = (float) ltemp;
-			break;
-		case _csv_lasthitt:
-			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp)))
-				lasthitt = (int) ltemp;
+		case _csv_elapsed_time: case _csv_levelpos: case _csv_xpos:
+		case _csv_ypos: case _csv_scrollminz: case _csv_scrollmaxz:
+		case _csv_blockade: case _csv_slowmotion: case _csv_slowmotion_duration:
+		case _csv_lasthitx: case _csv_lasthita: case _csv_lasthitc:
+		case _csv_lasthitz: case _csv_lasthitt:
+			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp))) {
+				switch(index) {
+					case _csv_elapsed_time: time = (int) ltemp; break;
+					case _csv_levelpos: level->pos = (int) ltemp; break;
+					case _csv_xpos: advancex = (float) ltemp; break;
+					case _csv_ypos: advancey = (float) ltemp; break;
+					case _csv_scrollminz: scrollminz = (float) ltemp; break;
+					case _csv_scrollmaxz: scrollmaxz = (float) ltemp; break;
+					case _csv_blockade: blockade = (float) ltemp; break;
+					case _csv_slowmotion: slowmotion[0] = (unsigned char) ltemp; break;
+					case _csv_slowmotion_duration: slowmotion[1] = (unsigned char) ltemp; break;
+					case _csv_lasthitx: lasthitx = (float) ltemp; break;
+					case _csv_lasthita: lasthita = (float) ltemp; break;
+					case _csv_lasthitc: lasthitc = (int) ltemp; break;
+					case _csv_lasthitz: lasthitz = (float) ltemp; break;
+					case _csv_lasthitt: lasthitt = (int) ltemp; break;
+					default: assert(0);
+				}
+			}
 			break;
 		case _csv_smartbomber:
 			smartbomber = (entity *) value;
