@@ -1909,33 +1909,15 @@ void clearSavedGame() {
 	}
 }
 
-
-
 void clearHighScore() {
+	unsigned i;
 	savescore.compatibleversion = CV_HIGH_SCORE;
-	savescore.highsc[0] = 0;	// Resets all the highscores to 0
-	savescore.highsc[1] = 0;
-	savescore.highsc[2] = 0;
-	savescore.highsc[3] = 0;
-	savescore.highsc[4] = 0;
-	savescore.highsc[5] = 0;
-	savescore.highsc[6] = 0;
-	savescore.highsc[7] = 0;
-	savescore.highsc[8] = 0;
-	savescore.highsc[9] = 0;
-	strcpy(savescore.hscoren[0], "None");	// Resets all the highscore names to "None"
-	strcpy(savescore.hscoren[1], "None");
-	strcpy(savescore.hscoren[2], "None");
-	strcpy(savescore.hscoren[3], "None");
-	strcpy(savescore.hscoren[4], "None");
-	strcpy(savescore.hscoren[5], "None");
-	strcpy(savescore.hscoren[6], "None");
-	strcpy(savescore.hscoren[7], "None");
-	strcpy(savescore.hscoren[8], "None");
-	strcpy(savescore.hscoren[9], "None");
+	
+	for(i = 0; i < 10; i++) {
+		savescore.highsc[i] = 0;
+		strcpy(savescore.hscoren[i], "None");
+	}
 }
-
-
 
 void saveGameFile() {
 #ifndef DC
