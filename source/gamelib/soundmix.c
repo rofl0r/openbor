@@ -615,7 +615,8 @@ int sound_play_sample(int samplenum, unsigned int priority, int lvolume, int rvo
 	unsigned int prio_low;
 	int channel;
 
-	if(samplenum < 0 || samplenum >= MAX_SAMPLES || !mixing_inited || !sampledata[samplenum].sampleptr)
+	if(samplenum < 0 || samplenum >= MAX_SAMPLES || !mixing_inited ||
+		!sampledata[samplenum].sampleptr || !playfrequency)
 		return -1;
 	
 	if(speed < 1)

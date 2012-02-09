@@ -579,31 +579,31 @@ typedef enum {
 #pragma pack (4)
 
 typedef struct {
-	unsigned int compatibleversion:32;
-	short gamma:16;
-	short brightness:16;
-	char usesound:8;	// Use SB
-	unsigned short soundrate:16;	// SB freq
-	short soundvol:16;	// SB volume
-	char usemusic:8;	// Play music
-	short musicvol:16;	// Music volume
-	short effectvol:16;	// Sound fx volume
-	char soundbits:8;	// SB bits
-	char usejoy:8;
-	char mode:8;		// Mode now saves
-	char windowpos:8;
+	unsigned int compatibleversion;
+	short gamma;
+	short brightness;
+	char usesound;	// Use SB
+	unsigned short soundrate;	// SB freq
+	short soundvol;	// SB volume
+	char usemusic;	// Play music
+	short musicvol;	// Music volume
+	short effectvol;	// Sound fx volume
+	char soundbits;	// SB bits
+	char usejoy;
+	char mode;		// Mode now saves
+	char windowpos;
 	int keys[MAX_PLAYERS][12];
-	char showtitles:8;
-	char videoNTSC:8;
+	char showtitles;
+	char videoNTSC;
 	char screen[7][2];	// Screen Filtering/Scaling Effects
-	char logo:8;
-	char uselog:8;
-	char debuginfo:8;	// FPS, Memory, etc...
-	char fullscreen:8;	// Window or Full Screen Mode
-	char stretch:8;		// Stretch (1) or preserve aspect ratio (0) in fullscreen mode
-	char usegl:8;		// 1 if OpenGL is preferred over SDL software blitting
+	char logo;
+	char uselog;
+	char debuginfo;	// FPS, Memory, etc...
+	char fullscreen;	// Window or Full Screen Mode
+	char stretch;		// Stretch (1) or preserve aspect ratio (0) in fullscreen mode
+	char usegl;		// 1 if OpenGL is preferred over SDL software blitting
 	float glscale;		// Scale factor for OpenGL
-	char glfilter:8;	// Simple or bilinear scaling
+	char glfilter;	// Simple or bilinear scaling
 } s_savedata;
 
 typedef struct {

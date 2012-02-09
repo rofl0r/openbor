@@ -655,16 +655,14 @@ void options(void) {
 
 void soundcard_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
+	int temprate;
 	switch (*selector) {
 		case 0:
 			if(direction == -1)
-				savedata.soundrate >>= 1;
-			else if(direction == 1)
-				savedata.soundrate <<= 1;
-			if(savedata.soundrate < 11025)
-				savedata.soundrate = 44100;
-			if(savedata.soundrate > 44100)
-				savedata.soundrate = 11025;
+				temprate = savedata.soundrate / 2;
+			else
+				temprate = (int) savedata.soundrate * 2;
+			savedata.soundrate = temprate > 44100 ? 11025 : temprate < 11025 ? 44100 : temprate;
 			break;
 		case 1:
 			savedata.soundbits = (savedata.soundbits ^ (8 + 16));
