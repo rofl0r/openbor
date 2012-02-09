@@ -1080,22 +1080,10 @@ void clear_scripts() {
 	int i;
 	//Script_Clear's second parameter set to 2, because the script fails to load,
 	//and will never have another chance to be loaded, so just clear the variable list in it
-	Script_Clear(&update_script, 2);
-	Script_Clear(&updated_script, 2);
-	Script_Clear(&level_script, 2);
-	Script_Clear(&endlevel_script, 2);
-	Script_Clear(&key_script_all, 2);
-	Script_Clear(&timetick_script, 2);
-	for(i = 0; i < 4; i++)
-		Script_Clear(&score_script[i], 2);
-	for(i = 0; i < 4; i++)
-		Script_Clear(&key_script[i], 2);
-	for(i = 0; i < 4; i++)
-		Script_Clear(&join_script[i], 2);
-	for(i = 0; i < 4; i++)
-		Script_Clear(&respawn_script[i], 2);
-	for(i = 0; i < 4; i++)
-		Script_Clear(&pdie_script[i], 2);
+	for(i = 0; i < script_and_path_itemcount; i++) {
+		Script_Clear(script_and_path[i].script, 2);
+	}
+
 	Script_Global_Clear();
 }
 
