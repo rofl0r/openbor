@@ -1932,4 +1932,9 @@ extern int maxplayers[MAX_DIFFICULTIES];
 extern int current_set;
 extern int pause;		//FIXME rename to borPause and remove pause macro
 extern int forcecheatsoff;
+extern unsigned int ifcomplete[MAX_DIFFICULTIES];
+extern unsigned int num_difficulties;
+extern int bonus;
+extern int saveslot;
+extern char set_names[MAX_DIFFICULTIES][MAX_NAME_LEN + 1];
 #endif

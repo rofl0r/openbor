@@ -3,9 +3,9 @@
 #include "video.h"
 #include "gfx.h"
 
-typedef void (*menu_toggle_callback)(int direction, int* quit, int* selector, void* data);
+typedef int (*menu_toggle_callback)(int direction, int* quit, int* selector, void* data);
 
-void menu_handle_input(int max_entry, menu_toggle_callback cb, int* quit, int* selector, void* data) {
+static int menu_handle_input(int max_entry, menu_toggle_callback cb, int* quit, int* selector, void* data) {
 	int dir;
 	if(bothnewkeys & FLAG_ESC)
 		*quit = 1;
@@ -29,12 +29,12 @@ void menu_handle_input(int max_entry, menu_toggle_callback cb, int* quit, int* s
 			dir = -1;
 		else if(bothnewkeys & FLAG_MOVERIGHT)
 			dir = 1;
-		cb(dir, quit, selector, data);
-
+		return cb(dir, quit, selector, data);
 	}
+	return -1;
 }
 
-void movie_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int movie_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) direction;
 	switch (*selector) {
 		case 0:
@@ -51,6 +51,7 @@ void movie_options_toggle_cb(int direction, int* quit, int* selector, void* data
 		default:
 			*quit = (bothnewkeys & FLAG_ANYBUTTON);
 	}
+	return 0;
 }
 
 void movie_options(void) {
@@ -71,7 +72,7 @@ void movie_options(void) {
 	bothnewkeys = 0;
 }
 
-void input_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int input_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) direction;
 	(void) data;
 	switch (*selector) {
@@ -84,6 +85,7 @@ void input_options_toggle_cb(int direction, int* quit, int* selector, void* data
 		default:
 			*quit = (bothnewkeys & FLAG_ANYBUTTON);
 	}
+	return 0;
 }
 
 void input_options(void) {
@@ -116,7 +118,7 @@ void input_options(void) {
 	bothnewkeys = 0;
 }
 
-void sound_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int sound_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
 	switch (*selector) {
 		case 0:
@@ -162,6 +164,7 @@ void sound_options_toggle_cb(int direction, int* quit, int* selector, void* data
 		default:
 			*quit = 1;
 	}
+	return 0;
 }
 
 void sound_options(void) {
@@ -201,7 +204,7 @@ typedef struct {
 	int restored;
 } config_settings_cb_data;
 
-void config_settings_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int config_settings_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) direction;
 	config_settings_cb_data *cb_data = (config_settings_cb_data*) data;
 	switch (*selector) {
@@ -228,7 +231,8 @@ void config_settings_toggle_cb(int direction, int* quit, int* selector, void* da
 			break;
 		default:
 			*quit = 1;
-	}	
+	}
+	return 0;
 }
 
 void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore OpenBoR "factory" settings.
@@ -269,7 +273,7 @@ static inline void toggle(int *dest) {
 	*dest = !(*dest);
 }
 
-void cheat_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int cheat_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
 	switch (*selector) {
 		case 0:
@@ -316,6 +320,7 @@ void cheat_options_toggle_cb(int direction, int* quit, int* selector, void* data
 		default:
 			*quit = 1;
 	}
+	return 0;
 }
 
 void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
@@ -359,7 +364,7 @@ void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
 	bothnewkeys = 0;
 }
 
-void system_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int system_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) direction;
 	(void) data;
 	switch (*selector) {
@@ -399,6 +404,7 @@ void system_options_toggle_cb(int direction, int* quit, int* selector, void* dat
 			*quit = 1;
 			break;
 	}
+	return 0;
 }
 
 void system_options(void) {
@@ -451,7 +457,7 @@ void system_options(void) {
 	bothnewkeys = 0;
 }
 
-void video_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int video_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
 	switch (*selector) {
 		case 0:
@@ -536,7 +542,7 @@ void video_options_toggle_cb(int direction, int* quit, int* selector, void* data
 		default:
 			*quit = 1;
 	}
-	
+	return 0;
 }
 
 void video_options(void) {
@@ -609,7 +615,7 @@ void video_options(void) {
 	bothnewkeys = 0;
 }
 
-void options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
 	(void) direction;
 	switch (*selector) {
@@ -628,6 +634,7 @@ void options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 		default:
 			*quit = 1;
 	}
+	return 0;
 }
 
 void options(void) {
@@ -653,7 +660,7 @@ void options(void) {
 	bothnewkeys = 0;
 }
 
-void soundcard_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+static int soundcard_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) data;
 	int temprate;
 	switch (*selector) {
@@ -689,7 +696,7 @@ void soundcard_options_toggle_cb(int direction, int* quit, int* selector, void* 
 		default:
 			*quit = (bothnewkeys & FLAG_ANYBUTTON);
 	}
-	
+	return 0;
 }
 
 void soundcard_options(void) {
@@ -715,4 +722,144 @@ void soundcard_options(void) {
 	}
 	loadsettings();
 	bothnewkeys = 0;
+}
+
+static int choose_difficulty_toggle_cb(int direction, int* quit, int* selector, void* data) {
+	(void) data;
+	(void) direction;
+	if(*selector == num_difficulties) {
+		*quit = 1;
+	} else if(bonus >= ifcomplete[*selector]) {
+		saveslot = *selector;
+		strncpy(savelevel[saveslot].dName, set_names[saveslot], MAX_NAME_LEN + 1);
+		return saveslot;
+	}
+	return -1;
+}
+
+int choose_difficulty(void) {
+	int quit = 0;
+	int selector = 0;
+	int maxdisplay = 5;
+	int i, j;
+	//float slider = 0;
+	int ret;
+	int barx, bary, barw, barh;
+
+	barx = videomodes.hRes / 5;
+	bary = _liney(0, 2) - 2;
+	barw = videomodes.hRes * 3 / 5;
+	barh = 5 * (font_heights[0] + 1) + 4;
+	bothnewkeys = 0;
+
+	if(loadGameFile()) {
+		bonus = 0;
+		for(i = 0; i < MAX_DIFFICULTIES; i++)
+			if(savelevel[i].times_completed > 0)
+				bonus += savelevel[i].times_completed;
+	}
+
+	while(!quit) {
+		if(num_difficulties > 1) {
+			_menutextm(2, 0, 0, "Game Mode");
+			for(j = 0, i = num_difficulties <= maxdisplay ? 0 : (selector >= maxdisplay ? maxdisplay : 0);
+			    i < num_difficulties; j++, i++) {
+				if(j < maxdisplay) {
+					if(bonus >= ifcomplete[i])
+						_menutextm((selector == i), 2 + j, 0, "%s", set_names[i]);
+					else {
+						if(ifcomplete[i] > 1)
+							_menutextm((selector == i), 2 + j, 0,
+								   "%s - Finish Game %i Times To UnLock", set_names[i],
+								   ifcomplete[i]);
+						else
+							_menutextm((selector == i), 2 + j, 0,
+								   "%s - Finish Game To UnLock", set_names[i]);
+					}
+				} else
+					break;
+			}
+			_menutextm((selector == i), 8, 0, "Back");
+
+			//draw the scroll bar
+			if(num_difficulties > maxdisplay) {
+				spriteq_add_box(barx, bary, barw, barh, 0, colors.black, 0);	//outerbox
+				spriteq_add_line(barx, bary, barx + 8, bary, 1, colors.white, 0);
+				spriteq_add_line(barx, bary, barx, bary + barh, 1, colors.white, 0);
+				spriteq_add_line(barx + 8, bary, barx + 8, bary + barh, 1, colors.white, 0);
+				spriteq_add_line(barx, bary + barh, barx + 8, bary + barh, 1, colors.white, 0);
+				spriteq_add_box(barx + 1, bary + selector * (barh - 3) / num_difficulties, 7, 3, 2, colors.white, 0);	//slider
+			}
+		}
+
+		update(0, 0);
+
+		if(num_difficulties == 1) {	// OX. Mods with only one set will auto load that difficulty.
+			if(selector == num_difficulties)
+				quit = 1;
+			else if(bonus >= ifcomplete[selector]) {
+				saveslot = selector;
+				strncpy(savelevel[saveslot].dName, set_names[saveslot], MAX_NAME_LEN + 1);
+				return saveslot;
+			}
+		}
+		if((ret = menu_handle_input(num_difficulties, choose_difficulty_toggle_cb, &quit, &selector, NULL)) != -1)
+			return ret;
+	}
+	bothnewkeys = 0;
+	return -1;
+}
+
+typedef struct {
+	int relback;
+	int* players;
+} choose_mode_data;
+
+static int choose_mode_toggle_cb(int direction, int* quit, int* selector, void* data) {
+	(void) direction;
+	int status;
+	choose_mode_data* cb_data = (choose_mode_data*) data;
+	cb_data->relback = 0;
+	switch (*selector) {
+		case 0:
+			status = choose_difficulty();
+			if(status != -1) {
+				playgame(cb_data->players, status, 0);
+				cb_data->relback = 1;
+				*quit = 1;
+			}
+			break;
+		case 1:
+			status = load_saved_game();
+			if(status != -1) {
+				playgame(cb_data->players, status, 1);
+				cb_data->relback = 1;
+				*quit = 1;
+			}
+			break;
+		default:
+			*quit = 1;
+			break;
+	}
+	return 0;
+}
+
+int choose_mode(int *players) {
+	int quit = 0;
+	choose_mode_data data = {0, players};
+	int selector = 0;
+
+	bothnewkeys = 0;
+
+	while(!quit) {
+		_menutextm(2, 0, 0, "Choose Mode");
+		_menutextm((selector == 0), 2, 0, "New Game");
+		_menutextm((selector == 1), 3, 0, "Load Game");
+		_menutextm((selector == 2), 5, 0, "Back");
+
+		update(0, 0);
+		menu_handle_input(2, choose_mode_toggle_cb, &quit, &selector, &data);
+	}
+	bothnewkeys = 0;
+	return data.relback;
 }

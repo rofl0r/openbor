@@ -10,5 +10,7 @@ void soundcard_options(void);
 void cheatoptions(void);
 void config_settings(void);
 void movie_options(void);
+int choose_difficulty(void);
+int choose_mode(int *players);
 
 #endif
