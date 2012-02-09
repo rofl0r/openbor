@@ -64,4 +64,13 @@ void int_min_max(int* candidate, int min, int max);
 
 void Array_Check_Size(const char *f_caller, char **array, int new_size, int *curr_size_allocated, int grow_step);
 
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+
 #endif
