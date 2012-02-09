@@ -748,56 +748,41 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 		return 0;
 
 	switch (index) {
-			
-		case _e_lasthita:
+		
+		case _e_lasthita: case _e_lasthitx: case _e_lasthitz:
+		case _e_xpos: case _e_ypos:
 			ScriptVariant_ChangeType(var, VT_DECIMAL);
-			var->dblVal = (DOUBLE) (lasthita);
+			switch(index) {
+				case _e_xpos: case _e_ypos:
+					if(!level)
+						return 0;
+					if(index == _e_xpos)
+						var->dblVal = (DOUBLE) advancex;
+					else
+						var->dblVal = (DOUBLE) advancey;
+					break;
+				case _e_lasthita: var->dblVal = (DOUBLE) (lasthita); break;
+				case _e_lasthitx: var->dblVal = (DOUBLE) (lasthitx); break;
+				case _e_lasthitz: var->dblVal = (DOUBLE) (lasthitz); break;
+				default:
+					assert(0);
+			}
 			break;
-
-		case _e_lasthitx:
-			ScriptVariant_ChangeType(var, VT_DECIMAL);
-			var->dblVal = (DOUBLE) (lasthitx);
-			break;
-		case _e_lasthitz:
-			ScriptVariant_ChangeType(var, VT_DECIMAL);
-			var->dblVal = (DOUBLE) (lasthitz);
-			break;
-		case _e_xpos:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_DECIMAL);
-			var->dblVal = (DOUBLE) advancex;
-			break;
-		case _e_ypos:
-			if(!level)
-				return 0;
-			ScriptVariant_ChangeType(var, VT_DECIMAL);
-			var->dblVal = (DOUBLE) advancey;
-			break;
-
 		case _e_branchname:
 			ScriptVariant_ChangeType(var, VT_STR);
 			strcpy(StrCache_Get(var->strVal), branch_name);
 			break;
-
-		case _e_player:
-		case _e_player1:
+		case _e_player: case _e_player1: case _e_player2:
+		case _e_player3: case _e_player4:
 			ScriptVariant_ChangeType(var, VT_PTR);
-			var->ptrVal = (VOID *) player;
+			switch(index) {
+				case _e_player: case _e_player1: var->ptrVal = (VOID *) player; break;
+				case _e_player2: var->ptrVal = (VOID *) (player + 1); break;
+				case _e_player3: var->ptrVal = (VOID *) (player + 2); break;
+				case _e_player4: var->ptrVal = (VOID *) (player + 3); break;
+				default: assert (0);
+			}
 			break;
-		case _e_player2:
-			ScriptVariant_ChangeType(var, VT_PTR);
-			var->ptrVal = (VOID *) (player + 1);
-			break;
-		case _e_player3:
-			ScriptVariant_ChangeType(var, VT_PTR);
-			var->ptrVal = (VOID *) (player + 2);
-			break;
-		case _e_player4:
-			ScriptVariant_ChangeType(var, VT_PTR);
-			var->ptrVal = (VOID *) (player + 3);
-			break;
-			
 		case _e_count_enemies: case _e_count_players: case _e_count_npcs: case _e_count_entities:
 		case _e_ent_max: case _e_in_level: case _e_elapsed_time: case _e_in_selectscreen: 
 		case _e_lasthitc: case _e_lasthitt: case _e_hResolution: case _e_vResolution: 
@@ -862,6 +847,7 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 				case _e_levelheight: var->lVal = (LONG) (panel_height); break;
 				default: assert(0); break;
 			}
+			break;
 		default:
 			// We use indices now, but players/modders don't need to be exposed
 			// to that implementation detail, so we write "name" and not "index".
