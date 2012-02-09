@@ -10187,30 +10187,21 @@ void free_ents() {
 }
 
 entity *alloc_ent() {
-	entity *ent = (entity *) malloc(sizeof(entity));
+	entity *ent = (entity *) calloc(1, sizeof(entity));
 	if(!ent)
 		return NULL;
-	memset(ent, 0, sizeof(entity));
-	ent->defense_factors = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_factors, 0, sizeof(float) * max_attack_types);
-	ent->defense_pain = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_pain, 0, sizeof(float) * max_attack_types);
-	ent->defense_knockdown = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_knockdown, 0, sizeof(float) * max_attack_types);
-	ent->defense_blockpower = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_blockpower, 0, sizeof(float) * max_attack_types);
-	ent->defense_blockthreshold = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_blockthreshold, 0, sizeof(float) * max_attack_types);
-	ent->defense_blockratio = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_blockratio, 0, sizeof(float) * max_attack_types);
-	ent->defense_blocktype = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->defense_blocktype, 0, sizeof(float) * max_attack_types);
-	ent->offense_factors = (float *) malloc(sizeof(float) * max_attack_types);
-	memset(ent->offense_factors, 0, sizeof(float) * max_attack_types);
+	ent->defense_factors = calloc(sizeof(float), max_attack_types);
+	ent->defense_pain = calloc(sizeof(float), max_attack_types);
+	ent->defense_knockdown = calloc(sizeof(float), max_attack_types);
+	ent->defense_blockpower = calloc(sizeof(float), max_attack_types);
+	ent->defense_blockthreshold = calloc(sizeof(float), max_attack_types);
+	ent->defense_blockratio = calloc(sizeof(float), max_attack_types);
+	ent->defense_blocktype = calloc(sizeof(float), max_attack_types);
+	ent->offense_factors = calloc(sizeof(float), max_attack_types);
+	
 	if(max_entity_vars > 0) {
-		ent->entvars = (ScriptVariant *) malloc(sizeof(ScriptVariant) * max_entity_vars);
-		// memset should be OK by know, because VT_EMPTY is zero by value, or else we should use ScriptVariant_Init
-		memset(ent->entvars, 0, sizeof(ScriptVariant) * max_entity_vars);
+		ent->entvars = calloc(sizeof(ScriptVariant), max_entity_vars);
+		// memset should be OK by now, because VT_EMPTY is zero by value, or else we should use ScriptVariant_Init
 	}
 	alloc_all_scripts(&ent->scripts);
 	return ent;
