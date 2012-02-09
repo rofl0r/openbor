@@ -12361,7 +12361,7 @@ void common_dot() {
 	entity *eOpp;		//Owner of dot effect.
 	s_attack attack;	//Attack struct.
 
-	for(iIndex = 0; iIndex <= MAX_DOTS; iIndex++)	//Loop through all DOT indexes.
+	for(iIndex = 0; iIndex < MAX_DOTS; iIndex++)	//Loop through all DOT indexes.
 	{
 		iDot_time = self->dot_time[iIndex];	//Get expire time.
 		iDot_cnt = self->dot_cnt[iIndex];	//Get next tick time.
