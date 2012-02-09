@@ -12302,38 +12302,39 @@ void update_health() {
 			// 2 No recover. Drop MP if MP < mpstableval.
 			// 3 Both: recover if MP if MP < mpstableval and drop if MP > mpstableval.
 			// 0 Default. Recover MP at all times.
+			// 4. Gain mp until it reaches max. Then it drops down to mpstableval.
+			switch(self->modeldata.mpstable) {
+				case 1:
+					if(self->mp < self->modeldata.mpstableval)
+						self->mp += self->modeldata.mprate;
+					break;
+				case 2:
+					if(self->mp > self->modeldata.mpstableval)
+						self->mp -= self->modeldata.mpdroprate;
+					break;
+				case 3:	
+					if(self->mp < self->modeldata.mpstableval) {
 
+						self->mp += self->modeldata.mprate;
+					} else if(self->mp > self->modeldata.mpstableval) {
+						self->mp -= self->modeldata.mpdroprate;
+					}
+					break;
+				case 4:
+					if(self->mp <= self->modeldata.mpstableval)
+						self->modeldata.mpswitch = 0;
+					else if(self->mp == self->modeldata.mp)
+						self->modeldata.mpswitch = 1;
 
-			if(self->modeldata.mpstable == 1) {
-				if(self->mp < self->modeldata.mpstableval)
+					if(self->modeldata.mpswitch == 1) {
+						self->mp -= self->modeldata.mpdroprate;
+					} else if(self->modeldata.mpswitch == 0) {
+						self->mp += self->modeldata.mprate;
+					}
+					break;
+				default:
 					self->mp += self->modeldata.mprate;
-			} else if(self->modeldata.mpstable == 2) {
-				if(self->mp > self->modeldata.mpstableval)
-					self->mp -= self->modeldata.mpdroprate;
-			} else if(self->modeldata.mpstable == 3) {
-				if(self->mp < self->modeldata.mpstableval) {
-
-					self->mp += self->modeldata.mprate;
-				} else if(self->mp > self->modeldata.mpstableval) {
-					self->mp -= self->modeldata.mpdroprate;
-				}
 			}
-			// OX. Stabletype 4. Gain mp until it reaches max. Then it drops down to mpstableval.
-			else if(self->modeldata.mpstable == 4) {
-				if(self->mp <= self->modeldata.mpstableval)
-					self->modeldata.mpswitch = 0;
-				else if(self->mp == self->modeldata.mp)
-					self->modeldata.mpswitch = 1;
-
-				if(self->modeldata.mpswitch == 1) {
-					self->mp -= self->modeldata.mpdroprate;
-				} else if(self->modeldata.mpswitch == 0) {
-					self->mp += self->modeldata.mprate;
-				}
-			} else {
-				self->mp += self->modeldata.mprate;
-			}
-
 			self->magictime = time + GAME_SPEED;	//Reset magictime.
 		}
 	}
