@@ -13071,6 +13071,12 @@ int set_pain(entity * iPain, int type, int reset) {
 	return 1;
 }
 
+static void setDestIfDestNeg_int(int* dest, int source) {
+	if(*dest < 0) *dest = source;
+}
+static void setDestIfDestNeg_char(char* dest, char source) {
+	if(*dest < 0) *dest = source;
+}
 
 //change model, anim_flag 1: reset animation 0: use original animation
 void set_model_ex(entity * ent, char *modelname, int index, s_model * newmodel, int anim_flag) {
@@ -13105,34 +13111,20 @@ void set_model_ex(entity * ent, char *modelname, int index, s_model * newmodel, 
 			newmodel->runupdown = model->runupdown;
 			newmodel->runhold = model->runhold;
 		}
-		if(newmodel->icon < 0)
-			newmodel->icon = model->icon;
-		if(newmodel->iconpain < 0)
-			newmodel->iconpain = model->iconpain;
-		if(newmodel->iconget < 0)
-			newmodel->iconget = model->iconget;
-		if(newmodel->icondie < 0)
-			newmodel->icondie = model->icondie;
-		if(newmodel->shadow < 0)
-			newmodel->shadow = model->shadow;
-		if(newmodel->knife < 0)
-			newmodel->knife = model->knife;
-		if(newmodel->pshotno < 0)
-			newmodel->pshotno = model->pshotno;
-		if(newmodel->bomb < 0)
-			newmodel->bomb = model->bomb;
-		if(newmodel->star < 0)
-			newmodel->star = model->star;
-		if(newmodel->flash < 0)
-			newmodel->flash = model->flash;
-		if(newmodel->bflash < 0)
-			newmodel->bflash = model->bflash;
-		if(newmodel->dust[0] < 0)
-			newmodel->dust[0] = model->dust[0];
-		if(newmodel->dust[1] < 0)
-			newmodel->dust[1] = model->dust[1];
-		if(newmodel->diesound < 0)
-			newmodel->diesound = model->diesound;
+		setDestIfDestNeg_int(&newmodel->icon, model->icon);
+		setDestIfDestNeg_int(&newmodel->iconpain, model->iconpain);
+		setDestIfDestNeg_int(&newmodel->iconget, model->iconget);
+		setDestIfDestNeg_int(&newmodel->icondie, model->icondie);
+		setDestIfDestNeg_int(&newmodel->knife, model->knife);
+		setDestIfDestNeg_int(&newmodel->pshotno, model->pshotno);
+		setDestIfDestNeg_int(&newmodel->bomb, model->bomb);
+		setDestIfDestNeg_int(&newmodel->star, model->star);
+		setDestIfDestNeg_int(&newmodel->flash, model->flash);
+		setDestIfDestNeg_int(&newmodel->bflash, model->bflash);
+		setDestIfDestNeg_int(&newmodel->dust[0], model->dust[0]);
+		setDestIfDestNeg_int(&newmodel->dust[1], model->dust[1]);
+		setDestIfDestNeg_int(&newmodel->diesound, model->diesound);
+		setDestIfDestNeg_char(&newmodel->shadow, model->shadow);
 
 		for(i = 0; i < max_animations; i++) {
 			if(!newmodel->animation[i] && model->animation[i] && model->animation[i]->numframes > 0)
