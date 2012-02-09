@@ -10805,8 +10805,7 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 	int i, id;
 	float *dfs, *dfsp, *dfsk, *dfsbp, *dfsbt, *dfsbr, *dfsbe, *ofs;
 	ScriptVariant *vars;
-	Script *pas, *pus, *pts, *pks, *pds, *pan, *pfs, *bls, *blw, *blo, *blz, *bla, *mox, *moz, *moa, *pis, *pkl,
-	    *phs, *osp, *pbs, *ocs;
+	s_scripts scripts_save;
 
 	if(!model) {
 		if(index >= 0)
@@ -10847,28 +10846,9 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 			memset(ofs, 0, sizeof(float) * max_attack_types);
 			// clear up
 			clear_all_scripts(&e->scripts, 1);
+			
+			scripts_save = e->scripts;
 
-			pas = e->scripts.animation_script;
-			pus = e->scripts.update_script;
-			pts = e->scripts.think_script;
-			pds = e->scripts.takedamage_script;
-			pfs = e->scripts.onfall_script;
-			pan = e->scripts.onpain_script;
-			bls = e->scripts.onblocks_script;
-			blw = e->scripts.onblockw_script;
-			blo = e->scripts.onblocko_script;
-			blz = e->scripts.onblockz_script;
-			bla = e->scripts.onblocka_script;
-			mox = e->scripts.onmovex_script;
-			moz = e->scripts.onmovez_script;
-			moa = e->scripts.onmovea_script;
-			pis = e->scripts.ondeath_script;
-			pkl = e->scripts.onkill_script;
-			pbs = e->scripts.didblock_script;
-			ocs = e->scripts.ondoattack_script;
-			phs = e->scripts.didhit_script;
-			osp = e->scripts.onspawn_script;
-			pks = e->scripts.key_script;
 			memset(e, 0, sizeof(entity));
 
 			// add to list and count current entities
@@ -10878,28 +10858,9 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 			e->modeldata = *model;	// copy the entir model data here
 			e->model = model;
 			e->defaultmodel = model;
+			
+			e->scripts = scripts_save;
 
-			e->scripts.animation_script = pas;
-			e->scripts.update_script = pus;
-			e->scripts.think_script = pts;
-			e->scripts.takedamage_script = pds;
-			e->scripts.onfall_script = pfs;
-			e->scripts.onpain_script = pan;
-			e->scripts.onblocks_script = bls;
-			e->scripts.onblockw_script = blw;
-			e->scripts.onblocko_script = blo;
-			e->scripts.onblockz_script = blz;
-			e->scripts.onblocka_script = bla;
-			e->scripts.onmovex_script = mox;
-			e->scripts.onmovez_script = moz;
-			e->scripts.onmovea_script = moa;
-			e->scripts.ondeath_script = pis;
-			e->scripts.onkill_script = pkl;
-			e->scripts.didblock_script = pbs;
-			e->scripts.ondoattack_script = ocs;
-			e->scripts.didhit_script = phs;
-			e->scripts.onspawn_script = osp;
-			e->scripts.key_script = pks;
 			// copy from model a fresh script
 
 			copy_all_scripts(&model->scripts, &e->scripts, 1);
