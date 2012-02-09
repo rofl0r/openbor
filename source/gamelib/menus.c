@@ -863,3 +863,113 @@ int choose_mode(int *players) {
 	bothnewkeys = 0;
 	return data.relback;
 }
+
+int load_saved_game(void) {
+	int quit = 0;
+	int selector = 0;
+	int savedStatus = 0;
+	char name[256] = { "" };
+	int col1 = -8, col2 = 6;
+
+	bothnewkeys = 0;
+
+	if((savedStatus = loadGameFile()))
+		getPakName(name, 0);
+	for(saveslot = 0; saveslot < MAX_DIFFICULTIES; saveslot++)
+		if(savelevel[saveslot].flag && savelevel[saveslot].level)
+			break;
+
+	while(!quit) {
+		if(saveslot >= MAX_DIFFICULTIES)	// not found
+		{
+			_menutextm(2, 0, 0, "Load Game");
+			_menutext(0, col1, 2, "Saved File:");
+			_menutext(0, col2, 2, "Not Found!");
+			_menutextm(1, 4, 0, "Back");
+
+			selector = 2;
+		} else {
+			_menutextm(2, -5, 0, "Load Game");
+			_menutext(0, col1, -3, "Saved File:");
+			if(savedStatus)
+				_menutext(0, col2, -3, "%s", name);
+			else
+				_menutext(0, col2, -3, "Not Found!");
+
+			if(savedStatus) {
+				_menutext((selector == 0), col1, -2, "Mode:");
+				_menutext((selector == 0), col2, -2, "%s", savelevel[saveslot].dName);
+				_menutext(0, col1, -1, "Stage:");
+				_menutext(0, col2, -1, "%d", savelevel[saveslot].stage);
+				_menutext(0, col1, 0, "Level:");
+				_menutext(0, col2, 0, "%d", savelevel[saveslot].level);
+				_menutext(0, col1, 1, "Credits:");
+				_menutext(0, col2, 1, "%d", savelevel[saveslot].credits);
+				_menutext(0, col1, 2, "Player 1 Lives:");
+				_menutext(0, col2, 2, "%d", savelevel[saveslot].pLives[0]);
+				_menutext(0, col1, 3, "Player 2 Lives:");
+				_menutext(0, col2, 3, "%d", savelevel[saveslot].pLives[1]);
+				_menutext(0, col1, 4, "Player 3 Lives:");
+				_menutext(0, col2, 4, "%d", savelevel[saveslot].pLives[2]);
+				_menutext(0, col1, 5, "Player 4 Lives:");
+				_menutext(0, col2, 5, "%d", savelevel[saveslot].pLives[3]);
+				_menutextm((selector == 1), 7, 0, "Start Game");
+			}
+			_menutextm((selector == 2), 8, 0, "Back");
+		}
+		update(0, 0);
+
+		if(bothnewkeys & FLAG_ESC)
+			quit = 1;
+		if(selector == 0 && (bothnewkeys & FLAG_MOVELEFT)) {
+			while(1) {
+				--saveslot;
+				if(saveslot < 0)
+					saveslot = MAX_DIFFICULTIES - 1;
+				if(savelevel[saveslot].flag && savelevel[saveslot].level)
+					break;
+			}
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+		}
+		if(selector == 0 && (bothnewkeys & FLAG_MOVERIGHT)) {
+			while(1) {
+				++saveslot;
+				if(saveslot > MAX_DIFFICULTIES - 1)
+					saveslot = 0;
+				if(savelevel[saveslot].flag && savelevel[saveslot].level)
+					break;
+			}
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+		}
+		if(bothnewkeys & FLAG_MOVEUP) {
+			--selector;
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+		}
+		if(bothnewkeys & FLAG_MOVEDOWN) {
+			++selector;
+			sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
+		}
+		if(savedStatus) {
+			if(selector < 0)
+				selector = 2;
+			if(selector > 2)
+				selector = 0;
+		} else
+			selector = 2;
+
+		if(selector > 0 && (bothnewkeys & FLAG_ANYBUTTON)) {
+			sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
+			switch (selector) {
+				case 1:
+					return saveslot;
+					break;
+				case 2:
+					quit = 1;
+					break;
+			}
+		}
+	}
+	bothnewkeys = 0;
+	return -1;
+}
+

@@ -12,5 +12,6 @@ void config_settings(void);
 void movie_options(void);
 int choose_difficulty(void);
 int choose_mode(int *players);
+int load_saved_game(void);
 
 #endif
