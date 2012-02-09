@@ -18602,7 +18602,14 @@ int obstacle_takedamage(entity * other, s_attack * attack) {
 	self->nextthink = time + 1;
 	return 1;
 }
-
+static void setDestIfSource_char(char* dest, char source) {
+	if(source)
+		*dest = source;
+}
+static void setDestIfSource_int(int* dest, int source) {
+	if(source)
+		*dest = source;
+}
 
 entity *smartspawn(s_spawn_entry * props) {	// 7-1-2005 Entire section replaced with lord balls code
 	entity *e = NULL;
@@ -18639,27 +18646,17 @@ entity *smartspawn(s_spawn_entry * props) {	// 7-1-2005 Entire section replaced 
 		e->item = props->itemindex;
 	if(props->itemalias[0])
 		strncpy(e->itemalias, props->itemalias, MAX_NAME_LEN);
-	if(props->itemmap)
-		e->itemmap = props->itemmap;
-	if(props->itemhealth)
-		e->itemhealth = props->itemhealth;
 	e->itemplayer_count = props->itemplayer_count;
-
-	if(props->spawntype)
-		e->spawntype = props->spawntype;	//2011_03_23, Pass spawntype.
-
-	if(props->health[playercount - 1] != 0) {
-		e->health = e->modeldata.health = props->health[playercount - 1];
-	}
-
-	if(props->mp != 0) {
-		e->mp = e->modeldata.mp = props->mp;
-	}
-
-	if(props->score != 0)
-		e->modeldata.score = props->score;	// Overwrite score if exists in the level's. txt file
-	if(props->multiple != 0)
-		e->modeldata.multiple = props->multiple;	// Overwrite multiple if exists in the level's .txt file
+	
+	setDestIfSource_int(&e->itemhealth, props->itemhealth);
+	setDestIfSource_int(&e->health, props->health[playercount - 1]);
+	setDestIfSource_int(&e->mp, props->mp);
+	setDestIfSource_int((int*) &e->modeldata.score, props->score);
+	setDestIfSource_int(&e->modeldata.multiple, props->multiple);
+	setDestIfSource_char(&e->itemtrans, props->itemtrans);
+	setDestIfSource_char(&e->modeldata.alpha, props->alpha);
+	setDestIfSource_char(&e->spawntype, props->spawntype);
+	setDestIfSource_char(&e->itemmap, props->itemmap);
 
 	if(!e->map && props->colourmap) {
 		ent_set_colourmap(e, props->colourmap);
@@ -18667,10 +18664,7 @@ entity *smartspawn(s_spawn_entry * props) {	// 7-1-2005 Entire section replaced 
 
 	if(props->aggression)
 		e->modeldata.aggression = props->aggression;	// Aggression can be changed with spawn points now
-	if(props->itemtrans)
-		e->itemtrans = props->itemtrans;
-	if(props->alpha)
-		e->modeldata.alpha = props->alpha;
+
 
 	// Feb 26, 2005 - Store the original map to be able to restore with dying flash
 	if(props->dying) {

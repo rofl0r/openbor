@@ -1047,33 +1047,43 @@ s_modelcache *model_cache;
 
 
 typedef struct entity {
-	char spawntype:8;	// Type of spawn. 1 = Level spawn. 0 for all else (subject to change).
-	char exists:8;		// flag to determine if it is a valid entity.
-	char reactive:8;	// Used for setting the "a" at which weapons are spawned
-	char ptype:8;
-	char playerindex:8;
-	float stats[20];	// Parameters that do nothing on their own.
-	int health;		// current hp
-	int mp;			// current mp
-	int oldhealth;
-	int oldmp;		//mp's variable for mp for players by tails
-	char name[MAX_NAME_LEN + 1];	// this is display name
+	struct entity *link;	// Used to link 2 entities together.
+	struct entity *owner;	// Added for "hitenemy" flag so projectile recognizes its owner
+	struct entity *grabbing;	// Added for "platform level" layering
+	struct entity *weapent;
+	struct entity *parent;	//Its spawner
+	struct entity *subentity;	//store the sub entity
+	struct entity *opponent;
+	struct entity *lasthit;
+	struct entity *hithead;	// when a player jumps and hits head on the bottom of a platform
+	struct entity *bound;	// ignore trymove method, follow this entity
+	struct entity *landed_on_platform;
+	struct entity *dot_owner[MAX_DOTS];	//Dot owner.
+
+	void (*think) ();
+	void (*takeaction) ();
+	int (*takedamage) (struct entity *, s_attack *);
+	int (*trymove) (float, float);
+	
+	unsigned char *colourmap;
+	
+	ScriptVariant *entvars;
+
 	s_model *defaultmodel;	// this is the default model
 	s_model *model;		// current model
-	s_model modeldata;	// model data copyied here
-	short item:16;		// item model id
-	char itemmap:8;		// Now items spawned can have their properties changed
-	char itemtrans:8;	// alpha effect of item
-	char itemalias[MAX_NAME_LEN + 1];	// Now items spawned can have their properties changed
-	int itemhealth;		// Now items spawned can have their properties changed
-	short itemplayer_count:8;
-	short boss:8;
-	char dying:8;		// Coresponds with which remap is to be used for the dying flash
-	char per1:8;		// Used to store at what health value the entity begins to flash
-	char per2:8;		// Used to store at what health value the entity flashes more rapidly
-	char direction:8;	// 0=left 1=right
-	char nograb:8;		// Some enemies cannot be grabbed (bikes) - now used with cantgrab as well
-	char movestep:8;
+	
+	s_anim *animation;
+
+	
+	float *defense_factors;	//defense factors: damage = damage*(1-def)
+	float *defense_pain;	//Pain factor (like nopain) for defense type.
+	float *defense_knockdown;	//Knockdowncount (like knockdowncount) for attack type.
+	float *defense_blockpower;	//If > unblockable, this attack type is blocked.
+	float *defense_blockthreshold;	//Strongest attack from this attack type that can be blocked.
+	float *defense_blockratio;	//% of damage still taken from this attack type when blocked.
+	float *defense_blocktype;	//0 = HP, 1=MP, 2=both taken when this attack type is blocked.
+	float *offense_factors;	//offense factors: damage = damage*(1+def)
+	
 	float x;		// X
 	float z;		// Depth
 	float a;		// Altitude
@@ -1085,9 +1095,23 @@ typedef struct entity {
 	float jumpz;
 	float jumpx;
 	float jumpv;
-	short jumpid:16;
-	unsigned char combostep[MAX_SPECIAL_INPUTS];	// merge into an array to clear up some code
-
+	float stats[20];	// Parameters that do nothing on their own.
+	float lifespancountdown;	// life span count down
+	float antigravity;	// gravity*(1-antigravity)
+	float knockdowncount;
+	
+	int health;		// current hp
+	int mp;			// current mp
+	int oldhealth;
+	int oldmp;		//mp's variable for mp for players by tails
+	int sortid;		// id for sprite queue sort
+	int itemhealth;		// Now items spawned can have their properties changed
+	int dot[MAX_DOTS];	//Dot mode.
+	int dot_atk[MAX_DOTS];	//Dot attack type.
+	int dot_force[MAX_DOTS];	//Dot amount.
+	int dot_rate[MAX_DOTS];	//Dot delay per tick.
+	int dot_cnt[MAX_DOTS];	//Dot time of next tick.
+	
 	// ---------------------- action times -------------------------------
 	unsigned int lastmove;
 	unsigned int lastdir;
@@ -1101,12 +1125,6 @@ typedef struct entity {
 	unsigned int maptime;	// used by forcemap
 	unsigned int sealtime;	// used by seal (stops special moves).
 	unsigned int dot_time[MAX_DOTS];	//Dot time to expire.
-	int dot[MAX_DOTS];	//Dot mode.
-	int dot_atk[MAX_DOTS];	//Dot attack type.
-	int dot_force[MAX_DOTS];	//Dot amount.
-	int dot_rate[MAX_DOTS];	//Dot delay per tick.
-	int dot_cnt[MAX_DOTS];	//Dot time of next tick.
-	struct entity *dot_owner[MAX_DOTS];	//Dot owner.
 	unsigned int magictime;
 	unsigned int guardtime;
 	unsigned int nextanim;
@@ -1119,89 +1137,88 @@ typedef struct entity {
 	unsigned int invinctime;	// Used to set time for invincibility to expire
 	unsigned int turntime;
 	unsigned int staydown[3];	// [0] = Extra time before next rise. [1] = Extra time before next rise attack. [3] = Stalltime placeholder for riseattack.
-	// -------------------------end of times ------------------------------
-	char update_mark:8;
 
-	//------------------------- a lot of flags ---------------------------
-
-	char seal:8;		//1 = No specials.
-	char dead:8;
-	char jumping:8;		// Stuff useful for AI
-	char idling:8;
-	char drop:8;
-	char attacking:8;
-	char getting:8;
-	char turning:8;
-	char charging:8;
-	char blocking:8;
-	char falling:8;
-	char running:8;		// Flag to determine if a player is running
-	char grabwalking:8;	// a flag for grabwalk check
-	char inpain:8;		// playing pain animation
-	char frozen:8;		// Flag to determine if an entity is frozen
-	char blink:8;
-	char invincible:8;	// Flag used to determine if player is currently invincible
-	char autokill:8;	// Kill on end animation
-	char remove_on_attack:8;
-	char cantfire:8;	// Flag to determine if another shot can be fired that costs energy
-	char tocost:8;		// Flag to determine if special costs life if doesn't hit an enemy
-	char noaicontrol:8;	// pause A.I. control
-	char projectile:8;
-	char toexplode:8;	// Needed to determine if the projectile is a type that will explode (bombs, dynamite, etc)
-	char animating:8;	// Set by animation code
-	char arrowon:8;		// Flag to display parrow/parrow2 or not
-	char pathblocked:8;
-
-	//---------------------   end of flags ----------------------------------------------
-	short animpos:16;
-	short lastanimpos:16;	// Used by AI
-	short animnum:16;	// animation id
-	s_anim *animation;
-	float knockdowncount;
-	char damage_on_landing:8;
-	char damagetype:8;	// used for set death animation or pain animation
-	char map:8;		// Stores the colourmap for restoring purposes
-	void (*think) ();
-	void (*takeaction) ();
-	int (*takedamage) (struct entity *, s_attack *);
-	int (*trymove) (float, float);
-	short attack_id:16;
-	short hit_by_attack_id:16;
-	unsigned char *colourmap;
-	//struct entity   *thrower;
-	struct entity *link;	// Used to link 2 entities together.
-	struct entity *owner;	// Added for "hitenemy" flag so projectile recognizes its owner
-	struct entity *grabbing;	// Added for "platform level" layering
-	struct entity *weapent;
-	struct entity *parent;	//Its spawner
-	struct entity *subentity;	//store the sub entity
-	struct entity *opponent;
-	struct entity *lasthit;
-	struct entity *hithead;	// when a player jumps and hits head on the bottom of a platform
-	struct entity *bound;	// ignore trymove method, follow this entity
-	struct entity *landed_on_platform;
-	short bindoffset[4];	// x, z, a, dir; int is ok
-	short bindanim:16;	// keep the bound entities same animation id
-	char escapecount:8;	// For escapehits
-	unsigned short rush[2];	// rush combo and max combo
-	float lifespancountdown;	// life span count down
-
-	//------------- these factors will be added by basic factors of model-------------
-	float *defense_factors;	//defense factors: damage = damage*(1-def)
-	float *defense_pain;	//Pain factor (like nopain) for defense type.
-	float *defense_knockdown;	//Knockdowncount (like knockdowncount) for attack type.
-	float *defense_blockpower;	//If > unblockable, this attack type is blocked.
-	float *defense_blockthreshold;	//Strongest attack from this attack type that can be blocked.
-	float *defense_blockratio;	//% of damage still taken from this attack type when blocked.
-	float *defense_blocktype;	//0 = HP, 1=MP, 2=both taken when this attack type is blocked.
-	float *offense_factors;	//offense factors: damage = damage*(1+def)
-	float antigravity;	// gravity*(1-antigravity)
-
-	//-------------------A.I. movement factors ----------------------------
-	int sortid;		// id for sprite queue sort
-	ScriptVariant *entvars;
 	s_drawmethod drawmethod;
 	s_scripts scripts;
+	s_model modeldata;	// model data copyied here
+	
+	short itemplayer_count;
+	short boss;
+	short item;		// item model id
+
+	short jumpid;
+	short animpos;
+	short lastanimpos;	// Used by AI
+	short animnum;	// animation id
+	
+	short attack_id;
+	short hit_by_attack_id;
+	//struct entity   *thrower;
+	short bindoffset[4];	// x, z, a, dir; int is ok
+	short bindanim;	// keep the bound entities same animation id
+	
+	unsigned short rush[2];	// rush combo and max combo
+	
+	char escapecount;	// For escapehits
+	char update_mark;
+	char damage_on_landing;
+	char damagetype;	// used for set death animation or pain animation
+	char map;		// Stores the colourmap for restoring purposes
+	
+	
+	char spawntype;	// Type of spawn. 1 = Level spawn. 0 for all else (subject to change).
+	char exists;		// flag to determine if it is a valid entity.
+	char reactive;	// Used for setting the "a" at which weapons are spawned
+	char ptype;
+	char playerindex;
+	
+	char dying;		// Coresponds with which remap is to be used for the dying flash
+	char per1;		// Used to store at what health value the entity begins to flash
+	char per2;		// Used to store at what health value the entity flashes more rapidly
+	char direction;	// 0=left 1=right
+	char nograb;		// Some enemies cannot be grabbed (bikes) - now used with cantgrab as well
+	char movestep;
+	char name[MAX_NAME_LEN + 1];	// this is display name
+	
+	char itemmap;		// Now items spawned can have their properties changed
+	char itemtrans;	// alpha effect of item
+	char itemalias[MAX_NAME_LEN + 1];	// Now items spawned can have their properties changed
+	unsigned char combostep[MAX_SPECIAL_INPUTS];	// merge into an array to clear up some code
+
+	
+	
+	//------------------------- a lot of flags ---------------------------
+	//TODO check if these can be set to 1 bit.
+
+	char seal;		//1 = No specials.
+	char dead;
+	char jumping;		// Stuff useful for AI
+	char idling;
+	char drop;
+	char attacking;
+	char getting;
+	char turning;
+	char charging;
+	char blocking;
+	char falling;
+	char running;		// Flag to determine if a player is running
+	char grabwalking;	// a flag for grabwalk check
+	char inpain;		// playing pain animation
+	char frozen;		// Flag to determine if an entity is frozen
+	char blink;
+	char invincible;	// Flag used to determine if player is currently invincible
+	char autokill;	// Kill on end animation
+	char remove_on_attack;
+	char cantfire;	// Flag to determine if another shot can be fired that costs energy
+	char tocost;		// Flag to determine if special costs life if doesn't hit an enemy
+	char noaicontrol;	// pause A.I. control
+	char projectile;
+	char toexplode;	// Needed to determine if the projectile is a type that will explode (bombs, dynamite, etc)
+	char animating;	// Set by animation code
+	char arrowon;		// Flag to display parrow/parrow2 or not
+	char pathblocked;
+	
+	
 } entity;
 
 
