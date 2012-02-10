@@ -10,8 +10,7 @@ ifndef VERSION_NAME
 VERSION_NAME = OpenBOR
 endif
 
-TARGET 	        = $(VERSION_NAME).exe
-TARGET_FINAL    = $(VERSION_NAME)
+TARGET          = $(VERSION_NAME)
 BUILD_SDL       = 1
 BUILD_GFX       = 1
 BUILD_PTHREAD   = 1
@@ -23,13 +22,6 @@ BUILDING        = 1
 CC              ?= gcc
 INCLUDES        = $(SDKPATH)/include \
                   $(SDKPATH)/include/SDL
-
-ifdef BUILD_DEBUG
-STRIP           = mv $(TARGET) $(TARGET_FINAL)
-else
-STRIP           ?= strip $(TARGET) -o $(TARGET_FINAL)
-endif
-
 
 #----------------------------------------------------------------------------------------------------
 # Directories
@@ -262,12 +254,8 @@ $(TARGET) : $(OBJS) $(RES)
 	@echo Linking $(TARGET_PLATFORM) Port: $(TARGET)...
 	@echo $(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(TARGET_RESOURCE) $(LIBS) 
 	@$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(TARGET_RESOURCE) $(LIBS) 
-$(TARGET_FINAL) : $(TARGET)
-	@echo Stripping $(TARGET_PLATFORM) Port: $(TARGET_FINAL)...
-	@$(STRIP)
-	@echo
 	@echo Completed $(TARGET_PLATFORM) Port!
-	@echo $(TARGET_FINAL) is now ready!
+	@echo $(TARGET) is now ready!
 
 clean-all: clean-releases clean
 
@@ -277,7 +265,7 @@ clean-releases:
 clean:
 	@echo
 	@echo "Removing All $(TARGET_PLATFORM) Files..."
-	@rm -f $(TARGET) $(TARGET_FINAL) $(TARGET_MAP) PARAM.SFO linkmap $(OBJS)
+	@rm -f $(TARGET) $(TARGET_MAP) PARAM.SFO linkmap $(OBJS)
 	@echo Done!
 	@echo
 
