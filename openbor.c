@@ -44,28 +44,8 @@ char bgbuffer_updated = 0;
 s_bitmap *texture = NULL;
 s_videomodes videomodes;
 
-static const s_videomodes videomodes_init_data[] = {
-	[VTM_320_240] = {320, 240, 0, 0, 231, {0, 0, 0, 0}, 0, 0, 0, 1.f, 1.f},
-	[VTM_480_272] = {480, 272, 80, 20, 163, {0, 0, 0, 0,}, 0, 0, 0, 1.5f, 1.13f},
-	[VTM_640_480] = {640, 480, 160, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.f, 2.f},
-	[VTM_720_480] = {720, 480, 200, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.25f, 2.f},
-	[VTM_800_480] = {800, 480, 240, 35, 464, {0, 0, 0, 0}, 0, 0, 0, 2.5f, 2.f},
-	[VTM_800_600] = {800, 600, 240, 44, 580, {0, 0, 0, 0}, 0, 0, 0, 2.5f, 2.5f},
-	[VTM_960_560] = {960, 540, 320, 40, 522, {0, 0, 0, 0}, 0, 0, 0, 3.f, 2.25f}
-};
-
 s_player_min_max_z_bgheight player_min_max_z_bgheight = {
 	160, 232, 160
-};
-
-static const s_player_min_max_z_bgheight player_min_max_z_bgheight_init_data[] = {
-	[VTM_320_240] = {160, 232, 160},
-	[VTM_480_272] = {182, 264, 182},
-	[VTM_640_480] = {321, 465, 321},
-	[VTM_720_480] = {321, 465, 321},
-	[VTM_800_480] = {321, 465, 321},
-	[VTM_800_600] = {401, 582, 401},
-	[VTM_960_560] = {362, 524, 362}
 };
 
 int quit_game = 0;
@@ -82,64 +62,6 @@ List *levelcmdlist = NULL;
 List *levelordercmdlist = NULL;
 List *scriptConstantsCommandList = NULL;
 
-const s_drawmethod plainmethod = {
-	.table = NULL,
-	.fp = NULL,
-	.fillcolor = 0,
-	.scalex = 256,
-	.scaley = 256,
-	.shiftx = 0,
-	.centerx = 0, //currently used only by gfxshadow, do not touch it
-	.centery = 0,
-	.alpha = -1,
-	.remap = -1,
-	.rotate = 0,
-	.flag = 1,
-	.flipx = 0,
-	.flipy = 0,
-	.transbg = 0,
-	.fliprotate = 0,
-};
-
-
-// unknockdown attack
-const s_attack emptyattack = {
-	.attack_force = 0,
-	.hitsound = -1,
-	.hitflash = -1,
-	.blockflash = -1,
-	.blocksound = -1,
-	.counterattack = 0,
-	.attack_coords = {0, 0, 0, 0, 0},
-	.no_pain = 0,
-	.no_flash = 0,
-	.no_block = 0,
-	.grab = 0,
-	.force_direction = 0,
-	.blast = 0,
-	.freeze = 0,
-	.steal = 0,
-	.forcemap = 0,
-	.seal = 0,
-	.freezetime = 0,
-	.maptime = 0,
-	.sealtime = 0,
-	.dot = 0,
-	.dot_index = 0,
-	.dot_time = 0,
-	.dot_force = 0,
-	.dot_rate = 0,
-	.dropv = {0.f, 0.f, 0.f},
-	.otg = 0,
-	.jugglecost = 0,
-	.guardcost = 0,
-	.attack_drop = 0,
-	.attack_type = 0,
-	.damage_on_landing = 0,
-	.grab_distance = 0,
-	.pause_add = 0,
-	.staydown = {0, 0, 0},
-};
 
 char *custBkgrds = NULL;
 char *custLevels = NULL;
@@ -394,77 +316,6 @@ float musicfade[2] = { 0, 0 };
 int musicloop = 0;
 u32 musicoffset = 0;
 
-int mpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int hpcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int ldcolourtable[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-s_barstatus loadingbarstatus = {
-	.offsetx = 0,
-	.offsety = 0,
-	.sizex = 0,
-	.sizey = 10,
-	.type = percentagebar,
-	.orientation = horizontalbar,
-	.noborder = 0,
-	.direction = 0,
-	.barlayer = 0,
-	.backlayer = 0,
-	.borderlayer = 0,
-	.shadowlayer = 0,
-	.colourtable = &ldcolourtable,
-};
-
-s_barstatus lbarstatus =	// Used for customizable lifebar size
-{
-	.offsetx = 0,
-	.offsety = 0,
-	.sizex = 0,
-	.sizey = 0,
-	.type = valuebar,
-	.orientation = horizontalbar,
-	.noborder = 0,
-	.direction = 0,
-	.barlayer = 0,
-	.backlayer = 0,
-	.borderlayer = 0,
-	.shadowlayer = 0,
-	.colourtable = &hpcolourtable,	
-};
-
-s_barstatus olbarstatus =	// Used for customizable opponent lifebar size
-{
-	.offsetx = 0,
-	.offsety = 0,
-	.sizex = 0,
-	.sizey = 0,
-	.type = valuebar,
-	.orientation = horizontalbar,
-	.noborder = 0,
-	.direction = 0,
-	.barlayer = 0,
-	.backlayer = 0,
-	.borderlayer = 0,
-	.shadowlayer = 0,
-	.colourtable = &hpcolourtable,	
-};
-
-s_barstatus mpbarstatus =	// Used for customizable lifebar size
-{
-	.offsetx = 0,
-	.offsety = 0,
-	.sizex = 0,
-	.sizey = 0,
-	.type = valuebar,
-	.orientation = horizontalbar,
-	.noborder = 0,
-	.direction = 0,
-	.barlayer = 0,
-	.backlayer = 0,
-	.borderlayer = 0,
-	.shadowlayer = 0,
-	.colourtable = &mpcolourtable,	
-};
-
 int timeloc[6] = { 0, 0, 0, 0, 0, -1 };	// Used for customizable timeclock location/size
 
 int timeicon = -1;
@@ -562,22 +413,7 @@ s_playercontrols *playercontrolpointers[] = { &playercontrols1, &playercontrols2
 s_savelevel savelevel[MAX_DIFFICULTIES];
 s_savescore savescore;
 s_savedata savedata;
-
-
-//global script
-Script level_script;		//execute when level start
-Script endlevel_script;		//execute when level finished
-Script update_script;		//execute when ingame update
-Script updated_script;		//execute when ingame update finished
-Script key_script_all;		//keyscript for all players
-Script timetick_script;		//time tick script.
-
-//player script
-Script score_script[4];		//execute when add score, 4 players
-Script key_script[4];		//key listeners, lol
-Script join_script[4];		//player join scripts
-Script respawn_script[4];	//player respawn scripts
-Script pdie_script[4];		//player death scripts
+s_game_scripts game_scripts;
 
 extern Script *pcurrentscript;	//used by local script functions
 //-------------------------methods-------------------------------
@@ -959,58 +795,10 @@ int load_script(Script * script, char *file) {
 void init_scripts() {
 	int i;
 	Script_Global_Init();
-	Script_Init(&update_script, "update", 1);
-	Script_Init(&level_script, "level", 1);
-	Script_Init(&endlevel_script, "endlevel", 1);
-	Script_Init(&key_script_all, "keyall", 1);
-	Script_Init(&timetick_script, "timetick", 1);
-	for(i = 0; i < 4; i++)
-		Script_Init(&score_script[i], "score", 1);
-	for(i = 0; i < 4; i++)
-		Script_Init(&key_script[i], "key", 1);
-	for(i = 0; i < 4; i++)
-		Script_Init(&join_script[i], "join", 1);
-	for(i = 0; i < 4; i++)
-		Script_Init(&respawn_script[i], "respawn", 1);
-	for(i = 0; i < 4; i++)
-		Script_Init(&pdie_script[i], "die", 1);
+	for (i = 0; i < script_and_path_and_name_itemcount; i++) {
+		Script_Init(script_and_path_and_name[i].script, script_and_path_and_name[i].name, 1);
+	}
 }
-
-typedef struct {
-	Script* script;
-	char* path;
-} s_script_and_path;
-
-static const s_script_and_path script_and_path[] = {
-	{&update_script, "data/scripts/update.c"},
-	{&updated_script, "data/scripts/updated.c"},
-	{&level_script, "data/scripts/level.c"},
-	{&endlevel_script, "data/scripts/endlevel.c"},
-	{&key_script_all, "data/scripts/keyall.c"},
-	{&timetick_script, "data/scripts/timetick.c"},
-	{&score_script[0], "data/scripts/score1.c"},
-	{&score_script[1], "data/scripts/score2.c"},
-	{&score_script[2], "data/scripts/score3.c"},
-	{&score_script[3], "data/scripts/score4.c"},
-	{&key_script[0], "data/scripts/key1.c"},
-	{&key_script[1], "data/scripts/key2.c"},
-	{&key_script[2], "data/scripts/key3.c"},
-	{&key_script[3], "data/scripts/key4.c"},
-	{&join_script[0], "data/scripts/join1.c"},
-	{&join_script[1], "data/scripts/join2.c"},
-	{&join_script[2], "data/scripts/join3.c"},
-	{&join_script[3], "data/scripts/join4.c"},
-	{&respawn_script[0], "data/scripts/respawn1.c"},
-	{&respawn_script[1], "data/scripts/respawn2.c"},
-	{&respawn_script[2], "data/scripts/respawn3.c"},
-	{&respawn_script[3], "data/scripts/respawn4.c"},
-	{&pdie_script[0], "data/scripts/die1.c"},
-	{&pdie_script[1], "data/scripts/die2.c"},
-	{&pdie_script[2], "data/scripts/die3.c"},
-	{&pdie_script[3], "data/scripts/die4.c"},
-};
-
-#define script_and_path_itemcount ARRAY_SIZE(script_and_path)
 
 // This method is called once when the engine starts, do not use it multiple times
 // It should be calld after load_script_setting
@@ -1019,10 +807,10 @@ void load_scripts() {
 	init_scripts();
 	//Script_Clear's second parameter set to 2, because the script fails to load,
 	//and will never have another chance to be loaded, so just clear the variable list in it
-	for (i = 0; i < script_and_path_itemcount; i++) {
-		if(!load_script(script_and_path[i].script, script_and_path[i].path))
-			Script_Clear(script_and_path[i].script, 2);
-		Script_Compile(script_and_path[i].script);
+	for (i = 0; i < script_and_path_and_name_itemcount; i++) {
+		if(!load_script(script_and_path_and_name[i].script, script_and_path_and_name[i].path))
+			Script_Clear(script_and_path_and_name[i].script, 2);
+		Script_Compile(script_and_path_and_name[i].script);
 	}
 }
 
@@ -1031,8 +819,8 @@ void clear_scripts() {
 	int i;
 	//Script_Clear's second parameter set to 2, because the script fails to load,
 	//and will never have another chance to be loaded, so just clear the variable list in it
-	for(i = 0; i < script_and_path_itemcount; i++) {
-		Script_Clear(script_and_path[i].script, 2);
+	for(i = 0; i < script_and_path_and_name_itemcount; i++) {
+		Script_Clear(script_and_path_and_name[i].script, 2);
 	}
 
 	Script_Global_Clear();
@@ -1544,12 +1332,12 @@ void execute_level_key_script(int player) {
 void execute_key_script_all(int player) {
 	ScriptVariant tempvar;
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&key_script_all)) {
+	if(Script_IsInitialized(&game_scripts.key_script_all)) {
 		ScriptVariant_Init(&tempvar);
 		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
 		tempvar.lVal = (LONG) player;
 		Script_Set_Local_Variant("player", &tempvar);
-		Script_Execute(&key_script_all);
+		Script_Execute(&game_scripts.key_script_all);
 		//clear to save variant space
 		ScriptVariant_Clear(&tempvar);
 		Script_Set_Local_Variant("player", &tempvar);
@@ -1560,14 +1348,14 @@ void execute_key_script_all(int player) {
 void execute_timetick_script(int time, int gotime) {
 	ScriptVariant tempvar;
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&timetick_script)) {
+	if(Script_IsInitialized(&game_scripts.timetick_script)) {
 		ScriptVariant_Init(&tempvar);
 		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
 		tempvar.lVal = (LONG) time;
 		Script_Set_Local_Variant("time", &tempvar);
 		tempvar.lVal = (LONG) gotime;
 		Script_Set_Local_Variant("gotime", &tempvar);
-		Script_Execute(&timetick_script);
+		Script_Execute(&game_scripts.timetick_script);
 		//clear to save variant space
 		ScriptVariant_Clear(&tempvar);
 		Script_Set_Local_Variant("time", &tempvar);
@@ -1578,32 +1366,32 @@ void execute_timetick_script(int time, int gotime) {
 
 void execute_key_script(int index) {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&key_script[index])) {
-		Script_Execute(&key_script[index]);
+	if(Script_IsInitialized(&game_scripts.key_script[index])) {
+		Script_Execute(&game_scripts.key_script[index]);
 	}
 	pcurrentscript = ptempscript;
 }
 
 void execute_join_script(int index) {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&join_script[index])) {
-		Script_Execute(&join_script[index]);
+	if(Script_IsInitialized(&game_scripts.join_script[index])) {
+		Script_Execute(&game_scripts.join_script[index]);
 	}
 	pcurrentscript = ptempscript;
 }
 
 void execute_respawn_script(int index) {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&respawn_script[index])) {
-		Script_Execute(&respawn_script[index]);
+	if(Script_IsInitialized(&game_scripts.respawn_script[index])) {
+		Script_Execute(&game_scripts.respawn_script[index]);
 	}
 	pcurrentscript = ptempscript;
 }
 
 void execute_pdie_script(int index) {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&pdie_script[index])) {
-		Script_Execute(&pdie_script[index]);
+	if(Script_IsInitialized(&game_scripts.pdie_script[index])) {
+		Script_Execute(&game_scripts.pdie_script[index]);
 	}
 	pcurrentscript = ptempscript;
 }
@@ -2414,31 +2202,31 @@ void lifebar_colors() {
 
 
 void init_colourtable() {
-	mpcolourtable[0] = colors.magic2;
-	mpcolourtable[1] = colors.magic;
-	mpcolourtable[2] = colors.magic;
-	mpcolourtable[3] = colors.magic;
-	mpcolourtable[4] = colors.magic2;
-	mpcolourtable[5] = colors.magic;
-	mpcolourtable[6] = colors.magic2;
-	mpcolourtable[7] = colors.magic;
-	mpcolourtable[8] = colors.magic2;
-	mpcolourtable[9] = colors.magic;
-	mpcolourtable[10] = colors.magic2;
+	color_tables.mp[0] = colors.magic2;
+	color_tables.mp[1] = colors.magic;
+	color_tables.mp[2] = colors.magic;
+	color_tables.mp[3] = colors.magic;
+	color_tables.mp[4] = colors.magic2;
+	color_tables.mp[5] = colors.magic;
+	color_tables.mp[6] = colors.magic2;
+	color_tables.mp[7] = colors.magic;
+	color_tables.mp[8] = colors.magic2;
+	color_tables.mp[9] = colors.magic;
+	color_tables.mp[10] = colors.magic2;
 
-	hpcolourtable[0] = colors.purple;
-	hpcolourtable[1] = colors.red;
-	hpcolourtable[2] = colors.yellow;
-	hpcolourtable[3] = colors.green;
-	hpcolourtable[4] = colors.blue;
-	hpcolourtable[5] = colors.orange;
-	hpcolourtable[6] = colors.pink;
-	hpcolourtable[7] = colors.purple;
-	hpcolourtable[8] = colors.black;
-	hpcolourtable[9] = colors.white;
-	hpcolourtable[10] = colors.white;
+	color_tables.hp[0] = colors.purple;
+	color_tables.hp[1] = colors.red;
+	color_tables.hp[2] = colors.yellow;
+	color_tables.hp[3] = colors.green;
+	color_tables.hp[4] = colors.blue;
+	color_tables.hp[5] = colors.orange;
+	color_tables.hp[6] = colors.pink;
+	color_tables.hp[7] = colors.purple;
+	color_tables.hp[8] = colors.black;
+	color_tables.hp[9] = colors.white;
+	color_tables.hp[10] = colors.white;
 
-	memcpy(ldcolourtable, hpcolourtable, 11 * sizeof(int));
+	memcpy(color_tables.ld, color_tables.hp, 11 * sizeof(int));
 }
 
 static void set_color_if_empty(int* color, s_rgb* rgb) {
@@ -4874,7 +4662,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					break;
 				case CMD_MODEL_LIFEBARSTATUS:
 					_readbarstatus(buf + pos, &(newchar->hpbarstatus));
-					newchar->hpbarstatus.colourtable = &hpcolourtable;
+					newchar->hpbarstatus.colourtable = &color_tables.hp;
 					break;
 				case CMD_MODEL_ICONPOSITION:
 					if((value = GET_ARG(1))[0])
@@ -9385,7 +9173,7 @@ void bar(int x, int y, int value, int maxvalue, s_barstatus * pstatus) {
 		return;
 
 	if(!pstatus->colourtable)
-		pstatus->colourtable = &hpcolourtable;
+		pstatus->colourtable = &color_tables.hp;
 
 	spriteq_add_box(x + 1, y + 1, bkw, bkh, HUD_Z + 1 + pstatus->backlayer, (*pstatus->colourtable)[bgindex],
 			alphabg);
@@ -10011,12 +9799,12 @@ void addscore(int playerindex, int add) {
 	player[playerindex].score = s;
 
 	//execute a script then
-	if(Script_IsInitialized(score_script + playerindex)) {
+	if(Script_IsInitialized(game_scripts.score_script + playerindex)) {
 		ScriptVariant_Clear(&var);
 		ScriptVariant_ChangeType(&var, VT_INTEGER);
 		var.lVal = (LONG) add;
 		Script_Set_Local_Variant("score", &var);
-		Script_Execute(score_script + playerindex);
+		Script_Execute(game_scripts.score_script + playerindex);
 		ScriptVariant_Clear(&var);
 		Script_Set_Local_Variant("score", &var);
 	}
@@ -19380,8 +19168,8 @@ void execute_keyscripts() {
 
 void execute_updatescripts() {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&update_script)) {
-		Script_Execute(&(update_script));
+	if(Script_IsInitialized(&game_scripts.update_script)) {
+		Script_Execute(&(game_scripts.update_script));
 	}
 	pcurrentscript = ptempscript;
 	if(level && Script_IsInitialized(&(level->update_script))) {
@@ -19392,8 +19180,8 @@ void execute_updatescripts() {
 
 void execute_updatedscripts() {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&updated_script)) {
-		Script_Execute(&(updated_script));
+	if(Script_IsInitialized(&game_scripts.updated_script)) {
+		Script_Execute(&(game_scripts.updated_script));
 	}
 	pcurrentscript = ptempscript;
 	if(level && Script_IsInitialized(&(level->updated_script))) {
@@ -20319,8 +20107,8 @@ int playlevel(char *filename) {
 	}
 
 	//execute a script when level started
-	if(Script_IsInitialized(&level_script))
-		Script_Execute(&level_script);
+	if(Script_IsInitialized(&game_scripts.level_script))
+		Script_Execute(&game_scripts.level_script);
 	if(Script_IsInitialized(&(level->level_script)))
 		Script_Execute(&(level->level_script));
 
@@ -20330,8 +20118,8 @@ int playlevel(char *filename) {
 			endgame |= (!findent(TYPE_ENEMY) || level->type || findent(TYPE_ENDLEVEL));	// Ends when all enemies die or a bonus level
 	}
 	//execute a script when level finished
-	if(Script_IsInitialized(&endlevel_script))
-		Script_Execute(&endlevel_script);
+	if(Script_IsInitialized(&game_scripts.endlevel_script))
+		Script_Execute(&game_scripts.endlevel_script);
 	if(Script_IsInitialized(&(level->endlevel_script)))
 		Script_Execute(&(level->endlevel_script));
 	fade_out(0, 0);

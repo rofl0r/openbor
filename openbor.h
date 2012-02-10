@@ -827,6 +827,24 @@ typedef struct {
 	Script *ondoattack_script;	//execute when attack passes do_attack checks.
 } s_scripts;
 
+typedef struct {
+	//global script
+	Script level_script;		//execute when level start
+	Script endlevel_script;		//execute when level finished
+	Script update_script;		//execute when ingame update
+	Script updated_script;		//execute when ingame update finished
+	Script key_script_all;		//keyscript for all players
+	Script timetick_script;		//time tick script.
+	//player script
+	Script score_script[4];		//execute when add score, 4 players
+	Script key_script[4];		//key listeners, lol
+	Script join_script[4];		//player join scripts
+	Script respawn_script[4];	//player respawn scripts
+	Script pdie_script[4];		//player death scripts
+} s_game_scripts;
+
+extern s_game_scripts game_scripts;
+
 typedef enum {
 	MF_NONE = 0,
 	MF_ANIMLIST = 1,
