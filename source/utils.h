@@ -34,26 +34,15 @@ extern unsigned long debug_time;
 void writeToLogFile(const char *, ...);
 void writeToScriptLog(const char *msg);
 
-#ifndef DC
 int fileExists(char *fnam);
 int dirExists(char *dname, int create);
 stringptr *readFromLogFile(int which);
-#endif
-
-#if XBOX || DC
-typedef struct {
-	char filename[80];
-} s_filelist;
-s_filelist paklist[20];
-
-int findmods(void);
-#endif
 
 void lc(char *buf, size_t size);
 size_t getNewLineStart(char *buf);
 void debugBuf(unsigned char *buf, size_t size, int columns);
 void debug_printf(char *, ...);
-void getPakName(char name[256], int type);
+void getPakName(char name[256], unsigned int type);
 void screenshot(s_screen * vscreen, unsigned char *pal, int ingame);
 void getBasePath(char *newName, char *name, int type);
 unsigned readlsb32(const unsigned char *src);

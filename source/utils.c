@@ -223,52 +223,34 @@ void debug_printf(char *format, ...) {
 	debug_time = 0xFFFFFFFF;
 }
 
-void getPakName(char name[256], int type) {
+const char* file_exts[] = {
+	".sav",
+	".hi",
+	".scr",
+	".inp",
+	".cfg",
+};
 
-	int i, x, y;
+const int file_exts_itemcount = ARRAY_SIZE(file_exts);
+
+void getPakName(char name[256], unsigned int type) {
+
 	char mod[256] = { "" };
-
-	strncpy(mod, packfile, strlen(packfile) - 4);
-
-	switch (type) {
-		case 0:
-			strncat(mod, ".sav", 4);
-			break;
-		case 1:
-			strncat(mod, ".hi", 3);
-			break;
-		case 2:
-			strncat(mod, ".scr", 4);
-			break;
-		case 3:
-			strncat(mod, ".inp", 4);
-			break;
-		case 4:
-			strncat(mod, ".cfg", 4);
-			break;
-		default:
-			// Loose extension!
-			break;
-	}
-
-	x = 0;
-	for(i = 0; i < (int) strlen(mod); i++) {
-		if((mod[i] == '/') || (mod[i] == '\\'))
-			x = i;
-	}
-	y = 0;
-	for(i = 0; i < (int) strlen(mod); i++) {
-		// For packfiles without '/'
-		if(x == 0) {
-			name[y] = mod[i];
-			y++;
-		}
-		// For packfiles with '/'
-		if(x != 0 && i > x) {
-			name[y] = mod[i];
-			y++;
-		}
-	}
+	const char* ext = "";
+	char* fn;
+	int l;
+	
+	if(type < file_exts_itemcount)
+		ext = file_exts[type];
+	
+	l = strlen(packfile) - 4;
+	memcpy(mod, packfile, l);
+	memcpy(mod + l, ext, strlen(ext));
+	
+	if((fn = strrchr(mod, '/')) || (fn = strrchr(mod, '\\')))
+		strcpy(name, fn + 1);
+	else
+		strcpy(name, mod);
 }
 
 void screenshot(s_screen * vscreen, unsigned char *pal, int ingame) {
