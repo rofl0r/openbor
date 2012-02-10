@@ -12,6 +12,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "debug.h"
+#include "data.h"
 #include "openbor.h"
 #include "commands.h"
 #include "models.h"
@@ -1609,108 +1610,8 @@ void execute_pdie_script(int index) {
 
 // ------------------------ Save/load -----------------------------
 
-void clearsettings() {
-	savedata.compatibleversion = COMPATIBLEVERSION;
-	savedata.gamma = 0;
-	savedata.brightness = 0;
-	savedata.usesound = 1;
-	savedata.soundrate = 44100;
-	savedata.soundbits = 16;
-	savedata.soundvol = 15;
-	savedata.usemusic = 1;
-	savedata.musicvol = 100;
-	savedata.effectvol = 120;
-	savedata.usejoy = 1;
-	savedata.mode = 0;
-	savedata.showtitles = 0;
-	savedata.windowpos = 0;
-	savedata.logo = 0;
-	savedata.uselog = 1;
-	savedata.debuginfo = 0;
-	savedata.fullscreen = 0;
-	savedata.stretch = 0;
-
-#ifdef SDL
-	savedata.usegl = 0;
-	savedata.glscale = 1.0;
-	savedata.glfilter = 0;
-#endif
-
-	savedata.screen[0][0] = 0;
-	savedata.screen[0][1] = 0;
-	savedata.screen[1][0] = 0;
-	savedata.screen[1][1] = 0;
-	savedata.screen[2][0] = 0;
-	savedata.screen[2][1] = 0;
-	savedata.screen[3][0] = 0;
-	savedata.screen[3][1] = 0;
-	savedata.screen[4][0] = 0;
-	savedata.screen[4][1] = 0;
-	savedata.screen[5][0] = 0;
-	savedata.screen[5][1] = 0;
-	savedata.screen[6][0] = 0;
-	savedata.screen[6][1] = 0;
-
-#ifdef PSP
-	savedata.screen[1][0] = 3;
-	savedata.pspcpuspeed = 2;
-	savedata.overscan[0] = 0;
-	savedata.overscan[1] = 0;
-	savedata.overscan[2] = 0;
-	savedata.overscan[3] = 0;
-#endif
-
-	savedata.keys[0][SDID_MOVEUP] = CONTROL_DEFAULT1_UP;
-	savedata.keys[0][SDID_MOVEDOWN] = CONTROL_DEFAULT1_DOWN;
-	savedata.keys[0][SDID_MOVELEFT] = CONTROL_DEFAULT1_LEFT;
-	savedata.keys[0][SDID_MOVERIGHT] = CONTROL_DEFAULT1_RIGHT;
-	savedata.keys[0][SDID_ATTACK] = CONTROL_DEFAULT1_FIRE1;
-	savedata.keys[0][SDID_ATTACK2] = CONTROL_DEFAULT1_FIRE2;
-	savedata.keys[0][SDID_ATTACK3] = CONTROL_DEFAULT1_FIRE3;
-	savedata.keys[0][SDID_ATTACK4] = CONTROL_DEFAULT1_FIRE4;
-	savedata.keys[0][SDID_JUMP] = CONTROL_DEFAULT1_FIRE5;
-	savedata.keys[0][SDID_SPECIAL] = CONTROL_DEFAULT1_FIRE6;
-	savedata.keys[0][SDID_START] = CONTROL_DEFAULT1_START;
-	savedata.keys[0][SDID_SCREENSHOT] = CONTROL_DEFAULT1_SCREENSHOT;
-
-	savedata.keys[1][SDID_MOVEUP] = CONTROL_DEFAULT2_UP;
-	savedata.keys[1][SDID_MOVEDOWN] = CONTROL_DEFAULT2_DOWN;
-	savedata.keys[1][SDID_MOVELEFT] = CONTROL_DEFAULT2_LEFT;
-	savedata.keys[1][SDID_MOVERIGHT] = CONTROL_DEFAULT2_RIGHT;
-	savedata.keys[1][SDID_ATTACK] = CONTROL_DEFAULT2_FIRE1;
-	savedata.keys[1][SDID_ATTACK2] = CONTROL_DEFAULT2_FIRE2;
-	savedata.keys[1][SDID_ATTACK3] = CONTROL_DEFAULT2_FIRE3;
-	savedata.keys[1][SDID_ATTACK4] = CONTROL_DEFAULT2_FIRE4;
-	savedata.keys[1][SDID_JUMP] = CONTROL_DEFAULT2_FIRE5;
-	savedata.keys[1][SDID_SPECIAL] = CONTROL_DEFAULT2_FIRE6;
-	savedata.keys[1][SDID_START] = CONTROL_DEFAULT2_START;
-	savedata.keys[1][SDID_SCREENSHOT] = CONTROL_DEFAULT2_SCREENSHOT;
-
-	savedata.keys[2][SDID_MOVEUP] = CONTROL_DEFAULT3_UP;
-	savedata.keys[2][SDID_MOVEDOWN] = CONTROL_DEFAULT3_DOWN;
-	savedata.keys[2][SDID_MOVELEFT] = CONTROL_DEFAULT3_LEFT;
-	savedata.keys[2][SDID_MOVERIGHT] = CONTROL_DEFAULT3_RIGHT;
-	savedata.keys[2][SDID_ATTACK] = CONTROL_DEFAULT3_FIRE1;
-	savedata.keys[2][SDID_ATTACK2] = CONTROL_DEFAULT3_FIRE2;
-	savedata.keys[2][SDID_ATTACK3] = CONTROL_DEFAULT3_FIRE3;
-	savedata.keys[2][SDID_ATTACK4] = CONTROL_DEFAULT3_FIRE4;
-	savedata.keys[2][SDID_JUMP] = CONTROL_DEFAULT3_FIRE5;
-	savedata.keys[2][SDID_SPECIAL] = CONTROL_DEFAULT3_FIRE6;
-	savedata.keys[2][SDID_START] = CONTROL_DEFAULT3_START;
-	savedata.keys[2][SDID_SCREENSHOT] = CONTROL_DEFAULT3_SCREENSHOT;
-
-	savedata.keys[3][SDID_MOVEUP] = CONTROL_DEFAULT4_UP;
-	savedata.keys[3][SDID_MOVEDOWN] = CONTROL_DEFAULT4_DOWN;
-	savedata.keys[3][SDID_MOVELEFT] = CONTROL_DEFAULT4_LEFT;
-	savedata.keys[3][SDID_MOVERIGHT] = CONTROL_DEFAULT4_RIGHT;
-	savedata.keys[3][SDID_ATTACK] = CONTROL_DEFAULT4_FIRE1;
-	savedata.keys[3][SDID_ATTACK2] = CONTROL_DEFAULT4_FIRE2;
-	savedata.keys[3][SDID_ATTACK3] = CONTROL_DEFAULT4_FIRE3;
-	savedata.keys[3][SDID_ATTACK4] = CONTROL_DEFAULT4_FIRE4;
-	savedata.keys[3][SDID_JUMP] = CONTROL_DEFAULT4_FIRE5;
-	savedata.keys[3][SDID_SPECIAL] = CONTROL_DEFAULT4_FIRE6;
-	savedata.keys[3][SDID_START] = CONTROL_DEFAULT4_START;
-	savedata.keys[3][SDID_SCREENSHOT] = CONTROL_DEFAULT4_SCREENSHOT;
+void clearsettings(void) {
+	savedata = savedata_default;
 }
 
 

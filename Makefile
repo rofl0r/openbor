@@ -139,7 +139,7 @@ endif
 
 
 MAIN            = openborscript.o					                                                \
-                  openbor.o
+                  openbor.o data.o
 
 OBJS            = $(GAME_CONSOLE)                                                                        \
                   $(ADPCM)                                                                          \
