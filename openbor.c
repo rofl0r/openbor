@@ -427,6 +427,8 @@ extern Script *pcurrentscript;	//used by local script functions
 			VERSION
 
 void leave_game(void) {
+	if(strcmp(packfile, MENU_PACK_FILENAME))
+		saveHighScoreFile();
 	shutdown(0, DEFAULT_SHUTDOWN_MESSAGE);
 }
 

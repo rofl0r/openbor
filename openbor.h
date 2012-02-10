@@ -575,6 +575,8 @@ typedef enum {
 //#define     MAX_MOVES             16
 //#define     MAX_MOVE_STEPS        16
 
+#define MENU_PACK_FILENAME "Menu.xxx"
+
 #pragma pack (4)
 
 typedef struct {

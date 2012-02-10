@@ -384,7 +384,7 @@ SDL_Surface *getPreview(char *filename) {
 	freescreen(&scale);
 
 	// ScreenShots within Menu will be saved as "Menu"
-	strncpy(packfile, "Menu.xxx", 128);
+	strncpy(packfile, MENU_PACK_FILENAME, 128);
 
 	return image;
 }
