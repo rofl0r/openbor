@@ -2598,24 +2598,17 @@ int loadsprite(char *filename, int ofsx, int ofsy, int bmpformat) {
 }
 
 void load_special_sprites() {
-	memset(shadowsprites, -1, sizeof(shadowsprites[0]) * 6);
-	golsprite = gosprite = -1;
-	if(testpackfile("data/sprites/shadow1.gif", packfile) >= 0)
-		shadowsprites[0] = loadsprite("data/sprites/shadow1", 9, 3, pixelformat);
-	if(testpackfile("data/sprites/shadow2.gif", packfile) >= 0)
-		shadowsprites[1] = loadsprite("data/sprites/shadow2", 14, 5, pixelformat);
-	if(testpackfile("data/sprites/shadow3.gif", packfile) >= 0)
-		shadowsprites[2] = loadsprite("data/sprites/shadow3", 19, 6, pixelformat);
-	if(testpackfile("data/sprites/shadow4.gif", packfile) >= 0)
-		shadowsprites[3] = loadsprite("data/sprites/shadow4", 24, 8, pixelformat);
-	if(testpackfile("data/sprites/shadow5.gif", packfile) >= 0)
-		shadowsprites[4] = loadsprite("data/sprites/shadow5", 29, 9, pixelformat);
-	if(testpackfile("data/sprites/shadow6.gif", packfile) >= 0)
-		shadowsprites[5] = loadsprite("data/sprites/shadow6", 34, 11, pixelformat);
-	if(testpackfile("data/sprites/arrow.gif", packfile) >= 0)
-		gosprite = loadsprite("data/sprites/arrow", 35, 23, pixelformat);
-	if(testpackfile("data/sprites/arrowl.gif", packfile) >= 0)
-		golsprite = loadsprite("data/sprites/arrowl", 35, 23, pixelformat);
+	unsigned i;
+	for(i = 0; i < special_sprites_init_itemcount; i++) {
+		if(testpackfile(special_sprites_init[i].fn, packfile) >= 0) {
+			*special_sprites_init[i].target = 
+				loadsprite(special_sprites_init[i].fn, 
+					   special_sprites_init[i].ofsx, 
+					   special_sprites_init[i].ofsy,
+					   pixelformat);
+		} else 
+			*special_sprites_init[i].target = -1;
+	}
 	if(timeicon_path[0])
 		timeicon = loadsprite(timeicon_path, 0, 0, pixelformat);
 	if(bgicon_path[0])
@@ -2630,24 +2623,17 @@ void unload_all_fonts() {
 		font_unload(i);
 	}
 }
-
 void load_all_fonts() {
-	if(!font_load(0, "data/sprites/font", packfile, fontmonospace[0]))
-		shutdown(1, "Unable to load font #1!\n");
-	if(!font_load(1, "data/sprites/font2", packfile, fontmonospace[1]))
-		shutdown(1, "Unable to load font #2!\n");
-	if(!font_load(2, "data/sprites/font3", packfile, fontmonospace[2]))
-		shutdown(1, "Unable to load font #3!\n");
-	if(!font_load(3, "data/sprites/font4", packfile, fontmonospace[3]))
-		shutdown(1, "Unable to load font #4!\n");
-	if(testpackfile("data/sprites/font5.gif", packfile) >= 0)
-		font_load(4, "data/sprites/font5", packfile, fontmonospace[4]);
-	if(testpackfile("data/sprites/font6.gif", packfile) >= 0)
-		font_load(5, "data/sprites/font6", packfile, fontmonospace[5]);
-	if(testpackfile("data/sprites/font7.gif", packfile) >= 0)
-		font_load(6, "data/sprites/font7", packfile, fontmonospace[6]);
-	if(testpackfile("data/sprites/font8.gif", packfile) >= 0)
-		font_load(7, "data/sprites/font8", packfile, fontmonospace[7]);
+	unsigned i;
+	for(i = 0; i < font_init_itemcount; i++) {
+		if(font_init[i].obligatory) {
+			if(!font_load(i, font_init[i].path, packfile, fontmonospace[i]))
+				shutdown(1, "Unable to load font #%d!\n", i);
+		} else {
+			if(testpackfile(font_init[i].path, packfile) >= 0)
+				font_load(i, font_init[i].path, packfile, fontmonospace[i]);
+		}
+	}
 }
 
 void load_menu_txt() {

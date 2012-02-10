@@ -74,6 +74,32 @@ s_barstatus mpbarstatus =	// Used for customizable lifebar size
 	.colourtable = &color_tables.mp,
 };
 
+const s_special_sprite special_sprites_init[] = {
+	{&shadowsprites[0], "data/sprites/shadow1.gif", 9, 3},
+	{&shadowsprites[1], "data/sprites/shadow2.gif", 14, 5},
+	{&shadowsprites[2], "data/sprites/shadow3.gif", 19, 6},
+	{&shadowsprites[3], "data/sprites/shadow4.gif", 24, 8},
+	{&shadowsprites[4], "data/sprites/shadow5.gif", 29, 9},
+	{&shadowsprites[5], "data/sprites/shadow6.gif", 34, 11},
+	{&gosprite, "data/sprites/arrow.gif", 35, 23},
+	{&golsprite, "data/sprites/arrowl.gif", 35, 23},
+};
+
+const int special_sprites_init_itemcount = ARRAY_SIZE(special_sprites_init);
+
+const s_font_init font_init[] = {
+	{1, "data/sprites/font.gif"},
+	{1, "data/sprites/font2.gif"},
+	{1, "data/sprites/font3.gif"},
+	{1, "data/sprites/font4.gif"},
+	{0, "data/sprites/font5.gif"},
+	{0, "data/sprites/font6.gif"},
+	{0, "data/sprites/font7.gif"},
+	{0, "data/sprites/font8.gif"},
+};
+
+const int font_init_itemcount = ARRAY_SIZE(font_init);
+
 const s_colors_rgb default_colors = {
 	.black = {0, 0, 0},
 	.red = {255, 0, 0},	// 1% - 25% Full Health
@@ -119,7 +145,6 @@ const s_script_and_path_and_name script_and_path_and_name[] = {
 };
 
 const int script_and_path_and_name_itemcount = ARRAY_SIZE(script_and_path_and_name);
-
 
 const s_videomodes videomodes_init_data[] = {
 	[VTM_320_240] = {320, 240, 0, 0, 231, {0, 0, 0, 0}, 0, 0, 0, 1.f, 1.f},

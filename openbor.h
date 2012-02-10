@@ -1972,5 +1972,8 @@ extern int saveslot;
 extern char set_names[MAX_DIFFICULTIES][MAX_NAME_LEN + 1];
 extern s_player player[4];
 extern u32 borTime;
+extern int shadowsprites[6];
+extern int gosprite;
+extern int golsprite;
 
 #endif

@@ -25,6 +25,24 @@ extern s_barstatus lbarstatus;
 extern s_barstatus olbarstatus;
 extern s_barstatus mpbarstatus;
 
+typedef struct {
+	int* target;
+	char* fn;
+	char ofsx;
+	char ofsy;
+} s_special_sprite;
+
+extern const int special_sprites_init_itemcount;
+extern const s_special_sprite special_sprites_init[];
+
+typedef struct {
+	char obligatory;
+	char* path;
+} s_font_init;
+
+extern const s_font_init font_init[];
+extern const int font_init_itemcount;
+
 extern const s_colors_rgb default_colors;
 
 extern const s_savedata savedata_default;
