@@ -140,7 +140,6 @@ const s_attack emptyattack = {
 	.staydown = {0, 0, 0},
 };
 
-char *custScenes = NULL;
 char *custBkgrds = NULL;
 char *custLevels = NULL;
 char *custModels = NULL;
@@ -318,7 +317,7 @@ int cansave_flag[MAX_DIFFICULTIES];	// 0, no save, 1 save level position 2 save 
 int cameratype = 0;
 
 u32 go_time = 0;
-u32 time = 0;
+u32 borTime = 0;
 u32 newtime = 0;
 unsigned char slowmotion[3] = { 0, 2, 0 };	// [0] = enable/disable; [1] = duration; [2] = counter;
 
@@ -810,7 +809,7 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 				case _e_count_entities: var->lVal = (LONG) ent_count; break;
 				case _e_ent_max: var->lVal = (LONG) ent_max; break;
 				case _e_in_level: var->lVal = (LONG) (level == NULL); break;
-				case _e_elapsed_time: var->lVal = (LONG) time; break;
+				case _e_elapsed_time: var->lVal = (LONG) borTime; break;
 				case _e_in_selectscreen: var->lVal = (LONG) (selectScreen); break;
 				case _e_lasthitc: var->lVal = (LONG) (lasthitc); break;
 				case _e_lasthitt: var->lVal = (LONG) (lasthitt); break;
@@ -903,7 +902,7 @@ int changesyspropertybyindex(int index, ScriptVariant * value) {
 		case _csv_lasthitz: case _csv_lasthitt:
 			if(SUCCEEDED(ScriptVariant_IntegerValue(value, &ltemp))) {
 				switch(index) {
-					case _csv_elapsed_time: time = (int) ltemp; break;
+					case _csv_elapsed_time: borTime = (int) ltemp; break;
 					case _csv_levelpos: level->pos = (int) ltemp; break;
 					case _csv_xpos: advancex = (float) ltemp; break;
 					case _csv_ypos: advancey = (float) ltemp; break;
@@ -8425,7 +8424,7 @@ void unload_level() {
 	endgame = 0;
 	go_time = 0;
 	neon_time = 0;
-	time = 0;
+	borTime = 0;
 	cameratype = 0;
 	light[0] = 128;
 	light[1] = 64;
@@ -9664,7 +9663,7 @@ void predrawstatus() {
 			font_printf(videomodes.shiftpos[i] + plifeN[i][0], savedata.windowpos + plifeN[i][1],
 				    plifeN[i][2], 0, "%i", player[i].lives);
 
-			if(rush[0] && player[i].ent->rush[0] > 1 && time <= player[i].ent->rushtime) {
+			if(rush[0] && player[i].ent->rush[0] > 1 && borTime <= player[i].ent->rushtime) {
 				font_printf(videomodes.shiftpos[i] + prush[i][0], prush[i][1], rush[2], 0, "%s",
 					    rush_names[0]);
 				font_printf(videomodes.shiftpos[i] + prush[i][2], prush[i][3], rush[3], 0, "%i",
@@ -9826,10 +9825,10 @@ void predrawstatus() {
 				player[i].playkeys = 0;
 			}
 		} else if(player[i].credits || credits || (!player[i].hasplayed && noshare)) {
-			if(player[i].credits && (time / (GAME_SPEED * 2)) & 1)
+			if(player[i].credits && (borTime / (GAME_SPEED * 2)) & 1)
 				font_printf(videomodes.shiftpos[i] + pnameJ[i][4], savedata.windowpos + pnameJ[i][5],
 					    pnameJ[i][6], 0, "Credit %i", player[i].credits);
-			else if(credits && (time / (GAME_SPEED * 2)) & 1)
+			else if(credits && (borTime / (GAME_SPEED * 2)) & 1)
 				font_printf(videomodes.shiftpos[i] + pnameJ[i][4], savedata.windowpos + pnameJ[i][5],
 					    pnameJ[i][6], 0, "Credit %i", credits);
 			else if(nojoin)
@@ -9914,8 +9913,8 @@ void predrawstatus() {
 	if(dt < 99)
 		showtimeover = 0;
 
-	if(go_time > time) {
-		dt = (go_time - time) % GAME_SPEED;
+	if(go_time > borTime) {
+		dt = (go_time - borTime) % GAME_SPEED;
 
 		if(dt < GAME_SPEED / 2) {
 			if(level->scrolldir & SCROLL_LEFT) {	//TODO: upward and downward go
@@ -10231,11 +10230,11 @@ void ent_default_init(entity * e) {
 	if(!e)
 		return;
 
-	if((!selectScreen && !time) || e->modeldata.type != TYPE_PLAYER) {
+	if((!selectScreen && !borTime) || e->modeldata.type != TYPE_PLAYER) {
 		if(validanim(e, ANI_SPAWN))
 			ent_set_anim(e, ANI_SPAWN, 0);	// use new playerselect spawn anim
 		//else set_idle(e);
-	} else if(!selectScreen && time && e->modeldata.type == TYPE_PLAYER)	// mid-level respawn
+	} else if(!selectScreen && borTime && e->modeldata.type == TYPE_PLAYER)	// mid-level respawn
 	{
 		if(validanim(e, ANI_RESPAWN))
 			ent_set_anim(e, ANI_RESPAWN, 0);
@@ -10267,18 +10266,18 @@ void ent_default_init(entity * e) {
 			if(validanim(e, ANI_SPAWN) || validanim(e, ANI_RESPAWN)) {
 				e->takeaction = common_spawn;
 			} else if(!e->animation) {
-				if(time && level->spawn[(int) e->playerindex][2] > e->a) {
+				if(borTime && level->spawn[(int) e->playerindex][2] > e->a) {
 					e->a = (float) level->spawn[(int) e->playerindex][2];
 					if(validanim(e, ANI_JUMP))
 						ent_set_anim(e, ANI_JUMP, 0);
 					e->takeaction = common_drop;
 				}
 			}
-			if(time && e->modeldata.makeinv) {
+			if(borTime && e->modeldata.makeinv) {
 				// Spawn invincible code
 				e->invincible = 1;
 				e->blink = (e->modeldata.makeinv > 0);
-				e->invinctime = time + ABS(e->modeldata.makeinv);
+				e->invinctime = borTime + ABS(e->modeldata.makeinv);
 				e->arrowon = 1;	// Display the image above the player
 			}
 			break;
@@ -10537,7 +10536,7 @@ void update_frame(entity * ent, int f) {
 			}
 		}
 
-		self->nextanim = time + iDelay;
+		self->nextanim = borTime + iDelay;
 		execute_animation_script(self);
 	}
 
@@ -10694,7 +10693,7 @@ void ent_set_anim(entity * ent, int aninum, int resetable) {
 		return;
 
 	if(aninum != ANI_SLEEP)
-		ent->sleeptime = time + ent->modeldata.sleepwait;
+		ent->sleeptime = borTime + ent->modeldata.sleepwait;
 	ent->animation = ani;
 	ent->animnum = aninum;	// Stored for nocost usage
 	ent->animation->animhits = 0;
@@ -10765,13 +10764,13 @@ void ent_set_model(entity * ent, char *modelname) {
 	ent->modeldata = *m;
 	ent_copy_uninit(ent, &oldmodel);
 	ent_set_colourmap(ent, ent->map);
-	if((!selectScreen && !time) || ent->modeldata.type != TYPE_PLAYER) {
+	if((!selectScreen && !borTime) || ent->modeldata.type != TYPE_PLAYER) {
 		// use new playerselect spawn anim
 		if(validanim(ent, ANI_SPAWN))
 			ent_set_anim(ent, ANI_SPAWN, 0);
 		else
 			ent_set_anim(ent, ANI_IDLE, 0);
-	} else if(!selectScreen && time && ent->modeldata.type == TYPE_PLAYER) {
+	} else if(!selectScreen && borTime && ent->modeldata.type == TYPE_PLAYER) {
 		// mid-level respawn
 		if(validanim(ent, ANI_RESPAWN))
 			ent_set_anim(ent, ANI_RESPAWN, 0);
@@ -10853,7 +10852,7 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 
 			if(ent_count > ent_max)
 				ent_max = ent_count;
-			e->timestamp = time;	// log time so update function will ignore it if it is new
+			e->timestamp = borTime;	// log time so update function will ignore it if it is new
 
 			e->health = e->modeldata.health;
 			e->mp = e->modeldata.mp;
@@ -10862,7 +10861,7 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 			e->z = z;
 			e->a = a;
 			e->direction = direction;
-			e->nextthink = time + 1;
+			e->nextthink = borTime + 1;
 			e->lifespancountdown = model->lifespan;	// new life span countdown
 			if((e->modeldata.type & (TYPE_PLAYER | TYPE_SHOT)) && level && (level->nohit || savedata.mode))
 				e->modeldata.hostile &= ~TYPE_PLAYER;
@@ -11019,7 +11018,7 @@ void kill_all() {
 	}
 	textbox = smartbomber = NULL;
 	ent_max = ent_count = 0;
-	time = 0;
+	borTime = 0;
 }
 
 
@@ -11426,10 +11425,17 @@ void do_attack(entity * e) {
 		// if #0
 		if(ent_list[i]->exists && !ent_list[i]->dead &&	// dont hit the dead
 		   (ent_list[i]->invincible != 1 || attack->attack_type == ATK_ITEM) &&	// so invincible people can get items
-		   !(current_anim->attackone > 0 && e->lasthit && ent_list[i] != e->lasthit) && (ent_list[i]->modeldata.type & them) && (ent_list[i]->pain_time < time || e->animation->fastattack) && ent_list[i]->takedamage && ent_list[i]->hit_by_attack_id != current_attack_id && ((ent_list[i]->takeaction != common_lie && attack->otg < 2) || (attack->otg >= 1 && ent_list[i]->takeaction == common_lie)) &&	//over the ground hit
-		   ((ent_list[i]->falling == 0 && attack->jugglecost >= 0) || (ent_list[i]->falling == 1 && attack->jugglecost <= ent_list[i]->modeldata.jugglepoints[0])) &&	// juggle system
-		   (checkhit(e, ent_list[i], 0) ||	// normal check bbox
-		    (attack->counterattack && checkhit(e, ent_list[i], 1))))	// check counter, e.g. upper
+		   !(current_anim->attackone > 0 && e->lasthit && ent_list[i] != e->lasthit) && (ent_list[i]->modeldata.type & them) && 
+		    (ent_list[i]->pain_time < borTime || e->animation->fastattack) && 
+		     ent_list[i]->takedamage && 
+		     ent_list[i]->hit_by_attack_id != current_attack_id &&
+		     (
+			     (ent_list[i]->takeaction != common_lie && attack->otg < 2) ||
+			     (attack->otg >= 1 && ent_list[i]->takeaction == common_lie)
+		     ) &&	//over the ground hit
+		     ((ent_list[i]->falling == 0 && attack->jugglecost >= 0) || (ent_list[i]->falling == 1 && attack->jugglecost <= ent_list[i]->modeldata.jugglepoints[0])) &&	// juggle system
+		     (checkhit(e, ent_list[i], 0) ||	// normal check bbox
+		     (attack->counterattack && checkhit(e, ent_list[i], 1))))	// check counter, e.g. upper
 		{
 			temp = self;
 			self = ent_list[i];
@@ -11625,7 +11631,7 @@ void do_attack(entity * e) {
 						if(flash)
 							execute_onspawn_script(flash);
 					}
-					topowner->combotime = time + (GAME_SPEED / 2);	// well, add to its owner's combo
+					topowner->combotime = borTime + (GAME_SPEED / 2);	// well, add to its owner's combo
 
 					if(e->animpos != e->lastanimpos || (inair(e) && !equalairpause))	// if equalairpause is set, inair(e) is nolonger a condition for extra pausetime
 					{	// Adds pause to the current animation
@@ -11752,7 +11758,7 @@ void do_attack(entity * e) {
 		}
 
 		if(!didblock) {
-			topowner->rushtime = time + (GAME_SPEED * rush[1]);
+			topowner->rushtime = borTime + (GAME_SPEED * rush[1]);
 			topowner->rush[0]++;
 			if(topowner->rush[0] > topowner->rush[1] && topowner->rush[0] > 1)
 				topowner->rush[1] = topowner->rush[0];
@@ -11795,7 +11801,7 @@ void check_gravity() {
 
 	if(!is_frozen(self))	// Incase an entity is in the air, don't update animations
 	{
-		if((self->falling || self->tossv || self->a != self->base) && self->toss_time <= time
+		if((self->falling || self->tossv || self->a != self->base) && self->toss_time <= borTime
 		   && !self->animation->dive[0] && !self->animation->dive[1]) {
 			if(self->modeldata.subject_to_platform > 0 && self->tossv > 0)
 				other = check_platform_above(self->x, self->z, self->a + self->tossv);
@@ -11900,7 +11906,7 @@ void check_gravity() {
 				// in case landing, set hithead to NULL
 				self->hithead = NULL;
 			}	// end of if - land checking
-			self->toss_time = time + (GAME_SPEED / 100);
+			self->toss_time = borTime + (GAME_SPEED / 100);
 		}		// end of if  - in-air checking
 
 	}			//end of if
@@ -11970,7 +11976,7 @@ void check_link_move(float xdir, float zdir) {
 void check_ai() {
 	entity *plat;
 	// check moving platform
-	if((plat = self->landed_on_platform) && (plat->xdir || plat->zdir) && (plat->nextthink <= time || (plat->update_mark & 2)) &&	// plat is updated before self or will be updated this loop
+	if((plat = self->landed_on_platform) && (plat->xdir || plat->zdir) && (plat->nextthink <= borTime || (plat->update_mark & 2)) &&	// plat is updated before self or will be updated this loop
 	   testplatform(plat, self->x, self->z) && self->a <= plat->a + plat->animation->platform[plat->animpos][7] + 0.5)	// on the platform?
 	{
 		// passive move with the platform
@@ -11986,7 +11992,7 @@ void check_ai() {
 		}
 	}
 
-	if(self->nextthink <= time && !endgame) {
+	if(self->nextthink <= borTime && !endgame) {
 		self->update_mark |= 2;	//mark it
 		// take actions
 		if(self->takeaction)
@@ -11994,8 +12000,8 @@ void check_ai() {
 
 		// A.I. think
 		if(self->think) {
-			if(self->nextthink <= time)
-				self->nextthink = time + THINK_SPEED;
+			if(self->nextthink <= borTime)
+				self->nextthink = borTime + THINK_SPEED;
 			// use noaicontrol flag to turn of A.I. think
 			if(!self->noaicontrol)
 				self->think();
@@ -12063,7 +12069,7 @@ void update_animation() {
 		}
 	}
 
-	if(self->invincible && time >= self->invinctime)	// Invincible time has run out, turn off
+	if(self->invincible && borTime >= self->invinctime)	// Invincible time has run out, turn off
 	{
 		self->invincible = 0;
 		self->blink = 0;
@@ -12074,7 +12080,7 @@ void update_animation() {
 	if(self->dying)		// Code for doing dying flash
 	{
 		if((self->health <= self->per1 && self->health > self->per2
-		    && (time % (GAME_SPEED / 10)) < (GAME_SPEED / 40)) || (self->health <= self->per2)) {
+		    && (borTime % (GAME_SPEED / 10)) < (GAME_SPEED / 40)) || (self->health <= self->per2)) {
 			if(self->colourmap == self->modeldata.colourmap[self->dying - 1] || self->health <= 0) {
 				ent_set_colourmap(self, self->map);
 			} else {
@@ -12083,20 +12089,20 @@ void update_animation() {
 		}
 	}
 
-	if(self->freezetime && time >= self->freezetime) {
+	if(self->freezetime && borTime >= self->freezetime) {
 		unfrozen(self);
 	}
 
-	if(self->maptime && time >= self->maptime) {
+	if(self->maptime && borTime >= self->maptime) {
 		ent_set_colourmap(self, self->map);
 	}
 
-	if(self->sealtime && time >= self->sealtime)	//Remove seal, special moves are available again.
+	if(self->sealtime && borTime >= self->sealtime)	//Remove seal, special moves are available again.
 	{
 		self->seal = 0;
 	}
 
-	if(self->nextanim == time || (self->modeldata.type == TYPE_TEXTBOX && self->modeldata.subtype != SUBTYPE_NOSKIP && (bothnewkeys & (FLAG_JUMP | FLAG_ATTACK | FLAG_ATTACK2 | FLAG_ATTACK3 | FLAG_ATTACK4 | FLAG_SPECIAL))))	// Textbox will autoupdate if a valid player presses an action button
+	if(self->nextanim == borTime || (self->modeldata.type == TYPE_TEXTBOX && self->modeldata.subtype != SUBTYPE_NOSKIP && (bothnewkeys & (FLAG_JUMP | FLAG_ATTACK | FLAG_ATTACK2 | FLAG_ATTACK3 | FLAG_ATTACK4 | FLAG_SPECIAL))))	// Textbox will autoupdate if a valid player presses an action button
 	{			// Now you can display text and cycle through with any jump/attack/special unless SUBTYPE_NOSKIP
 
 		f = self->animpos + self->animating;
@@ -12141,7 +12147,7 @@ void update_animation() {
 		}
 
 		if(self->animating) {
-			//self->nextanim = time + (self->animation->delay[f]);
+			//self->nextanim = borTime + (self->animation->delay[f]);
 			self->update_mark |= 1;	// frame updated, mark it
 			// just switch frame to f, if frozen, expand_time will deal with it well
 			update_frame(self, f);
@@ -12211,7 +12217,7 @@ void update_animation() {
 	if(other && other != self) {
 		// a bit complex, other->nextanim == time means other is behind self and not been updated,
 		// update_mark & 1 means other is updated in this loop and before self
-		if((other->nextanim == time || (other->update_mark & 1))
+		if((other->nextanim == borTime || (other->update_mark & 1))
 		   && self->a <= other->a + other->animation->platform[other->animpos][7] + 0.5) {
 			if(other->update_mark & 1)
 				f = other->animpos;
@@ -12223,7 +12229,7 @@ void update_animation() {
 				else
 					f = 0;
 			}
-			//printf("%d %d %d\n", other->nextanim, time, other->update_mark);
+			//printf("%d %d %d\n", other->nextanim, borTime, other->update_mark);
 			move = (float) (other->animation->move ? other->animation->move[f] : 0);
 			movez = (float) (other->animation->movez ? other->animation->movez[f] : 0);
 			if(other->direction == 0)
@@ -12262,7 +12268,7 @@ void check_attack() {
 
 void update_health() {
 	//12/30/2008: Guardrate by OX. Guardpoints increase over time.
-	if(self->modeldata.guardpoints[1] > 0 && time >= self->guardtime)	// If this is > 0 then guardpoints are set..
+	if(self->modeldata.guardpoints[1] > 0 && borTime >= self->guardtime)	// If this is > 0 then guardpoints are set..
 	{
 		if(self->blocking) {
 			self->modeldata.guardpoints[0] += (self->modeldata.guardrate / 2);
@@ -12273,7 +12279,7 @@ void update_health() {
 			if(self->modeldata.guardpoints[0] > self->modeldata.guardpoints[1])
 				self->modeldata.guardpoints[0] = self->modeldata.guardpoints[1];
 		}
-		self->guardtime = time + GAME_SPEED;	//Reset guardtime.
+		self->guardtime = borTime + GAME_SPEED;	//Reset guardtime.
 	}
 
 	common_dot();		//Damage over time.
@@ -12282,7 +12288,7 @@ void update_health() {
 	// Cleaning and addition of mpstable by DC, 08172008.
 	// stabletype 4 added by OX 12272008
 	if(magic_type == 0 && !self->charging) {
-		if(time >= self->magictime) {
+		if(borTime >= self->magictime) {
 
 			// 1 Only recover MP > mpstableval.
 			// 2 No recover. Drop MP if MP < mpstableval.
@@ -12321,12 +12327,12 @@ void update_health() {
 				default:
 					self->mp += self->modeldata.mprate;
 			}
-			self->magictime = time + GAME_SPEED;	//Reset magictime.
+			self->magictime = borTime + GAME_SPEED;	//Reset magictime.
 		}
 	}
-	if(self->charging && time >= self->mpchargetime) {
+	if(self->charging && borTime >= self->mpchargetime) {
 		self->mp += self->modeldata.chargerate;
-		self->mpchargetime = time + (GAME_SPEED / 4);
+		self->mpchargetime = borTime + (GAME_SPEED / 4);
 	}
 	if(self->mp > self->modeldata.mp)
 		self->mp = self->modeldata.mp;	// Don't want to add more than the max
@@ -12369,7 +12375,7 @@ void common_dot() {
 
 		if(iDot_time)	//Dot time present?
 		{
-			if(time > iDot_time)	//Dot effect expired? Then clear variants.
+			if(borTime > iDot_time)	//Dot effect expired? Then clear variants.
 			{
 				self->dot[iIndex] = 0;
 				self->dot_atk[iIndex] = 0;
@@ -12377,9 +12383,9 @@ void common_dot() {
 				self->dot_rate[iIndex] = 0;
 				self->dot_time[iIndex] = 0;
 				self->dot_force[iIndex] = 0;
-			} else if(time >= iDot_cnt && self->health >= 0)	//Time for a dot tick and alive?
+			} else if(borTime >= iDot_cnt && self->health >= 0)	//Time for a dot tick and alive?
 			{
-				self->dot_cnt[iIndex] = time + (iDot_rate * GAME_SPEED / 100);	//Reset next tick time.
+				self->dot_cnt[iIndex] = borTime + (iDot_rate * GAME_SPEED / 100);	//Reset next tick time.
 
 				iDot = self->dot[iIndex];	//Get dot mode.
 				iForce = self->dot_force[iIndex];	//Get dot force.
@@ -12528,7 +12534,7 @@ void arrange_ents() {
 void update_ents() {
 	int i;
 	for(i = 0; i < ent_max; i++) {
-		if(ent_list[i]->exists && time != ent_list[i]->timestamp)	// dont update fresh entity
+		if(ent_list[i]->exists && borTime != ent_list[i]->timestamp)	// dont update fresh entity
 		{
 			self = ent_list[i];
 			self->update_mark = 0;
@@ -12584,7 +12590,7 @@ void display_ents() {
 				drawenemystatus(e);
 
 			}
-			if(freezeall || !(e->blink && (time % (GAME_SPEED / 10)) < (GAME_SPEED / 20))) {	// If special is being executed, display all entities regardless
+			if(freezeall || !(e->blink && (borTime % (GAME_SPEED / 10)) < (GAME_SPEED / 20))) {	// If special is being executed, display all entities regardless
 				f = e->animation->sprite[e->animpos];
 
 				other = check_platform(e->x, e->z);
@@ -12845,7 +12851,7 @@ void display_ents() {
 void toss(entity * ent, float lift) {
 	if(!lift)
 		return;		//zero?
-	ent->toss_time = time + 1;
+	ent->toss_time = borTime + 1;
 	ent->tossv = lift;
 	ent->a += 0.5;		// Get some altitude (needed for checks)
 }
@@ -13266,7 +13272,7 @@ int melee_attack() {
 // chose next attack in atchain, if succeeded, return 1, otherwise return 0.
 int perform_atchain() {
 	int pickanim = 0;
-	if(self->combotime > time)
+	if(self->combotime > borTime)
 		self->combostep[0]++;
 	else
 		self->combostep[0] = 1;
@@ -13332,7 +13338,7 @@ void normal_prepare() {
 		return;
 	}
 	// Wait...
-	if(time < self->stalltime)
+	if(borTime < self->stalltime)
 		return;
 	// let go the projectile, well
 	if(self->weapent && self->weapent->modeldata.subtype == SUBTYPE_PROJECTILE &&
@@ -13527,8 +13533,8 @@ void common_fall() {
 
 	// Pause a bit...
 	self->takeaction = common_lie;
-	self->stalltime = self->staydown[0] + (time + GAME_SPEED - self->modeldata.risetime[0]);	//Set rise delay.
-	self->staydown[2] = self->staydown[1] + (time - self->modeldata.risetime[1]);	//Set rise attack delay.
+	self->stalltime = self->staydown[0] + (borTime + GAME_SPEED - self->modeldata.risetime[0]);	//Set rise delay.
+	self->staydown[2] = self->staydown[1] + (borTime - self->modeldata.risetime[1]);	//Set rise attack delay.
 	self->staydown[0] = 0;	//Reset staydown.
 	self->staydown[1] = 0;	//Reset staydown atk.
 }
@@ -13562,7 +13568,7 @@ void common_lie() {
 		if(!self->modeldata.nodieblink || (self->modeldata.nodieblink == 1 && !self->animating)) {	// Now have the option to blink or not
 			self->takeaction = (self->modeldata.type == TYPE_PLAYER) ? player_blink : suicide;
 			self->blink = 1;
-			self->stalltime = self->nextthink = time + GAME_SPEED * 2;
+			self->stalltime = self->nextthink = borTime + GAME_SPEED * 2;
 		} else if(self->modeldata.nodieblink == 2 && !self->animating) {
 			self->takeaction = (self->modeldata.type == TYPE_PLAYER) ? player_die : suicide;
 
@@ -13592,7 +13598,7 @@ void common_lie() {
 		return;
 	}
 
-	if(time < self->stalltime || self->a != self->base || self->tossv)
+	if(borTime < self->stalltime || self->a != self->base || self->tossv)
 		return;
 
 	//self->takeaction = common_rise;
@@ -13613,7 +13619,7 @@ void common_rise() {
 	set_idle(self);
 	if(self->modeldata.riseinv) {
 		self->blink = self->modeldata.riseinv > 0;
-		self->invinctime = time + ABS(self->modeldata.riseinv);
+		self->invinctime = borTime + ABS(self->modeldata.riseinv);
 		self->invincible = 1;
 	}
 	self->takeaction = NULL;
@@ -13715,7 +13721,7 @@ void common_grab_check() {
 
 	rnum = rand32() & 31;
 
-	if(time > self->releasetime) {
+	if(borTime > self->releasetime) {
 		if(rnum < 12) {
 			// Release
 			ent_unlink(self);
@@ -13723,7 +13729,7 @@ void common_grab_check() {
 			self->takeaction = NULL;
 			return;
 		} else
-			self->releasetime = time + (GAME_SPEED / 2);
+			self->releasetime = borTime + (GAME_SPEED / 2);
 	}
 
 	if(validanim(self, ANI_THROW) && rnum < 7) {
@@ -13962,7 +13968,7 @@ void checkdamageeffects(s_attack * attack) {
 	if(_freeze && !self->frozen && !self->owner && !self->modeldata.nomove) {	// New freeze attack - If not frozen, freeze entity unless it's a projectile
 		self->frozen = 1;
 		if(self->freezetime == 0)
-			self->freezetime = time + _freezetime;
+			self->freezetime = borTime + _freezetime;
 		if(_remap == -1 && self->modeldata.fmap != -1)
 			self->colourmap = self->modeldata.colourmap[self->modeldata.fmap - 1];	//12/14/2007 Damon Caskey: If opponents fmap = -1 or only stun, then don't change the color map.
 		self->drop = 0;
@@ -13972,13 +13978,13 @@ void checkdamageeffects(s_attack * attack) {
 	}
 
 	if(_remap > 0 && !_freeze) {
-		self->maptime = time + _maptime;
+		self->maptime = borTime + _maptime;
 		self->colourmap = self->modeldata.colourmap[_remap - 1];
 	}
 
 	if(_seal)		//Sealed: Disable special moves.
 	{
-		self->sealtime = time + _sealtime;	//Set time to apply seal. No specials for you!
+		self->sealtime = borTime + _sealtime;	//Set time to apply seal. No specials for you!
 		self->seal = _seal;	//Set seal. Any animation with energycost > seal is disabled.
 	}
 
@@ -13986,7 +13992,7 @@ void checkdamageeffects(s_attack * attack) {
 	{
 		self->dot_owner[_dot_index] = self->opponent;	//dot owner.
 		self->dot[_dot_index] = _dot;	//Mode: 1. HP (non lethal), 2. MP, 3. HP (non lethal) & MP, 4. HP, 5. HP & MP.
-		self->dot_time[_dot_index] = time + (_dot_time * GAME_SPEED / 100);	//Gametime dot will expire.
+		self->dot_time[_dot_index] = borTime + (_dot_time * GAME_SPEED / 100);	//Gametime dot will expire.
 		self->dot_force[_dot_index] = _dot_force;	//How much to dot each tick.
 		self->dot_rate[_dot_index] = _dot_rate;	//Delay between dot ticks.
 		self->dot_atk[_dot_index] = attack->attack_type;	//dot attack type.
@@ -14035,11 +14041,11 @@ void checkdamagedrop(s_attack * attack) {
 	if(self->drop || attack->no_pain)
 		return;		// just in case, if we already fall, dont check fall again
 	// reset count if knockdowntime expired.
-	if(self->knockdowntime && self->knockdowntime < time)
+	if(self->knockdowntime && self->knockdowntime < borTime)
 		self->knockdowncount = self->modeldata.knockdowncount;
 
 	self->knockdowncount -= (attackdrop * fdefense_knockdown);
-	self->knockdowntime = time + GAME_SPEED;
+	self->knockdowntime = borTime + GAME_SPEED;
 	self->drop = (self->knockdowncount < 0);	// knockdowncount < 0 means knocked down
 }
 
@@ -14139,7 +14145,7 @@ int common_takedamage(entity * other, s_attack * attack) {
 		return 0;	// try to grab but failed, so return 0 means attack missed
 
 	// set pain_time so it wont get hit too often
-	self->pain_time = time + (GAME_SPEED / 5);
+	self->pain_time = borTime + (GAME_SPEED / 5);
 	// set oppoent
 	if(self != other)
 		set_opponent(self, other);
@@ -14227,8 +14233,8 @@ int common_takedamage(entity * other, s_attack * attack) {
 			control_rumble(self->playerindex, attack->attack_force * 3);
 	} else if(attack->grab && !attack->no_pain) {
 		set_pain(self, self->damagetype, 0);
-		other->stalltime = time + GRAB_STALL;
-		self->releasetime = time + (GAME_SPEED / 2);
+		other->stalltime = borTime + GRAB_STALL;
+		self->releasetime = borTime + (GAME_SPEED / 2);
 		self->takeaction = common_pain;
 		other->takeaction = common_grabattack;
 	}
@@ -14355,11 +14361,11 @@ int common_try_normalattack(entity * target) {
 		self->idling = 0;	// not really idle, in fact it is thinking
 		self->attacking = -1;	// pre-attack, for AI-block check
 		self->takeaction = normal_prepare;
-		if(self->combostep[0] && self->combotime > time)
-			self->stalltime = time + 1;
+		if(self->combostep[0] && self->combotime > borTime)
+			self->stalltime = borTime + 1;
 		else
 			self->stalltime =
-			    time + (GAME_SPEED / 4) + (rand32() % (GAME_SPEED / 10) - self->modeldata.aggression);
+			    borTime + (GAME_SPEED / 4) + (rand32() % (GAME_SPEED / 10) - self->modeldata.aggression);
 		return 1;
 	}
 
@@ -14764,8 +14770,8 @@ int common_trymove(float xdir, float zdir) {
 			memset(self->combostep, 0, 5 * sizeof(int));
 			other->takeaction = common_grabbed;
 			self->takeaction = common_grab;
-			other->stalltime = time + GRAB_STALL;
-			self->releasetime = time + (GAME_SPEED / 2);
+			other->stalltime = borTime + GRAB_STALL;
+			self->releasetime = borTime + (GAME_SPEED / 2);
 		}
 		// use original throw code if throwframewait not present, kbandressen 10/20/06
 		else if(self->modeldata.throwframewait == -1)
@@ -14811,7 +14817,7 @@ void common_runoff() {
 
 	adjust_walk_animation(target);
 
-	if(time > self->stalltime)
+	if(borTime > self->stalltime)
 		self->takeaction = NULL;	// OK, back to A.I. root
 }
 
@@ -14878,7 +14884,7 @@ void common_attack_finish() {
 		self->takeaction = NULL;
 	}
 
-	self->stalltime = time + GAME_SPEED - self->modeldata.aggression;
+	self->stalltime = borTime + GAME_SPEED - self->modeldata.aggression;
 }
 
 
@@ -15078,12 +15084,12 @@ int common_try_pick(entity * other) {
 }
 
 void checkpathblocked() {
-	if(self->stalltime >= time) {
+	if(self->stalltime >= borTime) {
 		if(self->pathblocked > 10) {
 			self->xdir = self->zdir = 0;
 			set_idle(self);
 			self->pathblocked = 0;
-			self->stalltime = time + GAME_SPEED / 4;
+			self->stalltime = borTime + GAME_SPEED / 4;
 		}
 	}
 }
@@ -15446,7 +15452,7 @@ void common_pickupitem(entity * other) {
 		// else if, TODO: other effects
 		// kill that item
 		other->takeaction = suicide;
-		other->nextthink = time + GAME_SPEED * 3;
+		other->nextthink = borTime + GAME_SPEED * 3;
 		pickup = 1;
 	}
 	// hide it
@@ -15494,7 +15500,7 @@ int normal_move() {
 	checkpathblocked();
 
 	// judge next move if stalltime is expired
-	if(self->stalltime < time) {
+	if(self->stalltime < borTime) {
 		if(other) {
 			// try walking to the item
 			common_try_pick(other);
@@ -15512,7 +15518,7 @@ int normal_move() {
 		}
 		//end of if
 
-		self->stalltime = time + GAME_SPEED - self->modeldata.aggression;
+		self->stalltime = borTime + GAME_SPEED - self->modeldata.aggression;
 	}
 	//pick up the item if possible
 	if((other && other == find_ent_here(self, self->x, self->z, TYPE_ITEM)) && other->animation->vulnerable[other->animpos])	//won't pickup an item that is not previous one
@@ -15563,7 +15569,7 @@ int avoid_move() {
 	checkpathblocked();
 
 	// judge next move if stalltime is expired
-	if(self->stalltime < time) {
+	if(self->stalltime < borTime) {
 		if(target != NULL && (other == NULL ||
 				      (other && diff(self->x, other->x) + diff(self->z, other->z) >
 				       diff(self->x, target->x) + diff(self->z, target->z)))) {
@@ -15581,7 +15587,7 @@ int avoid_move() {
 		}
 		//end of if
 
-		self->stalltime = time + GAME_SPEED - self->modeldata.aggression;
+		self->stalltime = borTime + GAME_SPEED - self->modeldata.aggression;
 	}
 	//pick up the item if possible
 	if((other && other == find_ent_here(self, self->x, self->z, TYPE_ITEM)) && other->animation->vulnerable[other->animpos])	//won't pickup an item that is not previous one
@@ -15632,7 +15638,7 @@ int chase_move() {
 	checkpathblocked();
 
 	// judge next move if stalltime is expired
-	if(self->stalltime < time) {
+	if(self->stalltime < borTime) {
 		if(target != NULL && (other == NULL ||
 				      (other && diff(self->x, other->x) + diff(self->z, other->z) >
 				       diff(self->x, target->x) + diff(self->z, target->z)))) {
@@ -15650,7 +15656,7 @@ int chase_move() {
 		}
 		//end of if
 
-		self->stalltime = time + GAME_SPEED - self->modeldata.aggression;
+		self->stalltime = borTime + GAME_SPEED - self->modeldata.aggression;
 	}
 
 	//pick up the item if possible
@@ -15697,7 +15703,7 @@ int wander_move() {
 	checkpathblocked();
 
 	// judge next move if stalltime is expired
-	if(self->stalltime < time) {
+	if(self->stalltime < borTime) {
 		if(other) {
 			// try walking to the item
 			common_try_pick(other);
@@ -15716,7 +15722,7 @@ int wander_move() {
 			self->takeaction = common_turn;
 			return 1;
 		}
-		self->stalltime = time + GAME_SPEED - self->modeldata.aggression;
+		self->stalltime = borTime + GAME_SPEED - self->modeldata.aggression;
 	}
 	//pick up the item if possible
 	if((other && other == find_ent_here(self, self->x, self->z, TYPE_ITEM)) && other->animation->vulnerable[other->animpos])	//won't pickup an item that is not previous one
@@ -15745,7 +15751,7 @@ int biker_move() {
 						 randf((float) 0.6)) : (-((float) 1.7 + randf((float) 0.6)));
 	}
 
-	self->nextthink = time + THINK_SPEED / 2;
+	self->nextthink = borTime + THINK_SPEED / 2;
 	return 1;
 }
 
@@ -15844,9 +15850,9 @@ int arrow_move() {
 	}
 	if(self->ptype) {
 		self->autokill = 1;
-		self->nextthink = time + 1;
+		self->nextthink = borTime + 1;
 	} else
-		self->nextthink = time + THINK_SPEED / 2;
+		self->nextthink = borTime + THINK_SPEED / 2;
 	return 1;
 }
 
@@ -15860,7 +15866,7 @@ int bomb_move() {
 		self->xdir = self->modeldata.speed;
 	/*} */
 
-	self->nextthink = time + THINK_SPEED / 2;
+	self->nextthink = borTime + THINK_SPEED / 2;
 
 	if(inair(self) && self->toexplode == 1)
 		return 1;
@@ -15920,7 +15926,7 @@ int star_move() {
 		self->takeaction = common_lie;
 	}
 
-	self->nextthink = time + THINK_SPEED / 2;
+	self->nextthink = borTime + THINK_SPEED / 2;
 	return 1;
 }
 
@@ -15974,13 +15980,13 @@ void common_think() {
 	}
 	// rise? try rise attack
 	if(self->drop && self->a == self->base && !self->tossv && validanim(self, ANI_RISEATTACK)
-	   && ((rand32() % (self->stalltime - time + 1)) < 3) && (self->health > 0 && time > self->staydown[2])) {
+	   && ((rand32() % (self->stalltime - borTime + 1)) < 3) && (self->health > 0 && borTime > self->staydown[2])) {
 		common_try_riseattack();
 		return;
 	}
 	// Escape?
 	if(self->link && !self->grabbing && !self->inpain && self->takeaction != common_prethrow &&
-	   time >= self->stalltime && validanim(self, ANI_SPECIAL)) {
+	   borTime >= self->stalltime && validanim(self, ANI_SPECIAL)) {
 		check_special();
 		return;
 	}
@@ -16015,7 +16021,7 @@ void common_think() {
 //////////////////////////////////////////////////////////////////////////
 
 void suicide() {
-	if(time < self->stalltime)
+	if(borTime < self->stalltime)
 		return;
 	level_completed |= self->boss;
 	kill(self);
@@ -16215,7 +16221,7 @@ void runanimal() {
 
 void player_blink() {
 	self->blink = 1;
-	if(time >= self->stalltime)
+	if(borTime >= self->stalltime)
 		player_die();
 }
 
@@ -16381,7 +16387,7 @@ int check_combo(int m) {	// New function to check combos to make sure they are v
 		}
 	}			// end of for
 
-	if(time > self->movetime)
+	if(borTime > self->movetime)
 		return 0;	// Too much time passed so return 0
 
 	if(m == FLAG_FORWARD || m == FLAG_BACKWARD || m == FLAG_MOVEUP || m == FLAG_MOVEDOWN) {	// direction keys
@@ -16483,7 +16489,7 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.makeinv) {	// Mar 2, 2005 - New item makes player invincible
 		self->invincible = 1;
-		self->invinctime = time + ABS(other->modeldata.makeinv);
+		self->invinctime = borTime + ABS(other->modeldata.makeinv);
 		self->blink = (other->modeldata.makeinv > 0);
 		sound_play_sample(samples.get2, 0, savedata.effectvol, savedata.effectvol, 100);
 	} else if(other->modeldata.smartbomb) {	// Damages everything on the screen
@@ -16527,7 +16533,7 @@ void didfind_item(entity * other) {	// Function that takes care of items when pi
 	if(other->modeldata.subtype != SUBTYPE_WEAPON && other->modeldata.subtype != SUBTYPE_PROJECTILE) {
 		other->takeaction = suicide;
 		if(!other->modeldata.instantitemdeath)
-			other->nextthink = time + GAME_SPEED * 3;
+			other->nextthink = borTime + GAME_SPEED * 3;
 	}
 	other->z = 100000;
 }
@@ -16663,7 +16669,7 @@ void player_grab_check() {
 				update_frame(other, other->animation->numframes - 1);
 				other->x = self->x + (((self->direction * 2) - 1) * self->modeldata.grabdistance);
 			}
-		} else if(!validanim(self, ANI_GRABWALK) && time > self->releasetime) {
+		} else if(!validanim(self, ANI_GRABWALK) && borTime > self->releasetime) {
 			// Release
 			ent_unlink(self);
 			set_idle(self);
@@ -16671,7 +16677,7 @@ void player_grab_check() {
 			return;
 		}
 	} else
-		self->releasetime = time + (GAME_SPEED / 2);
+		self->releasetime = borTime + (GAME_SPEED / 2);
 
 	if((player[(int) self->playerindex].playkeys & FLAG_ATTACK) &&
 	   (self->direction ?
@@ -16816,7 +16822,7 @@ void player_grab_check() {
 	player_preinput();
 
 	if(self->attacking)
-		self->releasetime = time + (GAME_SPEED / 2);	// reset releasetime when do attacks
+		self->releasetime = borTime + (GAME_SPEED / 2);	// reset releasetime when do attacks
 }
 
 
@@ -16978,7 +16984,7 @@ void player_pain_check() {
 void player_lie_check() {
 	if(validanim(self, ANI_RISEATTACK) &&
 	   (player[(int) self->playerindex].playkeys & FLAG_ATTACK) &&
-	   (player[(int) self->playerindex].keys & FLAG_MOVEUP) && (self->health > 0 && time > self->staydown[2])) {
+	   (player[(int) self->playerindex].keys & FLAG_MOVEUP) && (self->health > 0 && borTime > self->staydown[2])) {
 		player[(int) self->playerindex].playkeys -= FLAG_ATTACK;
 		if((player[(int) self->playerindex].keys & FLAG_MOVELEFT)) {
 			self->direction = 0;
@@ -17048,7 +17054,7 @@ void player_preinput() {
 				
 				self->lastmove = check_flags2[i];
 			}
-			self->movetime = time + (GAME_SPEED / 4);
+			self->movetime = borTime + (GAME_SPEED / 4);
 			return;
 			
 		}
@@ -17100,7 +17106,7 @@ void player_think() {
 		}
 	}
 
-	if(time > player[(int) self->playerindex].ent->rushtime) {
+	if(borTime > player[(int) self->playerindex].ent->rushtime) {
 		player[(int) self->playerindex].ent->rush[0] = 0;
 		player[(int) self->playerindex].ent->rushtime = 0;
 	}
@@ -17160,14 +17166,14 @@ void player_think() {
 	if(player[(int) self->playerindex].playkeys & FLAG_MOVEUP) {
 		player[(int) self->playerindex].playkeys -= FLAG_MOVEUP;
 		self->lastdir = 0;
-		if(time < self->movetime && self->lastmove == FLAG_MOVEUP && validanim(self, ANI_ATTACKUP) && notinair) {	// New u u combo attack
+		if(borTime < self->movetime && self->lastmove == FLAG_MOVEUP && validanim(self, ANI_ATTACKUP) && notinair) {	// New u u combo attack
 			set_attacking(self);
 			self->combostep[0] = 0;
 			self->xdir = self->zdir = 0;
 			ent_set_anim(self, ANI_ATTACKUP, 0);
 			self->takeaction = common_attack_proc;
 			return;
-		} else if(time < self->movetime && self->lastmove == FLAG_MOVEUP && validanim(self, ANI_DODGE) && notinair) {	// New dodge move like on SOR3
+		} else if(borTime < self->movetime && self->lastmove == FLAG_MOVEUP && validanim(self, ANI_DODGE) && notinair) {	// New dodge move like on SOR3
 			self->combostep[0] = 0;
 			self->idling = 0;
 			self->zdir = (float) -0.1;
@@ -17180,20 +17186,20 @@ void player_think() {
 			self->movestep = 0;
 
 		self->lastmove = FLAG_MOVEUP;
-		self->movetime = time + (GAME_SPEED / 4);
+		self->movetime = borTime + (GAME_SPEED / 4);
 	}
 
 	if(player[(int) self->playerindex].playkeys & FLAG_MOVEDOWN) {
 		player[(int) self->playerindex].playkeys -= FLAG_MOVEDOWN;
 		self->lastdir = 0;
-		if(self->lastmove == FLAG_MOVEDOWN && validanim(self, ANI_ATTACKDOWN) && time < self->movetime && notinair) {	// New d d combo attack
+		if(self->lastmove == FLAG_MOVEDOWN && validanim(self, ANI_ATTACKDOWN) && borTime < self->movetime && notinair) {	// New d d combo attack
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
 			self->combostep[0] = 0;
 			ent_set_anim(self, ANI_ATTACKDOWN, 0);
 			self->takeaction = common_attack_proc;
 			return;
-		} else if(time < self->movetime && self->lastmove == FLAG_MOVEDOWN && validanim(self, ANI_DODGE) && notinair) {	// New dodge move like on SOR3
+		} else if(borTime < self->movetime && self->lastmove == FLAG_MOVEDOWN && validanim(self, ANI_DODGE) && notinair) {	// New dodge move like on SOR3
 			self->combostep[0] = 0;
 			self->idling = 0;
 			self->zdir = (float) 0.1;	//used for checking
@@ -17206,17 +17212,17 @@ void player_think() {
 			self->movestep = 0;
 
 		self->lastmove = FLAG_MOVEDOWN;
-		self->movetime = time + (GAME_SPEED / 4);
+		self->movetime = borTime + (GAME_SPEED / 4);
 	}
 	// Left/right movement for combos is more complicated because forward/backward is relative to the direction the player is facing
 	// Checks on current direction have to be made before and after executing the combo to make sure they get the right one
 	if((player[(int) self->playerindex].playkeys & FLAG_MOVELEFT)) {
 		player[(int) self->playerindex].playkeys -= FLAG_MOVELEFT;
-		if(validanim(self, ANI_RUN) && !self->direction && time < self->movetime
+		if(validanim(self, ANI_RUN) && !self->direction && borTime < self->movetime
 		   && self->lastdir == FLAG_MOVELEFT)
 			self->running = 1;	// Player begins to run
 
-		else if(validanim(self, ANI_ATTACKFORWARD) && !self->direction && time < self->movetime
+		else if(validanim(self, ANI_ATTACKFORWARD) && !self->direction && borTime < self->movetime
 			&& self->lastdir == FLAG_MOVELEFT) {
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
@@ -17237,16 +17243,16 @@ void player_think() {
 			self->lastmove = FLAG_FORWARD;
 		self->lastdir = FLAG_MOVELEFT;
 
-		self->movetime = time + (GAME_SPEED / 4);
+		self->movetime = borTime + (GAME_SPEED / 4);
 	}
 
 	if((player[(int) self->playerindex].playkeys & FLAG_MOVERIGHT)) {
 		player[(int) self->playerindex].playkeys -= FLAG_MOVERIGHT;
-		if(validanim(self, ANI_RUN) && self->direction && time < self->movetime
+		if(validanim(self, ANI_RUN) && self->direction && borTime < self->movetime
 		   && self->lastdir == FLAG_MOVERIGHT)
 			self->running = 1;	// Player begins to run
 
-		else if(validanim(self, ANI_ATTACKFORWARD) && self->direction && time < self->movetime
+		else if(validanim(self, ANI_ATTACKFORWARD) && self->direction && borTime < self->movetime
 			&& self->lastdir == FLAG_MOVERIGHT) {
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
@@ -17267,7 +17273,7 @@ void player_think() {
 			self->lastmove = FLAG_FORWARD;
 		self->lastdir = FLAG_MOVERIGHT;
 
-		self->movetime = time + (GAME_SPEED / 4);
+		self->movetime = borTime + (GAME_SPEED / 4);
 	}
 
 	if(!ajspecial && (player[(int) self->playerindex].playkeys & FLAG_JUMP) && validanim(self, ANI_ATTACKBOTH)) {
@@ -17333,13 +17339,13 @@ void player_think() {
 	if((player[(int) self->playerindex].releasekeys & FLAG_ATTACK)) {
 		if(self->stalltime && notinair &&
 		   ((validanim(self, ANI_CHARGEATTACK)
-		     && self->stalltime + (GAME_SPEED * self->modeldata.animation[ANI_CHARGEATTACK]->chargetime) < time)
+		     && self->stalltime + (GAME_SPEED * self->modeldata.animation[ANI_CHARGEATTACK]->chargetime) < borTime)
 		    || (!validanim(self, ANI_CHARGEATTACK)
 			&& self->stalltime +
 			(GAME_SPEED *
 			 self->modeldata.
 			 animation[animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1]]->
-			 chargetime) < time))) {
+			 chargetime) < borTime))) {
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
 			self->combostep[0] = 0;
@@ -17391,7 +17397,7 @@ void player_think() {
 			return;
 		}
 
-		if(validanim(self, ANI_ATTACKBACKWARD) && time < self->movetime - (GAME_SPEED / 10) && !self->movestep && self->lastmove == FLAG_BACKWARD)	// New back attacks
+		if(validanim(self, ANI_ATTACKBACKWARD) && borTime < self->movetime - (GAME_SPEED / 10) && !self->movestep && self->lastmove == FLAG_BACKWARD)	// New back attacks
 		{
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
@@ -17424,7 +17430,7 @@ void player_think() {
 			}
 		}
 		// Use stalltime to charge end-move
-		self->stalltime = time;
+		self->stalltime = borTime;
 		self->xdir = self->zdir = 0;
 
 		if(!validanim(self, ANI_ATTACK1) && validanim(self, ANI_JUMP)) {
@@ -17582,8 +17588,8 @@ void player_think() {
 		if(self->direction) {
 			self->running = 0;	// Quits running if player changes direction
 			if(self->modeldata.turndelay && !self->turntime)
-				self->turntime = time + self->modeldata.turndelay;
-			else if(self->turntime && time >= self->turntime) {
+				self->turntime = borTime + self->modeldata.turndelay;
+			else if(self->turntime && borTime >= self->turntime) {
 				self->turntime = 0;
 				if(validanim(self, ANI_TURN)) {
 					set_turning(self);
@@ -17615,8 +17621,8 @@ void player_think() {
 		if(!self->direction) {
 			self->running = 0;	// Quits running if player changes direction
 			if(self->modeldata.turndelay && !self->turntime)
-				self->turntime = time + self->modeldata.turndelay;
-			else if(self->turntime && time >= self->turntime) {
+				self->turntime = borTime + self->modeldata.turndelay;
+			else if(self->turntime && borTime >= self->turntime) {
 				self->turntime = 0;
 				if(validanim(self, ANI_TURN)) {
 					set_turning(self);
@@ -17721,7 +17727,7 @@ int common_idle_anim(entity * ent) {
 	{
 		ent_set_anim(ent, ANI_FAINT, 0);	//Set ANI_FAINT.
 		return 1;	//Return 1 and exit.
-	} else if(validanim(ent, ANI_SLEEP) && (time >= ent->sleeptime) && ent->animating)	//ANI_SLEEP, sleeptime up and currently animating?
+	} else if(validanim(ent, ANI_SLEEP) && (borTime >= ent->sleeptime) && ent->animating)	//ANI_SLEEP, sleeptime up and currently animating?
 	{
 		ent_set_anim(ent, ANI_SLEEP, 0);	//Set sleep anim.
 		return 1;	//Return 1 and exit.
@@ -17935,7 +17941,7 @@ void dropweapon(int flag) {
 					self->weapent->modeldata.type = TYPE_NONE;
 					self->weapent->think = runanimal;
 				}
-				self->weapent->nextthink = time + 1;
+				self->weapent->nextthink = borTime + 1;
 			}
 		}
 		self->weapent = NULL;
@@ -18132,7 +18138,7 @@ entity *knife_spawn(char *name, int index, float x, float z, float a, int direct
 	e->attacking = 1;
 	//e->direction = direction;
 	e->think = common_think;
-	e->nextthink = time + 1;
+	e->nextthink = borTime + 1;
 	e->trymove = NULL;
 	e->takedamage = arrow_takedamage;
 	e->takeaction = NULL;
@@ -18204,7 +18210,7 @@ entity *bomb_spawn(char *name, int index, float x, float z, float a, int directi
 	//e->direction = direction;
 	toss(e, e->modeldata.jumpheight);
 	e->think = common_think;
-	e->nextthink = time + 1;
+	e->nextthink = borTime + 1;
 	e->trymove = NULL;
 	e->takeaction = NULL;
 	e->modeldata.aimove = AIMOVE1_BOMB;
@@ -18258,7 +18264,7 @@ int star_spawn(float x, float z, float a, int direction) {	// added entity to kn
 		e->nograb = 1;	// Prevents trying to grab a projectile
 		e->xdir = fd / 2 * (float) i;
 		e->think = common_think;
-		e->nextthink = time + 1;
+		e->nextthink = borTime + 1;
 		e->trymove = NULL;
 		e->takeaction = NULL;
 		e->modeldata.aimove = AIMOVE1_STAR;
@@ -18302,7 +18308,7 @@ void trap_think() {
 	}
 
 	self->attacking = 1;
-	self->nextthink = time + 1;
+	self->nextthink = borTime + 1;
 }
 
 //    7-1-2005  trap end
@@ -18332,7 +18338,7 @@ void steamer_think() {
 	}
 
 	steam_spawn(self->x, self->z, self->a);
-	self->nextthink = time + (GAME_SPEED / 10) + (rand32() & 31);
+	self->nextthink = borTime + (GAME_SPEED / 10) + (rand32() & 31);
 }
 
 
@@ -18384,7 +18390,7 @@ void bike_crash() {
 		self->xdir = 2;
 	else
 		self->xdir = -2;
-	self->nextthink = time + THINK_SPEED / 2;
+	self->nextthink = borTime + THINK_SPEED / 2;
 	for(i = 0; i < maxplayers[current_set]; i++)
 		control_rumble(i, 100);
 	//if(self->x < advancex-100 || self->x > advancex+(videomodes.hRes+100)) kill(self);
@@ -18417,7 +18423,7 @@ int biker_takedamage(entity * other, s_attack * attack) {
 	if(!self->modeldata.offscreenkill)
 		self->modeldata.offscreenkill = 100;
 	self->think = bike_crash;
-	self->nextthink = time + THINK_SPEED;
+	self->nextthink = borTime + THINK_SPEED;
 	// well, this is the real entity, the driver who take the damage
 	if((driver = drop_driver(self))) {
 		driver->a = self->a;
@@ -18456,7 +18462,7 @@ void obstacle_fly()		// Now obstacles can fly when hit like on Simpsons/TMNT
 	if(self->x > advancex + (videomodes.hRes + 200) || self->x < advancex - 200)
 		kill(self);
 
-	self->nextthink = time + 2;
+	self->nextthink = borTime + 2;
 }
 
 
@@ -18467,7 +18473,7 @@ int obstacle_takedamage(entity * other, s_attack * attack) {
 		return 0;
 	}
 
-	self->pain_time = time + (GAME_SPEED / 5);
+	self->pain_time = borTime + (GAME_SPEED / 5);
 	set_opponent(other, self);
 	if(self->opponent && self->opponent->modeldata.type == TYPE_PLAYER) {
 		control_rumble(self->opponent->playerindex, 75);
@@ -18506,7 +18512,7 @@ int obstacle_takedamage(entity * other, s_attack * attack) {
 		}
 	}
 
-	self->nextthink = time + 1;
+	self->nextthink = borTime + 1;
 	return 1;
 }
 static void setDestIfSource_char(char* dest, char source) {
@@ -18751,11 +18757,11 @@ void update_scroller() {
 
 	scrolldx = scrolldy = 0;
 
-	if(time < level->advancetime || freezeall)
+	if(borTime < level->advancetime || freezeall)
 		return;		// Added freezeall so backgrounds/scrolling don't update if animations are frozen
 
 	//level->advancetime = time + (GAME_SPEED/100);    // Changed so scrolling speeds up for faster players
-	level->advancetime = time - ((player[0].ent && (player[0].ent->modeldata.speed >= 12 || player[0].ent->modeldata.runspeed >= 12)) || (player[1].ent && (player[1].ent->modeldata.speed >= 12 || player[1].ent->modeldata.runspeed >= 12)) || (player[2].ent && (player[2].ent->modeldata.speed >= 12 || player[2].ent->modeldata.runspeed >= 12)) || (player[3].ent && (player[3].ent->modeldata.speed >= 12 || player[3].ent->modeldata.runspeed >= 12)));	// Changed so if your player is faster the backgrounds scroll faster
+	level->advancetime = borTime - ((player[0].ent && (player[0].ent->modeldata.speed >= 12 || player[0].ent->modeldata.runspeed >= 12)) || (player[1].ent && (player[1].ent->modeldata.speed >= 12 || player[1].ent->modeldata.runspeed >= 12)) || (player[2].ent && (player[2].ent->modeldata.speed >= 12 || player[2].ent->modeldata.runspeed >= 12)) || (player[3].ent && (player[3].ent->modeldata.speed >= 12 || player[3].ent->modeldata.runspeed >= 12)));	// Changed so if your player is faster the backgrounds scroll faster
 
 	if(level_completed)
 		return;
@@ -18792,7 +18798,7 @@ void update_scroller() {
 				  level->spawnpoints[current_spawn].scrollmaxz) {
 				scrollminz = (float) level->spawnpoints[current_spawn].scrollminz;
 				scrollmaxz = (float) level->spawnpoints[current_spawn].scrollmaxz;
-				if(!time)
+				if(!borTime)
 					advancey = scrollminz;	// reset y if spawn at very beginning
 			} else if(level->spawnpoints[current_spawn].blockade) {
 				// assume level spawn entry will not roll back, so just change it to 0 here
@@ -18834,7 +18840,7 @@ void update_scroller() {
 			level->waiting = 0;
 			if(level->noreset <= 1)
 				timeleft = level->settime * COUNTER_SPEED;	// Feb 24, 2005 - This line moved here to set custom time
-			go_time = time + 3 * GAME_SPEED;
+			go_time = borTime + 3 * GAME_SPEED;
 		}
 	}
 	if(numplay == 0)
@@ -19085,11 +19091,11 @@ void applybglayers(s_screen * pbgscreen) {
 	s_drawmethod screenmethod;
 
 	if(!textbox)
-		bgtravelled += (((time - traveltime) * level->bgspeed / 30 * 4) + ((level->rocking) ? ((time - traveltime) / (GAME_SPEED / 30)) : 0));	// no like in real life, maybe
+		bgtravelled += (((borTime - traveltime) * level->bgspeed / 30 * 4) + ((level->rocking) ? ((borTime - traveltime) / (GAME_SPEED / 30)) : 0));	// no like in real life, maybe
 	else
-		texttime += time - traveltime;
+		texttime += borTime - traveltime;
 
-	timevar = time - texttime;
+	timevar = borTime - texttime;
 
 	for(index = 0; index < level->numbglayers; index++) {
 		bglayer = level->bglayers + index;
@@ -19153,7 +19159,7 @@ void applybglayers(s_screen * pbgscreen) {
 		}
 	}
 
-	traveltime = time;
+	traveltime = borTime;
 }
 
 void applyfglayers(s_screen * pbgscreen) {
@@ -19281,12 +19287,12 @@ void draw_scrolled_bg() {
 	if(texture) {
 		inta = (int) (advancex / 2);
 		if(level->rocking) {
-			inta += (time / (GAME_SPEED / 30));
+			inta += (borTime / (GAME_SPEED / 30));
 			apply_texture_plane(pbgscreen, 0, background->height, vscreen->width,
 					    BGHEIGHT - background->height, inta * 256, 10, texture, pscreenmethod);
 		} else
 			apply_texture_wave(pbgscreen, 0, background->height, vscreen->width,
-					   BGHEIGHT - background->height, inta, 0, texture, time, 5, pscreenmethod);
+					   BGHEIGHT - background->height, inta, 0, texture, borTime, 5, pscreenmethod);
 	}
 
 	pscreenmethod->alpha = 0;
@@ -19299,14 +19305,14 @@ void draw_scrolled_bg() {
 	bgbuffer_updated = 1;
 
 	if(level->rocking) {
-		rockpos = (time / (GAME_SPEED / 8)) & 31;
+		rockpos = (borTime / (GAME_SPEED / 8)) & 31;
 		if(level->rocking == 1)
 			gfx_y_offset = level->quake - 4 - rockoffssine[rockpos];
 		else if(level->rocking == 2)
 			gfx_y_offset = level->quake - 4 - rockoffsshake[rockpos];
 		else if(level->rocking == 3)
 			gfx_y_offset = level->quake - 4 - rockoffsrumble[rockpos];
-	} else if(time) {
+	} else if(borTime) {
 		if(level->quake >= 0)
 			gfx_y_offset = level->quake - 4;
 		else
@@ -19318,7 +19324,7 @@ void draw_scrolled_bg() {
 
 	// Draw 3 layers: screen, normal and neon
 	if(panels_loaded && panel_width) {
-		if(time >= neon_time && !freezeall) {	// Added freezeall so neon lights don't update if animations are frozen
+		if(borTime >= neon_time && !freezeall) {	// Added freezeall so neon lights don't update if animations are frozen
 			if(pixelformat == PIXEL_8)	// under 8bit mode just cycle the palette from 128 to 135
 			{
 				for(i = 0; i < 8; i++)
@@ -19335,7 +19341,7 @@ void draw_scrolled_bg() {
 					memcpy(neontable + (128 + 6) * pb, neonp, 2 * pb);
 				}
 			}
-			neon_time = time + (GAME_SPEED / 3);
+			neon_time = borTime + (GAME_SPEED / 3);
 			neon_count += 2;
 		}
 
@@ -19394,9 +19400,9 @@ void draw_scrolled_bg() {
 		}
 	}
 
-	if(level->quake != 0 && time >= level->quaketime) {
+	if(level->quake != 0 && borTime >= level->quaketime) {
 		level->quake /= 2;
-		level->quaketime = time + (GAME_SPEED / 25);
+		level->quaketime = borTime + (GAME_SPEED / 25);
 	}
 }
 
@@ -19501,7 +19507,7 @@ void draw_textobjs() {
 	for(i = 0; i < LEVEL_MAX_TEXTOBJS; i++) {
 		textobj = level->textobjs + i;
 
-		if(textobj->t && textobj->t <= time)	//If a time was set and passed, remove the text object.
+		if(textobj->t && textobj->t <= borTime)	//If a time was set and passed, remove the text object.
 		{
 			level->textobjs[i].t = 0;
 			level->textobjs[i].x = 0;
@@ -19531,9 +19537,9 @@ void update(int ingame, int usevwait) {
 
 		if((level_completed && !level->noslow && !tospeedup) || slowmotion[0]) {
 			if(slowmotion[1] == slowmotion[2])
-				newtime = time + interval;
+				newtime = borTime + interval;
 		} else
-			newtime = time + interval;
+			newtime = borTime + interval;
 
 		slowmotion[2]++;
 		if(slowmotion[2] == (slowmotion[1] + 1)) {
@@ -19541,10 +19547,10 @@ void update(int ingame, int usevwait) {
 			if(slowmotion[0] > 1)
 				slowmotion[1] = slowmotion[0];
 		}
-		if(newtime > time + 100)
-			newtime = time + 100;
+		if(newtime > borTime + 100)
+			newtime = borTime + 100;
 
-		while(time < newtime) {
+		while(borTime < newtime) {
 			if(ingame == 1) {
 				update_scroller();
 				if(!freezeall) {
@@ -19568,7 +19574,7 @@ void update(int ingame, int usevwait) {
 			}
 			if(ingame || selectScreen)
 				update_ents();
-			++time;
+			++borTime;
 		}
 
 	}
@@ -19608,8 +19614,8 @@ void update(int ingame, int usevwait) {
 
 	// Debug stuff, should not appear on screenshot
 	if(debug_time == 0xFFFFFFFF)
-		debug_time = time + GAME_SPEED * 5;
-	if(time < debug_time && debug_msg[0]) {
+		debug_time = borTime + GAME_SPEED * 5;
+	if(borTime < debug_time && debug_msg[0]) {
 		spriteq_clear();
 		font_printf(0, 230, 0, 0, debug_msg);
 		spriteq_draw(vscreen, (ingame == 0));
@@ -19767,7 +19773,7 @@ void apply_controls() {
 // ----------------------------------------------------------------------
 
 void display_credits() {
-	u32 finishtime = time + 10 * GAME_SPEED;
+	u32 finishtime = borTime + 10 * GAME_SPEED;
 	int done = 0;
 
 	if(savedata.logo != 1)
@@ -19817,7 +19823,7 @@ void display_credits() {
 
 		update(2, 0);
 
-		done |= (time > finishtime);
+		done |= (borTime > finishtime);
 		done |= (bothnewkeys & (FLAG_START + FLAG_ESC));
 	}
 	fade = 75;
@@ -20044,9 +20050,9 @@ int playgif(char *filename, int x, int y, int noskip) {
 		return 0;
 	}
 
-	temptime = time;
+	temptime = borTime;
 	tempnewtime = newtime;
-	time = 0;
+	borTime = 0;
 	lasttime = 0;
 	milliseconds = 0;
 	nextframe = 0;
@@ -20087,15 +20093,15 @@ int playgif(char *filename, int x, int y, int noskip) {
 				synctosound = 0;
 		}
 		if(!synctosound)
-			milliseconds += (time - lasttime) * 1000 / GAME_SPEED;
-		lasttime = time;
+			milliseconds += (borTime - lasttime) * 1000 / GAME_SPEED;
+		lasttime = borTime;
 
 		if(!noskip && (bothnewkeys & (FLAG_ESC | FLAG_ANYBUTTON)))
 			done = 1;
 	}
 	anigif_close();
 
-	time = temptime;
+	borTime = temptime;
 	newtime = tempnewtime;
 
 	freescreen(&background);
@@ -20155,26 +20161,18 @@ void playscene(char *filename) {
 
 void gameover(void) {
 	int done = 0;
-	char tmpBuff[128] = { "" };
+	int playback_started = 0;
 
 	music("data/music/gameover", 0, 0);
 
-	time = 0;
+	borTime = 0;
 	while(!done) {
-		if(custScenes != NULL) {
-			strcpy(tmpBuff, custScenes);
-			strncat(tmpBuff, "gameover.txt", 12);
-			if(testpackfile(tmpBuff, packfile) >= 0)
-				playscene(tmpBuff);
-			else
-				font_printf(_strmidx(3, "GAME OVER"), 110 + videomodes.vShift, 3, 0, "GAME OVER");
-		} else {
-			if(testpackfile("data/scenes/gameover.txt", packfile) >= 0)
-				playscene("data/scenes/gameover.txt");
-			else
-				font_printf(_strmidx(3, "GAME OVER"), 110 + videomodes.vShift, 3, 0, "GAME OVER");
-		}
-		done |= (time > GAME_SPEED * 8 && !sound_query_music(NULL, NULL));
+		if(!playback_started && testpackfile("data/scenes/gameover.txt", packfile) >= 0)
+			playscene("data/scenes/gameover.txt");
+		else
+			font_printf(_strmidx(3, "GAME OVER"), 110 + videomodes.vShift, 3, 0, "GAME OVER");
+		playback_started = 1;
+		done |= (borTime > GAME_SPEED * 8 && !sound_query_music(NULL, NULL));
 		done |= (bothnewkeys & (FLAG_ESC | FLAG_ANYBUTTON));
 		update(0, 0);
 	}
@@ -20224,7 +20222,7 @@ void hallfame(int addtoscore) {
 		}
 	}
 
-	time = 0;
+	borTime = 0;
 
 	while(!done) {
 		y = 60;
@@ -20241,7 +20239,7 @@ void hallfame(int addtoscore) {
 		}
 
 		update(0, 0);
-		done |= (time > GAME_SPEED * 8);
+		done |= (borTime > GAME_SPEED * 8);
 		done |= (bothnewkeys & (FLAG_START + FLAG_ESC));
 	}
 	unload_background();
@@ -20284,7 +20282,7 @@ void showcomplete(int num) {
 
 	update(0, 0);
 
-	time = 0;
+	borTime = 0;
 	while(!done) {
 		if(!scomplete[5])
 			font_printf(videomodes.hShift + scomplete[0], videomodes.vShift + scomplete[1], 3, 0,
@@ -20320,9 +20318,9 @@ void showcomplete(int num) {
 				font_printf(videomodes.hShift + tscore[j], videomodes.vShift + tscore[k], 0, 0,
 					    (scoreformat ? "%09lu" : "%lu"), player[i].score);
 
-		while(time > nexttime) {
+		while(borTime > nexttime) {
 			if(!finishtime)
-				finishtime = time + 4 * GAME_SPEED;
+				finishtime = borTime + 4 * GAME_SPEED;
 
 			for(i = 0; i < maxplayers[current_set]; i++) {
 				if(player[i].lives > 0) {
@@ -20353,7 +20351,7 @@ void showcomplete(int num) {
 
 		if(bothnewkeys & (FLAG_ANYBUTTON | FLAG_ESC))
 			done = 1;
-		if(finishtime && time > finishtime)
+		if(finishtime && borTime > finishtime)
 			done = 1;
 
 		update(0, 0);
@@ -20407,7 +20405,7 @@ int playlevel(char *filename) {
 	saveScriptFile();
 
 	load_level(filename);
-	time = 0;
+	borTime = 0;
 
 	// Fixes the start level executing last button bug
 	for(i = 0; i < maxplayers[current_set]; i++) {
@@ -20746,7 +20744,7 @@ int selectplayer(int *players, char *filename) {
 					}
 
 					if(!tperror) {
-						time = 0;
+						borTime = 0;
 						// yay you picked me!
 						if(validanim(example[i], ANI_PICK))
 							ent_set_anim(example[i], ANI_PICK, 0);
@@ -20754,12 +20752,12 @@ int selectplayer(int *players, char *filename) {
 							update(0, 0);
 							if((!validanim(example[i], ANI_PICK)
 							    || example[i]->modeldata.animation[ANI_PICK]->loop[0])
-							   && time > GAME_SPEED * 2)
+							   && borTime > GAME_SPEED * 2)
 								ready[i] = 1;
 							else if(!example[i]->animating)
 								ready[i] = 1;
 							if(ready[i])
-								time = 0;
+								borTime = 0;
 						}
 					}
 				}
@@ -20784,7 +20782,7 @@ int selectplayer(int *players, char *filename) {
 				players_ready++;
 		}
 
-		if(players_busy && players_busy == players_ready && time > GAME_SPEED)
+		if(players_busy && players_busy == players_ready && borTime > GAME_SPEED)
 			exit = 1;
 		update(0, 0);
 
@@ -20923,9 +20921,6 @@ void term_videomodes() {
 	videomodes.hRes = 0;
 	videomodes.vRes = 0;
 	video_set_mode(videomodes);
-	if(custScenes != NULL)
-		free(custScenes);
-	custScenes = NULL;
 	if(custBkgrds != NULL)
 		free(custBkgrds);
 	custBkgrds = NULL;
@@ -20960,7 +20955,7 @@ static const char* video_txt_commands_strings[] = {
 
 static char** video_txt_commands_dest[] = {
 	[VTC_VIDEO] = NULL,
-	[VTC_SCENES] = &custScenes,
+	[VTC_SCENES] = NULL,
 	[VTC_BACKGROUNDS] = &custBkgrds,
 	[VTC_LEVELS] = &custLevels,
 	[VTC_MODELS] = &custModels,
@@ -21293,12 +21288,10 @@ void openborMain(int argc, char **argv) {
 	sprite_map = NULL;
 	//int quit = 0;
 	int relback = 1;
-	int selector = 0;
 	u32 introtime = 0;
 	int started = 0;
 	char tmpBuff[128] = { "" };
 	int players[MAX_PLAYERS];
-	int i;
 	int argl;
 
 	printf("OpenBoR %s, Compile Date: " __DATE__ "\n\n", VERSION);
@@ -21334,31 +21327,20 @@ void openborMain(int argc, char **argv) {
 		load_cached_background("data/bgs/logo", 0);
 	}
 
-	while(time < GAME_SPEED * 6 && !(bothnewkeys & (FLAG_ANYBUTTON | FLAG_ESC)))
+	while(borTime < GAME_SPEED * 6 && !(bothnewkeys & (FLAG_ANYBUTTON | FLAG_ESC)))
 		update(0, 0);
 
 	music("data/music/remix", 1, 0);
 
-	// New alternative scene path for PSP
-	if(custScenes != NULL) {
-		strncpy(tmpBuff, custScenes, 128);
-		strncat(tmpBuff, "logo.txt", 8);
-		playscene(tmpBuff);
-	} else
-		playscene("data/scenes/logo.txt");
+	playscene("data/scenes/logo.txt");
+	
 	clearscreen(background);
 
 	while(!quit_game) {
-		if(time >= introtime) {
-			// New alternative scene path for PSP
-			if(custScenes != NULL) {
-				strncpy(tmpBuff, custScenes, 128);
-				strncat(tmpBuff, "intro.txt", 9);
-				playscene(tmpBuff);
-			} else
-				playscene("data/scenes/intro.txt");
+		if(borTime >= introtime) {
+			playscene("data/scenes/intro.txt");
 			update(0, 0);
-			introtime = time + GAME_SPEED * 20;
+			introtime = borTime + GAME_SPEED * 20;
 			relback = 1;
 			started = 0;
 		}
@@ -21367,70 +21349,15 @@ void openborMain(int argc, char **argv) {
 			quit_game = 1;
 
 		if(!started) {
-			if((time % GAME_SPEED) < (GAME_SPEED / 2))
+			if((borTime % GAME_SPEED) < (GAME_SPEED / 2))
 				_menutextm(0, 0, 0, "PRESS START");
 			if(bothnewkeys & (FLAG_ANYBUTTON)) {
 				started = 1;
 				relback = 1;
 			}
+			update(0, 0);
 		} else {
-			_menutextm((selector == 0), 2, 0, "Start Game");
-			_menutextm((selector == 1), 3, 0, "Movie Mode");
-			_menutextm((selector == 2), 4, 0, "Options");
-			_menutextm((selector == 3), 5, 0, "How To Play");
-			_menutextm((selector == 4), 6, 0, "Hall Of Fame");
-			_menutextm((selector == 5), 7, 0, "Quit");
-			if(selector < 0)
-				selector = 5;
-			if(selector > 5)
-				selector = 0;
-
-			if(bothnewkeys)
-				introtime = time + GAME_SPEED * 20;
-
-			if(bothnewkeys & FLAG_MOVEUP) {
-				--selector;
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(bothnewkeys & FLAG_MOVEDOWN) {
-				++selector;
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(bothnewkeys & (FLAG_ANYBUTTON)) {
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
-				switch (selector) {
-					case 0:
-						for(i = 0; i < MAX_PLAYERS; i++)
-							players[i] = player[i].newkeys & (FLAG_ANYBUTTON);
-						relback = choose_mode(players);
-						if(relback)
-							started = 0;
-						break;
-					case 1:
-						movie_options();
-						break;
-					case 2:
-						options();
-						break;
-					case 3:
-						if(custScenes != NULL) {
-							strncpy(tmpBuff, custScenes, 128);
-							strncat(tmpBuff, "howto.txt", 9);
-							playscene(tmpBuff);
-						} else
-							playscene("data/scenes/howto.txt");
-						relback = 1;
-						break;
-					case 4:
-						hallfame(0);
-						relback = 1;
-						break;
-					default:
-						quit_game = 1;
-						break;
-				}
-				introtime = time + GAME_SPEED * 20;
-			}
+			relback = main_menu(&started, &introtime, players);
 		}
 		if(relback) {
 			if(started) {
@@ -21453,7 +21380,6 @@ void openborMain(int argc, char **argv) {
 				music("data/music/remix", 1, 0);
 			relback = 0;
 		}
-		update(0, 0);
 	}
 	leave_game();
 }

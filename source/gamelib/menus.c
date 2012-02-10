@@ -585,11 +585,11 @@ static int options_toggle_cb(int direction, int* quit, int* selector, void* data
 		case 3:
 			system_options();
 			break;
-		case 4:
-			cheat_options();
-			break;
 		default:
-			*quit = 1;
+			if(cheats && *selector == 4)
+				cheat_options();
+			else 
+				*quit = 1;
 	}
 	return 0;
 }
@@ -929,5 +929,67 @@ int load_saved_game(void) {
 	}
 	bothnewkeys = 0;
 	return -1;
+}
+
+typedef struct {
+	int* started;
+	u32* introtime;
+	int* players;
+} main_menu_cb_data;
+
+static int main_menu_mode_toggle_cb(int direction, int* quit, int* selector, void* data) {
+	(void) direction;
+	main_menu_cb_data* cb_data = (main_menu_cb_data*) data;
+	int ret = 0;
+	unsigned i;
+	switch (*selector) {
+		case 0:
+			for(i = 0; i < MAX_PLAYERS; i++)
+				cb_data->players[i] = player[i].newkeys & (FLAG_ANYBUTTON);
+			ret = choose_mode(cb_data->players);
+			if(ret)
+				*cb_data->started = 0;
+			break;
+		case 1:
+			movie_options();
+			break;
+		case 2:
+			options();
+			break;
+		case 3:
+			playscene("data/scenes/howto.txt");
+			ret = 1;
+			break;
+		case 4:
+			hallfame(0);
+			ret = 1;
+			break;
+		default:
+			*quit = 1;
+			break;
+	}
+	*cb_data->introtime = borTime + GAME_SPEED * 20;
+	return ret;
+}
+
+int main_menu(int* started, u32* introtime, int *players) {
+	int selector;
+	int ret = 0;
+	main_menu_cb_data cb_data = {started, introtime, players};
+	_menutextm((selector == 0), 2, 0, "Start Game");
+	_menutextm((selector == 1), 3, 0, "Movie Mode");
+	_menutextm((selector == 2), 4, 0, "Options");
+	_menutextm((selector == 3), 5, 0, "How To Play");
+	_menutextm((selector == 4), 6, 0, "Hall Of Fame");
+	_menutextm((selector == 5), 7, 0, "Quit");
+	
+	update(0, 0);
+	
+	if(bothnewkeys)
+		*introtime = borTime + GAME_SPEED * 20;
+	
+	ret = menu_handle_input(5, 1, main_menu_mode_toggle_cb, &quit_game, &selector, &cb_data);
+	
+	return ret == -1 ? 0 : ret;
 }
 

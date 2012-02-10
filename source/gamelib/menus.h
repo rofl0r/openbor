@@ -1,6 +1,8 @@
 #ifndef MENUS_H
 #define MENUS_H
 
+#include "types.h"
+
 void options(void);
 void video_options(void);
 void system_options(void);
@@ -13,5 +15,6 @@ void movie_options(void);
 int choose_difficulty(void);
 int choose_mode(int *players);
 int load_saved_game(void);
+int main_menu(int* started, u32* introtime, int* players);
 
 #endif

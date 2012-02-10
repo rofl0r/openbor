@@ -50,7 +50,6 @@
 // FIXME wow. this needs to be fixed. does rename every occurence of those variables/functions.
 
 #define		exit				borExit
-#define		time				borTime
 #define		kill				borKill
 #define		pause				borPause
 #define		shutdown(ec, fmt, args...)	borShutdown(__FUNCTION__, ec, fmt, ## args)
@@ -493,7 +492,7 @@ typedef enum {
 						e->idling = 0;
 
 #define is_frozen(e)     ((textbox && e->modeldata.type != TYPE_TEXTBOX) || \
-						 (smartbomber && e != smartbomber && e->modeldata.type != TYPE_TEXTBOX) ||(self->frozen&&self->freezetime>time))
+						 (smartbomber && e != smartbomber && e->modeldata.type != TYPE_TEXTBOX) ||(self->frozen&&self->freezetime > borTime))
 
 #define expand_time(e)   if(e->stalltime>0) e->stalltime++;\
 						 if(e->releasetime>0)e->releasetime++;\
@@ -1937,4 +1936,7 @@ extern unsigned int num_difficulties;
 extern int bonus;
 extern int saveslot;
 extern char set_names[MAX_DIFFICULTIES][MAX_NAME_LEN + 1];
+extern s_player player[4];
+extern u32 borTime;
+
 #endif
