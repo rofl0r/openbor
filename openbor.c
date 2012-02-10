@@ -1403,7 +1403,7 @@ void clearsettings(void) {
 }
 
 
-void savesettings() {
+void savesettings(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1418,7 +1418,7 @@ void savesettings() {
 	fclose(handle);
 }
 
-void saveasdefault() {
+void saveasdefault(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1432,7 +1432,7 @@ void saveasdefault() {
 }
 
 
-void loadsettings() {
+void loadsettings(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1454,7 +1454,7 @@ void loadsettings() {
 		clearsettings();
 }
 
-void loadfromdefault() {
+void loadfromdefault(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
@@ -1470,7 +1470,7 @@ void loadfromdefault() {
 		clearsettings();
 }
 
-void clearSavedGame() {
+void clearSavedGame(void) {
 	int i;
 
 	for(i = 0; i < MAX_DIFFICULTIES; i++) {
@@ -1479,7 +1479,7 @@ void clearSavedGame() {
 	}
 }
 
-void clearHighScore() {
+void clearHighScore(void) {
 	unsigned i;
 	savescore.compatibleversion = CV_HIGH_SCORE;
 	
@@ -1489,7 +1489,7 @@ void clearHighScore() {
 	}
 }
 
-void saveGameFile() {
+void saveGameFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1506,7 +1506,7 @@ void saveGameFile() {
 }
 
 
-int loadGameFile() {
+int loadGameFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	int i;
@@ -1527,7 +1527,7 @@ int loadGameFile() {
 }
 
 
-void saveHighScoreFile() {
+void saveHighScoreFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1542,7 +1542,7 @@ void saveHighScoreFile() {
 	fclose(handle);
 }
 
-void loadHighScoreFile() {
+void loadHighScoreFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
@@ -1560,7 +1560,7 @@ void loadHighScoreFile() {
 		clearHighScore();
 }
 
-void saveScriptFile() {
+void saveScriptFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	int i, l, c;
@@ -1596,7 +1596,7 @@ void saveScriptFile() {
 }
 
 
-void loadScriptFile() {
+void loadScriptFile(void) {
 	int disCcWarns;
 
 	size_t size;
