@@ -993,28 +993,56 @@ int main_menu(int* started, u32* introtime, int *players) {
 	return ret == -1 ? 0 : ret;
 }
 
+typedef struct {
+	int* ok;
+	int* setting;
+	int player_nr;
+	int max_button;
+	char* disabled_keys;
+} controller_options_cb_data;
+
+static int controller_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
+	(void) direction;
+	controller_options_cb_data *cb_data = (controller_options_cb_data*) data;
+	unsigned i;
+	
+	if(*selector == cb_data->max_button)
+		*quit = 2;
+	else if(*selector == cb_data->max_button + 1)
+		*quit = 1;
+	else {
+		*cb_data->setting = *selector;
+		for(i = 0; i < *selector; i++) {
+			if(cb_data->disabled_keys[i])
+				(*cb_data->setting)++;
+		}
+		*cb_data->ok = savedata.keys[cb_data->player_nr][*cb_data->setting];
+		savedata.keys[cb_data->player_nr][*cb_data->setting] = 0;
+		keyboard_getlastkey();
+	}
+	return 0;
+}
+
 void controller_options(int player_nr, int *quit, char** buttonnames, char* disabledkey) {
 	int selector = 0;
 	int setting = -1;
 	int i, k, ok = 0;
 	int col1 = -8, col2 = 6;
-	ptrdiff_t voffset;
-	while(disabledkey[selector])
-		if(++selector > 11)
-			break;
+	controller_options_cb_data data = {&ok, &setting, player_nr, 0, disabledkey};
 
 	while(!(*quit)) {
-		voffset = -6;
+		data.max_button = 0;
 		_menutextm(2, -8, 0, "Player %i", player_nr + 1);
 		for(i = 0; i < CB_MAX; i++) {
 			if(!disabledkey[i]) {
-				_menutext((selector == i), col1, voffset, "%s", buttonnames[i]);
-				_menutext((selector == i), col2, voffset, "%s", control_getkeyname(savedata.keys[player_nr][i]));
-				voffset++;
+				_menutext((selector == i), col1, data.max_button -6, "%s", buttonnames[i]);
+				_menutext((selector == i), col2, data.max_button -6, "%s", control_getkeyname(savedata.keys[player_nr][i]));
+				data.max_button++;
 			}
 		}
-		_menutextm((selector == CB_MAX), 7, 0, "OK");
-		_menutextm((selector == CB_MAX + 1), 8, 0, "Cancel");
+		_menutextm((selector == data.max_button), data.max_button -6, 0, "OK");
+		_menutextm((selector == data.max_button + 1), data.max_button -5, 0, "Cancel");
+		
 		update(0, 0);
 
 		if(setting > -1) {
@@ -1034,43 +1062,7 @@ void controller_options(int player_nr, int *quit, char** buttonnames, char* disa
 				}
 			}
 		} else {
-			if(bothnewkeys & FLAG_ESC)
-				*quit = 1;
-			if(bothnewkeys & FLAG_MOVEUP) {
-				do {
-					if(--selector < 0)
-						break;
-				} while(disabledkey[selector]);
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(bothnewkeys & FLAG_MOVEDOWN) {
-				do {
-					if(++selector > 11)
-						break;
-				} while(disabledkey[selector]);
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(selector < 0)
-				selector = CB_MAX + 1;
-			if(selector > CB_MAX + 1) {
-				selector = 0;
-				while(disabledkey[selector])
-					if(++selector > (CB_MAX - 1))
-						break;
-			}
-			if(bothnewkeys & FLAG_ANYBUTTON) {
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
-				if(selector == CB_MAX)
-					*quit = 2;
-				else if(selector == CB_MAX + 1)
-					*quit = 1;
-				else {
-					setting = selector;
-					ok = savedata.keys[player_nr][setting];
-					savedata.keys[player_nr][setting] = 0;
-					keyboard_getlastkey();
-				}
-			}
+			menu_handle_input(data.max_button + 1, 1, controller_options_toggle_cb, quit, &selector, &data);
 		}
 	}
 	bothnewkeys = 0;
