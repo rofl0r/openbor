@@ -2233,21 +2233,6 @@ static void set_color_if_empty(int* color, s_rgb* rgb) {
 	 if(!*color) *color = _makecolour(rgb->r, rgb->g, rgb->b);
 }
 
-static const s_colors_rgb default_colors = {
-	.black = {0, 0, 0},
-	.red = {255, 0, 0},	// 1% - 25% Full Health
-	.orange = {255, 150, 0},	// 200-300HP
-	.yellow = {0xF8, 0xB8, 0x40},	// 26%-50% Full health
-	.white = {255, 255, 255},	// white boxes 600+ HP
-	.blue = {0, 0, 255},	// 100-200 HP
-	.green = {0, 255, 0},	// 51% - 100% full health
-	.pink = {255, 0, 255},	// 300-400HP
-	.purple = {128, 48, 208},	// transbox 400-500HP
-	.magic = {98, 180, 255},	// 1st magic bar color by tails
-	.magic2 = {24, 48, 143},	// 2sec magic bar color by tails
-	.shadow = {64, 64, 64},
-};
-
 void load_background(char *filename, int createtables) {
 	//if(pixelformat!=PIXEL_8) createtables = 0;
 	unsigned i;

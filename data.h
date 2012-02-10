@@ -25,6 +25,8 @@ extern s_barstatus lbarstatus;
 extern s_barstatus olbarstatus;
 extern s_barstatus mpbarstatus;
 
+extern const s_colors_rgb default_colors;
+
 extern const s_savedata savedata_default;
 extern const s_videomodes videomodes_init_data[];
 extern const s_player_min_max_z_bgheight player_min_max_z_bgheight_init_data[];
