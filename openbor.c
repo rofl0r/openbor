@@ -2268,119 +2268,8 @@ void load_background(char *filename, int createtables) {
 }
 
 void load_cached_background(char *filename, int createtables) {
-#if !WII
 	load_background(filename, createtables);
-#else
-	int index = -1;
-	unload_background();
-
-	if(strcmp(filename, "data/bgs/logo") == 0)
-		index = 0;
-	else if(strcmp(filename, "data/bgs/title") == 0)
-		index = 1;
-	else if(strcmp(filename, "data/bgs/titleb") == 0)
-		index = 2;
-	else if(strcmp(filename, "data/bgs/loading") == 0)
-		index = 3;
-	else if(strcmp(filename, "data/bgs/loading2") == 0)
-		index = 4;
-	else if(strcmp(filename, "data/bgs/hiscore") == 0)
-		index = 5;
-	else if(strcmp(filename, "data/bgs/complete") == 0)
-		index = 6;
-	else if(strcmp(filename, "data/bgs/unlockbg") == 0)
-		index = 7;
-	else if(strcmp(filename, "data/bgs/select") == 0)
-		index = 8;
-
-	if((index == -1) || (bg_cache[index] == NULL))
-		shutdown(1, "Error: can't load cached background '%s'", filename);
-
-	if(background)
-		freescreen(&background);
-	background = allocscreen(videomodes.hRes, videomodes.vRes, pixelformat);
-	copyscreen(background, bg_cache[index]);
-
-	if(pixelformat == PIXEL_8)
-		memcpy(pal, bg_palette_cache[index], PAL_BYTES);
-	else if(pixelformat == PIXEL_x8) {
-		memcpy(background->palette, bg_cache[index]->palette, PAL_BYTES);
-		memcpy(pal, background->palette, PAL_BYTES);
-	}
-
-
-	if(createtables) {
-		standard_palette(0);
-		if(!create_blending_tables(pal, blendings, blendfx))
-			shutdown(1, (char*) E_OUT_OF_MEMORY);
-	}
-
-	video_clearscreen();
-	pal[0] = pal[1] = pal[2] = 0;
-	//palette_set_corrected(pal, savedata.gamma,savedata.gamma,savedata.gamma, savedata.brightness,savedata.brightness,savedata.brightness);
-	change_system_palette(0);
-#endif
 }
-
-#if WII
-void cache_background(char *filename) {
-	s_screen *bg = allocscreen(videomodes.hRes, videomodes.vRes, pixelformat);
-	int index = -1;
-
-	if(pixelformat == PIXEL_8) {
-		if(!loadscreen(filename, packfile, pal, pixelformat, &bg)) {
-			freescreen(&bg);
-			bg = NULL;
-		}
-	} else if(pixelformat == PIXEL_x8) {
-		if(!loadscreen(filename, packfile, NULL, pixelformat, &bg)) {
-			freescreen(&bg);
-			bg = NULL;
-		}
-	} else {
-		shutdown(1, "Error caching background, Unknown Pixel Format!\n");
-	}
-
-	if(strcmp(filename, "data/bgs/logo") == 0)
-		index = 0;
-	else if(strcmp(filename, "data/bgs/title") == 0)
-		index = 1;
-	else if(strcmp(filename, "data/bgs/titleb") == 0)
-		index = 2;
-	else if(strcmp(filename, "data/bgs/loading") == 0)
-		index = 3;
-	else if(strcmp(filename, "data/bgs/loading2") == 0)
-		index = 4;
-	else if(strcmp(filename, "data/bgs/hiscore") == 0)
-		index = 5;
-	else if(strcmp(filename, "data/bgs/complete") == 0)
-		index = 6;
-	else if(strcmp(filename, "data/bgs/unlockbg") == 0)
-		index = 7;
-	else if(strcmp(filename, "data/bgs/select") == 0)
-		index = 8;
-	else
-		shutdown(1, "Error: unknown cached background '%s'", filename);
-
-	bg_cache[index] = bg;
-
-	if(pixelformat == PIXEL_8)
-		memcpy(bg_palette_cache[index], pal, PAL_BYTES);
-
-	change_system_palette(0);
-}
-
-void cache_all_backgrounds() {
-	cache_background("data/bgs/logo");
-	cache_background("data/bgs/title");
-	cache_background("data/bgs/titleb");
-	cache_background("data/bgs/loading2");
-	cache_background("data/bgs/hiscore");
-	cache_background("data/bgs/complete");
-	cache_background("data/bgs/unlockbg");
-	cache_background("data/bgs/select");
-}
-#endif
 
 void load_bglayer(char *filename, int index) {
 	if(!level)
@@ -2443,16 +2332,12 @@ void unload_texture() {
 	texture = NULL;
 }
 
-
-
 void load_texture(char *filename) {
 	unload_texture();
 	texture = loadbitmap(filename, packfile, pixelformat);
 	if(texture == NULL)
 		shutdown(1, "Error loading file '%s'", filename);
 }
-
-
 
 void freepanels() {
 	int i;
@@ -2506,8 +2391,6 @@ s_sprite *loadsprite2(char *filename, int *width, int *height) {
 	return sprite;
 }
 
-
-
 s_sprite *loadpanel2(char *filename) {
 	s_sprite *sprite;
 	int w, h;
@@ -2522,8 +2405,6 @@ s_sprite *loadpanel2(char *filename) {
 
 	return sprite;
 }
-
-
 
 int loadpanel(s_panel_filenames* filenames_s) {
 
@@ -2562,8 +2443,6 @@ int loadpanel(s_panel_filenames* filenames_s) {
 
 	return 1;
 }
-
-
 
 int loadfrontpanel(char *filename) {
 
