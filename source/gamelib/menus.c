@@ -5,7 +5,7 @@
 
 typedef int (*menu_toggle_callback)(int direction, int* quit, int* selector, void* data);
 
-static int menu_handle_input(int max_entry, menu_toggle_callback cb, int* quit, int* selector, void* data) {
+static int menu_handle_input(int max_entry, int button_only, menu_toggle_callback cb, int* quit, int* selector, void* data) {
 	int dir;
 	if(bothnewkeys & FLAG_ESC)
 		*quit = 1;
@@ -21,14 +21,19 @@ static int menu_handle_input(int max_entry, menu_toggle_callback cb, int* quit, 
 		*selector = max_entry;
 	if(*selector > max_entry)
 		*selector = 0;
-	if(bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) {
+	if(
+		(!button_only && bothnewkeys & (FLAG_MOVELEFT | FLAG_MOVERIGHT | FLAG_ANYBUTTON)) ||
+		(bothnewkeys & FLAG_ANYBUTTON)
+	) {
 		sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
 		
 		dir = 0;
-		if(bothnewkeys & FLAG_MOVELEFT)
-			dir = -1;
-		else if(bothnewkeys & FLAG_MOVERIGHT)
-			dir = 1;
+		if(!button_only) {
+			if(bothnewkeys & FLAG_MOVELEFT)
+				dir = -1;
+			else if(bothnewkeys & FLAG_MOVERIGHT)
+				dir = 1;
+		}
 		return cb(dir, quit, selector, data);
 	}
 	return -1;
@@ -66,7 +71,7 @@ void movie_options(void) {
 		_menutextm((selector == 1), 3, 0, "Load Movie");
 		_menutextm((selector == 2), 5, 0, "Back");
 		update(0, 0);
-		menu_handle_input(2, movie_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(2, 1, movie_options_toggle_cb, &quit, &selector, NULL);
 	}
 	savesettings();
 	bothnewkeys = 0;
@@ -111,7 +116,7 @@ void input_options(void) {
 		_menutext((selector == 4), -4, 2, "Setup Player 4...");
 		_menutextm((selector == 5), 7, 0, "Back");
 		update(0, 0);
-		menu_handle_input(5, input_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(5, 1, input_options_toggle_cb, &quit, &selector, NULL);
 
 	}
 	savesettings();
@@ -192,7 +197,7 @@ void sound_options(void) {
 		_menutextm((selector == 6), 7, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(6, sound_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(6, 0, sound_options_toggle_cb, &quit, &selector, NULL);
 	}
 	savesettings();
 	bothnewkeys = 0;
@@ -263,7 +268,7 @@ void config_settings(void) {	//  OX. Load from / save to default.cfg. Restore Op
 		_menutextm((selector == 3), 1, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(3, config_settings_toggle_cb, &quit, &selector, &cb_data);
+		menu_handle_input(3, 1, config_settings_toggle_cb, &quit, &selector, &cb_data);
 	}
 	savesettings();
 	bothnewkeys = 0;
@@ -358,7 +363,7 @@ void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
 		_menutextm((selector == 8), 7, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(8, cheat_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(8, 0, cheat_options_toggle_cb, &quit, &selector, NULL);
 	}
 	savesettings();
 	bothnewkeys = 0;
@@ -450,7 +455,7 @@ void system_options(void) {
 		_menutextm((selector == ret), 8, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(ret, system_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(ret, 0, system_options_toggle_cb, &quit, &selector, NULL);
 
 	}
 	savesettings();
@@ -608,7 +613,7 @@ void video_options(void) {
 		_menutextm((selector == 8), 7, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(8, video_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(8, 0, video_options_toggle_cb, &quit, &selector, NULL);
 
 	}
 	savesettings();
@@ -652,7 +657,7 @@ void options(void) {
 		_menutextm((selector == 4), 7, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(4, options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(4, 1, options_toggle_cb, &quit, &selector, NULL);
 	}
 	savesettings();
 	if(pause == 1)
@@ -718,7 +723,7 @@ void soundcard_options(void) {
 		_menutextm((selector == 3), 2, 0, "Discard");
 		_menutextm((selector == 4), 7, 0, "Back");
 		update(0, 0);
-		menu_handle_input(4, soundcard_options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(4, 0, soundcard_options_toggle_cb, &quit, &selector, NULL);
 	}
 	loadsettings();
 	bothnewkeys = 0;
@@ -803,7 +808,7 @@ int choose_difficulty(void) {
 				return saveslot;
 			}
 		}
-		if((ret = menu_handle_input(num_difficulties, choose_difficulty_toggle_cb, &quit, &selector, NULL)) != -1)
+		if((ret = menu_handle_input(num_difficulties, 1, choose_difficulty_toggle_cb, &quit, &selector, NULL)) != -1)
 			return ret;
 	}
 	bothnewkeys = 0;
@@ -858,7 +863,7 @@ int choose_mode(int *players) {
 		_menutextm((selector == 2), 5, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(2, choose_mode_toggle_cb, &quit, &selector, &data);
+		menu_handle_input(2, 1, choose_mode_toggle_cb, &quit, &selector, &data);
 	}
 	bothnewkeys = 0;
 	return data.relback;
