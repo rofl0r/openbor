@@ -282,43 +282,12 @@ static int cheat_options_toggle_cb(int direction, int* quit, int* selector, void
 	(void) data;
 	switch (*selector) {
 		case 0:
-			savedata.brightness += 8 * direction;
-			if(savedata.brightness < -256)
-				savedata.brightness = -256;
-			if(savedata.brightness > 256)
-				savedata.brightness = 256;
-			vga_vwait();
-			palette_set_corrected(pal, savedata.gamma, savedata.gamma, savedata.gamma,
-						savedata.brightness, savedata.brightness,
-						savedata.brightness);
-			break;
-		case 1:
-			savedata.gamma += 8 * direction;
-			if(savedata.gamma < -256)
-				savedata.gamma = -256;
-			if(savedata.gamma > 256)
-				savedata.gamma = 256;
-			vga_vwait();
-			palette_set_corrected(pal, savedata.gamma, savedata.gamma, savedata.gamma,
-						savedata.brightness, savedata.brightness,
-						savedata.brightness);
-			break;
-		case 2:
-			input_options();
-			break;
-		case 3:
-			sound_options();
-			break;
-		case 4:
-			system_options();
-			break;
-		case 5:
 			toggle(&livescheat);
 			break;
-		case 6:
+		case 1:
 			toggle(&creditscheat);
 			break;
-		case 7:
+		case 2:
 			toggle(&healthcheat);
 			break;
 
@@ -328,39 +297,19 @@ static int cheat_options_toggle_cb(int direction, int* quit, int* selector, void
 	return 0;
 }
 
-void cheatoptions(void) {	//  LTB 1-13-05 took out sameplayer option
+void cheat_options(void) {	//  LTB 1-13-05 took out sameplayer option
 	int quit = 0;
 	int selector = 0;
 	int col1 = -8;
-	int col2 = 6;
 
 	bothnewkeys = 0;
 
 	while(!quit) {
 		_menutextm(2, -5, 0, "Cheat Options");
-		_menutext((selector == 0), col1, -3, "Brightness:");
-		_menutext((selector == 0), col2, -3, "%i", savedata.brightness);
-		_menutext((selector == 1), col1, -2, "Gamma:");
-		_menutext((selector == 1), col2, -2, "%i", savedata.gamma);
-		_menutext((selector == 2), col1, -1, "Control Options...");
-		_menutext((selector == 3), col1, 0, "Sound Options...");
-		_menutext((selector == 4), col1, 1, "System Options...");
-
-		if(livescheat)
-			_menutext((selector == 5), col1, 2, "Infinite Lives On");
-		else
-			_menutext((selector == 5), col1, 2, "Infinite Lives Off");
-
-		if(creditscheat)
-			_menutext((selector == 6), col1, 3, "Infinite Credits On");	// Enemies fall down when you respawn
-		else
-			_menutext((selector == 6), col1, 3, "Infinite Credits Off");	//Enemies don't fall down when you respawn
-		if(healthcheat)
-			_menutext((selector == 7), col1, 4, "Infinite Health On");	// Enemies fall down when you respawn
-		else
-			_menutext((selector == 7), col1, 4, "Infinite Health Off");	//Enemies don't fall down when you respawn
-
-		_menutextm((selector == 8), 7, 0, "Back");
+		_menutext((selector == 0), col1, 0, livescheat ? "Infinite Lives ""On" : "Infinite Lives ""Off");
+		_menutext((selector == 1), col1, 1, creditscheat ? "Infinite Credits ""On" : "Infinite Credits ""Off");
+		_menutext((selector == 2), col1, 2, healthcheat ? "Infinite Health ""On" : "Infinite Health ""Off");
+		_menutextm((selector == 3), 4, 0, "Back");
 
 		update(0, 0);
 		menu_handle_input(8, 0, cheat_options_toggle_cb, &quit, &selector, NULL);
@@ -636,6 +585,9 @@ static int options_toggle_cb(int direction, int* quit, int* selector, void* data
 		case 3:
 			system_options();
 			break;
+		case 4:
+			cheat_options();
+			break;
 		default:
 			*quit = 1;
 	}
@@ -654,10 +606,11 @@ void options(void) {
 		_menutextm((selector == 1), 3, 0, "Sound Options...");
 		_menutextm((selector == 2), 4, 0, "Control Options...");
 		_menutextm((selector == 3), 5, 0, "System Options...");
-		_menutextm((selector == 4), 7, 0, "Back");
+		if(cheats) _menutextm((selector == 4), 6, 0, "Cheat Options...");
+		_menutextm((selector == 4 + cheats), 7 + cheats, 0, "Back");
 
 		update(0, 0);
-		menu_handle_input(4, 1, options_toggle_cb, &quit, &selector, NULL);
+		menu_handle_input(4 + cheats, 1, options_toggle_cb, &quit, &selector, NULL);
 	}
 	savesettings();
 	if(pause == 1)

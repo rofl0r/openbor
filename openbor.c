@@ -21410,14 +21410,7 @@ void openborMain(int argc, char **argv) {
 						movie_options();
 						break;
 					case 2:
-						if(!cheats)
-							options();
-						else {
-							if(!forcecheatsoff)
-								cheatoptions();
-							else
-								options();
-						}
+						options();
 						break;
 					case 3:
 						if(custScenes != NULL) {
