@@ -1597,6 +1597,22 @@ typedef struct {
 	
 } s_script_args_names;
 
+typedef enum {
+	CB_UP = 0,
+	CB_DOWN,
+	CB_LEFT,
+	CB_RIGHT,
+	CB_ATK1,
+	CB_ATK2,
+	CB_ATK3,
+	CB_ATK4,
+	CB_JUMP,
+	CB_SPECIAL,
+	CB_START,
+	CB_SCREENSHOT,
+	CB_MAX
+} control_buttons;
+
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);
 int changesyspropertybyindex(int index, ScriptVariant * value);

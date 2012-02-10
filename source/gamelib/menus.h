@@ -16,5 +16,6 @@ int choose_difficulty(void);
 int choose_mode(int *players);
 int load_saved_game(void);
 int main_menu(int* started, u32* introtime, int* players);
+void controller_options(int player_nr, int *quit, char** buttonnames, char* disabledkey);
 
 #endif

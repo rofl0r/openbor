@@ -21080,22 +21080,6 @@ void safe_set(int *arr, int index, int newkey, int oldkey) {
 	arr[index] = newkey;
 }
 
-typedef enum {
-	CB_UP = 0,
-	CB_DOWN,
-	CB_LEFT,
-	CB_RIGHT,
-	CB_ATK1,
-	CB_ATK2,
-	CB_ATK3,
-	CB_ATK4,
-	CB_JUMP,
-	CB_SPECIAL,
-	CB_START,
-	CB_SCREENSHOT,
-	CB_MAX
-} control_buttons;
-
 static const char *default_button_names[] = {
 	[CB_UP] = "Move Up",
 	[CB_DOWN] = "Move Down",
@@ -21132,16 +21116,13 @@ static void init_button_names(char **buttonnames) {
 		buttonnames[i] = (char *) default_button_names[i];
 }
 
-void keyboard_setup(int player) {
+void keyboard_setup(int player_nr) {
 	char lowercase_buf[16];
 	char disabledkey[CB_MAX] = { 0 };
-	char quit = 0;
-	int selector = 0;
-	int setting = -1;
-	int i, k, ok = 0;
-	int col1 = -8, col2 = 6;
+	int quit = 0;
+	unsigned i;
 
-	ptrdiff_t pos, voffset;
+	ptrdiff_t pos;
 	size_t size;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
@@ -21191,82 +21172,8 @@ void keyboard_setup(int player) {
 			buf = NULL;
 		}
 	}
-
-	while(disabledkey[selector])
-		if(++selector > 11)
-			break;
-
-	while(!quit) {
-		voffset = -6;
-		_menutextm(2, -8, 0, "Player %i", player + 1);
-		for(i = 0; i < CB_MAX; i++) {
-			if(!disabledkey[i]) {
-				_menutext((selector == i), col1, voffset, "%s", buttonnames[i]);
-				_menutext((selector == i), col2, voffset, "%s",
-					  control_getkeyname(savedata.keys[player][i]));
-				voffset++;
-			}
-		}
-		_menutextm((selector == CB_MAX), 7, 0, "OK");
-		_menutextm((selector == CB_MAX + 1), 8, 0, "Cancel");
-		update(0, 0);
-
-		if(setting > -1) {
-			if(bothnewkeys & FLAG_ESC) {
-				savedata.keys[player][setting] = ok;
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 50);
-				setting = -1;
-			}
-			if(setting > -1) {
-				k = control_scankey();
-				if(k) {
-					safe_set(savedata.keys[player], setting, k, ok);
-					sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
-					setting = -1;
-					// Prevent accidental screenshot
-					bothnewkeys = 0;
-				}
-			}
-		} else {
-			if(bothnewkeys & FLAG_ESC)
-				quit = 1;
-			if(bothnewkeys & FLAG_MOVEUP) {
-				do {
-					if(--selector < 0)
-						break;
-				} while(disabledkey[selector]);
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(bothnewkeys & FLAG_MOVEDOWN) {
-				do {
-					if(++selector > 11)
-						break;
-				} while(disabledkey[selector]);
-				sound_play_sample(samples.beep, 0, savedata.effectvol, savedata.effectvol, 100);
-			}
-			if(selector < 0)
-				selector = CB_MAX + 1;
-			if(selector > CB_MAX + 1) {
-				selector = 0;
-				while(disabledkey[selector])
-					if(++selector > (CB_MAX - 1))
-						break;
-			}
-			if(bothnewkeys & FLAG_ANYBUTTON) {
-				sound_play_sample(samples.beep2, 0, savedata.effectvol, savedata.effectvol, 100);
-				if(selector == CB_MAX)
-					quit = 2;
-				else if(selector == CB_MAX + 1)
-					quit = 1;
-				else {
-					setting = selector;
-					ok = savedata.keys[player][setting];
-					savedata.keys[player][setting] = 0;
-					keyboard_getlastkey();
-				}
-			}
-		}
-	}
+	
+	controller_options(player_nr, &quit, buttonnames, disabledkey);
 
 	if(quit == 2) {
 		apply_controls();
@@ -21276,7 +21183,6 @@ void keyboard_setup(int player) {
 
 
 	update(0, 0);
-	bothnewkeys = 0;
 	printf("Done!\n");
 }
 
