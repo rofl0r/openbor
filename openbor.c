@@ -880,6 +880,8 @@ static const s_script_args_names script_args_names = {
 	.player = "player",
 	.attacktype = "attacktype",
 	.reset = "reset",
+	.plane = "plane",
+	.height = "height",
 };
 
 static const s_script_args init_script_args_default = {
@@ -900,6 +902,8 @@ static const s_script_args init_script_args_default = {
 	.player = {VT_EMPTY, 0},
 	.attacktype = {VT_EMPTY, 0},
 	.reset = {VT_EMPTY, 0},
+	.plane = {VT_EMPTY, 0},
+	.height = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -920,6 +924,8 @@ static const s_script_args init_script_args_only_ent = {
 	.player = {VT_EMPTY, 0},
 	.attacktype = {VT_EMPTY, 0},
 	.reset = {VT_EMPTY, 0},
+	.plane = {VT_EMPTY, 0},
+	.height = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -928,6 +934,7 @@ static void execute_script_default(s_script_args* args, Script* dest_script) {
 	s_script_args_tuple* tuples = (s_script_args_tuple*) args;
 	char** names = (char**) &script_args_names;
 	unsigned i;
+	float tmp_float;
 	if(Script_IsInitialized(dest_script)) {
 		ScriptVariant_Init(&tempvar);
 		for(i = 0; i < s_script_args_membercount; i++) {
@@ -939,6 +946,10 @@ static void execute_script_default(s_script_args* args, Script* dest_script) {
 						break;
 					case VT_INTEGER:
 						tempvar.lVal = (LONG) tuples[i].value;
+						break;
+					case VT_DECIMAL:
+						memcpy(&tmp_float, &tuples[i].value, sizeof(float));
+						tempvar.dblVal = (DOUBLE) tmp_float;
 						break;
 					default:
 						assert(0);
@@ -1117,6 +1128,9 @@ static void execute_entity_key_script_i(s_script_args* args) {
 static void execute_onpain_script_i(s_script_args* args) {
 	execute_script_default(args, ((entity*) args->ent.value)->scripts.onpain_script);
 }
+static void execute_onblockw_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblockw_script);
+}
 
 
 void execute_animation_script(entity * ent) {
@@ -1208,30 +1222,13 @@ void execute_onpain_script(entity * ent, int iType, int iReset) {
 }
 
 void execute_onblockw_script(entity * ent, int plane, float height) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onblockw_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) plane;
-		Script_Set_Local_Variant("plane", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_DECIMAL);
-		tempvar.dblVal = (DOUBLE) height;
-		Script_Set_Local_Variant("height", &tempvar);
-		Script_Execute(ent->scripts.onblockw_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("plane", &tempvar);
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("height", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.plane.vt = VT_INTEGER;
+	script_args.height.vt = VT_DECIMAL;
+	script_args.plane.value = plane;
+	memcpy(&script_args.height.value, &height, sizeof(float));
+	execute_onblockw_script_i(&script_args);
 }
 
 void execute_onblocko_script(entity * ent, entity * other) {
