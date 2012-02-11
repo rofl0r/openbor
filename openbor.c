@@ -6191,58 +6191,19 @@ int load_models() {
 	    (dyn_anim_custom_maxvalues.max_walks - MAX_WALKS) + (dyn_anim_custom_maxvalues.max_ups - MAX_UPS) + (dyn_anim_custom_maxvalues.max_downs - MAX_DOWNS) + (dyn_anim_custom_maxvalues.max_backwalks - MAX_BACKWALKS);
 
 	// alloc indexed animation ids
-	dyn_anims.animdowns = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_downs);
-	dyn_anims.animups = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_ups);
-	dyn_anims.animbackwalks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_backwalks);
-	dyn_anims.animwalks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_walks);
-	dyn_anims.animidles = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_idles);
-	dyn_anims.animpains = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animdies = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animfalls = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animrises = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animriseattacks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animblkpains = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
-	dyn_anims.animattacks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attacks);
-	dyn_anims.animfollows = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_follows);
-	dyn_anims.animspecials = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_freespecials);
-	
+	int** dyn_anim_custom_max_ptr_arr = (int**) &dyn_anim_custom_max_ptr;
 	int** dyn_anims_arr = (int**) &dyn_anims;
 	int** dyn_anims_default_arr = (int**) &default_dyn_anims;
 	char* dyn_anims_default_sizes_arr = (char*) &default_dyn_anims_sizes;
+	unsigned j;
+	
 	for(i = 0; i < dyn_anim_itemcount; i++) {
+		dyn_anims_arr[i] = malloc(sizeof(int) * (*dyn_anim_custom_max_ptr_arr[i]));
 		memcpy(dyn_anims_arr[i], dyn_anims_default_arr[i], sizeof(int) * dyn_anims_default_sizes_arr[i]);
-		
+		for(j = dyn_anims_default_sizes_arr[i]; j < *dyn_anim_custom_max_ptr_arr[i]; j++) {
+			dyn_anims_arr[i][j] = maxanim++;
+		}
 	}
-
-	// copy default values and new animation ids
-	for(i = MAX_DOWNS; i < dyn_anim_custom_maxvalues.max_downs; i++)
-		dyn_anims.animdowns[i] = maxanim++;
-	for(i = MAX_UPS; i < dyn_anim_custom_maxvalues.max_ups; i++)
-		dyn_anims.animups[i] = maxanim++;
-	for(i = MAX_BACKWALKS; i < dyn_anim_custom_maxvalues.max_backwalks; i++)
-		dyn_anims.animbackwalks[i] = maxanim++;
-	for(i = MAX_WALKS; i < dyn_anim_custom_maxvalues.max_walks; i++)
-		dyn_anims.animwalks[i] = maxanim++;
-	for(i = MAX_IDLES; i < dyn_anim_custom_maxvalues.max_idles; i++)
-		dyn_anims.animidles[i] = maxanim++;
-	for(i = MAX_SPECIALS; i < dyn_anim_custom_maxvalues.max_freespecials; i++)
-		dyn_anims.animspecials[i] = maxanim++;
-	for(i = MAX_ATTACKS; i < dyn_anim_custom_maxvalues.max_attacks; i++)
-		dyn_anims.animattacks[i] = maxanim++;
-	for(i = MAX_FOLLOWS; i < dyn_anim_custom_maxvalues.max_follows; i++)
-		dyn_anims.animfollows[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animpains[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animfalls[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animrises[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animriseattacks[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animblkpains[i] = maxanim++;
-	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
-		dyn_anims.animdies[i] = maxanim++;
 
 	// Defer load_cached_model, so you can define models after their nested model.
 	printf("\n");

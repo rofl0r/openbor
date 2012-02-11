@@ -177,6 +177,24 @@ s_dyn_anim_custom_maxvalues dyn_anim_custom_maxvalues = {
 	.max_animations = MAX_ANIS,
 };
 
+//this table is used to find the custom max value for a
+//s_dynamic_animation_indexes member.
+const s_const_dynamic_animation_indexes dyn_anim_custom_max_ptr = {
+	.animdowns = &dyn_anim_custom_maxvalues.max_downs,
+	.animups = &dyn_anim_custom_maxvalues.max_ups,
+	.animbackwalks = &dyn_anim_custom_maxvalues.max_backwalks,
+	.animwalks = &dyn_anim_custom_maxvalues.max_walks,
+	.animidles = &dyn_anim_custom_maxvalues.max_idles,
+	.animpains = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animdies = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animfalls = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animrises = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animriseattacks = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animblkpains = &dyn_anim_custom_maxvalues.max_attack_types,
+	.animattacks = &dyn_anim_custom_maxvalues.max_attacks,
+	.animfollows = &dyn_anim_custom_maxvalues.max_follows,
+	.animspecials = &dyn_anim_custom_maxvalues.max_freespecials,
+};
 //----------------------------------
 
 const char *default_button_names[] = {

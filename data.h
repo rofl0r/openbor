@@ -108,6 +108,7 @@ typedef struct {
 
 extern const s_dyn_anim_custom_maxvalues dyn_anim_default_custom_maxvalues;
 extern s_dyn_anim_custom_maxvalues dyn_anim_custom_maxvalues;
+extern const s_const_dynamic_animation_indexes dyn_anim_custom_max_ptr;
 
 // -----------------------------
 
