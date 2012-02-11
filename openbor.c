@@ -797,6 +797,8 @@ static const s_script_args_names script_args_names = {
 	.obstacle = "obstacle",
 	.time = "time",
 	.gotime = "gotime",
+	.damage = "damage",
+	.damagetaker = "damagetaker",
 };
 
 static const s_script_args init_script_args_default = {
@@ -822,6 +824,8 @@ static const s_script_args init_script_args_default = {
 	.obstacle = {VT_EMPTY, 0},
 	.time = {VT_EMPTY, 0},
 	.gotime = {VT_EMPTY, 0},
+	.damage = {VT_EMPTY, 0},
+	.damagetaker = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -847,6 +851,8 @@ static const s_script_args init_script_args_only_ent = {
 	.obstacle = {VT_EMPTY, 0},
 	.time = {VT_EMPTY, 0},
 	.gotime = {VT_EMPTY, 0},
+	.damage = {VT_EMPTY, 0},
+	.damagetaker = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -998,17 +1004,25 @@ void execute_didhit_script(entity * ent, entity * other, int force, int drop, in
 			   int jugglecost, int pauseadd, int blocked) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
-	script_args.force.value = force;
+	script_args.other.vt = VT_EMPTY; /* yep, some smartass introduced another field "damagetaker"
+					    instead of reusing "attacker" */
+	script_args.damagetaker.vt = VT_PTR;
+	script_args.damagetaker.value = (intptr_t) other;
+	
+	script_args.force.vt = VT_EMPTY; /* and same here. */
+	script_args.damage.vt = VT_INTEGER;
+	script_args.damage.value = force;
+	
+	script_args.blocked.vt = VT_INTEGER;
+	script_args.blocked.value = blocked;
+	
+	// at least these few are standard...
 	script_args.drop.value = drop;
 	script_args.type.value = type;
 	script_args.noblock.value = noblock;
 	script_args.guardcost.value = guardcost;
 	script_args.jugglecost.value = jugglecost;
 	script_args.pauseadd.value = pauseadd;
-	
-	script_args.blocked.vt = VT_INTEGER;
-	script_args.blocked.value = blocked;
 	
 	execute_didhit_script_i(&script_args);
 }
