@@ -1279,36 +1279,20 @@ void execute_spawn_script(s_spawn_entry * p, entity * e) {
 	pcurrentscript = ptempscript;
 }
 
-void execute_level_key_script(int player) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&(level->key_script))) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) player;
-		Script_Set_Local_Variant("player", &tempvar);
-		Script_Execute(&(level->key_script));
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("player", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+void execute_script_player(int player_nr, Script* script) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.vt = VT_EMPTY;
+	script_args.player.vt = VT_INTEGER;
+	script_args.player.value = player_nr;
+	execute_script_default(&script_args, script);
 }
 
-void execute_key_script_all(int player) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&game_scripts.key_script_all)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) player;
-		Script_Set_Local_Variant("player", &tempvar);
-		Script_Execute(&game_scripts.key_script_all);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("player", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+void execute_level_key_script(int player_nr) {
+	execute_script_player(player_nr, &level->key_script);
+}
+
+void execute_key_script_all(int player_nr) {
+	execute_script_player(player_nr, &game_scripts.key_script_all);
 }
 
 void execute_timetick_script(int time, int gotime) {
