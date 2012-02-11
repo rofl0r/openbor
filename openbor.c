@@ -6418,11 +6418,15 @@ void unload_levelorder() {
 	}
 }
 
-
+void alloc_levelorder(int diff, char* filename) {
+	levelorder[diff][num_levels[diff]] = (s_level_entry *) calloc(1, sizeof(s_level_entry));
+	levelorder[diff][num_levels[diff]]->branchname = strdup(branch_name);
+	levelorder[diff][num_levels[diff]]->filename = strdup(filename);
+}
 
 // Add a level to the level order
 void add_level(char *filename, int diff) {
-	int len, Zs[3] = { 0, 0, 0 };
+	int Zs[3] = { 0, 0, 0 };
 
 	if(z_coords[0] > 0)
 		Zs[0] = z_coords[0];
@@ -6444,47 +6448,22 @@ void add_level(char *filename, int diff) {
 	if(num_levels[diff] >= MAX_LEVELS)
 		shutdown(1, "Too many entries in level order (max. %i)!", MAX_LEVELS);
 
-	levelorder[diff][num_levels[diff]] = malloc(sizeof(s_level_entry));
-	memset(levelorder[diff][num_levels[diff]], 0, sizeof(s_level_entry));
-
-	len = strlen(branch_name);
-	levelorder[diff][num_levels[diff]]->branchname = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->branchname, branch_name);
-	levelorder[diff][num_levels[diff]]->branchname[len] = 0;
-
-	len = strlen(filename);
-	levelorder[diff][num_levels[diff]]->filename = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->filename, filename);
-	levelorder[diff][num_levels[diff]]->filename[len] = 0;
-
+	alloc_levelorder(diff, filename);
+	
 	levelorder[diff][num_levels[diff]]->z_coords[0] = Zs[0];
 	levelorder[diff][num_levels[diff]]->z_coords[1] = Zs[1];
 	levelorder[diff][num_levels[diff]]->z_coords[2] = Zs[2];
 	num_levels[diff]++;
 }
 
-
-
 // Add a scene to the level order
 void add_scene(char *filename, int diff) {
-	int len;
 	if(diff > MAX_DIFFICULTIES)
 		return;
 	if(num_levels[diff] >= MAX_LEVELS)
 		shutdown(1, "Too many entries in level order (max. %i)!", MAX_LEVELS);
-
-	levelorder[diff][num_levels[diff]] = (s_level_entry *) malloc(sizeof(s_level_entry));
-	memset(levelorder[diff][num_levels[diff]], 0, sizeof(s_level_entry));
-
-	len = strlen(branch_name);
-	levelorder[diff][num_levels[diff]]->branchname = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->branchname, branch_name);
-	levelorder[diff][num_levels[diff]]->branchname[len] = 0;
-
-	len = strlen(filename);
-	levelorder[diff][num_levels[diff]]->filename = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->filename, filename);
-	levelorder[diff][num_levels[diff]]->filename[len] = 0;
+	
+	alloc_levelorder(diff, filename);
 
 	levelorder[diff][num_levels[diff]]->type = cut_scene;
 	num_levels[diff]++;
@@ -6492,24 +6471,12 @@ void add_scene(char *filename, int diff) {
 
 // Add a select screen file to the level order
 void add_select(char *filename, int diff) {
-	int len;
 	if(diff > MAX_DIFFICULTIES)
 		return;
 	if(num_levels[diff] >= MAX_LEVELS)
 		shutdown(1, "Too many entries in level order (max. %i)!", MAX_LEVELS);
-
-	levelorder[diff][num_levels[diff]] = (s_level_entry *) malloc(sizeof(s_level_entry));
-	memset(levelorder[diff][num_levels[diff]], 0, sizeof(s_level_entry));
-
-	len = strlen(branch_name);
-	levelorder[diff][num_levels[diff]]->branchname = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->branchname, branch_name);
-	levelorder[diff][num_levels[diff]]->branchname[len] = 0;
-
-	len = strlen(filename);
-	levelorder[diff][num_levels[diff]]->filename = malloc(len + 1);
-	strcpy(levelorder[diff][num_levels[diff]]->filename, filename);
-	levelorder[diff][num_levels[diff]]->filename[len] = 0;
+	
+	alloc_levelorder(diff, filename);
 
 	levelorder[diff][num_levels[diff]]->type = select_screen;
 	num_levels[diff]++;
