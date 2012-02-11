@@ -518,11 +518,8 @@ int buffer_pakfile(char *filename, char **pbuffer, size_t * psize) {
 		return 0;
 	}
 	if(readpackfile(handle, *pbuffer, *psize) != *psize) {
-		if(*pbuffer != NULL) {
-			free(*pbuffer);
-			*pbuffer = NULL;
-			*psize = 0;
-		}
+		freeAndNull((void**) pbuffer);
+		*psize = 0;
 		closepackfile(handle);
 		shutdown(1, "Can't read from packfile '%s'", filename);
 		return 0;
@@ -783,10 +780,7 @@ int load_script(Script * script, char *file) {
 
 	failed = !Script_AppendText(script, buf, file);
 
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 	// text loaded but parsing failed, shutdown
 	if(failed)
 		shutdown(1, "Failed to parse script file: '%s'!\n", file);
@@ -853,10 +847,7 @@ void free_all_scripts(s_scripts * s) {
 	Script **ps = (Script **) s;
 
 	for(i = 0; i < scripts_membercount; i++) {
-		if(ps[i]) {
-			free(ps[i]);
-			ps[i] = NULL;
-		}
+		freeAndNull((void**) &ps[i]);
 	}
 }
 
@@ -1889,14 +1880,12 @@ int load_colourmap(s_model * model, char *image1, char *image2) {
 		return -2;
 	}
 	if((bitmap1 = loadbitmap(image1, packfile, PIXEL_8)) == NULL) {
-		free(map);
-		map = NULL;
+		freeAndNull((void**) &map);
 		return -3;
 	}
 	if((bitmap2 = loadbitmap(image2, packfile, PIXEL_8)) == NULL) {
 		freebitmap(bitmap1);
-		free(map);
-		map = NULL;
+		freeAndNull((void**) &map);
 		return -4;
 	}
 	// Create the colour map
@@ -1946,8 +1935,7 @@ int convert_map_to_palette(s_model * model, unsigned char mapflag[]) {
 			memcpy(p1, p2, pb);
 		}
 		model->colourmap[c] = newmap;
-		free(oldmap);
-		oldmap = NULL;
+		freeAndNull((void**) &oldmap);
 	}
 	return 1;
 }
@@ -2080,9 +2068,7 @@ void unload_background() {
 	if(background)
 		clearscreen(background);
 	for(i = 0; i < MAX_BLENDINGS; i++) {
-		if(blendings[i])
-			free(blendings[i]);
-		blendings[i] = NULL;
+		freeAndNull((void**) &blendings[i]);
 	}
 }
 
@@ -2194,10 +2180,7 @@ void lifebar_colors() {
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
 	}
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 }
 
 // ltb 1-17-05 end new lifebar colors
@@ -2329,9 +2312,7 @@ void load_fglayer(char *filename, int index) {
 }
 
 void unload_texture() {
-	if(texture)
-		freebitmap(texture);
-	texture = NULL;
+	freeAndNull((void**) &texture);
 }
 
 void load_texture(char *filename) {
@@ -2344,22 +2325,10 @@ void load_texture(char *filename) {
 void freepanels() {
 	int i;
 	for(i = 0; i < MAX_PANELS; i++) {
-		if(panels[i].sprite_normal != NULL) {
-			free(panels[i].sprite_normal);
-			panels[i].sprite_normal = NULL;
-		}
-		if(panels[i].sprite_neon != NULL) {
-			free(panels[i].sprite_neon);
-			panels[i].sprite_neon = NULL;
-		}
-		if(panels[i].sprite_screen != NULL) {
-			free(panels[i].sprite_screen);
-			panels[i].sprite_screen = NULL;
-		}
-		if(frontpanels[i] != NULL) {
-			free(frontpanels[i]);
-			frontpanels[i] = NULL;
-		}
+		freeAndNull((void**) &panels[i].sprite_normal);
+		freeAndNull((void**) &panels[i].sprite_neon);
+		freeAndNull((void**) &panels[i].sprite_screen);
+		freeAndNull((void**) &frontpanels[i]);
 	}
 	panels_loaded = 0;
 	frontpanels_loaded = 0;
@@ -2491,20 +2460,15 @@ void freesprites() {
 	unsigned short i;
 	s_sprite_list *head;
 	for(i = 0; i <= sprites_loaded; i++) {
-		if(sprite_list != NULL) {
-			free(sprite_list->sprite);
-			sprite_list->sprite = NULL;
-			free(sprite_list->filename);
-			sprite_list->filename = NULL;
+		if(sprite_list) {
+			freeAndNull((void**) &sprite_list->sprite);
+			freeAndNull((void**) &sprite_list->filename);
 			head = sprite_list->next;
 			free(sprite_list);
 			sprite_list = head;
 		}
 	}
-	if(sprite_map != NULL) {
-		free(sprite_map);
-		sprite_map = NULL;
-	}
+	freeAndNull((void**) &sprite_map);
 	sprites_loaded = 0;
 }
 
@@ -2666,9 +2630,7 @@ void load_menu_txt() {
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
 	}
-
-	if(buf != NULL)
-		free(buf);
+	freeAndNull((void**) &buf);
 }
 
 static const s_samples_strings samples_special_filenames = {
@@ -2799,77 +2761,28 @@ void alloc_frames(s_anim * anim, int fcount) {
 
 void free_frames(s_anim * anim) {
 	int i;
-	if(anim->idle) {
-		free(anim->idle);
-		anim->idle = NULL;
-	}
-	if(anim->seta) {
-		free(anim->seta);
-		anim->seta = NULL;
-	}
-	if(anim->move) {
-		free(anim->move);
-		anim->move = NULL;
-	}
-	if(anim->movez) {
-		free(anim->movez);
-		anim->movez = NULL;
-	}
-	if(anim->movea) {
-		free(anim->movea);
-		anim->movea = NULL;
-	}
-	if(anim->delay) {
-		free(anim->delay);
-		anim->delay = NULL;
-	}
-	if(anim->sprite) {
-		free(anim->sprite);
-		anim->sprite = NULL;
-	}
-	if(anim->platform) {
-		free(anim->platform);
-		anim->platform = NULL;
-	}
-	if(anim->vulnerable) {
-		free(anim->vulnerable);
-		anim->vulnerable = NULL;
-	}
-	if(anim->bbox_coords) {
-		free(anim->bbox_coords);
-		anim->bbox_coords = NULL;
-	}
-	if(anim->shadow) {
-		free(anim->shadow);
-		anim->shadow = NULL;
-	}
-	if(anim->shadow_coords) {
-		free(anim->shadow_coords);
-		anim->shadow_coords = NULL;
-	}
-	if(anim->soundtoplay) {
-		free(anim->soundtoplay);
-		anim->soundtoplay = NULL;
-	}
+	freeAndNull((void**) &anim->idle);
+	freeAndNull((void**) &anim->seta);
+	freeAndNull((void**) &anim->move);
+	freeAndNull((void**) &anim->movez);
+	freeAndNull((void**) &anim->movea);
+	freeAndNull((void**) &anim->delay);
+	freeAndNull((void**) &anim->sprite);
+	freeAndNull((void**) &anim->platform);
+	freeAndNull((void**) &anim->vulnerable);
+	freeAndNull((void**) &anim->bbox_coords);
+	freeAndNull((void**) &anim->shadow);
+	freeAndNull((void**) &anim->shadow_coords);
+	freeAndNull((void**) &anim->soundtoplay);
 	if(anim->attacks) {
-		for(i = 0; i < anim->numframes; i++) {
-			if(anim->attacks[i]) {
-				free(anim->attacks[i]);
-				anim->attacks[i] = NULL;
-			}
-		}
-		free(anim->attacks);
-		anim->attacks = NULL;
+		for(i = 0; i < anim->numframes; i++)
+			freeAndNull((void**) &anim->attacks[i]);
+		freeAndNull((void**) &anim->attacks);
 	}
 	if(anim->drawmethods) {
-		for(i = 0; i < anim->numframes; i++) {
-			if(anim->drawmethods[i]) {
-				free(anim->drawmethods[i]);
-				anim->drawmethods[i] = NULL;
-			}
-		}
-		free(anim->drawmethods);
-		anim->drawmethods = NULL;
+		for(i = 0; i < anim->numframes; i++)
+			freeAndNull((void**) &anim->drawmethods[i]);
+		freeAndNull((void**) &anim->drawmethods);
 	}
 }
 
@@ -2891,22 +2804,10 @@ void free_anim(s_anim * anim) {
 	if(!anim)
 		return;
 	free_frames(anim);
-	if(anim->weaponframe) {
-		free(anim->weaponframe);
-		anim->weaponframe = NULL;
-	}
-	if(anim->spawnframe) {
-		free(anim->spawnframe);
-		anim->spawnframe = NULL;
-	}
-	if(anim->summonframe) {
-		free(anim->summonframe);
-		anim->summonframe = NULL;
-	}
-	if(anim) {
-		free(anim);
-		anim = NULL;
-	}
+	freeAndNull((void**) &anim->weaponframe);
+	freeAndNull((void**) &anim->spawnframe);
+	freeAndNull((void**) &anim->summonframe);
+	freeAndNull((void**) &anim);
 }
 
 int hasFreetype(s_model * m, ModelFreetype t) {
@@ -2931,69 +2832,50 @@ int free_model(s_model * model) {
 			anim_list = anim_list_delete(anim_list, model->index);
 
 	if(hasFreetype(model, MF_COLOURMAP))
-		for(i = 0; i < MAX_COLOUR_MAPS; i++) {
-			if(model->colourmap[i] != NULL) {
-				free(model->colourmap[i]);
-				model->colourmap[i] = NULL;
-			}
-		}
+		for(i = 0; i < MAX_COLOUR_MAPS; i++)
+			freeAndNull((void**) &model->colourmap[i]);
 
-	if(hasFreetype(model, MF_PALETTE) && model->palette) {
-		free(model->palette);
-		model->palette = NULL;
-	}
-	if(hasFreetype(model, MF_WEAPONS) && model->weapon && model->ownweapons) {
-		free(model->weapon);
-		model->weapon = NULL;
-	}
-	if(hasFreetype(model, MF_BRANCH) && model->branch) {
-		free(model->branch);
-		model->branch = NULL;
-	}
-	if(hasFreetype(model, MF_ANIMATION) && model->animation) {
-		free(model->animation);
-		model->animation = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_FACTORS) && model->defense_factors) {
-		free(model->defense_factors);
-		model->defense_factors = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_PAIN) && model->defense_pain) {
-		free(model->defense_pain);
-		model->defense_pain = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_KNOCKDOWN) && model->defense_knockdown) {
-		free(model->defense_knockdown);
-		model->defense_knockdown = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_BLOCKPOWER) && model->defense_blockpower) {
-		free(model->defense_blockpower);
-		model->defense_blockpower = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_BLOCKTRESHOLD) && model->defense_blockthreshold) {
-		free(model->defense_blockthreshold);
-		model->defense_blockthreshold = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_BLOCKRATIO) && model->defense_blockratio) {
-		free(model->defense_blockratio);
-		model->defense_blockratio = NULL;
-	}
-	if(hasFreetype(model, MF_DEF_BLOCKTYPE) && model->defense_blocktype) {
-		free(model->defense_blocktype);
-		model->defense_blocktype = NULL;
-	}
-	if(hasFreetype(model, MF_OFF_FACTORS) && model->offense_factors) {
-		free(model->offense_factors);
-		model->offense_factors = NULL;
-	}
-	if(hasFreetype(model, MF_SPECIAL) && model->special) {
-		free(model->special);
-		model->special = NULL;
-	}
-	if(hasFreetype(model, MF_SMARTBOMB) && model->smartbomb) {
-		free(model->smartbomb);
-		model->smartbomb = NULL;
-	}
+	if(hasFreetype(model, MF_PALETTE) && model->palette)
+		freeAndNull((void**) &model->palette);
+	
+	if(hasFreetype(model, MF_WEAPONS) && model->weapon && model->ownweapons) 
+		freeAndNull((void**) &model->weapon);
+	
+	if(hasFreetype(model, MF_BRANCH) && model->branch)
+		freeAndNull((void**) &model->branch);
+	
+	if(hasFreetype(model, MF_ANIMATION) && model->animation)
+		freeAndNull((void**) &model->animation);
+	
+	if(hasFreetype(model, MF_DEF_FACTORS) && model->defense_factors)
+		freeAndNull((void**) &model->defense_factors);
+	
+	if(hasFreetype(model, MF_DEF_PAIN) && model->defense_pain)
+		freeAndNull((void**) &model->defense_pain);
+	
+	if(hasFreetype(model, MF_DEF_KNOCKDOWN) && model->defense_knockdown)
+		freeAndNull((void**) &model->defense_knockdown);
+	
+	if(hasFreetype(model, MF_DEF_BLOCKPOWER) && model->defense_blockpower)
+		freeAndNull((void**) &model->defense_blockpower);
+	
+	if(hasFreetype(model, MF_DEF_BLOCKTRESHOLD) && model->defense_blockthreshold)
+		freeAndNull((void**) &model->defense_blockthreshold);
+	
+	if(hasFreetype(model, MF_DEF_BLOCKRATIO) && model->defense_blockratio)
+		freeAndNull((void**) &model->defense_blockratio);
+	
+	if(hasFreetype(model, MF_DEF_BLOCKTYPE) && model->defense_blocktype)
+		freeAndNull((void**) &model->defense_blocktype);
+	
+	if(hasFreetype(model, MF_OFF_FACTORS) && model->offense_factors)
+		freeAndNull((void**) &model->offense_factors);
+	
+	if(hasFreetype(model, MF_SPECIAL) && model->special)
+		freeAndNull((void**) &model->special);
+	
+	if(hasFreetype(model, MF_SMARTBOMB) && model->smartbomb)
+		freeAndNull((void**) &model->smartbomb);
 
 	if(hasFreetype(model, MF_SCRIPTS)) {
 		clear_all_scripts(&model->scripts, 2);
@@ -3005,70 +2887,32 @@ int free_model(s_model * model) {
 	return models_loaded--;
 }
 
+void freeAnims(void) {
+	freeAndNull((void**) &animdowns);
+	freeAndNull((void**) &animups);
+	freeAndNull((void**) &animbackwalks);
+	freeAndNull((void**) &animwalks);
+	freeAndNull((void**) &animidles);
+	freeAndNull((void**) &animspecials);
+	freeAndNull((void**) &animattacks);
+	freeAndNull((void**) &animfollows);
+	freeAndNull((void**) &animpains);
+	freeAndNull((void**) &animfalls);
+	freeAndNull((void**) &animrises);
+	freeAndNull((void**) &animriseattacks);
+	freeAndNull((void**) &animblkpains);
+	freeAndNull((void**) &animdies);
+}
+
 // Unload all models and animations memory
-void free_models() {
+void free_models(void) {
 	s_model *temp;
 
 	while((temp = getFirstModel()))
 		free_model(temp);
 
 	// free animation ids
-	if(animdowns) {
-		free(animdowns);
-		animdowns = NULL;
-	}
-	if(animups) {
-		free(animups);
-		animups = NULL;
-	}
-	if(animbackwalks) {
-		free(animbackwalks);
-		animbackwalks = NULL;
-	}
-	if(animwalks) {
-		free(animwalks);
-		animwalks = NULL;
-	}
-	if(animidles) {
-		free(animidles);
-		animidles = NULL;
-	}
-	if(animspecials) {
-		free(animspecials);
-		animspecials = NULL;
-	}
-	if(animattacks) {
-		free(animattacks);
-		animattacks = NULL;
-	}
-	if(animfollows) {
-		free(animfollows);
-		animfollows = NULL;
-	}
-	if(animpains) {
-		free(animpains);
-		animpains = NULL;
-	}
-	if(animfalls) {
-		free(animfalls);
-		animfalls = NULL;
-	}
-	if(animrises) {
-		free(animrises);
-		animrises = NULL;
-	}
-	if(animriseattacks) {
-		free(animriseattacks);
-		animriseattacks = NULL;
-	}
-	if(animblkpains) {
-		free(animblkpains);
-		animblkpains = NULL;
-	}
-	if(animdies) {
-		free(animdies);
-		animdies = NULL;
-	}
+	freeAnims();
 }
 
 
@@ -3232,11 +3076,7 @@ void _peek_model_name(int index) {
 		}
 		pos += getNewLineStart(buf + pos);
 	}
-
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 }
 
 void prepare_cache_map(size_t size) {
@@ -3285,8 +3125,7 @@ void free_modelcache() {
 			free(model_cache[models_cached].path);
 			model_cache[models_cached].path = NULL;
 		}
-		free(model_cache);
-		model_cache = NULL;
+		freeAndNull((void**) &model_cache);
 	}
 }
 
@@ -6238,15 +6077,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 	printf("Loading '%s' from %s\n", newchar->name, filename);
 
 	lCleanup:
-
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
-	if(scriptbuf) {
-		free(scriptbuf);
-		scriptbuf = NULL;
-	}
+	freeAndNull((void**) &buf);
+	freeAndNull((void**) &scriptbuf);
 
 	if(!shutdownmessage)
 		return newchar;
@@ -6314,10 +6146,7 @@ int load_script_setting() {
 		pos += getNewLineStart(buf + pos);
 	}
 
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 	return 1;
 }
 
@@ -6371,62 +6200,7 @@ int load_models() {
 	max_animations = MAX_ANIS;
 
 	// free old values
-	if(animspecials) {
-		free(animspecials);
-		animspecials = NULL;
-	}
-	if(animattacks) {
-		free(animattacks);
-		animattacks = NULL;
-	}
-	if(animfollows) {
-		free(animfollows);
-		animfollows = NULL;
-	}
-	if(animpains) {
-		free(animpains);
-		animpains = NULL;
-	}
-	if(animfalls) {
-		free(animfalls);
-		animfalls = NULL;
-	}
-	if(animrises) {
-		free(animrises);
-		animrises = NULL;
-	}
-	if(animriseattacks) {
-		free(animriseattacks);
-		animriseattacks = NULL;
-	}
-	if(animblkpains) {
-		free(animblkpains);
-		animblkpains = NULL;
-	}
-	if(animdies) {
-		free(animdies);
-		animdies = NULL;
-	}
-	if(animwalks) {
-		free(animwalks);
-		animwalks = NULL;
-	}
-	if(animbackwalks) {
-		free(animbackwalks);
-		animbackwalks = NULL;
-	}
-	if(animidles) {
-		free(animidles);
-		animidles = NULL;
-	}
-	if(animups) {
-		free(animups);
-		animups = NULL;
-	}
-	if(animdowns) {
-		free(animdowns);
-		animdowns = NULL;
-	}
+	freeAnims();
 
 	if(custModels != NULL) {
 		strcpy(filename, "data/");
@@ -6659,9 +6433,7 @@ int load_models() {
 	}
 	printf("\nLoading models...............\tDone!\n");
 
-
-	if(buf)
-		free(buf);
+	freeAndNull((void**) &buf);
 
 	return 1;
 }
@@ -6674,12 +6446,9 @@ void unload_levelorder() {
 	for(j = 0; j < MAX_DIFFICULTIES; j++) {
 		for(i = 0; i < MAX_LEVELS; i++) {
 			if(levelorder[j][i] != NULL) {
-				free(levelorder[j][i]->branchname);
-				levelorder[j][i]->branchname = NULL;
-				free(levelorder[j][i]->filename);
-				levelorder[j][i]->filename = NULL;
-				free(levelorder[j][i]);
-				levelorder[j][i] = NULL;
+				freeAndNull((void**) &levelorder[j][i]->branchname);
+				freeAndNull((void**) &levelorder[j][i]->filename);
+				freeAndNull((void**) &levelorder[j][i]);
 			}
 		}
 		num_levels[j] = 0;
@@ -6689,15 +6458,10 @@ void unload_levelorder() {
 
 	if(skipselect) {
 		for(i = 0; i < MAX_DIFFICULTIES; i++) {
-			for(j = 0; j < MAX_PLAYERS; j++) {
-				if((*skipselect)[i][j]) {
-					free((*skipselect)[i][j]);
-					(*skipselect)[i][j] = NULL;
-				}
-			}
+			for(j = 0; j < MAX_PLAYERS; j++)
+				freeAndNull((void**) &((*skipselect)[i][j]));
 		}
-		free(skipselect);
-		skipselect = NULL;
+		freeAndNull((void**) &skipselect);
 	}
 }
 
@@ -7818,9 +7582,7 @@ void load_levelorder() {
 		errormessage = "No levels were loaded!";
 
 	lCleanup:
-
-	if(buf)
-		free(buf);
+	freeAndNull((void**) &buf);
 
 	if(errormessage)
 		shutdown(1, "load_levelorder ERROR in %s at %d, msg: %s\n", filename, line, errormessage);
@@ -7836,42 +7598,23 @@ void free_level(s_level * lv) {
 	if(!lv)
 		return;
 	//offload blending tables
-	for(i = 0; i < LEVEL_MAX_PALETTES; i++) {
-		for(j = 0; j < MAX_BLENDINGS; j++) {
-			if(lv->blendings[i][j])
-				free(lv->blendings[i][j]);
-			lv->blendings[i][j] = NULL;
-		}
-	}
+	for(i = 0; i < LEVEL_MAX_PALETTES; i++)
+		for(j = 0; j < MAX_BLENDINGS; j++)
+			freeAndNull((void**) &lv->blendings[i][j]);
 	//offload bglayers
-	for(i = 1; i < lv->numbglayers; i++) {
-		if(lv->bglayers[i].handle) {
-			free(lv->bglayers[i].handle);
-			lv->bglayers[i].handle = NULL;
-		}
-	}
+	for(i = 1; i < lv->numbglayers; i++)
+		freeAndNull((void**) &lv->bglayers[i].handle);
+	
 	//offload fglayers
-	for(i = 0; i < lv->numfglayers; i++) {
-		if(lv->fglayers[i].handle) {
-			free(lv->fglayers[i].handle);
-			lv->fglayers[i].handle = NULL;
-		}
-	}
+	for(i = 0; i < lv->numfglayers; i++)
+		freeAndNull((void**) &lv->fglayers[i].handle);
 
 	//offload textobjs
-	for(i = 0; i < LEVEL_MAX_TEXTOBJS; i++) {
-		if(lv->textobjs[i].text) {
-			free(lv->textobjs[i].text);
-			lv->textobjs[i].text = NULL;
-		}
-	}
+	for(i = 0; i < LEVEL_MAX_TEXTOBJS; i++)
+		freeAndNull((void**) &lv->textobjs[i].text);
 
-	for(i = 0; i < LEVEL_MAX_FILESTREAMS; i++) {
-		if(lv->filestreams[i].buf) {
-			free(lv->filestreams[i].buf);
-			lv->filestreams[i].buf = NULL;
-		}
-	}
+	for(i = 0; i < LEVEL_MAX_FILESTREAMS; i++)
+		freeAndNull((void**) &lv->filestreams[i].buf);
 
 	//offload scripts
 	Script_Clear(&(lv->update_script), 2);
@@ -7899,17 +7642,13 @@ void free_level(s_level * lv) {
 	while(tempnode) {
 		tempnode2 = tempnode->next;
 		Script_Clear(tempnode->cached_spawn_script, 2);
-		free(tempnode->cached_spawn_script);
-		tempnode->cached_spawn_script = NULL;
-		free(tempnode->filename);
-		tempnode->filename = NULL;
+		freeAndNull((void**) &tempnode->cached_spawn_script);
+		freeAndNull((void**) &tempnode->filename);
 		tempnode->next = NULL;
 		free(tempnode);
 		tempnode = tempnode2;
 	}
-
-	free(lv);
-	lv = NULL;
+	freeAndNull((void**) &lv);
 }
 
 
@@ -7929,8 +7668,7 @@ void unload_level() {
 		level->waiting = 0;
 
 		printf("Level Unloading: '%s'\n", level->name);
-		free(level->name);
-		level->name = NULL;
+		freeAndNull((void**) &level->name);
 		free_level(level);
 		level = NULL;
 		temp = getFirstModel();
@@ -8939,9 +8677,7 @@ void load_level(char *filename) {
 	printf("Level Loaded:    '%s'\n", level->name);
 
 	lCleanup:
-
-	if(buf != NULL)
-		free(buf);
+	freeAndNull((void**) &buf);
 
 	if(errormessage)
 		shutdown(1, "ERROR: load_level, file %s, line %d, message: %s", filename, line, errormessage);
@@ -9668,56 +9404,35 @@ void addscore(int playerindex, int add) {
 
 // ---------------------------- Object handling ------------------------------
 
+void freeEntityFactors(entity* e) {
+	freeAndNull((void**) &e->defense_factors);
+	freeAndNull((void**) &e->defense_pain);
+	freeAndNull((void**) &e->defense_knockdown);
+	freeAndNull((void**) &e->defense_blockpower);
+	freeAndNull((void**) &e->defense_blockthreshold);
+	freeAndNull((void**) &e->defense_blockratio);
+	freeAndNull((void**) &e->defense_blocktype);
+	freeAndNull((void**) &e->offense_factors);
+}
+
 void free_ent(entity * e) {
 	int i;
 	if(!e)
 		return;
 	clear_all_scripts(&e->scripts, 2);
 	free_all_scripts(&e->scripts);
+	
+	freeEntityFactors(e);
 
-	if(e->defense_factors) {
-		free(e->defense_factors);
-		e->defense_factors = NULL;
-	}
-	if(e->defense_pain) {
-		free(e->defense_pain);
-		e->defense_pain = NULL;
-	}
-	if(e->defense_knockdown) {
-		free(e->defense_knockdown);
-		e->defense_knockdown = NULL;
-	}
-	if(e->defense_blockpower) {
-		free(e->defense_blockpower);
-		e->defense_blockpower = NULL;
-	}
-	if(e->defense_blockthreshold) {
-		free(e->defense_blockthreshold);
-		e->defense_blockthreshold = NULL;
-	}
-	if(e->defense_blockratio) {
-		free(e->defense_blockratio);
-		e->defense_blockratio = NULL;
-	}
-	if(e->defense_blocktype) {
-		free(e->defense_blocktype);
-		e->defense_blocktype = NULL;
-	}
-	if(e->offense_factors) {
-		free(e->offense_factors);
-		e->offense_factors = NULL;
-	}
 	if(e->entvars) {
 		// Although free_ent will be only called once when the engine is shutting down,
 		// just clear those in case we forget something
 		for(i = 0; i < max_entity_vars; i++) {
 			ScriptVariant_Clear(e->entvars + i);
 		}
-		free(e->entvars);
-		e->entvars = NULL;
+		freeAndNull((void**) &e->entvars);
 	}
-	free(e);
-	e = NULL;
+	freeAndNull((void**) &e);
 }
 
 void free_ents() {
@@ -19055,10 +18770,7 @@ void draw_textobjs() {
 			level->textobjs[i].y = 0;
 			level->textobjs[i].font = 0;
 			level->textobjs[i].z = 0;
-			if(level->textobjs[i].text) {
-				free(level->textobjs[i].text);
-				level->textobjs[i].text = NULL;
-			}
+			freeAndNull((void**) &level->textobjs[i].text);
 		} else {
 			if(textobj->text)
 				font_printf(textobj->x, textobj->y, textobj->font, textobj->z, textobj->text);
@@ -19692,10 +19404,7 @@ void playscene(char *filename) {
 		// Go to next non-blank line
 		pos += getNewLineStart(buf + pos);
 	}
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 }
 
 // ----------------------------------------------------------------------------
@@ -20051,10 +19760,7 @@ int selectplayer(int *players, char *filename) {
 
 			pos += getNewLineStart(buf + pos);
 		}
-		if(buf != NULL) {
-			free(buf);
-			buf = NULL;
-		}
+		freeAndNull((void**) &buf);
 		for(i = 0; i < maxplayers[current_set]; i++) {
 			if(players[i]) {
 				if(!psmenu[i][0] && !psmenu[i][1]) {
@@ -20462,15 +20168,9 @@ void term_videomodes() {
 	videomodes.hRes = 0;
 	videomodes.vRes = 0;
 	video_set_mode(videomodes);
-	if(custBkgrds != NULL)
-		free(custBkgrds);
-	custBkgrds = NULL;
-	if(custLevels != NULL)
-		free(custLevels);
-	custLevels = NULL;
-	if(custModels != NULL)
-		free(custModels);
-	custModels = NULL;
+	freeAndNull((void**) &custBkgrds);
+	freeAndNull((void**) &custLevels);
+	freeAndNull((void**) &custModels);
 }
 
 // Load Video Mode from file
@@ -20545,11 +20245,7 @@ int init_videomodes(void) {
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
 	}
-
-	if(buf != NULL) {
-		free(buf);
-		buf = NULL;
-	}
+	freeAndNull((void**) &buf);
 
 	VIDEOMODES:
 	if(videoMode >= VTM_MAX)
@@ -20647,10 +20343,7 @@ void keyboard_setup(int player_nr) {
 			// Go to next line
 			pos += getNewLineStart(buf + pos);
 		}
-		if(buf != NULL) {
-			free(buf);
-			buf = NULL;
-		}
+		freeAndNull((void**) &buf);
 	}
 	
 	controller_options(player_nr, &quit, buttonnames, disabledkey);
