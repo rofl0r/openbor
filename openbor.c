@@ -6426,33 +6426,16 @@ void alloc_levelorder(int diff, char* filename) {
 
 // Add a level to the level order
 void add_level(char *filename, int diff) {
-	int Zs[3] = { 0, 0, 0 };
-
-	if(z_coords[0] > 0)
-		Zs[0] = z_coords[0];
-	else
-		Zs[0] = PLAYER_MIN_Z;
-
-	if(z_coords[1] > 0)
-		Zs[1] = z_coords[1];
-	else
-		Zs[1] = PLAYER_MAX_Z;
-
-	if(z_coords[2] > 0)
-		Zs[2] = z_coords[2];
-	else
-		Zs[2] = PLAYER_MIN_Z;
-
 	if(diff > MAX_DIFFICULTIES)
 		return;
 	if(num_levels[diff] >= MAX_LEVELS)
 		shutdown(1, "Too many entries in level order (max. %i)!", MAX_LEVELS);
-
+	
 	alloc_levelorder(diff, filename);
 	
-	levelorder[diff][num_levels[diff]]->z_coords[0] = Zs[0];
-	levelorder[diff][num_levels[diff]]->z_coords[1] = Zs[1];
-	levelorder[diff][num_levels[diff]]->z_coords[2] = Zs[2];
+	levelorder[diff][num_levels[diff]]->z_coords[0] = (z_coords[0] > 0) ? z_coords[0] : PLAYER_MIN_Z;
+	levelorder[diff][num_levels[diff]]->z_coords[1] = (z_coords[1] > 0) ? z_coords[1] : PLAYER_MAX_Z;
+	levelorder[diff][num_levels[diff]]->z_coords[2] = (z_coords[2] > 0) ? z_coords[2] : PLAYER_MIN_Z;
 	num_levels[diff]++;
 }
 
