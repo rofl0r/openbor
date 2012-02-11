@@ -776,7 +776,7 @@ void copy_all_scripts(s_scripts * src, s_scripts * dest, int method) {
 
 static const s_script_args_names script_args_names = {
 	.ent = "self",
-	.other = "attacker",
+	.attacker = "attacker",
 	.force = "damage",
 	.drop = "drop",
 	.type = "attacktype",
@@ -803,7 +803,7 @@ static const s_script_args_names script_args_names = {
 
 static const s_script_args init_script_args_default = {
 	.ent = {VT_PTR, 0},
-	.other = {VT_PTR, 0},
+	.attacker = {VT_PTR, 0},
 	.force = {VT_INTEGER, 0},
 	.drop = {VT_INTEGER, 0},
 	.type = {VT_INTEGER, 0},
@@ -830,7 +830,7 @@ static const s_script_args init_script_args_default = {
 
 static const s_script_args init_script_args_only_ent = {
 	.ent = {VT_PTR, 0},
-	.other = {VT_EMPTY, 0},
+	.attacker = {VT_EMPTY, 0},
 	.force = {VT_EMPTY, 0},
 	.drop = {VT_EMPTY, 0},
 	.type = {VT_EMPTY, 0},
@@ -925,7 +925,7 @@ void execute_takedamage_script(entity * ent, entity * other, int force, int drop
 			       int jugglecost, int pauseadd) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
+	script_args.attacker.value = (intptr_t) other;
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
@@ -940,7 +940,7 @@ void execute_ondeath_script(entity * ent, entity * other, int force, int drop, i
 			    int jugglecost, int pauseadd) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
+	script_args.attacker.value = (intptr_t) other;
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
@@ -954,7 +954,7 @@ void execute_onfall_script(entity * ent, entity * other, int force, int drop, in
 			   int jugglecost, int pauseadd) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
+	script_args.attacker.value = (intptr_t) other;
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
@@ -969,7 +969,7 @@ void execute_didblock_script(entity * ent, entity * other, int force, int drop, 
 			     int jugglecost, int pauseadd) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
+	script_args.attacker.value = (intptr_t) other;
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
@@ -983,7 +983,7 @@ void execute_ondoattack_script(entity * ent, entity * other, int force, int drop
 			       int jugglecost, int pauseadd, int iWhich, int iAtkID) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.value = (intptr_t) other;
+	script_args.attacker.value = (intptr_t) other;
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
@@ -1004,7 +1004,7 @@ void execute_didhit_script(entity * ent, entity * other, int force, int drop, in
 			   int jugglecost, int pauseadd, int blocked) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.other.vt = VT_EMPTY; /* yep, some smartass introduced another field "damagetaker"
+	script_args.attacker.vt = VT_EMPTY; /* yep, some smartass introduced another field "damagetaker"
 					    instead of reusing "attacker" */
 	script_args.damagetaker.vt = VT_PTR;
 	script_args.damagetaker.value = (intptr_t) other;
