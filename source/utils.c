@@ -92,6 +92,13 @@ size_t getNewLineStart(char *buf) {
 	return res;
 }
 
+void freeAndNull(void** data) {
+	if(data && *data) {
+		free(*data);
+		*data = NULL;
+	}
+}
+
 FILE *openborLog = NULL;
 FILE *scriptLog = NULL;
 char debug_msg[2048];

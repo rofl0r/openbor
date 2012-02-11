@@ -37,7 +37,7 @@ void writeToScriptLog(const char *msg);
 int fileExists(char *fnam);
 int dirExists(char *dname, int create);
 stringptr *readFromLogFile(int which);
-
+void freeAndNull(void** data);
 void lc(char *buf, size_t size);
 size_t getNewLineStart(char *buf);
 void debugBuf(unsigned char *buf, size_t size, int columns);
