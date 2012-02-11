@@ -151,6 +151,32 @@ const s_const_dynamic_animation_indexes default_dyn_anims = {
 	},
 };
 
+const s_dyn_anim_custom_maxvalues dyn_anim_default_custom_maxvalues = {
+	.max_downs = MAX_DOWNS,
+	.max_ups = MAX_UPS,
+	.max_backwalks = MAX_BACKWALKS,
+	.max_walks = MAX_WALKS,
+	.max_idles = MAX_IDLES,
+	.max_attack_types = MAX_ATKS,
+	.max_freespecials = MAX_SPECIALS,
+	.max_follows = MAX_FOLLOWS,
+	.max_attacks = MAX_ATTACKS,
+	.max_animations = MAX_ANIS,
+};
+
+s_dyn_anim_custom_maxvalues dyn_anim_custom_maxvalues = {
+	.max_downs = MAX_DOWNS,
+	.max_ups = MAX_UPS,
+	.max_backwalks = MAX_BACKWALKS,
+	.max_walks = MAX_WALKS,
+	.max_idles = MAX_IDLES,
+	.max_attack_types = MAX_ATKS,
+	.max_freespecials = MAX_SPECIALS,
+	.max_follows = MAX_FOLLOWS,
+	.max_attacks = MAX_ATTACKS,
+	.max_animations = MAX_ANIS,
+};
+
 //----------------------------------
 
 const char *default_button_names[] = {

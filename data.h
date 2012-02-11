@@ -93,7 +93,24 @@ extern const s_dynamic_animation_indexes_default_sizes default_dyn_anims_sizes;
 extern const s_const_dynamic_animation_indexes default_dyn_anims;
 extern const int dyn_anim_itemcount;
 
+typedef struct {
+	int max_downs;
+	int max_ups;
+	int max_backwalks;
+	int max_walks;
+	int max_idles;
+	int max_attack_types;
+	int max_freespecials;
+	int max_follows;
+	int max_attacks;
+	int max_animations;
+} s_dyn_anim_custom_maxvalues;
+
+extern const s_dyn_anim_custom_maxvalues dyn_anim_default_custom_maxvalues;
+extern s_dyn_anim_custom_maxvalues dyn_anim_custom_maxvalues;
+
 // -----------------------------
+
 
 typedef struct {
 	char obligatory;

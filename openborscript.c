@@ -6971,7 +6971,6 @@ HRESULT openbor_findtarget(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 HRESULT openbor_checkrange(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL, *target = NULL;
 	LONG ani = 0;
-	extern int max_animations;
 
 	if(paramCount < 2)
 		goto checkrange_error;
@@ -6992,8 +6991,8 @@ HRESULT openbor_checkrange(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 	else if(paramCount <= 2)
 		ani = ent->animnum;
 
-	if(ani < 0 || ani >= max_animations) {
-		printf("Animation id out of range: %d / %d.\n", (int) ani, max_animations);
+	if(ani < 0 || ani >= dyn_anim_custom_maxvalues.max_animations) {
+		printf("Animation id out of range: %d / %d.\n", (int) ani, dyn_anim_custom_maxvalues.max_animations);
 		goto checkrange_error;
 	}
 

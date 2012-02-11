@@ -116,17 +116,6 @@ extern unsigned long seed;
 
 s_samples samples = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,};
 
-int max_downs = MAX_DOWNS;
-int max_ups = MAX_UPS;
-int max_backwalks = MAX_BACKWALKS;
-int max_walks = MAX_WALKS;
-int max_idles = MAX_IDLES;
-int max_attack_types = MAX_ATKS;
-int max_freespecials = MAX_SPECIALS;
-int max_follows = MAX_FOLLOWS;
-int max_attacks = MAX_ATTACKS;
-int max_animations = MAX_ANIS;
-
 //------------------------------
 
 int grab_attacks[5][2] = {
@@ -2704,7 +2693,7 @@ int free_model(s_model * model) {
 	printf("Unload '%s'\n", model->name);
 
 	if(hasFreetype(model, MF_ANIMLIST))
-		for(i = 0; i < max_animations; i++)
+		for(i = 0; i < dyn_anim_custom_maxvalues.max_animations; i++)
 			anim_list = anim_list_delete(anim_list, model->index);
 
 	if(hasFreetype(model, MF_COLOURMAP))
@@ -3411,16 +3400,16 @@ s_model *init_model(int cacheindex, int unload) {
 	newchar->isSubclassed = 0;
 	newchar->freetypes = MF_ALL;
 
-	newchar->defense_factors = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_pain = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_knockdown = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_blockpower = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_blockthreshold = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_blockratio = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->defense_blocktype = (float *) calloc(sizeof(float), (max_attack_types + 1));
-	newchar->offense_factors = (float *) calloc(sizeof(float), (max_attack_types + 1));
+	newchar->defense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_pain = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_knockdown = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockpower = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockthreshold = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockratio = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blocktype = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->offense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
 
-	newchar->special = calloc(sizeof(*newchar->special), max_freespecials);
+	newchar->special = calloc(sizeof(*newchar->special), dyn_anim_custom_maxvalues.max_freespecials);
 	if(!newchar->special)
 		shutdown(1, (char *) E_OUT_OF_MEMORY);
 
@@ -3491,7 +3480,7 @@ s_model *init_model(int cacheindex, int unload) {
 	newchar->star = -1;
 	newchar->knife = -1;
 
-	newchar->animation = (s_anim **) calloc(sizeof(s_anim *), max_animations);
+	newchar->animation = (s_anim **) calloc(sizeof(s_anim *), dyn_anim_custom_maxvalues.max_animations);
 	if(!newchar->animation)
 		shutdown(1, (char *) E_OUT_OF_MEMORY);
 
@@ -3500,7 +3489,7 @@ s_model *init_model(int cacheindex, int unload) {
 	newchar->flash = newchar->bflash = get_cached_model_index("flash");
 
 	//Default offense/defense values.
-	for(i = 0; i < max_attack_types; i++) {
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_attack_types; i++) {
 		newchar->offense_factors[i] = 1;
 		newchar->defense_factors[i] = 1;
 		newchar->defense_knockdown[i] = 1;
@@ -4005,7 +3994,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							newchar->defense_blockratio[tempInt+STA_ATKS-1]     = GET_FLOAT_ARG(7);
 							newchar->defense_blocktype[tempInt+STA_ATKS-1]      = GET_FLOAT_ARG(8);
 						} else if(stricmp(value, "ALL")==0) {
-							for(i=0;i<max_attack_types;i++)
+							for(i=0;i<dyn_anim_custom_maxvalues.max_attack_types;i++)
 							{
 								newchar->defense_factors[i]         = GET_FLOAT_ARG(2);
 								newchar->defense_pain[i]            = GET_FLOAT_ARG(3);
@@ -4030,7 +4019,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							newchar->offense_factors[tempInt+STA_ATKS-1] = GET_FLOAT_ARG(2);
 						} else if(stricmp(value, "ALL") == 0) {
 							tempFloat = GET_FLOAT_ARG(2);
-							for(i=0;i<max_attack_types;i++) {
+							for(i=0;i<dyn_anim_custom_maxvalues.max_attack_types;i++) {
 								newchar->offense_factors[i] = tempFloat;
 							}
 						}
@@ -4152,8 +4141,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						newchar->atchain[i] = GET_INT_ARG(i + 1);
 						if(newchar->atchain[i] < 0)
 							newchar->atchain[i] = 0;
-						if(newchar->atchain[i] > max_attacks)
-							newchar->atchain[i] = max_attacks;
+						if(newchar->atchain[i] > dyn_anim_custom_maxvalues.max_attacks)
+							newchar->atchain[i] = dyn_anim_custom_maxvalues.max_attacks;
 						if(newchar->atchain[i])
 							newchar->chainlength = i + 1;
 					}
@@ -4293,7 +4282,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						}
 						newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
 						newchar->specials_loaded++;
-						if(newchar->specials_loaded > max_freespecials) {
+						if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
 							shutdownmessage = "Too many Freespecials and/or Cancels. Please increase Maxfreespecials";	// OX. This is to catch freespecials that use same animation.
 							goto lCleanup;
 						}
@@ -5244,7 +5233,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						}
 						newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 6] = i - 1;	// max steps
 						newchar->specials_loaded++;
-						if(newchar->specials_loaded > max_freespecials) {
+						if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
 							shutdownmessage =
 							    "Too many Freespecials and/or Cancels. Please increase Maxfreespecials";
 							goto lCleanup;
@@ -5679,8 +5668,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					break;
 				case CMD_MODEL_FOLLOWANIM:
 					newanim->followanim = GET_INT_ARG(1);
-					if(newanim->followanim > max_follows)
-						newanim->followanim = max_follows;
+					if(newanim->followanim > dyn_anim_custom_maxvalues.max_follows)
+						newanim->followanim = dyn_anim_custom_maxvalues.max_follows;
 					if(newanim->followanim < 0)
 						newanim->followanim = 0;
 					break;
@@ -6055,16 +6044,7 @@ int load_models() {
 	update_loading(&loadingbg[0], -1, 1);	// initialize the update screen
 
 	// reload default values
-	max_idles = MAX_IDLES;
-	max_walks = MAX_WALKS;
-	max_ups = MAX_UPS;
-	max_downs = MAX_DOWNS;
-	max_backwalks = MAX_BACKWALKS;
-	max_attack_types = MAX_ATKS;
-	max_freespecials = MAX_SPECIALS;
-	max_follows = MAX_FOLLOWS;
-	max_attacks = MAX_ATTACKS;
-	max_animations = MAX_ANIS;
+	dyn_anim_custom_maxvalues = dyn_anim_default_custom_maxvalues;
 
 	// free old values
 	freeAnims();
@@ -6087,37 +6067,37 @@ int load_models() {
 		switch (cmd) {
 			case CMD_MODELSTXT_MAXIDLES:
 				// max idle stances
-				max_idles = MAX(GET_INT_ARG(1), MAX_IDLES);
+				dyn_anim_custom_maxvalues.max_idles = MAX(GET_INT_ARG(1), MAX_IDLES);
 				break;
 			case CMD_MODELSTXT_MAXWALKS:
-				max_walks = MAX(GET_INT_ARG(1), MAX_WALKS);
+				dyn_anim_custom_maxvalues.max_walks = MAX(GET_INT_ARG(1), MAX_WALKS);
 				break;
 			case CMD_MODELSTXT_MAXBACKWALKS:
 				// max backward walks
-				max_backwalks = MAX(GET_INT_ARG(1), MAX_BACKWALKS);
+				dyn_anim_custom_maxvalues.max_backwalks = MAX(GET_INT_ARG(1), MAX_BACKWALKS);
 				break;
 			case CMD_MODELSTXT_MAXUPS:
 				// max up walks
-				max_ups = MAX(GET_INT_ARG(1), MAX_UPS);
+				dyn_anim_custom_maxvalues.max_ups = MAX(GET_INT_ARG(1), MAX_UPS);
 				break;
 			case CMD_MODELSTXT_MAXDOWNS:
 				// max down walks
-				max_downs = MAX(GET_INT_ARG(1), MAX_DOWNS);
+				dyn_anim_custom_maxvalues.max_downs = MAX(GET_INT_ARG(1), MAX_DOWNS);
 				break;
 			case CMD_MODELSTXT_MAXATTACKTYPES:
 				// max attacktype/pain/fall/die
-				max_attack_types = MAX(GET_INT_ARG(1) + STA_ATKS, MAX_ATKS);
+				dyn_anim_custom_maxvalues.max_attack_types = MAX(GET_INT_ARG(1) + STA_ATKS, MAX_ATKS);
 				break;
 			case CMD_MODELSTXT_MAXFOLLOWS:
 				// max follow-ups
-				max_follows = MAX(GET_INT_ARG(1), MAX_FOLLOWS);
+				dyn_anim_custom_maxvalues.max_follows = MAX(GET_INT_ARG(1), MAX_FOLLOWS);
 				break;
 			case CMD_MODELSTXT_MAXFREESPECIALS:
 				// max freespecials
-				max_freespecials = MAX(GET_INT_ARG(1), MAX_SPECIALS);
+				dyn_anim_custom_maxvalues.max_freespecials = MAX(GET_INT_ARG(1), MAX_SPECIALS);
 				break;
 			case CMD_MODELSTXT_MAXATTACKS:
-				max_attacks = MAX(GET_INT_ARG(1), MAX_ATTACKS);
+				dyn_anim_custom_maxvalues.max_attacks = MAX(GET_INT_ARG(1), MAX_ATTACKS);
 				break;
 			case CMD_MODELSTXT_MUSIC:
 				music(GET_ARG(1), 1, atol(GET_ARG(2)));
@@ -6203,28 +6183,28 @@ int load_models() {
 		pos += getNewLineStart(buf + pos);
 	}
 	// calculate max animations
-	max_animations += (max_attack_types - MAX_ATKS) * 6 +	// multply by 5, for fall/die/pain/rise/blockpain/riseattack
-	    (max_follows - MAX_FOLLOWS) +
-	    (max_freespecials - MAX_SPECIALS) +
-	    (max_attacks - MAX_ATTACKS) +
-	    (max_idles - MAX_IDLES) +
-	    (max_walks - MAX_WALKS) + (max_ups - MAX_UPS) + (max_downs - MAX_DOWNS) + (max_backwalks - MAX_BACKWALKS);
+	dyn_anim_custom_maxvalues.max_animations += (dyn_anim_custom_maxvalues.max_attack_types - MAX_ATKS) * 6 +	// multply by 5, for fall/die/pain/rise/blockpain/riseattack
+	    (dyn_anim_custom_maxvalues.max_follows - MAX_FOLLOWS) +
+	    (dyn_anim_custom_maxvalues.max_freespecials - MAX_SPECIALS) +
+	    (dyn_anim_custom_maxvalues.max_attacks - MAX_ATTACKS) +
+	    (dyn_anim_custom_maxvalues.max_idles - MAX_IDLES) +
+	    (dyn_anim_custom_maxvalues.max_walks - MAX_WALKS) + (dyn_anim_custom_maxvalues.max_ups - MAX_UPS) + (dyn_anim_custom_maxvalues.max_downs - MAX_DOWNS) + (dyn_anim_custom_maxvalues.max_backwalks - MAX_BACKWALKS);
 
 	// alloc indexed animation ids
-	dyn_anims.animdowns = (int *) malloc(sizeof(int) * max_downs);
-	dyn_anims.animups = (int *) malloc(sizeof(int) * max_ups);
-	dyn_anims.animbackwalks = (int *) malloc(sizeof(int) * max_backwalks);
-	dyn_anims.animwalks = (int *) malloc(sizeof(int) * max_walks);
-	dyn_anims.animidles = (int *) malloc(sizeof(int) * max_idles);
-	dyn_anims.animpains = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animdies = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animfalls = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animrises = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animriseattacks = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animblkpains = (int *) malloc(sizeof(int) * max_attack_types);
-	dyn_anims.animattacks = (int *) malloc(sizeof(int) * max_attacks);
-	dyn_anims.animfollows = (int *) malloc(sizeof(int) * max_follows);
-	dyn_anims.animspecials = (int *) malloc(sizeof(int) * max_freespecials);
+	dyn_anims.animdowns = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_downs);
+	dyn_anims.animups = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_ups);
+	dyn_anims.animbackwalks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_backwalks);
+	dyn_anims.animwalks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_walks);
+	dyn_anims.animidles = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_idles);
+	dyn_anims.animpains = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animdies = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animfalls = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animrises = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animriseattacks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animblkpains = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attack_types);
+	dyn_anims.animattacks = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_attacks);
+	dyn_anims.animfollows = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_follows);
+	dyn_anims.animspecials = (int *) malloc(sizeof(int) * dyn_anim_custom_maxvalues.max_freespecials);
 	
 	int** dyn_anims_arr = (int**) &dyn_anims;
 	int** dyn_anims_default_arr = (int**) &default_dyn_anims;
@@ -6235,33 +6215,33 @@ int load_models() {
 	}
 
 	// copy default values and new animation ids
-	for(i = MAX_DOWNS; i < max_downs; i++)
+	for(i = MAX_DOWNS; i < dyn_anim_custom_maxvalues.max_downs; i++)
 		dyn_anims.animdowns[i] = maxanim++;
-	for(i = MAX_UPS; i < max_ups; i++)
+	for(i = MAX_UPS; i < dyn_anim_custom_maxvalues.max_ups; i++)
 		dyn_anims.animups[i] = maxanim++;
-	for(i = MAX_BACKWALKS; i < max_backwalks; i++)
+	for(i = MAX_BACKWALKS; i < dyn_anim_custom_maxvalues.max_backwalks; i++)
 		dyn_anims.animbackwalks[i] = maxanim++;
-	for(i = MAX_WALKS; i < max_walks; i++)
+	for(i = MAX_WALKS; i < dyn_anim_custom_maxvalues.max_walks; i++)
 		dyn_anims.animwalks[i] = maxanim++;
-	for(i = MAX_IDLES; i < max_idles; i++)
+	for(i = MAX_IDLES; i < dyn_anim_custom_maxvalues.max_idles; i++)
 		dyn_anims.animidles[i] = maxanim++;
-	for(i = MAX_SPECIALS; i < max_freespecials; i++)
+	for(i = MAX_SPECIALS; i < dyn_anim_custom_maxvalues.max_freespecials; i++)
 		dyn_anims.animspecials[i] = maxanim++;
-	for(i = MAX_ATTACKS; i < max_attacks; i++)
+	for(i = MAX_ATTACKS; i < dyn_anim_custom_maxvalues.max_attacks; i++)
 		dyn_anims.animattacks[i] = maxanim++;
-	for(i = MAX_FOLLOWS; i < max_follows; i++)
+	for(i = MAX_FOLLOWS; i < dyn_anim_custom_maxvalues.max_follows; i++)
 		dyn_anims.animfollows[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animpains[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animfalls[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animrises[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animriseattacks[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animblkpains[i] = maxanim++;
-	for(i = MAX_ATKS; i < max_attack_types; i++)
+	for(i = MAX_ATKS; i < dyn_anim_custom_maxvalues.max_attack_types; i++)
 		dyn_anims.animdies[i] = maxanim++;
 
 	// Defer load_cached_model, so you can define models after their nested model.
@@ -9238,14 +9218,14 @@ entity *alloc_ent() {
 	entity *ent = (entity *) calloc(1, sizeof(entity));
 	if(!ent)
 		return NULL;
-	ent->defense_factors = calloc(sizeof(float), max_attack_types);
-	ent->defense_pain = calloc(sizeof(float), max_attack_types);
-	ent->defense_knockdown = calloc(sizeof(float), max_attack_types);
-	ent->defense_blockpower = calloc(sizeof(float), max_attack_types);
-	ent->defense_blockthreshold = calloc(sizeof(float), max_attack_types);
-	ent->defense_blockratio = calloc(sizeof(float), max_attack_types);
-	ent->defense_blocktype = calloc(sizeof(float), max_attack_types);
-	ent->offense_factors = calloc(sizeof(float), max_attack_types);
+	ent->defense_factors = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_pain = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_knockdown = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_blockpower = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_blockthreshold = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_blockratio = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->defense_blocktype = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
+	ent->offense_factors = calloc(sizeof(float), dyn_anim_custom_maxvalues.max_attack_types);
 	
 	if(max_entity_vars > 0) {
 		ent->entvars = calloc(sizeof(ScriptVariant), max_entity_vars);
@@ -9654,7 +9634,7 @@ void update_frame(entity * ent, int f) {
 			attack.dropv[1] = (float) 1.2;
 			attack.dropv[2] = (float) 0;
 			attack.attack_force = self->health;
-			attack.attack_type = max_attack_types;
+			attack.attack_type = dyn_anim_custom_maxvalues.max_attack_types;
 			if(self->takedamage)
 				self->takedamage(self, &attack);
 			else
@@ -9723,7 +9703,7 @@ void ent_set_anim(entity * ent, int aninum, int resetable) {
 		return;
 	}
 
-	if(aninum < 0 || aninum >= max_animations) {
+	if(aninum < 0 || aninum >= dyn_anim_custom_maxvalues.max_animations) {
 		printf("FATAL: tried to set animation with invalid index (%s, %i)", ent->name, aninum);
 		return;
 	}
@@ -9870,14 +9850,14 @@ entity *spawn(float x, float z, float a, int direction, char *name, int index, s
 			dfsbe = e->defense_blocktype;
 			ofs = e->offense_factors;
 			vars = e->entvars;
-			memset(dfs, 0, sizeof(float) * max_attack_types);
-			memset(dfsp, 0, sizeof(float) * max_attack_types);
-			memset(dfsk, 0, sizeof(float) * max_attack_types);
-			memset(dfsbp, 0, sizeof(float) * max_attack_types);
-			memset(dfsbt, 0, sizeof(float) * max_attack_types);
-			memset(dfsbr, 0, sizeof(float) * max_attack_types);
-			memset(dfsbe, 0, sizeof(float) * max_attack_types);
-			memset(ofs, 0, sizeof(float) * max_attack_types);
+			memset(dfs, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsp, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsk, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsbp, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsbt, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsbr, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(dfsbe, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
+			memset(ofs, 0, sizeof(float) * dyn_anim_custom_maxvalues.max_attack_types);
 			// clear up
 			clear_all_scripts(&e->scripts, 1);
 			
@@ -9991,7 +9971,7 @@ void kill(entity * victim) {
 	victim->parent = NULL;
 	if(victim->modeldata.summonkill) {
 		attack = emptyattack;
-		attack.attack_type = max_attack_types;
+		attack.attack_type = dyn_anim_custom_maxvalues.max_attack_types;
 		attack.dropv[0] = (float) 3;
 		attack.dropv[1] = (float) 1.2;
 		attack.dropv[2] = (float) 0;
@@ -10988,7 +10968,7 @@ void check_lost() {
 			attack.dropv[1] = (float) 1.2;
 			attack.dropv[2] = (float) 0;
 			attack.attack_force = self->health;
-			attack.attack_type = max_attack_types;
+			attack.attack_type = dyn_anim_custom_maxvalues.max_attack_types;
 			self->takedamage(self, &attack);
 		}
 		return;
@@ -11974,7 +11954,7 @@ int set_death(entity * iDie, int type, int reset) {
 		iDie->blocking = 0;
 		return 1;
 	}
-	if(type < 0 || type >= max_attack_types || !validanim(iDie, dyn_anims.animdies[type]))
+	if(type < 0 || type >= dyn_anim_custom_maxvalues.max_attack_types || !validanim(iDie, dyn_anims.animdies[type]))
 		type = 0;
 	if(validanim(iDie, dyn_anims.animdies[type]))
 		ent_set_anim(iDie, dyn_anims.animdies[type], reset);
@@ -11995,7 +11975,7 @@ int set_death(entity * iDie, int type, int reset) {
 
 int set_fall(entity * iFall, int type, int reset, entity * other, int force, int drop, int noblock, int guardcost,
 	     int jugglecost, int pauseadd) {
-	if(type < 0 || type >= max_attack_types || !validanim(iFall, dyn_anims.animfalls[type]))
+	if(type < 0 || type >= dyn_anim_custom_maxvalues.max_attack_types || !validanim(iFall, dyn_anims.animfalls[type]))
 		type = 0;
 	if(validanim(iFall, dyn_anims.animfalls[type]))
 		ent_set_anim(iFall, dyn_anims.animfalls[type], reset);
@@ -12019,7 +11999,7 @@ int set_fall(entity * iFall, int type, int reset, entity * other, int force, int
 }
 
 int set_rise(entity * iRise, int type, int reset) {
-	if(type < 0 || type >= max_attack_types || !validanim(iRise, dyn_anims.animrises[type]))
+	if(type < 0 || type >= dyn_anim_custom_maxvalues.max_attack_types || !validanim(iRise, dyn_anims.animrises[type]))
 		type = 0;
 	if(validanim(iRise, dyn_anims.animrises[type]))
 		ent_set_anim(iRise, dyn_anims.animrises[type], reset);
@@ -12039,7 +12019,7 @@ int set_rise(entity * iRise, int type, int reset) {
 int set_riseattack(entity * iRiseattack, int type, int reset) {
 	if(!validanim(iRiseattack, dyn_anims.animriseattacks[type]) && iRiseattack->modeldata.riseattacktype == 1)
 		type = 0;
-	if(iRiseattack->modeldata.riseattacktype == 0 || type < 0 || type >= max_attack_types)
+	if(iRiseattack->modeldata.riseattacktype == 0 || type < 0 || type >= dyn_anim_custom_maxvalues.max_attack_types)
 		type = 0;
 	if(validanim(iRiseattack, dyn_anims.animriseattacks[type]))
 		ent_set_anim(iRiseattack, dyn_anims.animriseattacks[type], reset);
@@ -12060,7 +12040,7 @@ int set_blockpain(entity * iBlkpain, int type, int reset) {
 		iBlkpain->takeaction = common_pain;
 		return 1;
 	}
-	if(type < 0 || type >= max_attack_types || !validanim(iBlkpain, dyn_anims.animblkpains[type]))
+	if(type < 0 || type >= dyn_anim_custom_maxvalues.max_attack_types || !validanim(iBlkpain, dyn_anims.animblkpains[type]))
 		type = 0;
 	if(validanim(iBlkpain, dyn_anims.animblkpains[type]))
 		ent_set_anim(iBlkpain, dyn_anims.animblkpains[type], reset);
@@ -12077,7 +12057,7 @@ int set_pain(entity * iPain, int type, int reset) {
 	iPain->xdir = iPain->zdir = iPain->tossv = 0;	// stop the target
 	if(iPain->modeldata.guardpoints[1] > 0 && iPain->modeldata.guardpoints[0] <= 0)
 		pain = ANI_GUARDBREAK;
-	else if(type == -1 || type >= max_attack_types)
+	else if(type == -1 || type >= dyn_anim_custom_maxvalues.max_attack_types)
 		pain = ANI_GRABBED;
 	else
 		pain = dyn_anims.animpains[type];
@@ -12161,7 +12141,7 @@ void set_model_ex(entity * ent, char *modelname, int index, s_model * newmodel, 
 		setDestIfDestNeg_int(&newmodel->diesound, model->diesound);
 		setDestIfDestNeg_char(&newmodel->shadow, model->shadow);
 
-		for(i = 0; i < max_animations; i++) {
+		for(i = 0; i < dyn_anim_custom_maxvalues.max_animations; i++) {
 			if(!newmodel->animation[i] && model->animation[i] && model->animation[i]->numframes > 0)
 				newmodel->animation[i] = model->animation[i];
 		}
@@ -12399,12 +12379,12 @@ void normal_prepare() {
 	}
 	// move freespecial check here
 	if((rand32() & 7) < 2) {
-		for(i = 0; i < max_freespecials; i++) {
+		for(i = 0; i < dyn_anim_custom_maxvalues.max_freespecials; i++) {
 			if(validanim(self, dyn_anims.animspecials[i]) &&
 			   (check_energy(1, dyn_anims.animspecials[i]) ||
 			    check_energy(0, dyn_anims.animspecials[i])) &&
 			   (target = normal_find_target(dyn_anims.animspecials[i])) &&
-			   (rand32() % max_freespecials) < 3 && check_costmove(dyn_anims.animspecials[i], 1)) {
+			   (rand32() % dyn_anim_custom_maxvalues.max_freespecials) < 3 && check_costmove(dyn_anims.animspecials[i], 1)) {
 				return;
 			}
 		}
@@ -12417,7 +12397,7 @@ void normal_prepare() {
 	} else if(target)	// dont have a chain so just select an attack randomly
 	{
 		// Pick an attack
-		for(i = 0; i < max_attacks; i++) {
+		for(i = 0; i < dyn_anim_custom_maxvalues.max_attacks; i++) {
 			if(validanim(self, dyn_anims.animattacks[i]) && 
 			   (target = normal_find_target(dyn_anims.animattacks[i]))) {
 				lastpick = dyn_anims.animattacks[i];
@@ -13135,7 +13115,7 @@ void checkdamage(entity * other, s_attack * attack) {
 	int type = attack->attack_type;
 	if(self->modeldata.guardpoints[1] > 0 && self->modeldata.guardpoints[0] <= 0)
 		force = 0;	//guardbreak does not deal damage.
-	if(!(self->damage_on_landing && self == other) && !other->projectile && type >= 0 && type < max_attack_types) {
+	if(!(self->damage_on_landing && self == other) && !other->projectile && type >= 0 && type < dyn_anim_custom_maxvalues.max_attack_types) {
 		force = (int) (force * other->modeldata.offense_factors[type]);
 		force = (int) (force * self->modeldata.defense_factors[type]);
 	}
@@ -13200,7 +13180,7 @@ int common_takedamage(entity * other, s_attack * attack) {
 	if(self != other)
 		set_opponent(self, other);
 	// adjust type
-	if(attack->attack_type >= 0 && attack->attack_type < max_attack_types)
+	if(attack->attack_type >= 0 && attack->attack_type < dyn_anim_custom_maxvalues.max_attack_types)
 		self->damagetype = attack->attack_type;
 	else
 		self->damagetype = ATK_NORMAL;
@@ -13359,7 +13339,7 @@ int common_try_block(entity * target) {
 /*
 int common_try_freespecial(entity* target)
 {
-	int i, s=max_freespecials;
+	int i, s=dyn_anim_custom_maxvalues.max_freespecials;
 
 	for(i=0; i<s; i++)
 	{
@@ -13380,16 +13360,16 @@ int common_try_freespecial(entity* target)
 int common_try_normalattack(entity * target) {
 	int i, found = 0;
 
-	for(i = 0; !found && i < max_freespecials; i++) {
+	for(i = 0; !found && i < dyn_anim_custom_maxvalues.max_freespecials; i++) {
 		if(validanim(self, dyn_anims.animspecials[i]) &&
 		   (check_energy(1, dyn_anims.animspecials[i]) ||
 		    check_energy(0, dyn_anims.animspecials[i])) &&
-		   (target || (target = normal_find_target(dyn_anims.animspecials[i]))) && (rand32() % max_freespecials) < 3) {
+		   (target || (target = normal_find_target(dyn_anims.animspecials[i]))) && (rand32() % dyn_anim_custom_maxvalues.max_freespecials) < 3) {
 			found = 1;
 		}
 	}
 
-	for(i = 0; !found && i < max_attacks; i++)	// TODO: recheck range for attacks chains
+	for(i = 0; !found && i < dyn_anim_custom_maxvalues.max_attacks; i++)	// TODO: recheck range for attacks chains
 	{
 		if(!validanim(self, dyn_anims.animattacks[i]))
 			continue;
@@ -16782,7 +16762,7 @@ int common_idle_anim(entity * ent) {
 		ent_set_anim(ent, ANI_SLEEP, 0);	//Set sleep anim.
 		return 1;	//Return 1 and exit.
 	} else {
-		for(i = 0; i < max_idles; i++)	//Loop through all idle animations.
+		for(i = 0; i < dyn_anim_custom_maxvalues.max_idles; i++)	//Loop through all idle animations.
 		{
 			iAni = dyn_anims.animidles[i];	//Get current animation.
 
@@ -16817,7 +16797,7 @@ int common_walk_anim(entity * ent) {
 	int i;			//Loop counter.
 	int iAni;		//Animation.
 
-	for(i = 0; i < max_walks; i++)	//Loop through all relevant animations.
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_walks; i++)	//Loop through all relevant animations.
 	{
 		iAni = dyn_anims.animwalks[i];	//Get current animation.
 
@@ -16851,7 +16831,7 @@ int common_backwalk_anim(entity * ent) {
 	int i;			//Loop counter.
 	int iAni;		//Animation.
 
-	for(i = 0; i < max_backwalks; i++)	//Loop through all relevant animations.
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_backwalks; i++)	//Loop through all relevant animations.
 	{
 		iAni = dyn_anims.animbackwalks[i];	//Get current animation.
 
@@ -16885,7 +16865,7 @@ int common_up_anim(entity * ent) {
 	int i;			//Loop counter.
 	int iAni;		//Animation.
 
-	for(i = 0; i < max_ups; i++)	//Loop through all relevant animations.
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_ups; i++)	//Loop through all relevant animations.
 	{
 		iAni = dyn_anims.animups[i];	//Get current animation.
 
@@ -16919,7 +16899,7 @@ int common_down_anim(entity * ent) {
 	int i;			//Loop counter.
 	int iAni;		//Animation.
 
-	for(i = 0; i < max_downs; i++)	//Loop through all relevant animations.
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_downs; i++)	//Loop through all relevant animations.
 	{
 		iAni = dyn_anims.animdowns[i];	//Get current animation.
 
@@ -17062,7 +17042,7 @@ void kill_all_enemies() {
 	entity *tmpself = NULL;
 
 	attack = emptyattack;
-	attack.attack_type = max_attack_types;
+	attack.attack_type = dyn_anim_custom_maxvalues.max_attack_types;
 	attack.dropv[0] = (float) 3;
 	attack.dropv[1] = (float) 1.2;
 	attack.dropv[2] = (float) 0;
@@ -17771,7 +17751,7 @@ void time_over() {
 	s_attack attack;
 
 	attack = emptyattack;
-	attack.attack_type = max_attack_types;
+	attack.attack_type = dyn_anim_custom_maxvalues.max_attack_types;
 	attack.dropv[0] = (float) 3;
 	attack.dropv[1] = (float) 1.2;
 	attack.dropv[2] = (float) 0;
