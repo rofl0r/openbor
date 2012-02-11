@@ -1977,5 +1977,7 @@ extern u32 borTime;
 extern int shadowsprites[6];
 extern int gosprite;
 extern int golsprite;
-
+extern char *custBkgrds;
+extern char *custLevels;
+extern char *custModels;
 #endif

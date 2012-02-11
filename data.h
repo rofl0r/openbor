@@ -43,7 +43,24 @@ typedef struct {
 extern const s_font_init font_init[];
 extern const int font_init_itemcount;
 
+typedef enum {
+	VTC_VIDEO = 0,
+	VTC_SCENES,
+	VTC_BACKGROUNDS,
+	VTC_LEVELS,
+	VTC_MODELS,
+	VTC_COLOURDEPTH,
+	VTC_FORCEMODE,
+	VTC_MAX
+} VIDEO_TXT_COMMANDS;
+
+extern const char* video_txt_commands_strings[];
+extern char** video_txt_commands_dest[];
+
 extern const s_colors_rgb default_colors;
+
+extern const char *config_button_names[];
+extern const char *default_button_names[];
 
 extern const s_savedata savedata_default;
 extern const s_videomodes videomodes_init_data[];

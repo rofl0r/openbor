@@ -20473,37 +20473,6 @@ void term_videomodes() {
 	custModels = NULL;
 }
 
-typedef enum {
-	VTC_VIDEO = 0,
-	VTC_SCENES,
-	VTC_BACKGROUNDS,
-	VTC_LEVELS,
-	VTC_MODELS,
-	VTC_COLOURDEPTH,
-	VTC_FORCEMODE,
-	VTC_MAX
-} VIDEO_TXT_COMMANDS;
-
-static const char* video_txt_commands_strings[] = {
-	[VTC_VIDEO] = "video",
-	[VTC_SCENES] = "scenes",
-	[VTC_BACKGROUNDS] = "backgrounds",
-	[VTC_LEVELS] = "levels",
-	[VTC_MODELS] = "models",
-	[VTC_COLOURDEPTH] = "colourdepth",
-	[VTC_FORCEMODE] = "forcemode",
-};
-
-static char** video_txt_commands_dest[] = {
-	[VTC_VIDEO] = NULL,
-	[VTC_SCENES] = NULL,
-	[VTC_BACKGROUNDS] = &custBkgrds,
-	[VTC_LEVELS] = &custLevels,
-	[VTC_MODELS] = &custModels,
-	[VTC_COLOURDEPTH] = NULL,
-	[VTC_FORCEMODE] = NULL,
-};
-
 // Load Video Mode from file
 int init_videomodes(void) {
 	int result;
@@ -20620,36 +20589,6 @@ void safe_set(int *arr, int index, int newkey, int oldkey) {
 	}
 	arr[index] = newkey;
 }
-
-static const char *default_button_names[] = {
-	[CB_UP] = "Move Up",
-	[CB_DOWN] = "Move Down",
-	[CB_LEFT] = "Move Left",
-	[CB_RIGHT] = "Move Right",
-	[CB_ATK1] = "Attack 1",
-	[CB_ATK2] = "Attack 2",
-	[CB_ATK3] = "Attack 3",
-	[CB_ATK4] = "Attack 4",
-	[CB_JUMP] = "Jump",
-	[CB_SPECIAL] = "Special",
-	[CB_START] = "Start",
-	[CB_SCREENSHOT] = "Screenshot",
-};
-
-static const char *config_button_names[] = {
-	[CB_UP] = "moveup",
-	[CB_DOWN] = "movedown",
-	[CB_LEFT] = "moveleft",
-	[CB_RIGHT] = "moveright",
-	[CB_ATK1] = "attack",
-	[CB_ATK2] = "attack2",
-	[CB_ATK3] = "attack3",
-	[CB_ATK4] = "attack4",
-	[CB_JUMP] = "jump",
-	[CB_SPECIAL] = "special",
-	[CB_START] = "start",
-	[CB_SCREENSHOT] = "screenshot",
-};
 
 static void init_button_names(char **buttonnames) {
 	unsigned i;

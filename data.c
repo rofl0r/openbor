@@ -74,6 +74,36 @@ s_barstatus mpbarstatus =	// Used for customizable lifebar size
 	.colourtable = &color_tables.mp,
 };
 
+const char *default_button_names[] = {
+	[CB_UP] = "Move Up",
+	[CB_DOWN] = "Move Down",
+	[CB_LEFT] = "Move Left",
+	[CB_RIGHT] = "Move Right",
+	[CB_ATK1] = "Attack 1",
+	[CB_ATK2] = "Attack 2",
+	[CB_ATK3] = "Attack 3",
+	[CB_ATK4] = "Attack 4",
+	[CB_JUMP] = "Jump",
+	[CB_SPECIAL] = "Special",
+	[CB_START] = "Start",
+	[CB_SCREENSHOT] = "Screenshot",
+};
+
+const char *config_button_names[] = {
+	[CB_UP] = "moveup",
+	[CB_DOWN] = "movedown",
+	[CB_LEFT] = "moveleft",
+	[CB_RIGHT] = "moveright",
+	[CB_ATK1] = "attack",
+	[CB_ATK2] = "attack2",
+	[CB_ATK3] = "attack3",
+	[CB_ATK4] = "attack4",
+	[CB_JUMP] = "jump",
+	[CB_SPECIAL] = "special",
+	[CB_START] = "start",
+	[CB_SCREENSHOT] = "screenshot",
+};
+
 const s_special_sprite special_sprites_init[] = {
 	{&shadowsprites[0], "data/sprites/shadow1.gif", 9, 3},
 	{&shadowsprites[1], "data/sprites/shadow2.gif", 14, 5},
@@ -99,6 +129,26 @@ const s_font_init font_init[] = {
 };
 
 const int font_init_itemcount = ARRAY_SIZE(font_init);
+
+const char* video_txt_commands_strings[] = {
+	[VTC_VIDEO] = "video",
+	[VTC_SCENES] = "scenes",
+	[VTC_BACKGROUNDS] = "backgrounds",
+	[VTC_LEVELS] = "levels",
+	[VTC_MODELS] = "models",
+	[VTC_COLOURDEPTH] = "colourdepth",
+	[VTC_FORCEMODE] = "forcemode",
+};
+
+char** video_txt_commands_dest[] = {
+	[VTC_VIDEO] = NULL,
+	[VTC_SCENES] = NULL,
+	[VTC_BACKGROUNDS] = &custBkgrds,
+	[VTC_LEVELS] = &custLevels,
+	[VTC_MODELS] = &custModels,
+	[VTC_COLOURDEPTH] = NULL,
+	[VTC_FORCEMODE] = NULL,
+};
 
 const s_colors_rgb default_colors = {
 	.black = {0, 0, 0},
