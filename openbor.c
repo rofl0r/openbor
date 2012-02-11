@@ -2490,7 +2490,7 @@ void load_menu_txt() {
 	size_t size;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
-	unsigned i;
+	unsigned i, line = 1;
 
 	// Read file
 	if(buffer_pakfile(filename, &buf, &size) != 1) {
@@ -2506,10 +2506,11 @@ void load_menu_txt() {
 				for(i = 0; i < 8; i++)
 					fontmonospace[i] = GET_INT_ARG(i+1);
 			} else
-				printf("Command '%s' not understood in file '%s'!", command, filename);
+				printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
+		line++;
 	}
 	freeAndNull((void**) &buf);
 }
@@ -3564,7 +3565,9 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 	    frameshadow = -1,	// -1 will use default shadow for this entity, otherwise will use this value
 	    soundtoplay = -1, aimoveset = 0, maskindex = -1;
 
-	size_t size = 0, line = 0, len = 0;
+	size_t size = 0;
+	unsigned line = 1;
+	size_t len = 0;
 
 	ptrdiff_t pos = 0, index = 0;
 
@@ -3664,7 +3667,6 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 	// Now interpret the contents of buf line by line
 	while(pos < size) {
 		//command = GET_ARG(0);
-		line++;
 		if(ParseArgs(&arglist, buf + pos, argbuf)) {
 			command = GET_ARG(0);
 			cmd = getModelCommand(modelcmdlist, command);
@@ -4292,8 +4294,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 												  2] =
 								    dyn_anims.animspecials[tempInt - 1];
 							} else {
-								shutdownmessage = "Invalid freespecial command";
-								goto lCleanup;
+								printf("WARNING: Invalid freespecial command '%s' in '%s', line %u\n", value, filename, line);
+								goto next_line;
 							}
 						}
 						newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
@@ -5036,8 +5038,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						} else if(stricmp(value, "duckattack") == 0) {
 							ani_id = ANI_DUCKATTACK;
 						} else {
-							PLOG("invalid animation name %s", value);
-							//shutdownmessage = "Invalid animation name!";
+							printf("WARNING: invalid animation name '%s', file '%s', line %u\n", value, filename, line);
 							goto next_line;
 						}
 
@@ -5813,12 +5814,13 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					break;
 				default:
 					if(command && command[0])
-						printf("Command '%s' not understood in file '%s'!", command, filename);
+						printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 			}
 
 		}
 		next_line:
 		pos += getNewLineStart(buf + pos);
+		line++;
 	}
 
 
@@ -6193,7 +6195,7 @@ int load_models() {
 					savedata.mode = versusdamage ^ 1;
 				break;
 			default:
-				printf("command %s not understood in %s, line %d\n", command, filename, line);
+				printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 
 		// Go to next line
@@ -6386,7 +6388,7 @@ void load_levelorder() {
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
 	levelOrderCommands cmd;
-	int line = 0;
+	unsigned line = 1;
 
 	unload_levelorder();
 
@@ -6458,7 +6460,6 @@ void load_levelorder() {
 
 
 	while(pos < size) {
-		line++;
 		ParseArgs(&arglist, buf + pos, argbuf);
 		command = GET_ARG(0);
 		cmd = getLevelOrderCommand(levelordercmdlist, command);
@@ -7141,11 +7142,12 @@ void load_levelorder() {
 				break;
 			default:
 				if(command && command[0])
-					printf("Command '%s' not understood in level order!", command);
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
+		line++;
 	}
 
 #undef CHKDEF
@@ -7565,7 +7567,7 @@ void load_level(char *filename) {
 
 	levelCommands cmd;
 	levelCommands cmd2;
-	int line = 0;
+	unsigned line = 1;
 	char *errormessage = NULL;
 	char *scriptname = NULL;
 	Script *tempscript = NULL;
@@ -7641,7 +7643,6 @@ void load_level(char *filename) {
 	// Now interpret the contents of buf line by line
 	pos = 0;
 	while(pos < size) {
-		line++;
 		ParseArgs(&arglist, buf + pos, argbuf);
 		command = GET_ARG(0);
 		cmd = getLevelCommand(levelcmdlist, command);
@@ -8371,11 +8372,12 @@ void load_level(char *filename) {
 				break;
 			default:
 				if(command && command[0])
-					printf("Command '%s' not understood!", command);
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
+		line++;
 
 		if(isLoadingScreenTypeBar(bgPosi.set) || isLoadingScreenTypeBg(bgPosi.set))
 			update_loading(&bgPosi, pos, size);
@@ -19473,6 +19475,7 @@ int selectplayer(int *players, char *filename) {
 	char string[128] = { "" };
 	char *buf, *command;
 	size_t size = 0;
+	unsigned line = 1;
 	ptrdiff_t pos = 0;
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
@@ -19508,10 +19511,11 @@ int selectplayer(int *players, char *filename) {
 					else
 						update_model_loadflag(tempmodel, GET_INT_ARG(2));
 				} else if(command && command[0])
-					printf("Command '%s' is not understood in file '%s'", command, filename);
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 			}
 
 			pos += getNewLineStart(buf + pos);
+			line++;
 		}
 		freeAndNull((void**) &buf);
 		for(i = 0; i < maxplayers[current_set]; i++) {
@@ -19939,7 +19943,7 @@ int init_videomodes(void) {
 	ArgList arglist;
 	char argbuf[MAX_ARG_LEN + 1] = "";
 	char lowercase_buf[16];
-	unsigned i;
+	unsigned i, line = 1;
 
 	printf("Initializing video............\n");
 
@@ -19993,10 +19997,11 @@ int init_videomodes(void) {
 				}
 			}
 			if(i == VTC_MAX)
-				printf("Command '%s' not understood in file '%s'!", command, filename);
+				printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 		// Go to next line
 		pos += getNewLineStart(buf + pos);
+		line++;
 	}
 	freeAndNull((void**) &buf);
 
@@ -20049,7 +20054,7 @@ void keyboard_setup(int player_nr) {
 	char lowercase_buf[16];
 	char disabledkey[CB_MAX] = { 0 };
 	int quit = 0;
-	unsigned i;
+	unsigned i, line = 1;
 
 	ptrdiff_t pos;
 	size_t size;
@@ -20090,7 +20095,7 @@ void keyboard_setup(int player_nr) {
 						}
 					}
 				} else if(command && command[0])
-					printf("Command '%s' not understood in file '%s'!", command, filename);
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 
 			}
 			// Go to next line
