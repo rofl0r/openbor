@@ -878,6 +878,8 @@ static const s_script_args_names script_args_names = {
 	.animnum = "animnum",
 	.frame = "frame",
 	.player = "player",
+	.attacktype = "attacktype",
+	.reset = "reset",
 };
 
 static const s_script_args init_script_args_default = {
@@ -896,6 +898,8 @@ static const s_script_args init_script_args_default = {
 	.animnum = {VT_EMPTY, 0},
 	.frame = {VT_EMPTY, 0},
 	.player = {VT_EMPTY, 0},
+	.attacktype = {VT_EMPTY, 0},
+	.reset = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -914,6 +918,8 @@ static const s_script_args init_script_args_only_ent = {
 	.animnum = {VT_EMPTY, 0},
 	.frame = {VT_EMPTY, 0},
 	.player = {VT_EMPTY, 0},
+	.attacktype = {VT_EMPTY, 0},
+	.reset = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -1108,6 +1114,10 @@ static void execute_animation_script_i(s_script_args* args) {
 static void execute_entity_key_script_i(s_script_args* args) {
 	execute_script_default(args, ((entity*) args->ent.value)->scripts.key_script);
 }
+static void execute_onpain_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onpain_script);
+}
+
 
 void execute_animation_script(entity * ent) {
 	s_script_args script_args = init_script_args_only_ent;
@@ -1182,25 +1192,19 @@ void execute_entity_key_script(entity * ent) {
 }
 
 void execute_onpain_script(entity * ent, int iType, int iReset) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onpain_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.lVal = (LONG) iType;
-		Script_Set_Local_Variant("attacktype", &tempvar);
-		tempvar.lVal = (LONG) iReset;
-		Script_Set_Local_Variant("reset", &tempvar);
-		Script_Execute(ent->scripts.onpain_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("type", &tempvar);
-		Script_Set_Local_Variant("reset", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.reset.vt = VT_INTEGER;
+	script_args.attacktype.vt = VT_INTEGER;
+	script_args.reset.value = iReset;
+	script_args.attacktype.value = iType;
+	
+	/*script_args.type.vt = VT_INTEGER;
+	script_args.type.value = iReset; */
+	/*
+		FIXME the original code did not set this, but did Script_Set_Local_Variant("type", &tempvar)
+		after setting lval to iReset, additionally it did not set VT_INTEGER on any var */
+	execute_onpain_script_i(&script_args);
 }
 
 void execute_onblockw_script(entity * ent, int plane, float height) {

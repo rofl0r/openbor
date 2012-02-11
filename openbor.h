@@ -1601,6 +1601,8 @@ typedef struct {
 	s_script_args_tuple animnum;
 	s_script_args_tuple frame;
 	s_script_args_tuple player;
+	s_script_args_tuple attacktype;
+	s_script_args_tuple reset;
 } s_script_args;
 
 typedef struct {
@@ -1619,6 +1621,8 @@ typedef struct {
 	char* animnum;
 	char* frame;
 	char* player;
+	char* attacktype;
+	char* reset;
 } s_script_args_names;
 #define s_script_args_membercount (sizeof(s_script_args_names) / sizeof(char*))
 
