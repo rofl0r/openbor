@@ -1598,8 +1598,10 @@ typedef struct {
 	s_script_args_tuple which;
 	s_script_args_tuple atkid;
 	s_script_args_tuple blocked;
+	s_script_args_tuple animnum;
+	s_script_args_tuple frame;
+	s_script_args_tuple player;
 } s_script_args;
-#define s_script_args_membercount 12
 
 typedef struct {
 	char* ent;
@@ -1614,8 +1616,11 @@ typedef struct {
 	char* which;
 	char* atkid;
 	char* blocked;
-	
+	char* animnum;
+	char* frame;
+	char* player;
 } s_script_args_names;
+#define s_script_args_membercount (sizeof(s_script_args_names) / sizeof(char*))
 
 typedef enum {
 	CB_UP = 0,

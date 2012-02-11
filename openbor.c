@@ -862,30 +862,6 @@ void copy_all_scripts(s_scripts * src, s_scripts * dest, int method) {
 	}
 }
 
-void execute_animation_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.animation_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) ent->animnum;
-		Script_Set_Local_Variant("animnum", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) ent->animpos;
-		Script_Set_Local_Variant("frame", &tempvar);
-		Script_Execute(ent->scripts.animation_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("animnum", &tempvar);
-		Script_Set_Local_Variant("frame", &tempvar);
-	}
-	pcurrentscript = ptempscript;
-}
-
 static const s_script_args_names script_args_names = {
 	.ent = "self",
 	.other = "attacker",
@@ -898,7 +874,10 @@ static const s_script_args_names script_args_names = {
 	.pauseadd = "pauseadd",
 	.which = "which",
 	.atkid = "attackid",
-	.blocked = "blocked"
+	.blocked = "blocked",
+	.animnum = "animnum",
+	.frame = "frame",
+	.player = "player",
 };
 
 static const s_script_args init_script_args_default = {
@@ -914,6 +893,9 @@ static const s_script_args init_script_args_default = {
 	.which = {VT_EMPTY, 0},
 	.atkid = {VT_EMPTY, 0},
 	.blocked = {VT_EMPTY, 0},
+	.animnum = {VT_EMPTY, 0},
+	.frame = {VT_EMPTY, 0},
+	.player = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -929,6 +911,9 @@ static const s_script_args init_script_args_only_ent = {
 	.which = {VT_EMPTY, 0},
 	.atkid = {VT_EMPTY, 0},
 	.blocked = {VT_EMPTY, 0},
+	.animnum = {VT_EMPTY, 0},
+	.frame = {VT_EMPTY, 0},
+	.player = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -1117,6 +1102,22 @@ static void execute_think_script_i(s_script_args* args) {
 static void execute_onspawn_script_i(s_script_args* args) {
 	execute_script_default(args, ((entity*) args->ent.value)->scripts.onspawn_script);
 }
+static void execute_animation_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.animation_script);
+}
+static void execute_entity_key_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.key_script);
+}
+
+void execute_animation_script(entity * ent) {
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.animnum.vt = VT_INTEGER;
+	script_args.frame.vt = VT_INTEGER;
+	script_args.animnum.value = ent->animnum;
+	script_args.frame.value = ent->animpos;
+	execute_animation_script_i(&script_args);
+}
 
 void execute_onblocks_script(entity * ent) {
 	s_script_args script_args = init_script_args_only_ent;
@@ -1173,26 +1174,11 @@ void execute_onspawn_script(entity * ent) {
 }
 
 void execute_entity_key_script(entity * ent) {
-	ScriptVariant tempvar;
-	Script *ptempscript;
-	if(!ent)
-		return;
-	ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.key_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) ent->playerindex;
-		Script_Set_Local_Variant("player", &tempvar);
-		Script_Execute(ent->scripts.key_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("player", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.player.vt = VT_INTEGER;
+	script_args.player.value = ent->playerindex;
+	execute_entity_key_script_i(&script_args);
 }
 
 void execute_onpain_script(entity * ent, int iType, int iReset) {
@@ -18725,7 +18711,8 @@ void execute_keyscripts() {
 		   && (player[p].newkeys || (keyscriptrate && player[p].keys) || player[p].releasekeys)) {
 			if(level) {
 				execute_level_key_script(p);
-				execute_entity_key_script(player[p].ent);
+				if(player[p].ent)
+					execute_entity_key_script(player[p].ent);
 			}
 			execute_key_script(p);
 			execute_key_script_all(p);
