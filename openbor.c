@@ -5036,8 +5036,9 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						} else if(stricmp(value, "duckattack") == 0) {
 							ani_id = ANI_DUCKATTACK;
 						} else {
-							shutdownmessage = "Invalid animation name!";
-							goto lCleanup;
+							PLOG("invalid animation name %s", value);
+							//shutdownmessage = "Invalid animation name!";
+							goto next_line;
 						}
 
 						newchar->animation[ani_id] = newanim;
@@ -5816,7 +5817,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 			}
 
 		}
-		// Go to next line
+		next_line:
 		pos += getNewLineStart(buf + pos);
 	}
 
