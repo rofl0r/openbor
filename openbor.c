@@ -883,6 +883,8 @@ static const s_script_args_names script_args_names = {
 	.plane = "plane",
 	.height = "height",
 	.obstacle = "obstacle",
+	.time = "time",
+	.gotime = "gotime",
 };
 
 static const s_script_args init_script_args_default = {
@@ -906,6 +908,8 @@ static const s_script_args init_script_args_default = {
 	.plane = {VT_EMPTY, 0},
 	.height = {VT_EMPTY, 0},
 	.obstacle = {VT_EMPTY, 0},
+	.time = {VT_EMPTY, 0},
+	.gotime = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -929,6 +933,8 @@ static const s_script_args init_script_args_only_ent = {
 	.plane = {VT_EMPTY, 0},
 	.height = {VT_EMPTY, 0},
 	.obstacle = {VT_EMPTY, 0},
+	.time = {VT_EMPTY, 0},
+	.gotime = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -1141,7 +1147,6 @@ static void execute_onblocka_script_i(s_script_args* args) {
 	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblocka_script);
 }
 
-
 void execute_animation_script(entity * ent) {
 	s_script_args script_args = init_script_args_only_ent;
 	script_args.ent.value = (intptr_t) ent;
@@ -1296,22 +1301,13 @@ void execute_key_script_all(int player_nr) {
 }
 
 void execute_timetick_script(int time, int gotime) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&game_scripts.timetick_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_INTEGER);
-		tempvar.lVal = (LONG) time;
-		Script_Set_Local_Variant("time", &tempvar);
-		tempvar.lVal = (LONG) gotime;
-		Script_Set_Local_Variant("gotime", &tempvar);
-		Script_Execute(&game_scripts.timetick_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("time", &tempvar);
-		Script_Set_Local_Variant("gotime", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.vt = VT_EMPTY;
+	script_args.time.vt = VT_INTEGER;
+	script_args.gotime.vt = VT_INTEGER;
+	script_args.time.value = time;
+	script_args.gotime.value = gotime;
+	execute_script_default(&script_args, &game_scripts.timetick_script);
 }
 
 void execute_key_script(int index) {
