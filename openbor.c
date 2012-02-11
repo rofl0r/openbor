@@ -6173,55 +6173,37 @@ int load_models() {
 		switch (cmd) {
 			case CMD_MODELSTXT_MAXIDLES:
 				// max idle stances
-				max_idles = GET_INT_ARG(1);
-				if(max_idles < MAX_IDLES)
-					max_idles = MAX_IDLES;
+				max_idles = MAX(GET_INT_ARG(1), MAX_IDLES);
 				break;
 			case CMD_MODELSTXT_MAXWALKS:
-				max_walks = GET_INT_ARG(1);
-				if(max_walks < MAX_WALKS)
-					max_walks = MAX_WALKS;
+				max_walks = MAX(GET_INT_ARG(1), MAX_WALKS);
 				break;
 			case CMD_MODELSTXT_MAXBACKWALKS:
 				// max backward walks
-				max_backwalks = GET_INT_ARG(1);
-				if(max_backwalks < MAX_BACKWALKS)
-					max_backwalks = MAX_BACKWALKS;
+				max_backwalks = MAX(GET_INT_ARG(1), MAX_BACKWALKS);
 				break;
 			case CMD_MODELSTXT_MAXUPS:
 				// max up walks
-				max_ups = GET_INT_ARG(1);
-				if(max_ups < MAX_UPS)
-					max_ups = MAX_UPS;
+				max_ups = MAX(GET_INT_ARG(1), MAX_UPS);
 				break;
 			case CMD_MODELSTXT_MAXDOWNS:
 				// max down walks
-				max_downs = GET_INT_ARG(1);
-				if(max_downs < MAX_DOWNS)
-					max_downs = MAX_DOWNS;
+				max_downs = MAX(GET_INT_ARG(1), MAX_DOWNS);
 				break;
 			case CMD_MODELSTXT_MAXATTACKTYPES:
 				// max attacktype/pain/fall/die
-				max_attack_types = GET_INT_ARG(1) + STA_ATKS;
-				if(max_attack_types < MAX_ATKS)
-					max_attack_types = MAX_ATKS;
+				max_attack_types = MAX(GET_INT_ARG(1) + STA_ATKS, MAX_ATKS);
 				break;
 			case CMD_MODELSTXT_MAXFOLLOWS:
 				// max follow-ups
-				max_follows = GET_INT_ARG(1);
-				if(max_follows < MAX_FOLLOWS)
-					max_follows = MAX_FOLLOWS;
+				max_follows = MAX(GET_INT_ARG(1), MAX_FOLLOWS);
 				break;
 			case CMD_MODELSTXT_MAXFREESPECIALS:
 				// max freespecials
-				max_freespecials = GET_INT_ARG(1);
-				if(max_freespecials < MAX_SPECIALS)
-					max_freespecials = MAX_SPECIALS;
+				max_freespecials = MAX(GET_INT_ARG(1), MAX_SPECIALS);
 				break;
 			case CMD_MODELSTXT_MAXATTACKS:
-				max_attacks = GET_INT_ARG(1);
-				if(max_attacks < MAX_ATTACKS)
-					max_attacks = MAX_ATTACKS;
+				max_attacks = MAX(GET_INT_ARG(1), MAX_ATTACKS);
 				break;
 			case CMD_MODELSTXT_MUSIC:
 				music(GET_ARG(1), 1, atol(GET_ARG(2)));
