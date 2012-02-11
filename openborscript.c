@@ -54,19 +54,7 @@ extern s_savelevel savelevel[MAX_DIFFICULTIES];
 extern s_savescore savescore;
 extern s_level *level;
 extern entity *self;
-extern int *animspecials;
-extern int *animattacks;
-extern int *animfollows;
-extern int *animpains;
-extern int *animfalls;
-extern int *animrises;
-extern int *animriseattacks;
-extern int *animdies;
-extern int *animidles;
-extern int *animwalks;
-extern int *animbackwalks;
-extern int *animups;
-extern int *animdowns;
+
 extern int noshare;
 extern int credits;
 extern char musicname[128];
@@ -7748,8 +7736,6 @@ void mapstrings_transconst(ScriptVariant ** varlist, int paramCount) {
 
 #undef ICMPCONST
 
-#define ani_num_translations 13
-
 static const int ani_translate[] = {
 	CMD_SCRIPT_CONSTANT_ANI_DOWN,
 	CMD_SCRIPT_CONSTANT_ANI_UP,
@@ -7767,20 +7753,22 @@ static const int ani_translate[] = {
 };
 
 static int** ani_targets[] = {
-	&animdowns,
-	&animups,
-	&animbackwalks,
-	&animwalks,
-	&animidles,
-	&animfalls,
-	&animattacks,
-	&animfollows,
-	&animrises,
-	&animriseattacks,
-	&animpains,
-	&animdies,
-	&animspecials,
+	&dyn_anims.animdowns,
+	&dyn_anims.animups,
+	&dyn_anims.animbackwalks,
+	&dyn_anims.animwalks,
+	&dyn_anims.animidles,
+	&dyn_anims.animfalls,
+	&dyn_anims.animattacks,
+	&dyn_anims.animfollows,
+	&dyn_anims.animrises,
+	&dyn_anims.animriseattacks,
+	&dyn_anims.animpains,
+	&dyn_anims.animdies,
+	&dyn_anims.animspecials,
 };
+
+#define ani_num_translations (ARRAY_SIZE(ani_targets))
 
 //openborconstant(constname);
 //translate a constant by string, used to retrieve a constant or macro of openbor

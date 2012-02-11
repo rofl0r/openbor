@@ -128,20 +128,9 @@ int max_attacks = MAX_ATTACKS;
 int max_animations = MAX_ANIS;
 
 // -------dynamic animation indexes-------
-int *animdowns = NULL;
-int *animups = NULL;
-int *animbackwalks = NULL;
-int *animwalks = NULL;
-int *animidles = NULL;
-int *animpains = NULL;
-int *animdies = NULL;
-int *animfalls = NULL;
-int *animrises = NULL;
-int *animriseattacks = NULL;
-int *animblkpains = NULL;
-int *animattacks = NULL;
-int *animfollows = NULL;
-int *animspecials = NULL;
+
+const int dyn_anim_itemcount = sizeof(s_dynamic_animation_indexes) / sizeof(int*);
+s_dynamic_animation_indexes dyn_anims = {0};
 
 // system default values
 int downs[MAX_DOWNS] = { ANI_DOWN };
@@ -2841,20 +2830,11 @@ int free_model(s_model * model) {
 }
 
 void freeAnims(void) {
-	freeAndNull((void**) &animdowns);
-	freeAndNull((void**) &animups);
-	freeAndNull((void**) &animbackwalks);
-	freeAndNull((void**) &animwalks);
-	freeAndNull((void**) &animidles);
-	freeAndNull((void**) &animspecials);
-	freeAndNull((void**) &animattacks);
-	freeAndNull((void**) &animfollows);
-	freeAndNull((void**) &animpains);
-	freeAndNull((void**) &animfalls);
-	freeAndNull((void**) &animrises);
-	freeAndNull((void**) &animriseattacks);
-	freeAndNull((void**) &animblkpains);
-	freeAndNull((void**) &animdies);
+	unsigned i;
+	int** dyn_anims_arr = (int**) &dyn_anims;
+	for (i = 0; i < dyn_anim_itemcount; i++) {
+		freeAndNull((void**) &dyn_anims_arr[i]);
+	}
 }
 
 // Unload all models and animations memory
@@ -4371,7 +4351,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 								newchar->special[newchar->
 										 specials_loaded][MAX_SPECIAL_INPUTS -
 												  2] =
-								    animspecials[tempInt - 1];
+								    dyn_anims.animspecials[tempInt - 1];
 							} else {
 								shutdownmessage = "Invalid freespecial command";
 								goto lCleanup;
@@ -4639,7 +4619,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 4);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animidles[tempInt - 1];
+							ani_id = dyn_anims.animidles[tempInt - 1];
 						} else if(stricmp(value, "waiting") == 0) {
 							ani_id = ANI_SELECT;
 						} else if(strnicmp(value, "walk", 4) == 0 &&
@@ -4647,7 +4627,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 4);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animwalks[tempInt - 1];
+							ani_id = dyn_anims.animwalks[tempInt - 1];
 						} else if(stricmp(value, "sleep") == 0) {
 							ani_id = ANI_SLEEP;
 						} else if(stricmp(value, "run") == 0) {
@@ -4657,19 +4637,19 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 2);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animups[tempInt - 1];
+							ani_id = dyn_anims.animups[tempInt - 1];
 						} else if(strnicmp(value, "down", 4) == 0 &&
 							  (!value[4] || (value[4] >= '1' && value[4] <= '9'))) {
 							tempInt = atoi(value + 4);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animdowns[tempInt - 1];
+							ani_id = dyn_anims.animdowns[tempInt - 1];
 						} else if(strnicmp(value, "backwalk", 8) == 0 &&
 							  (!value[8] || (value[8] >= '1' && value[8] <= '9'))) {
 							tempInt = atoi(value + 8);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animbackwalks[tempInt - 1];
+							ani_id = dyn_anims.animbackwalks[tempInt - 1];
 						} else if(stricmp(value, "jump") == 0) {
 							ani_id = ANI_JUMP;
 							newanim->range[0] = 50;	// Used for enemies that jump on walls
@@ -4706,7 +4686,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animpains[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animpains[tempInt + STA_ATKS - 1];
 							}
 						} else if(stricmp(value, "spain") == 0) {	// If shock attacks don't knock opponent down, play this
 							ani_id = ANI_SHOCKPAIN;
@@ -4741,7 +4721,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animfalls[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animfalls[tempInt + STA_ATKS - 1];
 							}
 							newanim->bounce = 4;
 						} else if(stricmp(value, "shock") == 0) {	// If shock attacks do knock opponent down, play this
@@ -4778,7 +4758,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animdies[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animdies[tempInt + STA_ATKS - 1];
 							}
 						} else if(stricmp(value, "sdie") == 0) {
 							ani_id = ANI_SHOCKDIE;
@@ -4820,7 +4800,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animrises[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animrises[tempInt + STA_ATKS - 1];
 							}
 						} else if(stricmp(value, "riseattackb") == 0) {
 							ani_id = ANI_RISEATTACKB;
@@ -4854,7 +4834,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animriseattacks[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animriseattacks[tempInt + STA_ATKS - 1];
 							}
 						} else if(stricmp(value, "select") == 0) {
 							ani_id = ANI_PICK;
@@ -4863,7 +4843,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 6);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animattacks[tempInt - 1];
+							ani_id = dyn_anims.animattacks[tempInt - 1];
 						} else if(stricmp(value, "throwattack") == 0) {
 							ani_id = ANI_THROWATTACK;
 						} else if(stricmp(value, "upper") == 0) {
@@ -4895,7 +4875,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 11);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animspecials[tempInt - 1];
+							ani_id = dyn_anims.animspecials[tempInt - 1];
 							switch (tempInt)	// old default values
 							{
 								case 1:
@@ -5059,7 +5039,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							tempInt = atoi(value + 6);
 							if(tempInt < 1)
 								tempInt = 1;
-							ani_id = animfollows[tempInt - 1];
+							ani_id = dyn_anims.animfollows[tempInt - 1];
 						} else if(stricmp(value, "chargeattack") == 0) {
 							ani_id = ANI_CHARGEATTACK;
 						} else if(stricmp(value, "vault") == 0) {
@@ -5112,7 +5092,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							} else {
 								if(tempInt < MAX_ATKS - STA_ATKS + 1)
 									tempInt = MAX_ATKS - STA_ATKS + 1;
-								ani_id = animblkpains[tempInt + STA_ATKS - 1];
+								ani_id = dyn_anims.animblkpains[tempInt + STA_ATKS - 1];
 							}
 						} else if(stricmp(value, "duckattack") == 0) {
 							ani_id = ANI_DUCKATTACK;
@@ -5318,7 +5298,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 								newchar->special[newchar->
 										 specials_loaded][MAX_SPECIAL_INPUTS -
 												  5] =
-								    animspecials[tempInt - 1];
+								    dyn_anims.animspecials[tempInt - 1];
 								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 7] = GET_INT_ARG(1);	// stores start frame
 								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 8] = GET_INT_ARG(2);	// stores end frame
 								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 9] = ani_id;	// stores current anim
@@ -6297,64 +6277,64 @@ int load_models() {
 	    (max_walks - MAX_WALKS) + (max_ups - MAX_UPS) + (max_downs - MAX_DOWNS) + (max_backwalks - MAX_BACKWALKS);
 
 	// alloc indexed animation ids
-	animdowns = (int *) malloc(sizeof(int) * max_downs);
-	animups = (int *) malloc(sizeof(int) * max_ups);
-	animbackwalks = (int *) malloc(sizeof(int) * max_backwalks);
-	animwalks = (int *) malloc(sizeof(int) * max_walks);
-	animidles = (int *) malloc(sizeof(int) * max_idles);
-	animpains = (int *) malloc(sizeof(int) * max_attack_types);
-	animdies = (int *) malloc(sizeof(int) * max_attack_types);
-	animfalls = (int *) malloc(sizeof(int) * max_attack_types);
-	animrises = (int *) malloc(sizeof(int) * max_attack_types);
-	animriseattacks = (int *) malloc(sizeof(int) * max_attack_types);
-	animblkpains = (int *) malloc(sizeof(int) * max_attack_types);
-	animattacks = (int *) malloc(sizeof(int) * max_attacks);
-	animfollows = (int *) malloc(sizeof(int) * max_follows);
-	animspecials = (int *) malloc(sizeof(int) * max_freespecials);
+	dyn_anims.animdowns = (int *) malloc(sizeof(int) * max_downs);
+	dyn_anims.animups = (int *) malloc(sizeof(int) * max_ups);
+	dyn_anims.animbackwalks = (int *) malloc(sizeof(int) * max_backwalks);
+	dyn_anims.animwalks = (int *) malloc(sizeof(int) * max_walks);
+	dyn_anims.animidles = (int *) malloc(sizeof(int) * max_idles);
+	dyn_anims.animpains = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animdies = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animfalls = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animrises = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animriseattacks = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animblkpains = (int *) malloc(sizeof(int) * max_attack_types);
+	dyn_anims.animattacks = (int *) malloc(sizeof(int) * max_attacks);
+	dyn_anims.animfollows = (int *) malloc(sizeof(int) * max_follows);
+	dyn_anims.animspecials = (int *) malloc(sizeof(int) * max_freespecials);
 
 	// copy default values and new animation ids
-	memcpy(animdowns, downs, sizeof(int) * MAX_DOWNS);
+	memcpy(dyn_anims.animdowns, downs, sizeof(int) * MAX_DOWNS);
 	for(i = MAX_DOWNS; i < max_downs; i++)
-		animdowns[i] = maxanim++;
-	memcpy(animups, ups, sizeof(int) * MAX_UPS);
+		dyn_anims.animdowns[i] = maxanim++;
+	memcpy(dyn_anims.animups, ups, sizeof(int) * MAX_UPS);
 	for(i = MAX_UPS; i < max_ups; i++)
-		animups[i] = maxanim++;
-	memcpy(animbackwalks, backwalks, sizeof(int) * MAX_BACKWALKS);
+		dyn_anims.animups[i] = maxanim++;
+	memcpy(dyn_anims.animbackwalks, backwalks, sizeof(int) * MAX_BACKWALKS);
 	for(i = MAX_BACKWALKS; i < max_backwalks; i++)
-		animbackwalks[i] = maxanim++;
-	memcpy(animwalks, walks, sizeof(int) * MAX_WALKS);
+		dyn_anims.animbackwalks[i] = maxanim++;
+	memcpy(dyn_anims.animwalks, walks, sizeof(int) * MAX_WALKS);
 	for(i = MAX_WALKS; i < max_walks; i++)
-		animwalks[i] = maxanim++;
-	memcpy(animidles, idles, sizeof(int) * MAX_IDLES);
+		dyn_anims.animwalks[i] = maxanim++;
+	memcpy(dyn_anims.animidles, idles, sizeof(int) * MAX_IDLES);
 	for(i = MAX_IDLES; i < max_idles; i++)
-		animidles[i] = maxanim++;
-	memcpy(animspecials, freespecials, sizeof(int) * MAX_SPECIALS);
+		dyn_anims.animidles[i] = maxanim++;
+	memcpy(dyn_anims.animspecials, freespecials, sizeof(int) * MAX_SPECIALS);
 	for(i = MAX_SPECIALS; i < max_freespecials; i++)
-		animspecials[i] = maxanim++;
-	memcpy(animattacks, normal_attacks, sizeof(int) * MAX_ATTACKS);
+		dyn_anims.animspecials[i] = maxanim++;
+	memcpy(dyn_anims.animattacks, normal_attacks, sizeof(int) * MAX_ATTACKS);
 	for(i = MAX_ATTACKS; i < max_attacks; i++)
-		animattacks[i] = maxanim++;
-	memcpy(animfollows, follows, sizeof(int) * MAX_FOLLOWS);
+		dyn_anims.animattacks[i] = maxanim++;
+	memcpy(dyn_anims.animfollows, follows, sizeof(int) * MAX_FOLLOWS);
 	for(i = MAX_FOLLOWS; i < max_follows; i++)
-		animfollows[i] = maxanim++;
-	memcpy(animpains, pains, sizeof(int) * MAX_ATKS);
+		dyn_anims.animfollows[i] = maxanim++;
+	memcpy(dyn_anims.animpains, pains, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animpains[i] = maxanim++;
-	memcpy(animfalls, falls, sizeof(int) * MAX_ATKS);
+		dyn_anims.animpains[i] = maxanim++;
+	memcpy(dyn_anims.animfalls, falls, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animfalls[i] = maxanim++;
-	memcpy(animrises, rises, sizeof(int) * MAX_ATKS);
+		dyn_anims.animfalls[i] = maxanim++;
+	memcpy(dyn_anims.animrises, rises, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animrises[i] = maxanim++;
-	memcpy(animriseattacks, riseattacks, sizeof(int) * MAX_ATKS);
+		dyn_anims.animrises[i] = maxanim++;
+	memcpy(dyn_anims.animriseattacks, riseattacks, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animriseattacks[i] = maxanim++;
-	memcpy(animblkpains, blkpains, sizeof(int) * MAX_ATKS);
+		dyn_anims.animriseattacks[i] = maxanim++;
+	memcpy(dyn_anims.animblkpains, blkpains, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animblkpains[i] = maxanim++;
-	memcpy(animdies, deaths, sizeof(int) * MAX_ATKS);
+		dyn_anims.animblkpains[i] = maxanim++;
+	memcpy(dyn_anims.animdies, deaths, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
-		animdies[i] = maxanim++;
+		dyn_anims.animdies[i] = maxanim++;
 
 	// Defer load_cached_model, so you can define models after their nested model.
 	printf("\n");
@@ -10722,7 +10702,7 @@ void do_attack(entity * e) {
 				{
 					if(self->animation->counterframe[3])
 						self->health -= force;	// Take damage?
-					current_follow_id = animfollows[self->animation->followanim - 1];
+					current_follow_id = dyn_anims.animfollows[self->animation->followanim - 1];
 					if(validanim(self, current_follow_id)) {
 						if(self->modeldata.animation[current_follow_id]->attackone == -1)
 							self->modeldata.animation[current_follow_id]->attackone =
@@ -10812,7 +10792,7 @@ void do_attack(entity * e) {
 				   ((e->animation->followcond < 3) || ((self->health > 0) && !didblock)) &&	// check if health or blocking matters
 				   ((e->animation->followcond < 4) || cangrab(e, self)))	// check if nograb matters
 				{
-					current_follow_id = animfollows[e->animation->followanim - 1];
+					current_follow_id = dyn_anims.animfollows[e->animation->followanim - 1];
 					if(validanim(e, current_follow_id)) {
 						if(e->modeldata.animation[current_follow_id]->attackone == -1)
 							e->modeldata.animation[current_follow_id]->attackone =
@@ -12066,10 +12046,10 @@ int set_death(entity * iDie, int type, int reset) {
 		iDie->blocking = 0;
 		return 1;
 	}
-	if(type < 0 || type >= max_attack_types || !validanim(iDie, animdies[type]))
+	if(type < 0 || type >= max_attack_types || !validanim(iDie, dyn_anims.animdies[type]))
 		type = 0;
-	if(validanim(iDie, animdies[type]))
-		ent_set_anim(iDie, animdies[type], reset);
+	if(validanim(iDie, dyn_anims.animdies[type]))
+		ent_set_anim(iDie, dyn_anims.animdies[type], reset);
 	else
 		return 0;
 
@@ -12087,10 +12067,10 @@ int set_death(entity * iDie, int type, int reset) {
 
 int set_fall(entity * iFall, int type, int reset, entity * other, int force, int drop, int noblock, int guardcost,
 	     int jugglecost, int pauseadd) {
-	if(type < 0 || type >= max_attack_types || !validanim(iFall, animfalls[type]))
+	if(type < 0 || type >= max_attack_types || !validanim(iFall, dyn_anims.animfalls[type]))
 		type = 0;
-	if(validanim(iFall, animfalls[type]))
-		ent_set_anim(iFall, animfalls[type], reset);
+	if(validanim(iFall, dyn_anims.animfalls[type]))
+		ent_set_anim(iFall, dyn_anims.animfalls[type], reset);
 	else
 		return 0;
 	iFall->drop = 1;
@@ -12111,10 +12091,10 @@ int set_fall(entity * iFall, int type, int reset, entity * other, int force, int
 }
 
 int set_rise(entity * iRise, int type, int reset) {
-	if(type < 0 || type >= max_attack_types || !validanim(iRise, animrises[type]))
+	if(type < 0 || type >= max_attack_types || !validanim(iRise, dyn_anims.animrises[type]))
 		type = 0;
-	if(validanim(iRise, animrises[type]))
-		ent_set_anim(iRise, animrises[type], reset);
+	if(validanim(iRise, dyn_anims.animrises[type]))
+		ent_set_anim(iRise, dyn_anims.animrises[type], reset);
 	else
 		return 0;
 	iRise->takeaction = common_rise;
@@ -12129,19 +12109,19 @@ int set_rise(entity * iRise, int type, int reset) {
 }
 
 int set_riseattack(entity * iRiseattack, int type, int reset) {
-	if(!validanim(iRiseattack, animriseattacks[type]) && iRiseattack->modeldata.riseattacktype == 1)
+	if(!validanim(iRiseattack, dyn_anims.animriseattacks[type]) && iRiseattack->modeldata.riseattacktype == 1)
 		type = 0;
 	if(iRiseattack->modeldata.riseattacktype == 0 || type < 0 || type >= max_attack_types)
 		type = 0;
-	if(validanim(iRiseattack, animriseattacks[type]))
-		ent_set_anim(iRiseattack, animriseattacks[type], reset);
+	if(validanim(iRiseattack, dyn_anims.animriseattacks[type]))
+		ent_set_anim(iRiseattack, dyn_anims.animriseattacks[type], reset);
 	else
 		return 0;
 	self->staydown[2] = 0;	//Reset riseattack delay.
 	set_attacking(iRiseattack);
 	iRiseattack->drop = 0;
 	iRiseattack->nograb = 0;
-	ent_set_anim(iRiseattack, animriseattacks[type], 0);
+	ent_set_anim(iRiseattack, dyn_anims.animriseattacks[type], 0);
 	iRiseattack->takeaction = common_attack_proc;
 	iRiseattack->modeldata.jugglepoints[0] = iRiseattack->modeldata.jugglepoints[1];	//reset jugglepoints
 	return 1;
@@ -12152,10 +12132,10 @@ int set_blockpain(entity * iBlkpain, int type, int reset) {
 		iBlkpain->takeaction = common_pain;
 		return 1;
 	}
-	if(type < 0 || type >= max_attack_types || !validanim(iBlkpain, animblkpains[type]))
+	if(type < 0 || type >= max_attack_types || !validanim(iBlkpain, dyn_anims.animblkpains[type]))
 		type = 0;
-	if(validanim(iBlkpain, animblkpains[type]))
-		ent_set_anim(iBlkpain, animblkpains[type], reset);
+	if(validanim(iBlkpain, dyn_anims.animblkpains[type]))
+		ent_set_anim(iBlkpain, dyn_anims.animblkpains[type], reset);
 	else
 		return 0;
 	iBlkpain->takeaction = common_block;
@@ -12172,11 +12152,11 @@ int set_pain(entity * iPain, int type, int reset) {
 	else if(type == -1 || type >= max_attack_types)
 		pain = ANI_GRABBED;
 	else
-		pain = animpains[type];
+		pain = dyn_anims.animpains[type];
 	if(validanim(iPain, pain))
 		ent_set_anim(iPain, pain, reset);
-	else if(validanim(iPain, animpains[0]))
-		ent_set_anim(iPain, animpains[0], reset);
+	else if(validanim(iPain, dyn_anims.animpains[0]))
+		ent_set_anim(iPain, dyn_anims.animpains[0], reset);
 	else if(validanim(iPain, ANI_IDLE))
 		ent_set_anim(iPain, ANI_IDLE, reset);
 	else
@@ -12424,19 +12404,19 @@ int perform_atchain() {
 		return 0;
 	}
 
-	if(validanim(self, animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1])) {
+	if(validanim(self, dyn_anims.animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1])) {
 		if(((self->combostep[0] == 1 || self->modeldata.combostyle != 1) && self->modeldata.type == TYPE_PLAYER) ||	// player should use attack 1st step without checking range
-		   (self->modeldata.combostyle != 1 && normal_find_target(animattacks[self->modeldata.atchain[0] - 1])) ||	// normal chain just checks the first attack in chain(guess no one like it)
-		   (self->modeldata.combostyle == 1 && normal_find_target(animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1])))	// combostyle 1 checks all anyway
+		   (self->modeldata.combostyle != 1 && normal_find_target(dyn_anims.animattacks[self->modeldata.atchain[0] - 1])) ||	// normal chain just checks the first attack in chain(guess no one like it)
+		   (self->modeldata.combostyle == 1 && normal_find_target(dyn_anims.animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1])))	// combostyle 1 checks all anyway
 		{
 			pickanim = 1;
 		} else if(self->modeldata.combostyle == 1 && self->combostep[0] != 1)	// ranged combo? search for a valid attack
 		{
 			while(++self->combostep[0] <= self->modeldata.chainlength) {
 				if(self->modeldata.atchain[self->combostep[0] - 1] &&
-				   validanim(self, animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1]) &&
+				   validanim(self, dyn_anims.animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1]) &&
 				   (self->combostep[0] == self->modeldata.chainlength ||
-				    normal_find_target(animattacks
+				    normal_find_target(dyn_anims.animattacks
 						       [self->modeldata.atchain[self->combostep[0] - 1] - 1]))) {
 					pickanim = 1;
 					break;
@@ -12446,7 +12426,7 @@ int perform_atchain() {
 	} else
 		self->combostep[0] = 0;
 	if(pickanim) {
-		ent_set_anim(self, animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1], 1);
+		ent_set_anim(self, dyn_anims.animattacks[self->modeldata.atchain[self->combostep[0] - 1] - 1], 1);
 		set_attacking(self);
 		self->takeaction = common_attack_proc;
 	}
@@ -12492,11 +12472,11 @@ void normal_prepare() {
 	// move freespecial check here
 	if((rand32() & 7) < 2) {
 		for(i = 0; i < max_freespecials; i++) {
-			if(validanim(self, animspecials[i]) &&
-			   (check_energy(1, animspecials[i]) ||
-			    check_energy(0, animspecials[i])) &&
-			   (target = normal_find_target(animspecials[i])) &&
-			   (rand32() % max_freespecials) < 3 && check_costmove(animspecials[i], 1)) {
+			if(validanim(self, dyn_anims.animspecials[i]) &&
+			   (check_energy(1, dyn_anims.animspecials[i]) ||
+			    check_energy(0, dyn_anims.animspecials[i])) &&
+			   (target = normal_find_target(dyn_anims.animspecials[i])) &&
+			   (rand32() % max_freespecials) < 3 && check_costmove(dyn_anims.animspecials[i], 1)) {
 				return;
 			}
 		}
@@ -12510,8 +12490,9 @@ void normal_prepare() {
 	{
 		// Pick an attack
 		for(i = 0; i < max_attacks; i++) {
-			if(validanim(self, animattacks[i]) && (target = normal_find_target(animattacks[i]))) {
-				lastpick = animattacks[i];
+			if(validanim(self, dyn_anims.animattacks[i]) && 
+			   (target = normal_find_target(dyn_anims.animattacks[i]))) {
+				lastpick = dyn_anims.animattacks[i];
 				if((rand32() & 31) > 10)
 					break;
 			}
@@ -13472,20 +13453,20 @@ int common_try_normalattack(entity * target) {
 	int i, found = 0;
 
 	for(i = 0; !found && i < max_freespecials; i++) {
-		if(validanim(self, animspecials[i]) &&
-		   (check_energy(1, animspecials[i]) ||
-		    check_energy(0, animspecials[i])) &&
-		   (target || (target = normal_find_target(animspecials[i]))) && (rand32() % max_freespecials) < 3) {
+		if(validanim(self, dyn_anims.animspecials[i]) &&
+		   (check_energy(1, dyn_anims.animspecials[i]) ||
+		    check_energy(0, dyn_anims.animspecials[i])) &&
+		   (target || (target = normal_find_target(dyn_anims.animspecials[i]))) && (rand32() % max_freespecials) < 3) {
 			found = 1;
 		}
 	}
 
 	for(i = 0; !found && i < max_attacks; i++)	// TODO: recheck range for attacks chains
 	{
-		if(!validanim(self, animattacks[i]))
+		if(!validanim(self, dyn_anims.animattacks[i]))
 			continue;
 
-		if(target || (target = normal_find_target(animattacks[i]))) {
+		if(target || (target = normal_find_target(dyn_anims.animattacks[i]))) {
 			found = 1;
 		}
 	}
@@ -16485,7 +16466,7 @@ void player_think() {
 			&& self->stalltime +
 			(GAME_SPEED *
 			 self->modeldata.
-			 animation[animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1]]->
+			 animation[dyn_anims.animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1]]->
 			 chargetime) < borTime))) {
 			set_attacking(self);
 			self->xdir = self->zdir = 0;
@@ -16495,7 +16476,7 @@ void player_think() {
 				ent_set_anim(self, ANI_CHARGEATTACK, 0);
 			else
 				ent_set_anim(self,
-					     animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1],
+					     dyn_anims.animattacks[self->modeldata.atchain[self->modeldata.chainlength - 1] - 1],
 					     0);
 
 			sound_play_sample(samples.punch, 0, savedata.effectvol, savedata.effectvol, 100);
@@ -16875,7 +16856,7 @@ int common_idle_anim(entity * ent) {
 	} else {
 		for(i = 0; i < max_idles; i++)	//Loop through all idle animations.
 		{
-			iAni = animidles[i];	//Get current animation.
+			iAni = dyn_anims.animidles[i];	//Get current animation.
 
 			if(validanim(ent, iAni) && iAni != ANI_IDLE)	//Valid and not ANI_IDLE?
 			{
@@ -16910,7 +16891,7 @@ int common_walk_anim(entity * ent) {
 
 	for(i = 0; i < max_walks; i++)	//Loop through all relevant animations.
 	{
-		iAni = animwalks[i];	//Get current animation.
+		iAni = dyn_anims.animwalks[i];	//Get current animation.
 
 		if(validanim(ent, iAni) && iAni != ANI_WALK)	//Valid and not Default animation??
 		{
@@ -16944,7 +16925,7 @@ int common_backwalk_anim(entity * ent) {
 
 	for(i = 0; i < max_backwalks; i++)	//Loop through all relevant animations.
 	{
-		iAni = animbackwalks[i];	//Get current animation.
+		iAni = dyn_anims.animbackwalks[i];	//Get current animation.
 
 		if(validanim(ent, iAni) && iAni != ANI_BACKWALK)	//Valid and not Default animation??
 		{
@@ -16978,7 +16959,7 @@ int common_up_anim(entity * ent) {
 
 	for(i = 0; i < max_ups; i++)	//Loop through all relevant animations.
 	{
-		iAni = animups[i];	//Get current animation.
+		iAni = dyn_anims.animups[i];	//Get current animation.
 
 		if(validanim(ent, iAni) && iAni != ANI_UP)	//Valid and not Default animation??
 		{
@@ -17012,7 +16993,7 @@ int common_down_anim(entity * ent) {
 
 	for(i = 0; i < max_downs; i++)	//Loop through all relevant animations.
 	{
-		iAni = animdowns[i];	//Get current animation.
+		iAni = dyn_anims.animdowns[i];	//Get current animation.
 
 		if(validanim(ent, iAni) && iAni != ANI_DOWN)	//Valid and not Default animation??
 		{
