@@ -1610,6 +1610,7 @@ typedef struct {
 	s_script_args_tuple gotime;
 	s_script_args_tuple damage;
 	s_script_args_tuple damagetaker;
+	s_script_args_tuple other;
 } s_script_args;
 
 typedef struct {
@@ -1637,6 +1638,7 @@ typedef struct {
 	char* gotime;
 	char* damage;
 	char* damagetaker;
+	char* other;
 } s_script_args_names;
 #define s_script_args_membercount (sizeof(s_script_args_names) / sizeof(char*))
 

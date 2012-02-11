@@ -799,6 +799,7 @@ static const s_script_args_names script_args_names = {
 	.gotime = "gotime",
 	.damage = "damage",
 	.damagetaker = "damagetaker",
+	.other = "other",
 };
 
 static const s_script_args init_script_args_default = {
@@ -826,6 +827,7 @@ static const s_script_args init_script_args_default = {
 	.gotime = {VT_EMPTY, 0},
 	.damage = {VT_EMPTY, 0},
 	.damagetaker = {VT_EMPTY, 0},
+	.other = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -853,6 +855,7 @@ static const s_script_args init_script_args_only_ent = {
 	.gotime = {VT_EMPTY, 0},
 	.damage = {VT_EMPTY, 0},
 	.damagetaker = {VT_EMPTY, 0},
+	.other = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -983,7 +986,12 @@ void execute_ondoattack_script(entity * ent, entity * other, int force, int drop
 			       int jugglecost, int pauseadd, int iWhich, int iAtkID) {
 	s_script_args script_args = init_script_args_default;
 	script_args.ent.value = (intptr_t) ent;
-	script_args.attacker.value = (intptr_t) other;
+	
+	script_args.attacker.vt = VT_EMPTY;
+	script_args.other.vt = VT_PTR;
+	script_args.other.value = (intptr_t) other;
+	/* yep, that one calls it "other", all the others "attacker" */
+	
 	script_args.force.value = force;
 	script_args.drop.value = drop;
 	script_args.type.value = type;
