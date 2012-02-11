@@ -137,19 +137,10 @@ ifdef BUILD_LOADGL
 GAME_CONSOLE   += sdl/loadgl.o
 endif
 
+MAIN = openbor.o data.o openborscript.o
 
-MAIN            = openborscript.o					                                                \
-                  openbor.o data.o
-
-OBJS            = $(GAME_CONSOLE)                                                                        \
-                  $(ADPCM)                                                                          \
-                  $(GFX)                                                                            \
-                  $(GAME)                                                                           \
-                  $(SOURCE)                                                                         \
-                  $(SCRIPT)                                                                         \
-                  $(RAND)                                                                           \
-                  $(PNG)                                                                            \
-                  $(MAIN)
+OBJS = $(MAIN) $(GAME_CONSOLE) $(ADPCM) $(GFX) $(GAME) $(SOURCE) $(SCRIPT) $(RAND) $(PNG)
+                  
 		  
 #----------------------------------------------------------------------------------------------------
 # Compiler Flags
