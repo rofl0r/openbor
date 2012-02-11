@@ -1588,7 +1588,6 @@ typedef struct {
 typedef struct {
 	s_script_args_tuple ent;
 	s_script_args_tuple attacker;
-	s_script_args_tuple force;
 	s_script_args_tuple drop;
 	s_script_args_tuple type;
 	s_script_args_tuple noblock;
@@ -1616,7 +1615,6 @@ typedef struct {
 typedef struct {
 	char* ent;
 	char* attacker;
-	char* force;
 	char* drop;
 	char* type;
 	char* noblock;
