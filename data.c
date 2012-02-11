@@ -197,34 +197,34 @@ const s_const_dynamic_animation_indexes dyn_anim_custom_max_ptr = {
 };
 //----------------------------------
 
-const char *default_button_names[] = {
-	[CB_UP] = "Move Up",
-	[CB_DOWN] = "Move Down",
-	[CB_LEFT] = "Move Left",
-	[CB_RIGHT] = "Move Right",
-	[CB_ATK1] = "Attack 1",
-	[CB_ATK2] = "Attack 2",
-	[CB_ATK3] = "Attack 3",
-	[CB_ATK4] = "Attack 4",
-	[CB_JUMP] = "Jump",
-	[CB_SPECIAL] = "Special",
-	[CB_START] = "Start",
-	[CB_SCREENSHOT] = "Screenshot",
+s_button_names buttonnames = {
+	.moveup = "Move Up",
+	.movedown = "Move Down",
+	.moveleft = "Move Left",
+	.moveright = "Move Right",
+	.attack = "Attack 1",
+	.attack2 = "Attack 2",
+	.attack3 = "Attack 3",
+	.attack4 = "Attack 4",
+	.jump = "Jump",
+	.special = "Special",
+	.start = "Start",
+	.screenshot = "Screenshot",
 };
 
-const char *config_button_names[] = {
-	[CB_UP] = "moveup",
-	[CB_DOWN] = "movedown",
-	[CB_LEFT] = "moveleft",
-	[CB_RIGHT] = "moveright",
-	[CB_ATK1] = "attack",
-	[CB_ATK2] = "attack2",
-	[CB_ATK3] = "attack3",
-	[CB_ATK4] = "attack4",
-	[CB_JUMP] = "jump",
-	[CB_SPECIAL] = "special",
-	[CB_START] = "start",
-	[CB_SCREENSHOT] = "screenshot",
+const s_button_names_const config_button_names = {
+	.moveup = "moveup",
+	.movedown = "movedown",
+	.moveleft = "moveleft",
+	.moveright = "moveright",
+	.attack = "attack",
+	.attack2 = "attack2",
+	.attack3 = "attack3",
+	.attack4 = "attack4",
+	.jump = "jump",
+	.special = "special",
+	.start = "start",
+	.screenshot = "screenshot",
 };
 
 const s_special_sprite special_sprites_init[] = {

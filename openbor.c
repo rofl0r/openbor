@@ -48,6 +48,9 @@ s_player_min_max_z_bgheight player_min_max_z_bgheight = {
 	160, 232, 160
 };
 
+char custom_button_names[CB_MAX][16];
+char disabledkey[CB_MAX] = { 0 };
+
 int quit_game = 0;
 
 int sprite_map_max_items = 0;
@@ -2485,6 +2488,7 @@ void load_all_fonts() {
 
 void load_menu_txt() {
 	char *filename = "data/menu.txt";
+	char lowercase_buf[16];
 	int pos;
 	char *buf, *command;
 	size_t size;
@@ -2492,27 +2496,42 @@ void load_menu_txt() {
 	char argbuf[MAX_ARG_LEN + 1] = "";
 	unsigned i, line = 1;
 
-	// Read file
-	if(buffer_pakfile(filename, &buf, &size) != 1) {
-		return;
-	}
-	// Now interpret the contents of buf line by line
-	pos = 0;
-	while(pos < size) {
-		ParseArgs(&arglist, buf + pos, argbuf);
-		command = GET_ARG(0);
-		if(command && command[0]) {
-			if(stricmp(command, "fontmonospace") == 0) {
-				for(i = 0; i < 8; i++)
-					fontmonospace[i] = GET_INT_ARG(i+1);
-			} else
-				printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
+	if(buffer_pakfile(filename, &buf, &size)) {
+		// Now interpret the contents of buf line by line
+		pos = 0;
+		while(pos < size) {
+			ParseArgs(&arglist, buf + pos, argbuf);
+			command = GET_ARG(0);
+			if(command[0]) {
+				if(stricmp(command, "disablekey") == 0) {
+					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+					for(i = 0; i < CB_MAX; i++) {
+						if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
+							disabledkey[i] = 1;
+							break;
+						}
+					}
+				} else if(stricmp(command, "renamekey") == 0) {
+					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+					for(i = 0; i < CB_MAX; i++) {
+						if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
+							strncpy(custom_button_names[i], GET_ARG(2), 16);
+							((char**)&buttonnames)[i] = custom_button_names[i];
+							break;
+						}
+					}
+				} else if(stricmp(command, "fontmonospace") == 0) {
+					for(i = 0; i < 8; i++)
+						fontmonospace[i] = GET_INT_ARG(i+1);
+				} else if(command && command[0])
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
+
+			}
+			// Go to next line
+			pos += getNewLineStart(buf + pos);
 		}
-		// Go to next line
-		pos += getNewLineStart(buf + pos);
-		line++;
+		freeAndNull((void**) &buf);
 	}
-	freeAndNull((void**) &buf);
 }
 
 static const s_samples_strings samples_special_filenames = {
@@ -20044,74 +20063,20 @@ void safe_set(int *arr, int index, int newkey, int oldkey) {
 	arr[index] = newkey;
 }
 
-static void init_button_names(char **buttonnames) {
-	unsigned i;
-	for(i = 0; i < CB_MAX; i++)
-		buttonnames[i] = (char *) default_button_names[i];
-}
-
 void keyboard_setup(int player_nr) {
-	char lowercase_buf[16];
-	char disabledkey[CB_MAX] = { 0 };
 	int quit = 0;
-	unsigned i, line = 1;
-
-	ptrdiff_t pos;
-	size_t size;
-	ArgList arglist;
-	char argbuf[MAX_ARG_LEN + 1] = "";
-	char *buf, *command, *filename = "data/menu.txt", custom_button_names[CB_MAX][16], *buttonnames[CB_MAX];
-
-	init_button_names(buttonnames);
-
 	printf("Loading control settings.......\t");
 
 	savesettings();
 	bothnewkeys = 0;
 
-	// Read file
-	if(buffer_pakfile(filename, &buf, &size)) {
-		// Now interpret the contents of buf line by line
-		pos = 0;
-		while(pos < size) {
-			ParseArgs(&arglist, buf + pos, argbuf);
-			command = GET_ARG(0);
-			if(command[0]) {
-				if(stricmp(command, "disablekey") == 0) {
-					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
-					for(i = 0; i < CB_MAX; i++) {
-						if(!strcmp(lowercase_buf, config_button_names[i])) {
-							disabledkey[i] = 1;
-							break;
-						}
-					}
-				} else if(stricmp(command, "renamekey") == 0) {
-					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
-					for(i = 0; i < CB_MAX; i++) {
-						if(!strcmp(lowercase_buf, config_button_names[i])) {
-							strncpy(custom_button_names[i], GET_ARG(2), 16);
-							buttonnames[i] = custom_button_names[i];
-							break;
-						}
-					}
-				} else if(command && command[0])
-					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
-
-			}
-			// Go to next line
-			pos += getNewLineStart(buf + pos);
-		}
-		freeAndNull((void**) &buf);
-	}
-	
-	controller_options(player_nr, &quit, buttonnames, disabledkey);
+	controller_options(player_nr, &quit, (char**) &buttonnames, disabledkey);
 
 	if(quit == 2) {
 		apply_controls();
 		savesettings();
 	} else
 		loadsettings();
-
 
 	update(0, 0);
 	printf("Done!\n");

@@ -137,8 +137,39 @@ extern char** video_txt_commands_dest[];
 
 extern const s_colors_rgb default_colors;
 
-extern const char *config_button_names[];
-extern const char *default_button_names[];
+typedef struct {
+	char* moveup;
+	char* movedown;
+	char* moveleft;
+	char* moveright;
+	char* attack;
+	char* attack2;
+	char* attack3;
+	char* attack4;
+	char* jump;
+	char* special;
+	char* start;
+	char* screenshot;
+} s_button_names;
+
+typedef struct {
+	const char* moveup;
+	const char* movedown;
+	const char* moveleft;
+	const char* moveright;
+	const char* attack;
+	const char* attack2;
+	const char* attack3;
+	const char* attack4;
+	const char* jump;
+	const char* special;
+	const char* start;
+	const char* screenshot;
+} s_button_names_const;
+
+extern const s_button_names default_button_names;
+extern const s_button_names_const config_button_names;
+extern s_button_names buttonnames;
 
 extern const s_savedata savedata_default;
 extern const s_videomodes videomodes_init_data[];
