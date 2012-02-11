@@ -74,6 +74,85 @@ s_barstatus mpbarstatus =	// Used for customizable lifebar size
 	.colourtable = &color_tables.mp,
 };
 
+// -------dynamic animation indexes-------
+const s_dynamic_animation_indexes_default_sizes default_dyn_anims_sizes = {
+	.animdowns = MAX_DOWNS,
+	.animups = MAX_UPS,
+	.animbackwalks = MAX_BACKWALKS,
+	.animwalks = MAX_WALKS,
+	.animidles = MAX_IDLES,
+	.animpains = MAX_ATKS,
+	.animdies = MAX_ATKS,
+	.animfalls = MAX_ATKS,
+	.animrises = MAX_ATKS,
+	.animriseattacks = MAX_ATKS,
+	.animblkpains = MAX_ATKS,
+	.animattacks = MAX_ATTACKS,
+	.animfollows = MAX_FOLLOWS,
+	.animspecials = MAX_SPECIALS,
+};
+
+s_dynamic_animation_indexes dyn_anims = {0};
+const int dyn_anim_itemcount = sizeof(s_dynamic_animation_indexes) / sizeof(int*);
+
+
+const s_const_dynamic_animation_indexes default_dyn_anims = {
+	.animdowns = (const int[]) { ANI_DOWN },
+	.animups = (const int[]) { ANI_UP },
+	.animbackwalks = (const int[]) { ANI_BACKWALK },
+	.animwalks = (const int[]) { ANI_WALK },
+	.animidles = (const int[]) { ANI_IDLE },
+	.animpains = (const int[]) {
+		ANI_PAIN, ANI_PAIN2, ANI_PAIN3, ANI_PAIN4,
+		ANI_PAIN, ANI_BURNPAIN, ANI_PAIN, ANI_SHOCKPAIN,
+		ANI_PAIN, ANI_PAIN5, ANI_PAIN6, ANI_PAIN7,
+		ANI_PAIN8, ANI_PAIN9, ANI_PAIN10
+	},
+	.animdies = (const int[]) {
+		ANI_DIE, ANI_DIE2, ANI_DIE3, ANI_DIE4,
+		ANI_DIE, ANI_BURNDIE, ANI_DIE, ANI_SHOCKDIE,
+		ANI_DIE, ANI_DIE5, ANI_DIE6, ANI_DIE7,
+		ANI_DIE8, ANI_DIE9, ANI_DIE10
+	},	
+	.animfalls = (const int[]) {
+		ANI_FALL, ANI_FALL2, ANI_FALL3, ANI_FALL4,
+		ANI_FALL, ANI_BURN, ANI_FALL, ANI_SHOCK,
+		ANI_FALL, ANI_FALL5, ANI_FALL6, ANI_FALL7,
+		ANI_FALL8, ANI_FALL9, ANI_FALL10
+	},
+	.animrises = (const int[]) {
+		ANI_RISE, ANI_RISE2, ANI_RISE3, ANI_RISE4,
+		ANI_RISE, ANI_RISEB, ANI_RISE, ANI_RISES,
+		ANI_RISE, ANI_RISE5, ANI_RISE6, ANI_RISE7,
+		ANI_RISE8, ANI_RISE9, ANI_RISE10
+	},
+	.animriseattacks = (const int[]) {
+		ANI_RISEATTACK, ANI_RISEATTACK2, ANI_RISEATTACK3, ANI_RISEATTACK4,
+		ANI_RISEATTACK, ANI_RISEATTACKB, ANI_RISEATTACK, ANI_RISEATTACKS,
+		ANI_RISEATTACK, ANI_RISEATTACK5, ANI_RISEATTACK6, ANI_RISEATTACK7,
+		ANI_RISEATTACK8, ANI_RISEATTACK9, ANI_RISEATTACK10
+	},
+	.animblkpains = (const int[]) {
+		ANI_BLOCKPAIN, ANI_BLOCKPAIN2, ANI_BLOCKPAIN3, ANI_BLOCKPAIN4,
+		ANI_BLOCKPAIN, ANI_BLOCKPAINB, ANI_BLOCKPAIN, ANI_BLOCKPAINS,
+		ANI_BLOCKPAIN, ANI_BLOCKPAIN5, ANI_BLOCKPAIN6, ANI_BLOCKPAIN7,
+		ANI_BLOCKPAIN8, ANI_BLOCKPAIN9, ANI_BLOCKPAIN10
+	},
+	.animattacks = (const int[]) {
+		ANI_ATTACK1, ANI_ATTACK2, ANI_ATTACK3, ANI_ATTACK4
+	},
+	.animfollows = (const int[]) {
+		ANI_FOLLOW1, ANI_FOLLOW2, ANI_FOLLOW3, ANI_FOLLOW4
+	},	
+	.animspecials = (const int[]) {
+		ANI_FREESPECIAL, ANI_FREESPECIAL2, ANI_FREESPECIAL3,
+		ANI_FREESPECIAL4, ANI_FREESPECIAL5, ANI_FREESPECIAL6,
+		ANI_FREESPECIAL7, ANI_FREESPECIAL8
+	},
+};
+
+//----------------------------------
+
 const char *default_button_names[] = {
 	[CB_UP] = "Move Up",
 	[CB_DOWN] = "Move Down",

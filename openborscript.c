@@ -27,6 +27,7 @@
 
 */
 
+#include "data.h"
 #include "openborscript.h"
 #include "openbor.h"
 #include "soundmix.h"
@@ -70,7 +71,6 @@ Script *pcurrentscript = NULL;	//used by local script functions
 List theFunctionList;
 static List scriptheap;
 static s_spawn_entry spawnentry;
-extern s_drawmethod plainmethod;
 static s_drawmethod drawmethod;
 
 int max_global_var_index = -1;
@@ -1741,7 +1741,6 @@ HRESULT openbor_drawscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 	int i;
 	LONG value[3], l;
 	s_screen *s;
-	extern s_drawmethod plainmethod;
 	s_drawmethod screenmethod;
 	*pretvar = NULL;
 
@@ -6855,7 +6854,6 @@ HRESULT openbor_damageentity(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 	entity *temp = NULL;
 	LONG force, drop, type;
 	s_attack attack;
-	extern s_attack emptyattack;
 
 	if(paramCount < 1) {
 		*pretvar = NULL;

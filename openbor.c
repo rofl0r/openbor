@@ -127,63 +127,7 @@ int max_follows = MAX_FOLLOWS;
 int max_attacks = MAX_ATTACKS;
 int max_animations = MAX_ANIS;
 
-// -------dynamic animation indexes-------
-
-const int dyn_anim_itemcount = sizeof(s_dynamic_animation_indexes) / sizeof(int*);
-s_dynamic_animation_indexes dyn_anims = {0};
-
-// system default values
-int downs[MAX_DOWNS] = { ANI_DOWN };
-int ups[MAX_UPS] = { ANI_UP };
-int backwalks[MAX_BACKWALKS] = { ANI_BACKWALK };
-int walks[MAX_WALKS] = { ANI_WALK };
-int idles[MAX_IDLES] = { ANI_IDLE };
-
-int falls[MAX_ATKS] = {
-	ANI_FALL, ANI_FALL2, ANI_FALL3, ANI_FALL4,
-	ANI_FALL, ANI_BURN, ANI_FALL, ANI_SHOCK,
-	ANI_FALL, ANI_FALL5, ANI_FALL6, ANI_FALL7,
-	ANI_FALL8, ANI_FALL9, ANI_FALL10
-};
-
-int rises[MAX_ATKS] = {
-	ANI_RISE, ANI_RISE2, ANI_RISE3, ANI_RISE4,
-	ANI_RISE, ANI_RISEB, ANI_RISE, ANI_RISES,
-	ANI_RISE, ANI_RISE5, ANI_RISE6, ANI_RISE7,
-	ANI_RISE8, ANI_RISE9, ANI_RISE10
-};
-
-int riseattacks[MAX_ATKS] = {
-	ANI_RISEATTACK, ANI_RISEATTACK2, ANI_RISEATTACK3, ANI_RISEATTACK4,
-	ANI_RISEATTACK, ANI_RISEATTACKB, ANI_RISEATTACK, ANI_RISEATTACKS,
-	ANI_RISEATTACK, ANI_RISEATTACK5, ANI_RISEATTACK6, ANI_RISEATTACK7,
-	ANI_RISEATTACK8, ANI_RISEATTACK9, ANI_RISEATTACK10
-};
-
-int pains[MAX_ATKS] = {
-	ANI_PAIN, ANI_PAIN2, ANI_PAIN3, ANI_PAIN4,
-	ANI_PAIN, ANI_BURNPAIN, ANI_PAIN, ANI_SHOCKPAIN,
-	ANI_PAIN, ANI_PAIN5, ANI_PAIN6, ANI_PAIN7,
-	ANI_PAIN8, ANI_PAIN9, ANI_PAIN10
-};
-
-int deaths[MAX_ATKS] = {
-	ANI_DIE, ANI_DIE2, ANI_DIE3, ANI_DIE4,
-	ANI_DIE, ANI_BURNDIE, ANI_DIE, ANI_SHOCKDIE,
-	ANI_DIE, ANI_DIE5, ANI_DIE6, ANI_DIE7,
-	ANI_DIE8, ANI_DIE9, ANI_DIE10
-};
-
-int blkpains[MAX_ATKS] = {
-	ANI_BLOCKPAIN, ANI_BLOCKPAIN2, ANI_BLOCKPAIN3, ANI_BLOCKPAIN4,
-	ANI_BLOCKPAIN, ANI_BLOCKPAINB, ANI_BLOCKPAIN, ANI_BLOCKPAINS,
-	ANI_BLOCKPAIN, ANI_BLOCKPAIN5, ANI_BLOCKPAIN6, ANI_BLOCKPAIN7,
-	ANI_BLOCKPAIN8, ANI_BLOCKPAIN9, ANI_BLOCKPAIN10
-};
-
-int normal_attacks[MAX_ATTACKS] = {
-	ANI_ATTACK1, ANI_ATTACK2, ANI_ATTACK3, ANI_ATTACK4
-};
+//------------------------------
 
 int grab_attacks[5][2] = {
 	{ANI_GRABATTACK, ANI_GRABATTACK2},
@@ -191,16 +135,6 @@ int grab_attacks[5][2] = {
 	{ANI_GRABUP, ANI_GRABUP2},
 	{ANI_GRABDOWN, ANI_GRABDOWN2},
 	{ANI_GRABBACKWARD, ANI_GRABBACKWARD2}
-};
-
-int freespecials[MAX_SPECIALS] = {
-	ANI_FREESPECIAL, ANI_FREESPECIAL2, ANI_FREESPECIAL3,
-	ANI_FREESPECIAL4, ANI_FREESPECIAL5, ANI_FREESPECIAL6,
-	ANI_FREESPECIAL7, ANI_FREESPECIAL8
-};
-
-int follows[MAX_FOLLOWS] = {
-	ANI_FOLLOW1, ANI_FOLLOW2, ANI_FOLLOW3, ANI_FOLLOW4
 };
 
 // background cache to speed up in-game menus
@@ -6291,48 +6225,42 @@ int load_models() {
 	dyn_anims.animattacks = (int *) malloc(sizeof(int) * max_attacks);
 	dyn_anims.animfollows = (int *) malloc(sizeof(int) * max_follows);
 	dyn_anims.animspecials = (int *) malloc(sizeof(int) * max_freespecials);
+	
+	int** dyn_anims_arr = (int**) &dyn_anims;
+	int** dyn_anims_default_arr = (int**) &default_dyn_anims;
+	char* dyn_anims_default_sizes_arr = (char*) &default_dyn_anims_sizes;
+	for(i = 0; i < dyn_anim_itemcount; i++) {
+		memcpy(dyn_anims_arr[i], dyn_anims_default_arr[i], sizeof(int) * dyn_anims_default_sizes_arr[i]);
+		
+	}
 
 	// copy default values and new animation ids
-	memcpy(dyn_anims.animdowns, downs, sizeof(int) * MAX_DOWNS);
 	for(i = MAX_DOWNS; i < max_downs; i++)
 		dyn_anims.animdowns[i] = maxanim++;
-	memcpy(dyn_anims.animups, ups, sizeof(int) * MAX_UPS);
 	for(i = MAX_UPS; i < max_ups; i++)
 		dyn_anims.animups[i] = maxanim++;
-	memcpy(dyn_anims.animbackwalks, backwalks, sizeof(int) * MAX_BACKWALKS);
 	for(i = MAX_BACKWALKS; i < max_backwalks; i++)
 		dyn_anims.animbackwalks[i] = maxanim++;
-	memcpy(dyn_anims.animwalks, walks, sizeof(int) * MAX_WALKS);
 	for(i = MAX_WALKS; i < max_walks; i++)
 		dyn_anims.animwalks[i] = maxanim++;
-	memcpy(dyn_anims.animidles, idles, sizeof(int) * MAX_IDLES);
 	for(i = MAX_IDLES; i < max_idles; i++)
 		dyn_anims.animidles[i] = maxanim++;
-	memcpy(dyn_anims.animspecials, freespecials, sizeof(int) * MAX_SPECIALS);
 	for(i = MAX_SPECIALS; i < max_freespecials; i++)
 		dyn_anims.animspecials[i] = maxanim++;
-	memcpy(dyn_anims.animattacks, normal_attacks, sizeof(int) * MAX_ATTACKS);
 	for(i = MAX_ATTACKS; i < max_attacks; i++)
 		dyn_anims.animattacks[i] = maxanim++;
-	memcpy(dyn_anims.animfollows, follows, sizeof(int) * MAX_FOLLOWS);
 	for(i = MAX_FOLLOWS; i < max_follows; i++)
 		dyn_anims.animfollows[i] = maxanim++;
-	memcpy(dyn_anims.animpains, pains, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animpains[i] = maxanim++;
-	memcpy(dyn_anims.animfalls, falls, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animfalls[i] = maxanim++;
-	memcpy(dyn_anims.animrises, rises, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animrises[i] = maxanim++;
-	memcpy(dyn_anims.animriseattacks, riseattacks, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animriseattacks[i] = maxanim++;
-	memcpy(dyn_anims.animblkpains, blkpains, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animblkpains[i] = maxanim++;
-	memcpy(dyn_anims.animdies, deaths, sizeof(int) * MAX_ATKS);
 	for(i = MAX_ATKS; i < max_attack_types; i++)
 		dyn_anims.animdies[i] = maxanim++;
 

@@ -35,6 +35,66 @@ typedef struct {
 extern const int special_sprites_init_itemcount;
 extern const s_special_sprite special_sprites_init[];
 
+// -------dynamic animation indexes-------
+typedef struct {
+	int *animdowns;
+	int *animups;
+	int *animbackwalks;
+	int *animwalks;
+	int *animidles;
+	int *animpains;
+	int *animdies;
+	int *animfalls;
+	int *animrises;
+	int *animriseattacks;
+	int *animblkpains;
+	int *animattacks;
+	int *animfollows;
+	int *animspecials;
+} s_dynamic_animation_indexes;
+
+typedef struct {
+	const int *animdowns;
+	const int *animups;
+	const int *animbackwalks;
+	const int *animwalks;
+	const int *animidles;
+	const int *animpains;
+	const int *animdies;
+	const int *animfalls;
+	const int *animrises;
+	const int *animriseattacks;
+	const int *animblkpains;
+	const int *animattacks;
+	const int *animfollows;
+	const int *animspecials;
+} s_const_dynamic_animation_indexes;
+
+typedef struct {
+	char animdowns;
+	char animups;
+	char animbackwalks;
+	char animwalks;
+	char animidles;
+	char animpains;
+	char animdies;
+	char animfalls;
+	char animrises;
+	char animriseattacks;
+	char animblkpains;
+	char animattacks;
+	char animfollows;
+	char animspecials;
+} s_dynamic_animation_indexes_default_sizes;
+
+extern s_dynamic_animation_indexes dyn_anims;
+
+extern const s_dynamic_animation_indexes_default_sizes default_dyn_anims_sizes;
+extern const s_const_dynamic_animation_indexes default_dyn_anims;
+extern const int dyn_anim_itemcount;
+
+// -----------------------------
+
 typedef struct {
 	char obligatory;
 	char* path;

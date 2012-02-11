@@ -1652,28 +1652,6 @@ typedef enum {
 	CB_MAX
 } control_buttons;
 
-// -------dynamic animation indexes-------
-typedef struct {
-	int *animdowns;
-	int *animups;
-	int *animbackwalks;
-	int *animwalks;
-	int *animidles;
-	int *animpains;
-	int *animdies;
-	int *animfalls;
-	int *animrises;
-	int *animriseattacks;
-	int *animblkpains;
-	int *animattacks;
-	int *animfollows;
-	int *animspecials;
-} s_dynamic_animation_indexes;
-
-extern const int dyn_anim_itemcount;
-extern s_dynamic_animation_indexes dyn_anims;
-
-
 int buffer_pakfile(char *filename, char **pbuffer, size_t * psize);
 int getsyspropertybyindex(ScriptVariant * var, int index);
 int changesyspropertybyindex(int index, ScriptVariant * value);
