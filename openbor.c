@@ -882,6 +882,7 @@ static const s_script_args_names script_args_names = {
 	.reset = "reset",
 	.plane = "plane",
 	.height = "height",
+	.obstacle = "obstacle",
 };
 
 static const s_script_args init_script_args_default = {
@@ -904,6 +905,7 @@ static const s_script_args init_script_args_default = {
 	.reset = {VT_EMPTY, 0},
 	.plane = {VT_EMPTY, 0},
 	.height = {VT_EMPTY, 0},
+	.obstacle = {VT_EMPTY, 0},
 };
 
 static const s_script_args init_script_args_only_ent = {
@@ -926,6 +928,7 @@ static const s_script_args init_script_args_only_ent = {
 	.reset = {VT_EMPTY, 0},
 	.plane = {VT_EMPTY, 0},
 	.height = {VT_EMPTY, 0},
+	.obstacle = {VT_EMPTY, 0},
 };
 
 static void execute_script_default(s_script_args* args, Script* dest_script) {
@@ -1131,6 +1134,12 @@ static void execute_onpain_script_i(s_script_args* args) {
 static void execute_onblockw_script_i(s_script_args* args) {
 	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblockw_script);
 }
+static void execute_onblocko_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblocko_script);
+}
+static void execute_onblocka_script_i(s_script_args* args) {
+	execute_script_default(args, ((entity*) args->ent.value)->scripts.onblocka_script);
+}
 
 
 void execute_animation_script(entity * ent) {
@@ -1232,43 +1241,20 @@ void execute_onblockw_script(entity * ent, int plane, float height) {
 }
 
 void execute_onblocko_script(entity * ent, entity * other) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onblocko_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("obstacle", &tempvar);
-		Script_Execute(ent->scripts.onblocko_script);
-
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("obstacle", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.obstacle.vt = VT_PTR;
+	script_args.obstacle.value = (intptr_t) other;
+	execute_onblocko_script_i(&script_args);
 }
 
 
 void execute_onblocka_script(entity * ent, entity * other) {
-	ScriptVariant tempvar;
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(ent->scripts.onblocka_script)) {
-		ScriptVariant_Init(&tempvar);
-		ScriptVariant_ChangeType(&tempvar, VT_PTR);
-		tempvar.ptrVal = (VOID *) ent;
-		Script_Set_Local_Variant("self", &tempvar);
-		tempvar.ptrVal = (VOID *) other;
-		Script_Set_Local_Variant("obstacle", &tempvar);
-		Script_Execute(ent->scripts.onblocka_script);
-		//clear to save variant space
-		ScriptVariant_Clear(&tempvar);
-		Script_Set_Local_Variant("self", &tempvar);
-		Script_Set_Local_Variant("obstacle", &tempvar);
-	}
-	pcurrentscript = ptempscript;
+	s_script_args script_args = init_script_args_only_ent;
+	script_args.ent.value = (intptr_t) ent;
+	script_args.obstacle.vt = VT_PTR;
+	script_args.obstacle.value = (intptr_t) other;
+	execute_onblocka_script_i(&script_args);
 }
 
 void execute_spawn_script(s_spawn_entry * p, entity * e) {

@@ -1605,6 +1605,7 @@ typedef struct {
 	s_script_args_tuple reset;
 	s_script_args_tuple plane;
 	s_script_args_tuple height;
+	s_script_args_tuple obstacle;
 } s_script_args;
 
 typedef struct {
@@ -1627,6 +1628,7 @@ typedef struct {
 	char* reset;
 	char* plane;
 	char* height;
+	char* obstacle;
 } s_script_args_names;
 #define s_script_args_membercount (sizeof(s_script_args_names) / sizeof(char*))
 
