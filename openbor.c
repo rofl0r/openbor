@@ -1696,7 +1696,7 @@ char *findarg(char *command, int which) {
 			if(argc == which)
 				return arg + argstart;
 		} else if(command[d] == 0 || command[d] == '\n' || command[d] == '\r' ||
-			  strncmp(command + d, comment_mark, strlen(comment_mark)) == 0) {
+			  (!strcmp(command + d, comment_mark))) {
 			// End of line
 			arg[d] = 0;
 			if(argc == which)
@@ -2390,7 +2390,7 @@ void prepare_sprite_map(size_t size) {
 //             24bit palettte sprite should have a palette allocated at the end of
 //             pixel data, and the information is carried by the bitmap paramter.
 int loadsprite(char *filename, int ofsx, int ofsy, int bmpformat) {
-	ptrdiff_t i, size, len;
+	ptrdiff_t i, size;
 	s_bitmap *bitmap = NULL;
 	int clipl, clipr, clipt, clipb;
 	s_sprite_list *curr = NULL, *head = NULL;
@@ -2426,17 +2426,17 @@ int loadsprite(char *filename, int ofsx, int ofsy, int bmpformat) {
 
 	clipbitmap(bitmap, &clipl, &clipr, &clipt, &clipb);
 
-	len = strlen(filename);
-	size = fakey_encodesprite(bitmap);
 	curr = malloc(sizeof(s_sprite_list));
+	if(!curr) goto eoom;
+	curr->filename = strdup(filename);
+	size = fakey_encodesprite(bitmap);
 	curr->sprite = malloc(size);
-	curr->filename = malloc(len + 1);
-	if(curr == NULL || curr->sprite == NULL || curr->filename == NULL) {
+	
+	if(!curr->sprite || !curr->filename) {
+		eoom:
 		freebitmap(bitmap);
 		shutdown(1, (char*) E_OUT_OF_MEMORY);
 	}
-	memcpy(curr->filename, filename, len);
-	curr->filename[len] = 0;
 	encodesprite(ofsx - clipl, ofsy - clipt, bitmap, curr->sprite);
 	if(sprite_list == NULL) {
 		sprite_list = curr;
@@ -2950,7 +2950,7 @@ int addframe(s_anim * a, int spriteindex, int framecount, short delay, unsigned 
 // it does so in the cache.
 void _peek_model_name(int index) {
 	size_t size = 0;
-	ptrdiff_t pos = 0, len;
+	ptrdiff_t pos = 0;
 	char *buf = NULL;
 	char *command, *value;
 	ArgList arglist;
@@ -2968,12 +2968,8 @@ void _peek_model_name(int index) {
 			cmd = getModelCommand(modelcmdlist, command);
 			if(cmd == CMD_MODEL_NAME) {
 				value = GET_ARG(1);
-				free(model_cache[index].name);
-				model_cache[index].name = NULL;
-				len = strlen(value);
-				model_cache[index].name = malloc(len + 1);
-				strcpy(model_cache[index].name, value);
-				model_cache[index].name[len] = 0;
+				freeAndNull((void**) &model_cache[index].name);
+				model_cache[index].name = strdup(value);
 				break;
 			}
 		}
@@ -2997,20 +2993,12 @@ void prepare_cache_map(size_t size) {
 }
 
 void cache_model(char *name, char *path, int flag) {
-	int len;
 	printf("Cacheing '%s' from %s\n", name, path);
 	prepare_cache_map(models_cached + 1);
 	memset(&model_cache[models_cached], 0, sizeof(s_modelcache));
 
-	len = strlen(name);
-	model_cache[models_cached].name = malloc(len + 1);
-	strcpy(model_cache[models_cached].name, name);
-	model_cache[models_cached].name[len] = 0;
-
-	len = strlen(path);
-	model_cache[models_cached].path = malloc(len + 1);
-	strcpy(model_cache[models_cached].path, path);
-	model_cache[models_cached].path[len] = 0;
+	model_cache[models_cached].name = strdup(name);
+	model_cache[models_cached].path = strdup(path);
 
 	model_cache[models_cached].loadflag = flag;
 
@@ -3023,10 +3011,8 @@ void free_modelcache() {
 	if(model_cache != NULL) {
 		while(models_cached) {
 			--models_cached;
-			free(model_cache[models_cached].name);
-			model_cache[models_cached].name = NULL;
-			free(model_cache[models_cached].path);
-			model_cache[models_cached].path = NULL;
+			freeAndNull((void**) &model_cache[models_cached].name);
+			freeAndNull((void**) &model_cache[models_cached].path);
 		}
 		freeAndNull((void**) &model_cache);
 	}
@@ -7502,7 +7488,6 @@ void unload_level() {
 char *llHandleCommandSpawnscript(ArgList * arglist, s_spawn_entry * next) {
 	char *result = NULL;
 	char *value;
-	size_t len;
 
 	s_spawn_script_cache_node *tempnode;
 	s_spawn_script_cache_node *tempnode2;
@@ -7550,23 +7535,17 @@ char *llHandleCommandSpawnscript(ArgList * arglist, s_spawn_entry * next) {
 
 		if(load_script(templistnode->spawn_script, value)) {
 			Script_Compile(templistnode->spawn_script);
-			len = strlen(value);
-
 			if(tempnode) {
 				tempnode2 = malloc(sizeof(s_spawn_script_cache_node));
 				tempnode2->cached_spawn_script = templistnode->spawn_script;
-				tempnode2->filename = malloc(len + 1);
-				strcpy(tempnode2->filename, value);
-				tempnode2->filename[len] = 0;
+				tempnode2->filename = strdup(value);
 				tempnode2->next = NULL;
 				tempnode->next = tempnode2;
 			} else {
 				level->spawn_script_cache_head = malloc(sizeof(s_spawn_script_cache_node));
 				level->spawn_script_cache_head->cached_spawn_script = templistnode->spawn_script;
-				level->spawn_script_cache_head->filename = malloc(len + 1);
+				level->spawn_script_cache_head->filename = strdup(value);
 				level->spawn_script_cache_head->next = NULL;
-				strcpy(level->spawn_script_cache_head->filename, value);
-				level->spawn_script_cache_head->filename[len] = 0;
 			}
 		} else {
 			result = "Failed loading spawn entry script!";
@@ -7580,7 +7559,7 @@ char *llHandleCommandSpawnscript(ArgList * arglist, s_spawn_entry * next) {
 
 void load_level(char *filename) {
 	char *buf;
-	size_t size, len;
+	size_t size;
 	ptrdiff_t pos, oldpos;
 	char *command;
 	char *value;
@@ -7637,17 +7616,14 @@ void load_level(char *filename) {
 
 	level = calloc(1, sizeof(s_level));
 	if(!level) {
+		eoom:
 		errormessage = (char*) E_OUT_OF_MEMORY;
 		goto lCleanup;
 	}
-	len = strlen(filename);
-	level->name = malloc(len + 1);
+	level->name = strdup(filename);
 
-	if(!level->name) {
-		errormessage = (char*) E_OUT_OF_MEMORY;
-		goto lCleanup;
-	}
-	strcpy(level->name, filename);
+	if(!level->name) 
+		goto eoom;
 
 	if(buffer_pakfile(filename, &buf, &size) != 1) {
 		errormessage = "Unable to load level file!";
@@ -7746,7 +7722,7 @@ void load_level(char *filename) {
 				break;
 			case CMD_LEVEL_BACKGROUND:
 				value = GET_ARG(1);
-				strncpy(bgPath, value, strlen(value) + 1);
+				strncpy(bgPath, value, sizeof(bgPath));
 				level->bglayers[0].type = bg_screen;
 				level->bglayers[0].bgspeedratio = 1;
 
@@ -8794,8 +8770,7 @@ void predrawstatus() {
 				// reports error if players try to use the same character and sameplay mode is off
 				if(sameplayer) {
 					for(x = 0; x < maxplayers[current_set]; x++) {
-						if((strncmp(player[i].name, player[x].name, strlen(player[i].name)) ==
-						    0) && (i != x)) {
+						if((!strcmp(player[i].name, player[x].name)) && (i != x)) {
 							tperror = i + 1;
 							break;
 						}
@@ -19783,9 +19758,7 @@ int selectplayer(int *players, char *filename) {
 					// reports error if players try to use the same character and sameplay mode is off
 					if(sameplayer) {
 						for(x = 0; x < maxplayers[current_set]; x++) {
-							if((strncmp
-							    (player[i].name, player[x].name,
-							     strlen(player[i].name)) == 0) && (i != x)) {
+							if((!strcmp(player[i].name, player[x].name)) && (i != x)) {
 								tperror = i + 1;
 								break;
 							}
