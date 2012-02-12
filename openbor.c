@@ -3714,6 +3714,20 @@ void lcmSetCachedModelIndexOrMinusOne(char* value, int* dest) {
 		*dest = get_cached_model_index(value);
 }
 
+//stringswitch_gen add lcm_cmdcom "u"
+//stringswitch_gen add lcm_cmdcom "d"
+//stringswitch_gen add lcm_cmdcom "f"
+//stringswitch_gen add lcm_cmdcom "b"
+//stringswitch_gen add lcm_cmdcom "a"
+//stringswitch_gen add lcm_cmdcom "a2"
+//stringswitch_gen add lcm_cmdcom "a3"
+//stringswitch_gen add lcm_cmdcom "a4"
+//stringswitch_gen add lcm_cmdcom "j"
+//stringswitch_gen add lcm_cmdcom "s"
+//stringswitch_gen add lcm_cmdcom "k"
+
+#include "stringswitch_impl_lcm_cmdcom.c"
+
 // returns: 0: OK, -1: fatal, 1:warning, proceed to next line
 int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char** shutdownmessage) {
 	// Section for custom freespecials starts here
@@ -3724,51 +3738,53 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 		*value = GET_ARGP(t);
 		if(!(*value)[0])
 			break;
-		if(stricmp(*value, "u") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_MOVEUP;
-		} else if(stricmp(*value, "d") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_MOVEDOWN;
-		} else if(stricmp(*value, "f") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_FORWARD;
-		} else if(stricmp(*value, "b") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_BACKWARD;
-		} else if(stricmp(*value, "a") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_ATTACK;
-		} else if(stricmp(*value, "a2") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_ATTACK2;
-		} else if(stricmp(*value, "a3") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_ATTACK3;
-		} else if(stricmp(*value, "a4") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_ATTACK4;
-		} else if(stricmp(*value, "j") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_JUMP;
-		} else if(stricmp(*value, "s") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_SPECIAL;
-		} else if(stricmp(*value, "k") == 0) {
-			newchar->special[newchar->specials_loaded][i] =
-				FLAG_SPECIAL;
-		} else if(strnicmp(*value, "freespecial", 11) == 0
-				&& (!(*value)[11]
-				|| ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
-			tempInt = atoi((*value) + 11);
-			if(tempInt < 1)
-				tempInt = 1;
-			newchar->special[newchar->
-						specials_loaded][MAX_SPECIAL_INPUTS -
-								2] =
-				dyn_anims.animspecials[tempInt - 1];
-		} else {
-			return 1;
+		lc(*value, GET_ARGP_LEN(t));
+		stringswitch_d(lcm_cmdcom, (*value)) {
+			stringcase(lcm_cmdcom, u):
+				newchar->special[newchar->specials_loaded][i] = FLAG_MOVEUP;
+				break;
+			stringcase(lcm_cmdcom, d):
+				newchar->special[newchar->specials_loaded][i] = FLAG_MOVEDOWN;
+				break;
+			stringcase(lcm_cmdcom, f):
+				newchar->special[newchar->specials_loaded][i] = FLAG_FORWARD;
+				break;
+			stringcase(lcm_cmdcom, b):
+				newchar->special[newchar->specials_loaded][i] = FLAG_BACKWARD;
+				break;
+			stringcase(lcm_cmdcom, a):
+				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK;
+				break;
+			stringcase(lcm_cmdcom, a2):
+				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK2;
+				break;
+			stringcase(lcm_cmdcom, a3):
+				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK3;
+				break;
+			stringcase(lcm_cmdcom, a4):
+				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK4;
+				break;
+			stringcase(lcm_cmdcom, j):
+				newchar->special[newchar->specials_loaded][i] = FLAG_JUMP;
+				break;
+			stringcase(lcm_cmdcom, s):
+			stringcase(lcm_cmdcom, k):
+				newchar->special[newchar->specials_loaded][i] = FLAG_SPECIAL;
+				break;
+			default:
+				if((!strnicmp(*value, "freespecial", 11)) && 
+					(
+						!(*value)[11] || 
+						((*value)[11] >= '1' && (*value)[11] <= '9')
+					)
+				) {
+					tempInt = atoi((*value) + 11);
+					if(tempInt < 1)
+						tempInt = 1;
+					newchar->special[newchar->specials_loaded]
+						[MAX_SPECIAL_INPUTS - 2] = dyn_anims.animspecials[tempInt - 1];
+				} else 
+					return 1;
 		}
 	}
 	newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
