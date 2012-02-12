@@ -3376,27 +3376,46 @@ void lcmHandleCommandHostile(ArgList * arglist, s_model * newchar) {
 		lc(value, GET_ARGP_LEN(i));
 	}
 }
+
+//stringswitch_gen add lcm_cmdcandamage "enemy"
+//stringswitch_gen add lcm_cmdcandamage "player"
+//stringswitch_gen add lcm_cmdcandamage "obstacle"
+//stringswitch_gen add lcm_cmdcandamage "shot"
+//stringswitch_gen add lcm_cmdcandamage "npc"
+//stringswitch_gen add lcm_cmdcandamage "ground"
+
+#include "stringswitch_impl_lcm_cmdcandamage.c"
+
 void lcmHandleCommandCandamage(ArgList * arglist, s_model * newchar) {
 	int i = 1;
 	char *value = GET_ARGP(i);
+	lc(value, GET_ARGP_LEN(i));
 	newchar->candamage = 0;
 
 	while(value && value[0]) {
-		if(stricmp(value, "enemy") == 0) {
-			newchar->candamage |= TYPE_ENEMY;
-		} else if(stricmp(value, "player") == 0) {
-			newchar->candamage |= TYPE_PLAYER;
-		} else if(stricmp(value, "obstacle") == 0) {
-			newchar->candamage |= TYPE_OBSTACLE;
-		} else if(stricmp(value, "shot") == 0) {
-			newchar->candamage |= TYPE_SHOT;
-		} else if(stricmp(value, "npc") == 0) {
-			newchar->candamage |= TYPE_NPC;
-		} else if(stricmp(value, "ground") == 0) {	// not really needed, though
-			newchar->ground = 1;
+		stringswitch_d(lcm_cmdcandamage, value) {
+			stringcase(lcm_cmdcandamage, enemy):
+				newchar->candamage |= TYPE_ENEMY;
+				break;
+			stringcase(lcm_cmdcandamage, player):
+				newchar->candamage |= TYPE_PLAYER;
+				break;
+			stringcase(lcm_cmdcandamage, obstacle):
+				newchar->candamage |= TYPE_OBSTACLE;
+				break;
+			stringcase(lcm_cmdcandamage, shot):
+				newchar->candamage |= TYPE_SHOT;
+				break;
+			stringcase(lcm_cmdcandamage, npc):
+				newchar->candamage |= TYPE_NPC;
+				break;
+			stringcase(lcm_cmdcandamage, ground):
+				newchar->ground = 1;
+				break;
 		}
 		i++;
 		value = GET_ARGP(i);
+		lc(value, GET_ARGP_LEN(i));
 	}
 }
 
