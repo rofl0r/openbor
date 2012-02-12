@@ -3212,67 +3212,93 @@ void lcmHandleCommandType(ArgList * arglist, s_model * newchar, char *filename) 
 	}
 }
 
+//stringswitch_gen add lcm_cmdsubtype "biker"
+//stringswitch_gen add lcm_cmdsubtype "arrow"
+//stringswitch_gen add lcm_cmdsubtype "notgrab"
+//stringswitch_gen add lcm_cmdsubtype "touch"
+//stringswitch_gen add lcm_cmdsubtype "weapon"
+//stringswitch_gen add lcm_cmdsubtype "noskip"
+//stringswitch_gen add lcm_cmdsubtype "flydie"
+//stringswitch_gen add lcm_cmdsubtype "both"
+//stringswitch_gen add lcm_cmdsubtype "project"
+//stringswitch_gen add lcm_cmdsubtype "follow"
+//stringswitch_gen add lcm_cmdsubtype "chase"
+
+#include "stringswitch_impl_lcm_cmdsubtype.c"
+
 void lcmHandleCommandSubtype(ArgList * arglist, s_model * newchar, char *filename) {
 	char *value = GET_ARGP(1);
 	int i;
-	if(stricmp(value, "biker") == 0) {
-		newchar->subtype = SUBTYPE_BIKER;
-		if(newchar->aimove == -1)
-			newchar->aimove = 0;
-		newchar->aimove |= AIMOVE1_BIKER;
-		for(i = 0; i < MAX_ATKS; i++)
-			newchar->defense_factors[i] = 2;
-		if(!newchar->offscreenkill)
-			newchar->offscreenkill = 300;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_wall = 0;
-		newchar->subject_to_platform = 0;
-		newchar->subject_to_screen = 0;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->subject_to_platform = 0;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "arrow") == 0) {	// 7-1-2005 Arrow type
-		newchar->subtype = SUBTYPE_ARROW;	// 7-1-2005 Arrow type
-		if(newchar->aimove == -1)
-			newchar->aimove = 0;
-		newchar->aimove |= AIMOVE1_ARROW;
-		if(!newchar->offscreenkill)
-			newchar->offscreenkill = 200;
-		newchar->subject_to_hole = 0;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_wall = 0;
-		newchar->subject_to_platform = 0;
-		newchar->subject_to_screen = 0;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->subject_to_platform = 0;
-		newchar->no_adjust_base = 1;
-	} else if(stricmp(value, "notgrab") == 0) {	// 7-1-2005 notgrab type
-		newchar->subtype = SUBTYPE_NOTGRAB;	// 7-1-2005 notgrab type
-	}
-	//    ltb 1-18-05  Item Subtype
-	else if(stricmp(value, "touch") == 0) {	// 7-1-2005 notgrab type
-		newchar->subtype = SUBTYPE_TOUCH;	// 7-1-2005 notgrab type
-	} else if(stricmp(value, "weapon") == 0) {	// 7-1-2005 notgrab type
-		newchar->subtype = SUBTYPE_WEAPON;	// 7-1-2005 notgrab type
-	} else if(stricmp(value, "noskip") == 0) {	// Text animation cannot be skipped if subtype noskip
-		newchar->subtype = SUBTYPE_NOSKIP;
-	} else if(stricmp(value, "flydie") == 0) {	// Obstacle will fly across the screen when hit if subtype flydie
-		newchar->subtype = SUBTYPE_FLYDIE;
-	} else if(stricmp(value, "both") == 0) {
-		newchar->subtype = SUBTYPE_BOTH;
-	} else if(stricmp(value, "project") == 0) {
-		newchar->subtype = SUBTYPE_PROJECTILE;
-	} else if(stricmp(value, "follow") == 0) {
-		newchar->subtype = SUBTYPE_FOLLOW;
-	} else if(stricmp(value, "chase") == 0) {
-		newchar->subtype = SUBTYPE_CHASE;
-	}
-	//    end new subtype
-	else
-		shutdown(1, "Model '%s' has invalid subtype: '%s'", filename, value);
+	lc(value, GET_ARGP_LEN(1));
+	stringswitch_d(lcm_cmdsubtype, value) {
+		stringcase(lcm_cmdsubtype, biker):
+			newchar->subtype = SUBTYPE_BIKER;
+			if(newchar->aimove == -1)
+				newchar->aimove = 0;
+			newchar->aimove |= AIMOVE1_BIKER;
+			for(i = 0; i < MAX_ATKS; i++)
+				newchar->defense_factors[i] = 2;
+			if(!newchar->offscreenkill)
+				newchar->offscreenkill = 300;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_wall = 0;
+			newchar->subject_to_platform = 0;
+			newchar->subject_to_screen = 0;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->subject_to_platform = 0;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdsubtype, arrow):
+			newchar->subtype = SUBTYPE_ARROW;	// 7-1-2005 Arrow type
+			if(newchar->aimove == -1)
+				newchar->aimove = 0;
+			newchar->aimove |= AIMOVE1_ARROW;
+			if(!newchar->offscreenkill)
+				newchar->offscreenkill = 200;
+			newchar->subject_to_hole = 0;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_wall = 0;
+			newchar->subject_to_platform = 0;
+			newchar->subject_to_screen = 0;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->subject_to_platform = 0;
+			newchar->no_adjust_base = 1;
+			break;
+		stringcase(lcm_cmdsubtype, notgrab):
+			newchar->subtype = SUBTYPE_NOTGRAB;	// 7-1-2005 notgrab type
+			break;
+		stringcase(lcm_cmdsubtype, touch):
+			newchar->subtype = SUBTYPE_TOUCH;	// 7-1-2005 notgrab type
+			break;
+		stringcase(lcm_cmdsubtype, weapon):
+			newchar->subtype = SUBTYPE_WEAPON;	// 7-1-2005 notgrab type
+			break;
+		stringcase(lcm_cmdsubtype, noskip):	
+			// Text animation cannot be skipped if subtype noskip
+			newchar->subtype = SUBTYPE_NOSKIP;
+			break;
+		stringcase(lcm_cmdsubtype, flydie):
+			// Obstacle will fly across the screen when hit if subtype flydie
+			newchar->subtype = SUBTYPE_FLYDIE;
+			break;
+		stringcase(lcm_cmdsubtype, both):
+			newchar->subtype = SUBTYPE_BOTH;
+			break;
+		stringcase(lcm_cmdsubtype, project):
+			newchar->subtype = SUBTYPE_PROJECTILE;
+			break;
+		stringcase(lcm_cmdsubtype, follow):
+			newchar->subtype = SUBTYPE_FOLLOW;
+			break;
+		stringcase(lcm_cmdsubtype, chase):
+			newchar->subtype = SUBTYPE_CHASE;
+			break;
+		default:
+			shutdown(1, "Model '%s' has invalid subtype: '%s'", filename, value);
+	}		
 }
 
 void lcmHandleCommandSmartbomb(ArgList * arglist, s_model * newchar, char *filename) {
