@@ -315,6 +315,7 @@ entity *ent_list[MAX_ENTS];
 entity *self;
 int ent_count = 0;		// log count of entites
 int ent_max = 0;
+int combodelay = GAME_SPEED / 2;
 
 s_player player[4];
 u32 bothkeys, bothnewkeys;
@@ -6220,6 +6221,9 @@ int load_models() {
 				if(versusdamage == 0 || versusdamage == 1)
 					savedata.mode = versusdamage ^ 1;
 				break;
+			case CMD_MODELSTXT_COMBODELAY:
+				combodelay = GET_INT_ARG(1);
+				break;				
 			default:
 				if(command && *command) 
 					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
@@ -10667,7 +10671,7 @@ void do_attack(entity * e) {
 						if(flash)
 							execute_onspawn_script(flash);
 					}
-					topowner->combotime = borTime + (GAME_SPEED / 2);	// well, add to its owner's combo
+					topowner->combotime = borTime + combodelay;	// well, add to its owner's combo
 
 					if(e->animpos != e->lastanimpos || (inair(e) && !equalairpause))	// if equalairpause is set, inair(e) is nolonger a condition for extra pausetime
 					{	// Adds pause to the current animation
@@ -12347,6 +12351,8 @@ int perform_atchain() {
 	}
 	if(!pickanim || self->combostep[0] > self->modeldata.chainlength)
 		self->combostep[0] = 0;
+	if((self->modeldata.combostyle & 2))
+		self->combotime = borTime + combodelay;
 	return pickanim;
 }
 
