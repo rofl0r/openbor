@@ -2011,6 +2011,8 @@ void lifebar_colors() {
 		LTC_COLOR400,
 		LTC_COLOR500,
 		LTC_SHADOWCOLOR,
+		LTC_COLORMAGIC,
+		LTC_COLORMAGIC2,
 		LTC_MAX
 	} lifebar_txt_commands;
 	
@@ -2025,6 +2027,8 @@ void lifebar_colors() {
 		[LTC_COLOR400] = "color400",
 		[LTC_COLOR500] = "color500",
 		[LTC_SHADOWCOLOR] = "shadowcolor",
+		[LTC_COLORMAGIC] = "colormagic",
+		[LTC_COLORMAGIC2] = "colormagic2",
 	};
 	
 	static int* lifebar_txt_commands_destcolor[] = {
@@ -2038,6 +2042,9 @@ void lifebar_colors() {
 		[LTC_COLOR400] = &colors.pink,
 		[LTC_COLOR500] = &colors.purple,
 		[LTC_SHADOWCOLOR] = &colors.shadow,
+		[LTC_COLORMAGIC] = &colors.magic,
+		[LTC_COLORMAGIC2] = &colors.magic2,
+		
 	};
 
 	pos = 0;
