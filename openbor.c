@@ -3066,120 +3066,150 @@ void lcmHandleCommandName(ArgList * arglist, s_model * newchar, int cacheindex) 
 	}
 }
 
+//stringswitch_gen add lcm_cmdtype "none"
+//stringswitch_gen add lcm_cmdtype "player"
+//stringswitch_gen add lcm_cmdtype "enemy"
+//stringswitch_gen add lcm_cmdtype "item"
+//stringswitch_gen add lcm_cmdtype "obstacle"
+//stringswitch_gen add lcm_cmdtype "steamer"
+//stringswitch_gen add lcm_cmdtype "pshot"
+//stringswitch_gen add lcm_cmdtype "trap"
+//stringswitch_gen add lcm_cmdtype "text"
+//stringswitch_gen add lcm_cmdtype "endlevel"
+//stringswitch_gen add lcm_cmdtype "npc"
+//stringswitch_gen add lcm_cmdtype "panel"
+
+#include "stringswitch_impl_lcm_cmdtype.c"
+
 void lcmHandleCommandType(ArgList * arglist, s_model * newchar, char *filename) {
 	char *value = GET_ARGP(1);
 	int i;
-	if(stricmp(value, "none") == 0) {
-		newchar->type = TYPE_NONE;
-	} else if(stricmp(value, "player") == 0) {
-		newchar->type = TYPE_PLAYER;
-		newchar->nopassiveblock = 1;
-		for(i = 0; i < MAX_ATCHAIN; i++) {
-			if(i < 2 || i > 3)
-				newchar->atchain[i] = 1;
-			else
-				newchar->atchain[i] = i;
-		}
-		newchar->chainlength = 4;
-		newchar->bounce = 1;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_obstacle = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_screen = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "enemy") == 0) {
-		newchar->type = TYPE_ENEMY;
-		newchar->bounce = 1;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_obstacle = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "item") == 0) {
-		newchar->type = TYPE_ITEM;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_obstacle = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "obstacle") == 0) {
-		newchar->type = TYPE_OBSTACLE;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "steamer") == 0) {
-		newchar->type = TYPE_STEAMER;
+	lc(value, GET_ARGP_LEN(1));
+	stringswitch_d(lcm_cmdtype, value) {
+		stringcase(lcm_cmdtype, none):
+			newchar->type = TYPE_NONE;
+			break;
+		stringcase(lcm_cmdtype, player):
+			newchar->type = TYPE_PLAYER;
+			newchar->nopassiveblock = 1;
+			for(i = 0; i < MAX_ATCHAIN; i++) {
+				if(i < 2 || i > 3)
+					newchar->atchain[i] = 1;
+				else
+					newchar->atchain[i] = i;
+			}
+			newchar->chainlength = 4;
+			newchar->bounce = 1;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_obstacle = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_screen = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, enemy):
+			newchar->type = TYPE_ENEMY;
+			newchar->bounce = 1;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_obstacle = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, item):
+			newchar->type = TYPE_ITEM;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_obstacle = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, obstacle):
+			newchar->type = TYPE_OBSTACLE;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, steamer):
+			newchar->type = TYPE_STEAMER;
+			break;
+		stringcase(lcm_cmdtype, pshot):	
+			newchar->type = TYPE_SHOT;
+			if(newchar->aimove == -1)
+				newchar->aimove = 0;
+			newchar->aimove |= AIMOVE1_ARROW;
+			if(!newchar->offscreenkill)
+				newchar->offscreenkill = 200;
+			newchar->subject_to_hole = 0;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_wall = 0;
+			newchar->subject_to_platform = 0;
+			newchar->subject_to_screen = 0;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->subject_to_platform = 0;
+			newchar->no_adjust_base = 1;
+			break;
+		stringcase(lcm_cmdtype, trap):	
+			newchar->type = TYPE_TRAP;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, text):
+			// Used for displaying text/images and freezing the screen
+			newchar->type = TYPE_TEXTBOX;
+			newchar->subject_to_gravity = 0;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			break;
+		stringcase(lcm_cmdtype, endlevel):
+			// Used for ending the level when the players reach a certain point
+			newchar->type = TYPE_ENDLEVEL;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_obstacle = 1;
+			newchar->subject_to_gravity = 1;
+			break;
+		stringcase(lcm_cmdtype, npc):
+			newchar->type = TYPE_NPC;
+			newchar->bounce = 1;
+			newchar->subject_to_wall = 1;
+			newchar->subject_to_platform = 1;
+			newchar->subject_to_hole = 1;
+			newchar->subject_to_obstacle = 1;
+			newchar->subject_to_gravity = 1;
+			newchar->subject_to_minz = 1;
+			newchar->subject_to_maxz = 1;
+			newchar->no_adjust_base = 0;
+			break;
+		stringcase(lcm_cmdtype, panel):
+			newchar->type = TYPE_PANEL;
+			newchar->antigravity = 1.0;
+			newchar->subject_to_gravity = 1;
+			newchar->no_adjust_base = 1;
+			break;
+		default:
+			shutdown(1, "Model '%s' has invalid type: '%s'", filename, value);
 	}
-	// my new types   7-1-2005
-	else if(stricmp(value, "pshot") == 0) {
-		newchar->type = TYPE_SHOT;
-		if(newchar->aimove == -1)
-			newchar->aimove = 0;
-		newchar->aimove |= AIMOVE1_ARROW;
-		if(!newchar->offscreenkill)
-			newchar->offscreenkill = 200;
-		newchar->subject_to_hole = 0;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_wall = 0;
-		newchar->subject_to_platform = 0;
-		newchar->subject_to_screen = 0;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->subject_to_platform = 0;
-		newchar->no_adjust_base = 1;
-	} else if(stricmp(value, "trap") == 0) {
-		newchar->type = TYPE_TRAP;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "text") == 0) {	// Used for displaying text/images and freezing the screen
-		newchar->type = TYPE_TEXTBOX;
-		newchar->subject_to_gravity = 0;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-	} else if(stricmp(value, "endlevel") == 0) {	// Used for ending the level when the players reach a certain point
-		newchar->type = TYPE_ENDLEVEL;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_obstacle = 1;
-		newchar->subject_to_gravity = 1;
-	} else if(stricmp(value, "npc") == 0) {	// NPC type
-		newchar->type = TYPE_NPC;
-		newchar->bounce = 1;
-		newchar->subject_to_wall = 1;
-		newchar->subject_to_platform = 1;
-		newchar->subject_to_hole = 1;
-		newchar->subject_to_obstacle = 1;
-		newchar->subject_to_gravity = 1;
-		newchar->subject_to_minz = 1;
-		newchar->subject_to_maxz = 1;
-		newchar->no_adjust_base = 0;
-	} else if(stricmp(value, "panel") == 0) {	// NPC type
-		newchar->type = TYPE_PANEL;
-		newchar->antigravity = 1.0;	//float type
-		newchar->subject_to_gravity = 1;
-		newchar->no_adjust_base = 1;
-	} else
-		shutdown(1, "Model '%s' has invalid type: '%s'", filename, value);
 }
 
 void lcmHandleCommandSubtype(ArgList * arglist, s_model * newchar, char *filename) {
