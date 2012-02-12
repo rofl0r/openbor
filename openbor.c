@@ -18539,28 +18539,22 @@ void execute_keyscripts() {
 	}
 }
 
-void execute_updatescripts() {
+static void runscript(Script* script) {
 	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&game_scripts.update_script)) {
-		Script_Execute(&(game_scripts.update_script));
-	}
-	pcurrentscript = ptempscript;
-	if(level && Script_IsInitialized(&(level->update_script))) {
-		Script_Execute(&(level->update_script));
+	if(Script_IsInitialized(script)) {
+		Script_Execute(script);
 	}
 	pcurrentscript = ptempscript;
 }
 
+void execute_updatescripts() {
+	runscript(&game_scripts.update_script);
+	if(level) runscript(&(level->update_script));
+}
+
 void execute_updatedscripts() {
-	Script *ptempscript = pcurrentscript;
-	if(Script_IsInitialized(&game_scripts.updated_script)) {
-		Script_Execute(&(game_scripts.updated_script));
-	}
-	pcurrentscript = ptempscript;
-	if(level && Script_IsInitialized(&(level->updated_script))) {
-		Script_Execute(&(level->updated_script));
-	}
-	pcurrentscript = ptempscript;
+	runscript(&game_scripts.updated_script);
+	if(level) runscript(&(level->updated_script));
 }
 
 void draw_textobjs() {
