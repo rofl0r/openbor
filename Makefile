@@ -10,6 +10,8 @@ ifndef VERSION_NAME
 VERSION_NAME = OpenBOR
 endif
 
+STRINGSWITCH_GEN=../stringswitch/stringswitch_gen.out
+
 TARGET          = $(VERSION_NAME)
 BUILD_SDL       = 1
 BUILD_GFX       = 1
@@ -247,6 +249,10 @@ $(TARGET) : $(OBJS) $(RES)
 	@$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(TARGET_RESOURCE) $(LIBS) 
 	@echo Completed $(TARGET_PLATFORM) Port!
 	@echo $(TARGET) is now ready!
+
+#call make switch_gen to re-generate the stringswitch files
+switch_gen:
+	$(STRINGSWITCH_GEN) openbor.c
 
 clean-all: clean-releases clean
 
