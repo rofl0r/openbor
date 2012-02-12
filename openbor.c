@@ -3896,26 +3896,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "pain", 4) == 0 && (*value)[4] >= '1'
 			&& (*value)[4] <= '9') {
 		tempInt = atoi((*value) + 4);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_PAIN;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_PAIN2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_PAIN3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_PAIN4;
-		} else if(tempInt == 5) {
-			(*ani_id) = ANI_PAIN5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_PAIN6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_PAIN7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_PAIN8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_PAIN9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_PAIN10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_PAIN + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
