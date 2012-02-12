@@ -3338,25 +3338,42 @@ void lcmHandleCommandSmartbomb(ArgList * arglist, s_model * newchar, char *filen
 	}
 }
 
+//stringswitch_gen add lcm_cmdhostile "enemy"
+//stringswitch_gen add lcm_cmdhostile "player"
+//stringswitch_gen add lcm_cmdhostile "obstacle"
+//stringswitch_gen add lcm_cmdhostile "shot"
+//stringswitch_gen add lcm_cmdhostile "npc"
+
+#include "stringswitch_impl_lcm_cmdhostile.c"
+
 void lcmHandleCommandHostile(ArgList * arglist, s_model * newchar) {
 	int i = 1;
 	char *value = GET_ARGP(i);
+	lc(value, GET_ARGP_LEN(i));
 	newchar->hostile = 0;
-
 	while(value && value[0]) {
-		if(stricmp(value, "enemy") == 0) {
-			newchar->hostile |= TYPE_ENEMY;
-		} else if(stricmp(value, "player") == 0) {
-			newchar->hostile |= TYPE_PLAYER;
-		} else if(stricmp(value, "obstacle") == 0) {
-			newchar->hostile |= TYPE_OBSTACLE;
-		} else if(stricmp(value, "shot") == 0) {
-			newchar->hostile |= TYPE_SHOT;
-		} else if(stricmp(value, "npc") == 0) {
-			newchar->hostile |= TYPE_NPC;
+		stringswitch_d(lcm_cmdhostile, value) {
+			stringcase(lcm_cmdhostile, enemy):
+				newchar->hostile |= TYPE_ENEMY;
+				break;
+			stringcase(lcm_cmdhostile, player):
+				newchar->hostile |= TYPE_PLAYER;
+				break;
+			stringcase(lcm_cmdhostile, obstacle):
+				newchar->hostile |= TYPE_OBSTACLE;
+				break;
+			stringcase(lcm_cmdhostile, shot):
+				newchar->hostile |= TYPE_SHOT;
+				break;
+			stringcase(lcm_cmdhostile, npc):	
+				newchar->hostile |= TYPE_NPC;
+				break;
+			default:
+				break;
 		}
 		i++;
 		value = GET_ARGP(i);
+		lc(value, GET_ARGP_LEN(i));
 	}
 }
 void lcmHandleCommandCandamage(ArgList * arglist, s_model * newchar) {
