@@ -262,8 +262,6 @@ typedef enum {
 	ANI_WALK,
 	ANI_JUMP,
 	ANI_LAND,
-	ANI_FALL,
-	ANI_RISE,
 	ANI_ATTACK1,
 	ANI_ATTACK2,
 	ANI_ATTACK3,
@@ -280,7 +278,6 @@ typedef enum {
 	ANI_SPECIAL,
 	ANI_FREESPECIAL,
 	ANI_SPAWN,	// 26-12-2004 new animation added here ani_spawn
-	ANI_DIE,	// 29-12-2004 new animation added here ani_die
 	ANI_PICK,	// 7-1-2005 used when players select their character at the select screen
 	ANI_FREESPECIAL2,
 	ANI_JUMPATTACK3,
@@ -305,7 +302,6 @@ typedef enum {
 	ANI_FREESPECIAL6,	// More freespecials added
 	ANI_FREESPECIAL7,	// More freespecials added
 	ANI_FREESPECIAL8,	// More freespecials added
-	ANI_RISEATTACK,	// Attack used for enemies when players are crowding around after knocking them down
 	ANI_DODGE,	// Used for up up / down down SOR3 dodge moves for players
 	ANI_ATTACKBOTH,	// Used for when a player holds down attack and presses jump
 	ANI_GRABFORWARD,	// New grab attack for when a player holds down forward/attack
@@ -336,12 +332,26 @@ typedef enum {
 	ANI_PAIN8,
 	ANI_PAIN9,
 	ANI_PAIN10,
+	ANI_FALL,
 	ANI_FALL2,
 	ANI_FALL3,
 	ANI_FALL4,
+	ANI_FALL5,
+	ANI_FALL6,
+	ANI_FALL7,
+	ANI_FALL8,
+	ANI_FALL9,
+	ANI_FALL10,
+	ANI_DIE,	// 29-12-2004 new animation added here ani_die
 	ANI_DIE2,
 	ANI_DIE3,
 	ANI_DIE4,
+	ANI_DIE5,
+	ANI_DIE6,
+	ANI_DIE7,
+	ANI_DIE8,
+	ANI_DIE9,
+	ANI_DIE10,
 	ANI_CHARGE,
 	ANI_BACKWALK,
 	ANI_SLEEP,
@@ -349,18 +359,6 @@ typedef enum {
 	ANI_FOLLOW2,
 	ANI_FOLLOW3,
 	ANI_FOLLOW4,
-	ANI_FALL5,
-	ANI_FALL6,
-	ANI_FALL7,
-	ANI_FALL8,
-	ANI_FALL9,
-	ANI_FALL10,
-	ANI_DIE5,
-	ANI_DIE6,
-	ANI_DIE7,
-	ANI_DIE8,
-	ANI_DIE9,
-	ANI_DIE10,
 	ANI_TURN,	// turn back/flip
 	ANI_RESPAWN,	//now spawn works for players
 	ANI_FORWARDJUMP,
@@ -382,8 +380,8 @@ typedef enum {
 	ANI_GRABBEDBACKWALK,
 	ANI_SLIDE,	//Down + Jump animation.
 	ANI_RUNSLIDE,	//Down + Jump while running.
-	ANI_BLOCKPAIN,	//If entity has this, it will play in place of "pain" when it's blokcpain is 1 and incomming attack is blocked.
 	ANI_DUCKATTACK,
+	ANI_RISE,
 	ANI_RISE2,
 	ANI_RISE3,
 	ANI_RISE4,
@@ -395,6 +393,7 @@ typedef enum {
 	ANI_RISE10,
 	ANI_RISEB,
 	ANI_RISES,
+	ANI_BLOCKPAIN,	//If entity has this, it will play in place of "pain" when its blockpain is 1 and incoming attack is blocked.
 	ANI_BLOCKPAIN2,
 	ANI_BLOCKPAIN3,
 	ANI_BLOCKPAIN4,
@@ -408,6 +407,7 @@ typedef enum {
 	ANI_BLOCKPAINS,
 	ANI_CHIPDEATH,
 	ANI_GUARDBREAK,
+	ANI_RISEATTACK,	// Attack used for enemies when players are crowding around after knocking them down
 	ANI_RISEATTACK2,
 	ANI_RISEATTACK3,
 	ANI_RISEATTACK4,

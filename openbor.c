@@ -3913,26 +3913,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "fall", 4) == 0 && (*value)[4] >= '1'
 			&& (*value)[4] <= '9') {
 		tempInt = atoi((*value) + 4);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_FALL;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_FALL2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_FALL3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_FALL4;
-		} else if(tempInt == 5) {
-			(*ani_id) = ANI_FALL5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_FALL6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_FALL7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_FALL8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_FALL9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_FALL10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_FALL + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
@@ -3950,26 +3932,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "death", 5) == 0 && (*value)[5] >= '1'
 			&& (*value)[5] <= '9') {
 		tempInt = atoi((*value) + 5);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_DIE;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_DIE2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_DIE3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_DIE4;
-		} else if(tempInt == 5) {
-			(*ani_id) = ANI_DIE5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_DIE6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_DIE7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_DIE8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_DIE9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_DIE10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_DIE + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
@@ -3992,26 +3956,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "rise", 4) == 0 && (*value)[4] >= '1'
 			&& (*value)[4] <= '9') {
 		tempInt = atoi((*value) + 4);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_RISE;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_RISE2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_RISE3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_RISE4;
-		} else if(tempInt == 5) {
-			(*ani_id) = ANI_RISE5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_RISE6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_RISE7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_RISE8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_RISE9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_RISE10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_RISE + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
@@ -4026,26 +3972,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "riseattack", 10) == 0 && (*value)[10] >= '1'
 			&& (*value)[10] <= '9') {
 		tempInt = atoi((*value) + 10);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_RISEATTACK;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_RISEATTACK2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_RISEATTACK3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_RISEATTACK4;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_RISEATTACK5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_RISEATTACK6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_RISEATTACK7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_RISEATTACK8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_RISEATTACK9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_RISEATTACK10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_RISEATTACK + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
@@ -4284,26 +4212,8 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(strnicmp((*value), "blockpain", 9) == 0 && (*value)[9] >= '1'
 			&& (*value)[9] <= '9') {
 		tempInt = atoi((*value) + 9);
-		if(tempInt == 1) {
-			(*ani_id) = ANI_BLOCKPAIN;
-		} else if(tempInt == 2) {
-			(*ani_id) = ANI_BLOCKPAIN2;
-		} else if(tempInt == 3) {
-			(*ani_id) = ANI_BLOCKPAIN3;
-		} else if(tempInt == 4) {
-			(*ani_id) = ANI_BLOCKPAIN4;
-		} else if(tempInt == 5) {
-			(*ani_id) = ANI_BLOCKPAIN5;
-		} else if(tempInt == 6) {
-			(*ani_id) = ANI_BLOCKPAIN6;
-		} else if(tempInt == 7) {
-			(*ani_id) = ANI_BLOCKPAIN7;
-		} else if(tempInt == 8) {
-			(*ani_id) = ANI_BLOCKPAIN8;
-		} else if(tempInt == 9) {
-			(*ani_id) = ANI_BLOCKPAIN9;
-		} else if(tempInt == 10) {
-			(*ani_id) = ANI_BLOCKPAIN10;
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_BLOCKPAIN + (tempInt - 1);
 		} else {
 			if(tempInt < MAX_ATKS - STA_ATKS + 1)
 				tempInt = MAX_ATKS - STA_ATKS + 1;
