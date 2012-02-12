@@ -3051,6 +3051,143 @@ char *get_cached_model_path(char *name) {
 
 static void _readbarstatus(char *, s_barstatus *);
 
+//alloc a new model, and everything thats required,
+//set all values to defaults
+s_model *init_model(int cacheindex, int unload) {
+	//to free: newchar, newchar->offense_factors, newchar->special, newchar->animation - OK
+	int i;
+
+	s_model *newchar = calloc(1, sizeof(s_model));
+	if(!newchar)
+		shutdown(1, (char *) E_OUT_OF_MEMORY);
+	newchar->name = model_cache[cacheindex].name;	// well give it a name for sort method
+	newchar->index = cacheindex;
+	newchar->isSubclassed = 0;
+	newchar->freetypes = MF_ALL;
+
+	newchar->defense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_pain = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_knockdown = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockpower = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockthreshold = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blockratio = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->defense_blocktype = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+	newchar->offense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
+
+	newchar->special = calloc(sizeof(*newchar->special), dyn_anim_custom_maxvalues.max_freespecials);
+	if(!newchar->special)
+		shutdown(1, (char *) E_OUT_OF_MEMORY);
+
+	alloc_all_scripts(&newchar->scripts);
+
+	newchar->unload = unload;
+	newchar->jumpspeed = -1;
+	newchar->jumpheight = 4;	// 28-12-2004   Set default jump height to 4, if not specified
+	newchar->runjumpheight = 4;	// Default jump height if a player is running
+	newchar->runjumpdist = 1;	// Default jump distane if a player is running
+	newchar->grabdistance = 36;	//  30-12-2004 Default grabdistance is same as originally set
+	newchar->throwdamage = 21;	// default throw damage
+	newchar->icon = -1;
+	newchar->icondie = -1;
+	newchar->iconpain = -1;
+	newchar->iconget = -1;
+	newchar->iconw = -1;	// No weapon icon set yet
+	newchar->diesound = -1;
+	newchar->nolife = 0;	// default show life = 1 (yes)
+	newchar->remove = 1;	// Flag set to weapons are removed upon hitting an opponent
+	newchar->throwdist = 2.5;
+	newchar->counter = 3;	// Default 3 times to drop a weapon / projectile
+	newchar->aimove = -1;
+	newchar->aiattack = -1;
+	newchar->throwframewait = -1;	// makes sure throw animations run normally unless throwfram is specified, added by kbandressen 10/20/06
+	newchar->path = model_cache[cacheindex].path;	// Record path, so script can get it without looping the whole model collection.
+
+	for(i = 0; i < 3; i++)
+		newchar->iconmp[i] = -1;	// No magicbar icon set yet
+
+	// Default Attack1 in chain must be referenced if not used.
+	for(i = 0; i < MAX_ATCHAIN; i++)
+		newchar->atchain[i] = 1;
+	newchar->chainlength = 1;
+
+	if(magic_type == 1)
+		newchar->mprate = 1;
+	else
+		newchar->mprate = 2;
+	newchar->chargerate = newchar->guardrate = 2;
+	newchar->risetime[0] = -1;
+	newchar->sleepwait = 1000;
+	newchar->jugglepoints[0] = newchar->jugglepoints[1] = 0;
+	newchar->guardpoints[0] = newchar->guardpoints[1] = 0;
+	newchar->mpswitch = -1;	// switch between reduce mp or gain mp for mpstabletype 4
+	newchar->weaploss[0] = -1;
+	newchar->weaploss[1] = -1;
+	newchar->lifespan = (float) 0xFFFFFFFF;
+	newchar->summonkill = 1;
+	newchar->candamage = -1;
+	newchar->hostile = -1;
+	newchar->projectilehit = -1;
+	newchar->subject_to_wall = -1;
+	newchar->subject_to_platform = -1;
+	newchar->subject_to_obstacle = -1;
+	newchar->subject_to_hole = -1;
+	newchar->subject_to_gravity = -1;
+	newchar->subject_to_screen = -1;
+	newchar->subject_to_minz = -1;
+	newchar->subject_to_maxz = -1;
+	newchar->no_adjust_base = -1;
+	newchar->pshotno = -1;
+	newchar->project = -1;
+	newchar->dust[0] = -1;
+	newchar->dust[1] = -1;
+	newchar->dust[2] = -1;
+	newchar->bomb = -1;
+	newchar->star = -1;
+	newchar->knife = -1;
+
+	newchar->animation = (s_anim **) calloc(sizeof(s_anim *), dyn_anim_custom_maxvalues.max_animations);
+	if(!newchar->animation)
+		shutdown(1, (char *) E_OUT_OF_MEMORY);
+
+	// default string value, only by reference
+	newchar->rider = get_cached_model_index("K'");
+	newchar->flash = newchar->bflash = get_cached_model_index("flash");
+
+	//Default offense/defense values.
+	for(i = 0; i < dyn_anim_custom_maxvalues.max_attack_types; i++) {
+		newchar->offense_factors[i] = 1;
+		newchar->defense_factors[i] = 1;
+		newchar->defense_knockdown[i] = 1;
+	}
+
+	for(i = 0; i < 3; i++) {
+		newchar->sight[i * 2] = -9999;
+		newchar->sight[i * 2 + 1] = 9999;
+	}
+
+	newchar->offense_factors[ATK_BLAST] = 1;
+	newchar->defense_factors[ATK_BLAST] = 1;
+	newchar->defense_knockdown[ATK_BLAST] = 1;
+	newchar->offense_factors[ATK_BURN] = 1;
+	newchar->defense_factors[ATK_BURN] = 1;
+	newchar->defense_knockdown[ATK_BURN] = 1;
+	newchar->offense_factors[ATK_FREEZE] = 1;
+	newchar->defense_factors[ATK_FREEZE] = 1;
+	newchar->defense_knockdown[ATK_FREEZE] = 1;
+	newchar->offense_factors[ATK_SHOCK] = 1;
+	newchar->defense_factors[ATK_SHOCK] = 1;
+	newchar->defense_knockdown[ATK_SHOCK] = 1;
+	newchar->offense_factors[ATK_STEAL] = 1;
+	newchar->defense_factors[ATK_STEAL] = 1;
+	newchar->defense_knockdown[ATK_STEAL] = 1;
+
+	return newchar;
+}
+
+void update_model_loadflag(s_model * model, char unload) {
+	model->unload = unload;
+}
+
 void lcmHandleCommandName(ArgList * arglist, s_model * newchar, int cacheindex) {
 	char *value = GET_ARGP(1);
 	s_model *tempmodel;
@@ -3570,148 +3707,77 @@ void lcmHandleCommandScripts(ArgList * arglist, Script * script, char *scriptnam
 		shutdown(1, "Unable to load %s '%s' in file '%s'.\n", scriptname, GET_ARGP(1), filename);
 }
 
-//alloc a new model, and everything thats required,
-//set all values to defaults
-s_model *init_model(int cacheindex, int unload) {
-	//to free: newchar, newchar->offense_factors, newchar->special, newchar->animation - OK
-	int i;
-
-	s_model *newchar = calloc(1, sizeof(s_model));
-	if(!newchar)
-		shutdown(1, (char *) E_OUT_OF_MEMORY);
-	newchar->name = model_cache[cacheindex].name;	// well give it a name for sort method
-	newchar->index = cacheindex;
-	newchar->isSubclassed = 0;
-	newchar->freetypes = MF_ALL;
-
-	newchar->defense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_pain = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_knockdown = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_blockpower = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_blockthreshold = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_blockratio = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->defense_blocktype = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-	newchar->offense_factors = (float *) calloc(sizeof(float), (dyn_anim_custom_maxvalues.max_attack_types + 1));
-
-	newchar->special = calloc(sizeof(*newchar->special), dyn_anim_custom_maxvalues.max_freespecials);
-	if(!newchar->special)
-		shutdown(1, (char *) E_OUT_OF_MEMORY);
-
-	alloc_all_scripts(&newchar->scripts);
-
-	newchar->unload = unload;
-	newchar->jumpspeed = -1;
-	newchar->jumpheight = 4;	// 28-12-2004   Set default jump height to 4, if not specified
-	newchar->runjumpheight = 4;	// Default jump height if a player is running
-	newchar->runjumpdist = 1;	// Default jump distane if a player is running
-	newchar->grabdistance = 36;	//  30-12-2004 Default grabdistance is same as originally set
-	newchar->throwdamage = 21;	// default throw damage
-	newchar->icon = -1;
-	newchar->icondie = -1;
-	newchar->iconpain = -1;
-	newchar->iconget = -1;
-	newchar->iconw = -1;	// No weapon icon set yet
-	newchar->diesound = -1;
-	newchar->nolife = 0;	// default show life = 1 (yes)
-	newchar->remove = 1;	// Flag set to weapons are removed upon hitting an opponent
-	newchar->throwdist = 2.5;
-	newchar->counter = 3;	// Default 3 times to drop a weapon / projectile
-	newchar->aimove = -1;
-	newchar->aiattack = -1;
-	newchar->throwframewait = -1;	// makes sure throw animations run normally unless throwfram is specified, added by kbandressen 10/20/06
-	newchar->path = model_cache[cacheindex].path;	// Record path, so script can get it without looping the whole model collection.
-
-	for(i = 0; i < 3; i++)
-		newchar->iconmp[i] = -1;	// No magicbar icon set yet
-
-	// Default Attack1 in chain must be referenced if not used.
-	for(i = 0; i < MAX_ATCHAIN; i++)
-		newchar->atchain[i] = 1;
-	newchar->chainlength = 1;
-
-	if(magic_type == 1)
-		newchar->mprate = 1;
-	else
-		newchar->mprate = 2;
-	newchar->chargerate = newchar->guardrate = 2;
-	newchar->risetime[0] = -1;
-	newchar->sleepwait = 1000;
-	newchar->jugglepoints[0] = newchar->jugglepoints[1] = 0;
-	newchar->guardpoints[0] = newchar->guardpoints[1] = 0;
-	newchar->mpswitch = -1;	// switch between reduce mp or gain mp for mpstabletype 4
-	newchar->weaploss[0] = -1;
-	newchar->weaploss[1] = -1;
-	newchar->lifespan = (float) 0xFFFFFFFF;
-	newchar->summonkill = 1;
-	newchar->candamage = -1;
-	newchar->hostile = -1;
-	newchar->projectilehit = -1;
-	newchar->subject_to_wall = -1;
-	newchar->subject_to_platform = -1;
-	newchar->subject_to_obstacle = -1;
-	newchar->subject_to_hole = -1;
-	newchar->subject_to_gravity = -1;
-	newchar->subject_to_screen = -1;
-	newchar->subject_to_minz = -1;
-	newchar->subject_to_maxz = -1;
-	newchar->no_adjust_base = -1;
-	newchar->pshotno = -1;
-	newchar->project = -1;
-	newchar->dust[0] = -1;
-	newchar->dust[1] = -1;
-	newchar->dust[2] = -1;
-	newchar->bomb = -1;
-	newchar->star = -1;
-	newchar->knife = -1;
-
-	newchar->animation = (s_anim **) calloc(sizeof(s_anim *), dyn_anim_custom_maxvalues.max_animations);
-	if(!newchar->animation)
-		shutdown(1, (char *) E_OUT_OF_MEMORY);
-
-	// default string value, only by reference
-	newchar->rider = get_cached_model_index("K'");
-	newchar->flash = newchar->bflash = get_cached_model_index("flash");
-
-	//Default offense/defense values.
-	for(i = 0; i < dyn_anim_custom_maxvalues.max_attack_types; i++) {
-		newchar->offense_factors[i] = 1;
-		newchar->defense_factors[i] = 1;
-		newchar->defense_knockdown[i] = 1;
-	}
-
-	for(i = 0; i < 3; i++) {
-		newchar->sight[i * 2] = -9999;
-		newchar->sight[i * 2 + 1] = 9999;
-	}
-
-	newchar->offense_factors[ATK_BLAST] = 1;
-	newchar->defense_factors[ATK_BLAST] = 1;
-	newchar->defense_knockdown[ATK_BLAST] = 1;
-	newchar->offense_factors[ATK_BURN] = 1;
-	newchar->defense_factors[ATK_BURN] = 1;
-	newchar->defense_knockdown[ATK_BURN] = 1;
-	newchar->offense_factors[ATK_FREEZE] = 1;
-	newchar->defense_factors[ATK_FREEZE] = 1;
-	newchar->defense_knockdown[ATK_FREEZE] = 1;
-	newchar->offense_factors[ATK_SHOCK] = 1;
-	newchar->defense_factors[ATK_SHOCK] = 1;
-	newchar->defense_knockdown[ATK_SHOCK] = 1;
-	newchar->offense_factors[ATK_STEAL] = 1;
-	newchar->defense_factors[ATK_STEAL] = 1;
-	newchar->defense_knockdown[ATK_STEAL] = 1;
-
-	return newchar;
-}
-
-void update_model_loadflag(s_model * model, char unload) {
-	model->unload = unload;
-}
-
 void lcmSetCachedModelIndexOrMinusOne(char* value, int* dest) {
 	if(stricmp(value, "none") == 0)
 		*dest = -1;
 	else
 		*dest = get_cached_model_index(value);
+}
+
+// returns: 0: OK, -1: fatal, 1:warning, proceed to next line
+int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char** shutdownmessage) {
+	// Section for custom freespecials starts here
+	int tempInt;
+	int i;
+	int t;
+	for(i = 0, t = 1; i < MAX_SPECIAL_INPUTS - 3; i++, t++) {
+		*value = GET_ARGP(t);
+		if(!(*value)[0])
+			break;
+		if(stricmp(*value, "u") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_MOVEUP;
+		} else if(stricmp(*value, "d") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_MOVEDOWN;
+		} else if(stricmp(*value, "f") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_FORWARD;
+		} else if(stricmp(*value, "b") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_BACKWARD;
+		} else if(stricmp(*value, "a") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_ATTACK;
+		} else if(stricmp(*value, "a2") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_ATTACK2;
+		} else if(stricmp(*value, "a3") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_ATTACK3;
+		} else if(stricmp(*value, "a4") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_ATTACK4;
+		} else if(stricmp(*value, "j") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_JUMP;
+		} else if(stricmp(*value, "s") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_SPECIAL;
+		} else if(stricmp(*value, "k") == 0) {
+			newchar->special[newchar->specials_loaded][i] =
+				FLAG_SPECIAL;
+		} else if(strnicmp(*value, "freespecial", 11) == 0
+				&& (!(*value)[11]
+				|| ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
+			tempInt = atoi((*value) + 11);
+			if(tempInt < 1)
+				tempInt = 1;
+			newchar->special[newchar->
+						specials_loaded][MAX_SPECIAL_INPUTS -
+								2] =
+				dyn_anims.animspecials[tempInt - 1];
+		} else {
+			return 1;
+		}
+	}
+	newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
+	newchar->specials_loaded++;
+	if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
+		*shutdownmessage = "Too many Freespecials and/or Cancels. Please increase Maxfreespecials";	// OX. This is to catch freespecials that use same animation.
+		return -1;
+	}
+	return 0;
 }
 
 s_model *load_cached_model(char *name, char *owner, char unload) {
@@ -4409,69 +4475,13 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 						newchar->namey = atoi(value);
 					break;
 				case CMD_MODEL_COM:
-					{
-						// Section for custom freespecials starts here
-						int i;
-						int t;
-						for(i = 0, t = 1; i < MAX_SPECIAL_INPUTS - 3; i++, t++) {
-							value = GET_ARG(t);
-							if(!value[0])
-								break;
-							if(stricmp(value, "u") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_MOVEUP;
-							} else if(stricmp(value, "d") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_MOVEDOWN;
-							} else if(stricmp(value, "f") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_FORWARD;
-							} else if(stricmp(value, "b") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_BACKWARD;
-							} else if(stricmp(value, "a") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK;
-							} else if(stricmp(value, "a2") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK2;
-							} else if(stricmp(value, "a3") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK3;
-							} else if(stricmp(value, "a4") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK4;
-							} else if(stricmp(value, "j") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_JUMP;
-							} else if(stricmp(value, "s") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_SPECIAL;
-							} else if(stricmp(value, "k") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_SPECIAL;
-							} else if(strnicmp(value, "freespecial", 11) == 0
-								  && (!value[11]
-								      || (value[11] >= '1' && value[11] <= '9'))) {
-								tempInt = atoi(value + 11);
-								if(tempInt < 1)
-									tempInt = 1;
-								newchar->special[newchar->
-										 specials_loaded][MAX_SPECIAL_INPUTS -
-												  2] =
-								    dyn_anims.animspecials[tempInt - 1];
-							} else {
-								printf("WARNING: Invalid freespecial command '%s' in '%s', line %u\n", value, filename, line);
-								goto next_line;
-							}
-						}
-						newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
-						newchar->specials_loaded++;
-						if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
-							shutdownmessage = "Too many Freespecials and/or Cancels. Please increase Maxfreespecials";	// OX. This is to catch freespecials that use same animation.
-							goto lCleanup;
-						}
-					}
+					tempInt = lcmHandleCommandCom(&arglist, newchar, &value, &shutdownmessage);
+					if(tempInt == 0) ; 
+					else if(tempInt == 1) {
+						printf("WARNING: Invalid freespecial command '%s' in '%s', line %u\n", value, filename, line);
+						goto next_line;
+					} else
+						goto lCleanup;
 					// End section for custom freespecials
 					break;
 				case CMD_MODEL_REMAP:
