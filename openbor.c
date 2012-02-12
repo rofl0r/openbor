@@ -2498,6 +2498,11 @@ void load_all_fonts() {
 	}
 }
 
+//stringswitch_gen add menutxt_cmd "disablekey"
+//stringswitch_gen add menutxt_cmd "renamekey"
+//stringswitch_gen add menutxt_cmd "fontmonospace"
+#include "stringswitch_impl_menutxt_cmd.c"
+
 void load_menu_txt() {
 	char *filename = "data/menu.txt";
 	char lowercase_buf[16];
@@ -2515,28 +2520,34 @@ void load_menu_txt() {
 			ParseArgs(&arglist, buf + pos, argbuf);
 			command = GET_ARG(0);
 			if(command[0]) {
-				if(stricmp(command, "disablekey") == 0) {
-					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
-					for(i = 0; i < CB_MAX; i++) {
-						if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
-							disabledkey[i] = 1;
-							break;
+				lc(command, GET_ARG_LEN(0));
+				stringswitch_d(menutxt_cmd, command) {
+					stringcase(menutxt_cmd, disablekey):
+						char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+						for(i = 0; i < CB_MAX; i++) {
+							if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
+								disabledkey[i] = 1;
+								break;
+							}
 						}
-					}
-				} else if(stricmp(command, "renamekey") == 0) {
-					char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
-					for(i = 0; i < CB_MAX; i++) {
-						if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
-							strncpy(custom_button_names[i], GET_ARG(2), 16);
-							((char**)&buttonnames)[i] = custom_button_names[i];
-							break;
+						break;
+					stringcase(menutxt_cmd, renamekey):
+						char_to_lower(lowercase_buf, GET_ARG(1), sizeof(lowercase_buf));
+						for(i = 0; i < CB_MAX; i++) {
+							if(!strcmp(lowercase_buf, ((char**)&config_button_names)[i])) {
+								strncpy(custom_button_names[i], GET_ARG(2), 16);
+								((char**)&buttonnames)[i] = custom_button_names[i];
+								break;
+							}
 						}
-					}
-				} else if(stricmp(command, "fontmonospace") == 0) {
-					for(i = 0; i < 8; i++)
-						fontmonospace[i] = GET_INT_ARG(i+1);
-				} else if(command && command[0])
-					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
+					stringcase(menutxt_cmd, fontmonospace):
+						for(i = 0; i < 8; i++)
+							fontmonospace[i] = GET_INT_ARG(i+1);
+						break;
+					default:	
+						if(command && command[0])
+							printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
+				}
 
 			}
 			// Go to next line
