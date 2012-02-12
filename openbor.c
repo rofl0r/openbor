@@ -3419,26 +3419,41 @@ void lcmHandleCommandCandamage(ArgList * arglist, s_model * newchar) {
 	}
 }
 
+//stringswitch_gen add lcm_cmdprojectilehit "enemy"
+//stringswitch_gen add lcm_cmdprojectilehit "player"
+//stringswitch_gen add lcm_cmdprojectilehit "obstacle"
+//stringswitch_gen add lcm_cmdprojectilehit "shot"
+//stringswitch_gen add lcm_cmdprojectilehit "npc"
+
+#include "stringswitch_impl_lcm_cmdprojectilehit.c"
+
 void lcmHandleCommandProjectilehit(ArgList * arglist, s_model * newchar) {
 	int i = 1;
 	char *value = GET_ARGP(i);
-
+	lc(value, GET_ARGP_LEN(i));
 	newchar->projectilehit = 0;
 
 	while(value && value[0]) {
-		if(stricmp(value, "enemy") == 0) {
-			newchar->projectilehit |= TYPE_ENEMY;
-		} else if(stricmp(value, "player") == 0) {
-			newchar->projectilehit |= TYPE_PLAYER;
-		} else if(stricmp(value, "obstacle") == 0) {
-			newchar->projectilehit |= TYPE_OBSTACLE;
-		} else if(stricmp(value, "shot") == 0) {
-			newchar->projectilehit |= TYPE_SHOT;
-		} else if(stricmp(value, "npc") == 0) {
-			newchar->projectilehit |= TYPE_NPC;
+		stringswitch_d(lcm_cmdprojectilehit, value) {
+			stringcase(lcm_cmdprojectilehit, enemy):
+				newchar->projectilehit |= TYPE_ENEMY;
+				break;
+			stringcase(lcm_cmdprojectilehit, player):
+				newchar->projectilehit |= TYPE_PLAYER;
+				break;
+			stringcase(lcm_cmdprojectilehit, obstacle):
+				newchar->projectilehit |= TYPE_OBSTACLE;
+				break;
+			stringcase(lcm_cmdprojectilehit, shot):
+				newchar->projectilehit |= TYPE_SHOT;
+				break;
+			stringcase(lcm_cmdprojectilehit, npc):
+				newchar->projectilehit |= TYPE_NPC;
+				break;
 		}
 		i++;
 		value = GET_ARGP(i);
+		lc(value, GET_ARGP_LEN(i));
 	}
 }
 
