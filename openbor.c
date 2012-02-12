@@ -6221,7 +6221,8 @@ int load_models() {
 					savedata.mode = versusdamage ^ 1;
 				break;
 			default:
-				printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
+				if(command && *command) 
+					printf("%s(): Command '%s' is not understood in file '%s', line %u!\n", __FUNCTION__, command, filename, line);
 		}
 
 		// Go to next line
