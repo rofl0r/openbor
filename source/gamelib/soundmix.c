@@ -318,7 +318,7 @@ int sound_alloc_sample(char *filename, char *packfilename) {
 
 // Load a sound or return index
 int sound_load_sample(char *filename, char *packfilename, int iLog) {
-	int i, len;
+	int i;
 	for(i = 0; i <= MAX_SAMPLES; i++) {
 		if(i == MAX_SAMPLES)
 			return -1;
@@ -330,14 +330,11 @@ int sound_load_sample(char *filename, char *packfilename, int iLog) {
 	soundcache[i].index = sound_alloc_sample(filename, packfilename);
 	if(soundcache[i].index == -1) {
 		if(!iLog) {
-			writeToLogFile("\nsound_load_sample: Failed to load: %s\n", filename);
+			writeToLogFile("sound_load_sample: Failed to load: %s\n", filename);
 		}
 		return -1;
 	}
-	len = strlen(filename);
-	soundcache[i].filename = malloc(len + 1);
-	strcpy(soundcache[i].filename, filename);
-	soundcache[i].filename[len] = 0;
+	soundcache[i].filename = strdup(filename);
 	return soundcache[i].index;
 }
 
