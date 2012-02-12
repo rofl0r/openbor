@@ -18,6 +18,7 @@
 #include "models.h"
 #include "movie.h"
 #include "menus.h"
+#include "source/strswitch/stringswitch.h"
 
 #define GET_ARG(z) arglist.count > z ? arglist.args[z] : ""
 #define GET_ARG_LEN(z) arglist.count > z ? arglist.arglen[z] : 0
