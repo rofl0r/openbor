@@ -8770,7 +8770,7 @@ void predrawstatus() {
 				// reports error if players try to use the same character and sameplay mode is off
 				if(sameplayer) {
 					for(x = 0; x < maxplayers[current_set]; x++) {
-						if((!strcmp(player[i].name, player[x].name)) && (i != x)) {
+						if((i != x) && (!strcmp(player[i].name, player[x].name))) {
 							tperror = i + 1;
 							break;
 						}
@@ -19758,7 +19758,7 @@ int selectplayer(int *players, char *filename) {
 					// reports error if players try to use the same character and sameplay mode is off
 					if(sameplayer) {
 						for(x = 0; x < maxplayers[current_set]; x++) {
-							if((!strcmp(player[i].name, player[x].name)) && (i != x)) {
+							if((i != x) && (!strcmp(player[i].name, player[x].name))) {
 								tperror = i + 1;
 								break;
 							}
