@@ -3457,44 +3457,76 @@ void lcmHandleCommandProjectilehit(ArgList * arglist, s_model * newchar) {
 	}
 }
 
+//stringswitch_gen add lcm_cmdaimove "normal"
+//stringswitch_gen add lcm_cmdaimove "chase"
+//stringswitch_gen add lcm_cmdaimove "chasex"
+//stringswitch_gen add lcm_cmdaimove "chasez"
+//stringswitch_gen add lcm_cmdaimove "avoid"
+//stringswitch_gen add lcm_cmdaimove "avoidx"
+//stringswitch_gen add lcm_cmdaimove "avoidz"
+//stringswitch_gen add lcm_cmdaimove "wander"
+//stringswitch_gen add lcm_cmdaimove "biker"
+//stringswitch_gen add lcm_cmdaimove "arrow"
+//stringswitch_gen add lcm_cmdaimove "star"
+//stringswitch_gen add lcm_cmdaimove "bomb"
+//stringswitch_gen add lcm_cmdaimove "nomove"
+
+#include "stringswitch_impl_lcm_cmdaimove.c"
+
 void lcmHandleCommandAimove(ArgList * arglist, s_model * newchar, int *aimoveset, char *filename) {
 	char *value = GET_ARGP(1);
+	lc(value, GET_ARGP_LEN(1));
 	if(!*aimoveset) {
 		newchar->aimove = 0;
 		*aimoveset = 1;
 	}
 	//main A.I. move switches
 	if(value && value[0]) {
-		if(stricmp(value, "normal") == 0) {
-			newchar->aimove |= AIMOVE1_NORMAL;
-		} else if(stricmp(value, "chase") == 0) {
-			newchar->aimove |= AIMOVE1_CHASE;
-		} else if(stricmp(value, "chasex") == 0) {
-			newchar->aimove |= AIMOVE1_CHASEX;
-		} else if(stricmp(value, "chasez") == 0) {
-			newchar->aimove |= AIMOVE1_CHASEZ;
-		} else if(stricmp(value, "avoid") == 0) {
-			newchar->aimove |= AIMOVE1_AVOID;
-		} else if(stricmp(value, "avoidx") == 0) {
-			newchar->aimove |= AIMOVE1_AVOIDX;
-		} else if(stricmp(value, "avoidz") == 0) {
-			newchar->aimove |= AIMOVE1_AVOIDZ;
-		} else if(stricmp(value, "wander") == 0) {
-			newchar->aimove |= AIMOVE1_WANDER;
-		} else if(stricmp(value, "biker") == 0) {
-			newchar->aimove |= AIMOVE1_BIKER;
-		} else if(stricmp(value, "arrow") == 0) {
-			newchar->aimove |= AIMOVE1_ARROW;
-			if(!newchar->offscreenkill)
-				newchar->offscreenkill = 200;
-		} else if(stricmp(value, "star") == 0) {
-			newchar->aimove |= AIMOVE1_STAR;
-		} else if(stricmp(value, "bomb") == 0) {
-			newchar->aimove |= AIMOVE1_BOMB;
-		} else if(stricmp(value, "nomove") == 0) {
-			newchar->aimove |= AIMOVE1_NOMOVE;
-		} else
-			shutdown(1, "Model '%s' has invalid A.I. move switch: '%s'", filename, value);
+		stringswitch_d(lcm_cmdaimove, value) {
+			stringcase(lcm_cmdaimove, normal):
+				newchar->aimove |= AIMOVE1_NORMAL;
+				break;
+			stringcase(lcm_cmdaimove, chase):
+				newchar->aimove |= AIMOVE1_CHASE;
+				break;
+			stringcase(lcm_cmdaimove, chasex):
+				newchar->aimove |= AIMOVE1_CHASEX;
+				break;
+			stringcase(lcm_cmdaimove, chasez):
+				newchar->aimove |= AIMOVE1_CHASEZ;
+				break;
+			stringcase(lcm_cmdaimove, avoid):
+				newchar->aimove |= AIMOVE1_AVOID;
+				break;
+			stringcase(lcm_cmdaimove, avoidx):
+				newchar->aimove |= AIMOVE1_AVOIDX;
+				break;
+			stringcase(lcm_cmdaimove, avoidz):
+				newchar->aimove |= AIMOVE1_AVOIDZ;
+				break;
+			stringcase(lcm_cmdaimove, wander):
+				newchar->aimove |= AIMOVE1_WANDER;
+				break;
+			stringcase(lcm_cmdaimove, biker):
+				newchar->aimove |= AIMOVE1_BIKER;
+				break;
+			stringcase(lcm_cmdaimove, arrow):
+				newchar->aimove |= AIMOVE1_ARROW;
+				if(!newchar->offscreenkill)
+					newchar->offscreenkill = 200;
+				break;
+			stringcase(lcm_cmdaimove, star):
+				newchar->aimove |= AIMOVE1_STAR;
+				break;
+			stringcase(lcm_cmdaimove, bomb):
+				newchar->aimove |= AIMOVE1_BOMB;
+				break;
+			stringcase(lcm_cmdaimove, nomove):
+				newchar->aimove |= AIMOVE1_NOMOVE;
+				break;
+			default:
+				shutdown(1, "Model '%s' has invalid A.I. move switch: '%s'", filename, value);
+		}
 	}
 	value = GET_ARGP(2);
 	//sub A.I. move switches
