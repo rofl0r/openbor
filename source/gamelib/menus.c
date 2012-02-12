@@ -1004,20 +1004,24 @@ typedef struct {
 static int controller_options_toggle_cb(int direction, int* quit, int* selector, void* data) {
 	(void) direction;
 	controller_options_cb_data *cb_data = (controller_options_cb_data*) data;
-	unsigned i;
+	unsigned i, hit;
 	
 	if(*selector == cb_data->max_button)
 		*quit = 2;
 	else if(*selector == cb_data->max_button + 1)
 		*quit = 1;
 	else {
-		*cb_data->setting = *selector;
-		for(i = 0; i < *selector; i++) {
-			if(cb_data->disabled_keys[i])
-				(*cb_data->setting)++;
+		hit = 0;
+		i = 0;
+		while(1) {
+			if(!cb_data->disabled_keys[i])
+				hit++;
+			if(hit > *selector) break;
+			i++;
 		}
-		*cb_data->ok = savedata.keys[cb_data->player_nr][*cb_data->setting];
-		savedata.keys[cb_data->player_nr][*cb_data->setting] = 0;
+		*cb_data->setting = i;
+		*cb_data->ok = savedata.keys[cb_data->player_nr][i];
+		savedata.keys[cb_data->player_nr][i] = 0;
 		keyboard_getlastkey();
 	}
 	return 0;
@@ -1035,8 +1039,8 @@ void controller_options(int player_nr, int *quit, char** buttonnames, char* disa
 		_menutextm(2, -8, 0, "Player %i", player_nr + 1);
 		for(i = 0; i < CB_MAX; i++) {
 			if(!disabledkey[i]) {
-				_menutext((selector == i), col1, data.max_button -6, "%s", buttonnames[i]);
-				_menutext((selector == i), col2, data.max_button -6, "%s", control_getkeyname(savedata.keys[player_nr][i]));
+				_menutext((selector == data.max_button), col1, data.max_button -6, "%s", buttonnames[i]);
+				_menutext((selector == data.max_button), col2, data.max_button -6, "%s", control_getkeyname(savedata.keys[player_nr][i]));
 				data.max_button++;
 			}
 		}
