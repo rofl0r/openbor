@@ -419,6 +419,7 @@ typedef enum {
 	ANI_RISEATTACK10,
 	ANI_RISEATTACKB,
 	ANI_RISEATTACKS,
+	ANI_WALKOFF,
 	MAX_ANIS
 } ani_types;
 #define     ARG_FLOAT            0

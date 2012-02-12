@@ -332,6 +332,9 @@ s_savedata savedata;
 s_game_scripts game_scripts;
 
 extern Script *pcurrentscript;	//used by local script functions
+
+void common_walkoff(void);
+
 //-------------------------methods-------------------------------
 
 #define		DEFAULT_SHUTDOWN_MESSAGE \
@@ -5064,6 +5067,8 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 							}
 						} else if(stricmp(value, "duckattack") == 0) {
 							ani_id = ANI_DUCKATTACK;
+						} else if(stricmp(value, "walkoff")==0){
+							ani_id = ANI_WALKOFF;
 						} else {
 							printf("WARNING: invalid animation name '%s', file '%s', line %u\n", value, filename, line);
 							goto next_line;
@@ -10878,7 +10883,12 @@ void check_gravity() {
 			}
 			if(self->tossv)
 				execute_onmovea_script(self);	//Move A event.
-
+				
+			if(self->idling && validanim(self, ANI_WALKOFF)) {
+				self->idling = 0;
+				self->takeaction = common_walkoff;
+				ent_set_anim(self, ANI_WALKOFF, 0);
+			}
 			// UTunnels: tossv <= 0 means land, while >0 means still rising, so
 			// you wont be stopped if you are passing the edge of a wall
 			if((self->a <= self->base || !inair(self)) && self->tossv <= 0) {
@@ -12503,7 +12513,7 @@ void common_jump() {
 }
 
 //A.I. characters spawn
-void common_spawn() {
+void common_spawn(void) {
 	self->idling = 0;
 	if(self->animating)
 		return;
@@ -12512,7 +12522,7 @@ void common_spawn() {
 }
 
 //A.I. characters drop from the sky
-void common_drop() {
+void common_drop(void) {
 	if(inair(self))
 		return;
 	self->idling = 1;
@@ -12521,8 +12531,16 @@ void common_drop() {
 		kill(self);
 }
 
+//walk off a wall/cliff
+void common_walkoff(void) {
+	if(inair(self) || self->animating)
+		return;
+	self->takeaction = NULL;
+	set_idle(self);
+}
+
 // play turn animation and then flip
-void common_turn() {
+void common_turn(void) {
 	if(!self->animating) {
 		self->xdir = self->zdir = 0;
 		self->direction = !self->direction;
@@ -12532,7 +12550,7 @@ void common_turn() {
 }
 
 // switch to land animation, land safely
-void doland() {
+void doland(void) {
 	self->xdir = self->zdir = 0;
 	self->drop = 0;
 	self->projectile = 0;
@@ -12547,7 +12565,7 @@ void doland() {
 	}
 }
 
-void common_fall() {
+void common_fall(void) {
 	// Still falling?
 	if(self->falling || inair(self) || self->tossv) {
 		return;
@@ -12582,7 +12600,7 @@ void common_fall() {
 	self->staydown[1] = 0;	//Reset staydown atk.
 }
 
-void common_try_riseattack() {
+void common_try_riseattack(void) {
 	entity *target;
 	if(!validanim(self, ANI_RISEATTACK))
 		return;
@@ -12600,7 +12618,7 @@ void common_try_riseattack() {
 	}
 }
 
-void common_lie() {
+void common_lie(void) {
 	// Died?
 	if(self->health <= 0) {
 		// Drop Weapon due to death.
@@ -12655,7 +12673,7 @@ void common_lie() {
 }
 
 // rise proc
-void common_rise() {
+void common_rise(void) {
 	if(self->animating)
 		return;
 	self->staydown[2] = 0;	//Reset riseattack delay.
@@ -12669,7 +12687,7 @@ void common_rise() {
 }
 
 // pain proc
-void common_pain() {
+void common_pain(void) {
 	//self->xdir = self->zdir = 0; // complained
 
 	if(self->animating || inair(self))
@@ -12688,7 +12706,7 @@ void common_pain() {
 	}
 }
 
-void doprethrow() {
+void doprethrow(void) {
 	entity *other = self->link;
 	self->xdir = self->zdir = self->tossv = other->xdir = other->zdir = other->tossv = 0;
 	ent_set_anim(self, ANI_THROW, 0);
@@ -12725,7 +12743,7 @@ void dograbattack(int which) {
 	self->takeaction = common_grabattack;
 }
 
-void dovault() {
+void dovault(void) {
 	int heightvar;
 	entity *other = self->link;
 	self->link->xdir = self->link->zdir = self->xdir = self->zdir = 0;
@@ -12743,7 +12761,7 @@ void dovault() {
 	self->takeaction = common_vault;
 }
 
-void common_grab_check() {
+void common_grab_check(void) {
 	int rnum, which;
 	entity *other = self->link;
 
@@ -12801,7 +12819,7 @@ void common_grab_check() {
 }
 
 //grabbing someone
-void common_grab() {
+void common_grab(void) {
 	// if(self->link) return;
 	if(self->link || (self->modeldata.grabfinish && self->animating && !self->grabwalking))
 		return;
@@ -12813,7 +12831,7 @@ void common_grab() {
 }
 
 // being grabbed
-void common_grabbed() {
+void common_grabbed(void) {
 	// Just check if we're still grabbed...
 	if(self->link)
 		return;
@@ -12824,7 +12842,7 @@ void common_grabbed() {
 }
 
 // picking up something
-void common_get() {
+void common_get(void) {
 	if(self->animating)
 		return;
 
@@ -12834,7 +12852,7 @@ void common_get() {
 }
 
 // A.I. characters do the block
-void common_block() {
+void common_block(void) {
 	if(self->animating)
 		return;
 
@@ -12844,7 +12862,7 @@ void common_block() {
 }
 
 
-void common_charge() {
+void common_charge(void) {
 	if(self->animating)
 		return;
 
@@ -12925,7 +12943,7 @@ entity *drop_driver(entity * e) {
 }
 
 
-void checkdeath() {
+void checkdeath(void) {
 	entity *item;
 	if(self->health > 0)
 		return;
