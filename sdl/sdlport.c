@@ -21,7 +21,7 @@ char logsDir[128] = { "Logs" };
 char screenShotsDir[128] = { "ScreenShots" };
 
 void borExit(int reset) {
-	SDL_Delay(1000);
+	SDL_Delay(10);
 	appExit(0);
 }
 
