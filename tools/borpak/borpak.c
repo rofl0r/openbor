@@ -265,11 +265,11 @@ int put_file(FILE * fd, char *fname) {
 		fname += 2;	/* skip .\ */
 
 	for(p = fname; *p; p++) {	// WIN mode
-		if(*p == '/') {
-			*p = '\\';
-		}		/*else {
-				 *p = toupper(*p);
-				 } */
+		if(*p == '\\') {
+			*p = '/';
+		} else {
+			*p = tolower(*p);
+		}
 	}
 
 	// fflush(fd);
@@ -300,10 +300,7 @@ int put_file(FILE * fd, char *fname) {
 	ps->pn.pns = 12 + len;
 	ps->pn.off = off;
 	ps->pn.size = size;
-	ps->pn.name = malloc(len);
-	if(!ps->pn.name)
-		std_err();
-	memcpy(ps->pn.name, fname, len);
+	ps->pn.name = strdup(fname);
 
 	printf("  %08x %10u   %s\n", off, size, fname);
 	return (0);
