@@ -166,20 +166,9 @@ int findPaks(void) {
 	if(dp != NULL) {
 		while((ds = readdir(dp)) != NULL) {
 			if(packfile_supported(ds)) {
-				fileliststruct *copy = NULL;
-				if(filelist == NULL)
-					filelist = malloc(sizeof(fileliststruct));
-				else {
-					copy = malloc(i * sizeof(fileliststruct));
-					memcpy(copy, filelist, i * sizeof(fileliststruct));
-					free(filelist);
-					filelist = malloc((i + 1) * sizeof(fileliststruct));
-					memcpy(filelist, copy, i * sizeof(fileliststruct));
-					free(copy);
-					copy = NULL;
-				}
+				filelist = realloc(filelist, (i + 1) * sizeof(fileliststruct));
 				memset(&filelist[i], 0, sizeof(fileliststruct));
-				strncpy(filelist[i].filename, ds->d_name, strlen(ds->d_name));
+				filelist[i].filename = strdup(ds->d_name); //TODO free this mem at exit...
 				i++;
 			}
 		}

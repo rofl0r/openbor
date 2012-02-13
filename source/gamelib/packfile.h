@@ -36,7 +36,7 @@ typedef struct pnamestruct {
 } pnamestruct;
 
 typedef struct fileliststruct {
-	char filename[128];
+	char* filename;
 	int nTracks;
 	char bgmFileName[80][256];
 	int bgmTrack;
