@@ -779,7 +779,6 @@ static int readpcx(unsigned char *buf, unsigned char *pal, int maxwidth, int max
 
 
 static int open_type = 0;
-
 static int openimage(char *filename, char *packfile) {
 	char fnam[128];
 	unsigned l = strlen(filename);
@@ -870,7 +869,12 @@ int loadscreen(char *filename, char *packfile, unsigned char *pal, int format, s
 	return 1;
 }
 
+#ifdef DEBUG
+s_bitmap *loadbitmap_(const char* caller_func, char *filename, char *packfile, int format) {
+	PDEBUG("loadbitmap called from %s(): file '%s'\n", caller_func, filename);
+#else
 s_bitmap *loadbitmap(char *filename, char *packfile, int format) {
+#endif
 	int result;
 	s_bitmap *bitmap;
 	int maxwidth, maxheight;
