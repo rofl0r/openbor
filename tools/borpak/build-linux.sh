@@ -5,5 +5,5 @@
 # This should also work on Mac OS X, although it hasn't been tested because 
 # Plombo doesn't own a Mac.
 
-gcc -o borpak borpak.c stristr.c
+gcc -Wall -Wextra -O0 -g -o borpak borpak.c stristr.c
 
