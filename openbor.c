@@ -3847,42 +3847,12 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*newanim)->custstar = (*newanim)->custpshotno = -1;
 	memset((*newanim)->quakeframe, 0, sizeof((*newanim)->quakeframe));
 
-	if(strnicmp((*value), "idle", 4) == 0 &&
-		(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-		tempInt = atoi((*value) + 4);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animidles[tempInt - 1];
-	} else if(stricmp((*value), "waiting") == 0) {
+	if(stricmp((*value), "waiting") == 0) {
 		(*ani_id) = ANI_SELECT;
-	} else if(strnicmp((*value), "walk", 4) == 0 &&
-			(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-		tempInt = atoi((*value) + 4);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animwalks[tempInt - 1];
 	} else if(stricmp((*value), "sleep") == 0) {
 		(*ani_id) = ANI_SLEEP;
 	} else if(stricmp((*value), "run") == 0) {
 		(*ani_id) = ANI_RUN;
-	} else if(strnicmp((*value), "up", 2) == 0 &&
-			(!(*value)[2] || ((*value)[2] >= '1' && (*value)[2] <= '9'))) {
-		tempInt = atoi((*value) + 2);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animups[tempInt - 1];
-	} else if(strnicmp((*value), "down", 4) == 0 &&
-			(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-		tempInt = atoi((*value) + 4);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animdowns[tempInt - 1];
-	} else if(strnicmp((*value), "backwalk", 8) == 0 &&
-			(!(*value)[8] || ((*value)[8] >= '1' && (*value)[8] <= '9'))) {
-		tempInt = atoi((*value) + 8);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animbackwalks[tempInt - 1];
 	} else if(stricmp((*value), "jump") == 0) {
 		(*ani_id) = ANI_JUMP;
 		(*newanim)->range[0] = 50;	// Used for enemies that jump on walls
@@ -3893,33 +3863,12 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*ani_id) = ANI_LAND;
 	} else if(stricmp((*value), "pain") == 0) {
 		(*ani_id) = ANI_PAIN;
-	} else if(strnicmp((*value), "pain", 4) == 0 && (*value)[4] >= '1'
-			&& (*value)[4] <= '9') {
-		tempInt = atoi((*value) + 4);
-		if(tempInt > 0 && tempInt < 11) {
-			(*ani_id) = ANI_PAIN + (tempInt - 1);
-		} else {
-			if(tempInt < MAX_ATKS - STA_ATKS + 1)
-				tempInt = MAX_ATKS - STA_ATKS + 1;
-			(*ani_id) = dyn_anims.animpains[tempInt + STA_ATKS - 1];
-		}
 	} else if(stricmp((*value), "spain") == 0) {	// If shock attacks don't knock opponent down, play this
 		(*ani_id) = ANI_SHOCKPAIN;
 	} else if(stricmp((*value), "bpain") == 0) {	// If burn attacks don't knock opponent down, play this
 		(*ani_id) = ANI_BURNPAIN;
 	} else if(stricmp((*value), "fall") == 0) {
 		(*ani_id) = ANI_FALL;	// If no new animation, load fall animation into both "respawn" & "fall"
-		(*newanim)->bounce = 4;
-	} else if(strnicmp((*value), "fall", 4) == 0 && (*value)[4] >= '1'
-			&& (*value)[4] <= '9') {
-		tempInt = atoi((*value) + 4);
-		if(tempInt > 0 && tempInt < 11) {
-			(*ani_id) = ANI_FALL + (tempInt - 1);
-		} else {
-			if(tempInt < MAX_ATKS - STA_ATKS + 1)
-				tempInt = MAX_ATKS - STA_ATKS + 1;
-			(*ani_id) = dyn_anims.animfalls[tempInt + STA_ATKS - 1];
-		}
 		(*newanim)->bounce = 4;
 	} else if(stricmp((*value), "shock") == 0) {	// If shock attacks do knock opponent down, play this
 		(*ani_id) = ANI_SHOCK;
@@ -3929,16 +3878,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*newanim)->bounce = 4;
 	} else if(stricmp((*value), "death") == 0) {	//  If new animation is present, overwrite new_anim with it.
 		(*ani_id) = ANI_DIE;
-	} else if(strnicmp((*value), "death", 5) == 0 && (*value)[5] >= '1'
-			&& (*value)[5] <= '9') {
-		tempInt = atoi((*value) + 5);
-		if(tempInt > 0 && tempInt < 11) {
-			(*ani_id) = ANI_DIE + (tempInt - 1);
-		} else {
-			if(tempInt < MAX_ATKS - STA_ATKS + 1)
-				tempInt = MAX_ATKS - STA_ATKS + 1;
-			(*ani_id) = dyn_anims.animdies[tempInt + STA_ATKS - 1];
-		}
 	} else if(stricmp((*value), "sdie") == 0) {
 		(*ani_id) = ANI_SHOCKDIE;
 	} else if(stricmp((*value), "bdie") == 0) {
@@ -3953,40 +3892,14 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*ani_id) = ANI_RISES;
 	} else if(stricmp((*value), "rise") == 0) {
 		(*ani_id) = ANI_RISE;	// If no new animation, load fall animation into both "respawn" & "fall"
-	} else if(strnicmp((*value), "rise", 4) == 0 && (*value)[4] >= '1'
-			&& (*value)[4] <= '9') {
-		tempInt = atoi((*value) + 4);
-		if(tempInt > 0 && tempInt < 11) {
-			(*ani_id) = ANI_RISE + (tempInt - 1);
-		} else {
-			if(tempInt < MAX_ATKS - STA_ATKS + 1)
-				tempInt = MAX_ATKS - STA_ATKS + 1;
-			(*ani_id) = dyn_anims.animrises[tempInt + STA_ATKS - 1];
-		}
 	} else if(stricmp((*value), "riseattackb") == 0) {
 		(*ani_id) = ANI_RISEATTACKB;
 	} else if(stricmp((*value), "riseattacks") == 0) {
 		(*ani_id) = ANI_RISEATTACKS;
 	} else if(stricmp((*value), "riseattack") == 0) {
 		(*ani_id) = ANI_RISEATTACK;	// If no new animation, load fall animation into both "respawn" & "fall"
-	} else if(strnicmp((*value), "riseattack", 10) == 0 && (*value)[10] >= '1'
-			&& (*value)[10] <= '9') {
-		tempInt = atoi((*value) + 10);
-		if(tempInt > 0 && tempInt < 11) {
-			(*ani_id) = ANI_RISEATTACK + (tempInt - 1);
-		} else {
-			if(tempInt < MAX_ATKS - STA_ATKS + 1)
-				tempInt = MAX_ATKS - STA_ATKS + 1;
-			(*ani_id) = dyn_anims.animriseattacks[tempInt + STA_ATKS - 1];
-		}
 	} else if(stricmp((*value), "select") == 0) {
 		(*ani_id) = ANI_PICK;
-	} else if(strnicmp((*value), "attack", 6) == 0 &&
-			(!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
-		tempInt = atoi((*value) + 6);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animattacks[tempInt - 1];
 	} else if(stricmp((*value), "throwattack") == 0) {
 		(*ani_id) = ANI_THROWATTACK;
 	} else if(stricmp((*value), "upper") == 0) {
@@ -4013,78 +3926,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 	} else if(stricmp((*value), "special3") == 0
 			|| stricmp((*value), "jumpspecial") == 0) {
 		(*ani_id) = ANI_JUMPSPECIAL;
-	} else if(strnicmp((*value), "freespecial", 11) == 0
-			&& (!(*value)[11] || ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
-		tempInt = atoi((*value) + 11);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animspecials[tempInt - 1];
-		switch (tempInt)	// old default (*value)s
-		{
-			case 1:
-				if(!is_set(newchar, ANI_FREESPECIAL)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_FORWARD;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_FORWARD;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
-					newchar->specials_loaded++;
-				}
-				break;
-			case 2:
-				if(!is_set(newchar, ANI_FREESPECIAL2)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_MOVEDOWN;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_MOVEDOWN;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL2;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
-					newchar->specials_loaded++;
-				}
-				break;
-			case 3:
-				if(!is_set(newchar, ANI_FREESPECIAL3)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_MOVEUP;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_MOVEUP;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL3;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
-					newchar->specials_loaded++;
-				}
-				break;
-		}
 	} else if(stricmp((*value), "jumpattack") == 0) {
 		(*ani_id) = ANI_JUMPATTACK;
 		if(newchar->jumpheight == 4) {
@@ -4177,12 +4018,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*ani_id) = ANI_BLOCK;
 		(*newanim)->range[0] = 1;
 		(*newanim)->range[1] = 100;
-	} else if(strnicmp((*value), "follow", 6) == 0
-			&& (!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
-		tempInt = atoi((*value) + 6);
-		if(tempInt < 1)
-			tempInt = 1;
-		(*ani_id) = dyn_anims.animfollows[tempInt - 1];
 	} else if(stricmp((*value), "chargeattack") == 0) {
 		(*ani_id) = ANI_CHARGEATTACK;
 	} else if(stricmp((*value), "vault") == 0) {
@@ -4209,6 +4044,103 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*ani_id) = ANI_BLOCKPAINS;
 	} else if(stricmp((*value), "blockpain") == 0) {
 		(*ani_id) = ANI_BLOCKPAIN;	// If no new animation, load fall animation into both "respawn" & "fall"
+	} else if(stricmp((*value), "duckattack") == 0) {
+		(*ani_id) = ANI_DUCKATTACK;
+	} else if(stricmp((*value), "walkoff")==0){
+		(*ani_id) = ANI_WALKOFF;
+	} else if(strnicmp((*value), "attack", 6) == 0 &&
+			(!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
+		tempInt = atoi((*value) + 6);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animattacks[tempInt - 1];
+	} else if(strnicmp((*value), "walk", 4) == 0 &&
+			(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
+		tempInt = atoi((*value) + 4);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animwalks[tempInt - 1];
+	} else if(strnicmp((*value), "up", 2) == 0 &&
+			(!(*value)[2] || ((*value)[2] >= '1' && (*value)[2] <= '9'))) {
+		tempInt = atoi((*value) + 2);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animups[tempInt - 1];
+	} else if(strnicmp((*value), "down", 4) == 0 &&
+			(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
+		tempInt = atoi((*value) + 4);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animdowns[tempInt - 1];
+	} else if(strnicmp((*value), "backwalk", 8) == 0 &&
+			(!(*value)[8] || ((*value)[8] >= '1' && (*value)[8] <= '9'))) {
+		tempInt = atoi((*value) + 8);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animbackwalks[tempInt - 1];
+	} else if(strnicmp((*value), "pain", 4) == 0 && (*value)[4] >= '1'
+			&& (*value)[4] <= '9') {
+		tempInt = atoi((*value) + 4);
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_PAIN + (tempInt - 1);
+		} else {
+			if(tempInt < MAX_ATKS - STA_ATKS + 1)
+				tempInt = MAX_ATKS - STA_ATKS + 1;
+			(*ani_id) = dyn_anims.animpains[tempInt + STA_ATKS - 1];
+		}
+	} else if(strnicmp((*value), "idle", 4) == 0 &&
+		(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
+		tempInt = atoi((*value) + 4);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animidles[tempInt - 1];
+	} else if(strnicmp((*value), "follow", 6) == 0
+			&& (!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
+		tempInt = atoi((*value) + 6);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animfollows[tempInt - 1];
+	} else if(strnicmp((*value), "rise", 4) == 0 && (*value)[4] >= '1'
+			&& (*value)[4] <= '9') {
+		tempInt = atoi((*value) + 4);
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_RISE + (tempInt - 1);
+		} else {
+			if(tempInt < MAX_ATKS - STA_ATKS + 1)
+				tempInt = MAX_ATKS - STA_ATKS + 1;
+			(*ani_id) = dyn_anims.animrises[tempInt + STA_ATKS - 1];
+		}
+	} else if(strnicmp((*value), "death", 5) == 0 && (*value)[5] >= '1'
+			&& (*value)[5] <= '9') {
+		tempInt = atoi((*value) + 5);
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_DIE + (tempInt - 1);
+		} else {
+			if(tempInt < MAX_ATKS - STA_ATKS + 1)
+				tempInt = MAX_ATKS - STA_ATKS + 1;
+			(*ani_id) = dyn_anims.animdies[tempInt + STA_ATKS - 1];
+		}
+	} else if(strnicmp((*value), "fall", 4) == 0 && (*value)[4] >= '1'
+			&& (*value)[4] <= '9') {
+		tempInt = atoi((*value) + 4);
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_FALL + (tempInt - 1);
+		} else {
+			if(tempInt < MAX_ATKS - STA_ATKS + 1)
+				tempInt = MAX_ATKS - STA_ATKS + 1;
+			(*ani_id) = dyn_anims.animfalls[tempInt + STA_ATKS - 1];
+		}
+		(*newanim)->bounce = 4;
+	} else if(strnicmp((*value), "riseattack", 10) == 0 && (*value)[10] >= '1'
+			&& (*value)[10] <= '9') {
+		tempInt = atoi((*value) + 10);
+		if(tempInt > 0 && tempInt < 11) {
+			(*ani_id) = ANI_RISEATTACK + (tempInt - 1);
+		} else {
+			if(tempInt < MAX_ATKS - STA_ATKS + 1)
+				tempInt = MAX_ATKS - STA_ATKS + 1;
+			(*ani_id) = dyn_anims.animriseattacks[tempInt + STA_ATKS - 1];
+		}
 	} else if(strnicmp((*value), "blockpain", 9) == 0 && (*value)[9] >= '1'
 			&& (*value)[9] <= '9') {
 		tempInt = atoi((*value) + 9);
@@ -4219,10 +4151,78 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 				tempInt = MAX_ATKS - STA_ATKS + 1;
 			(*ani_id) = dyn_anims.animblkpains[tempInt + STA_ATKS - 1];
 		}
-	} else if(stricmp((*value), "duckattack") == 0) {
-		(*ani_id) = ANI_DUCKATTACK;
-	} else if(stricmp((*value), "walkoff")==0){
-		(*ani_id) = ANI_WALKOFF;
+	} else if(strnicmp((*value), "freespecial", 11) == 0
+			&& (!(*value)[11] || ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
+		tempInt = atoi((*value) + 11);
+		if(tempInt < 1)
+			tempInt = 1;
+		(*ani_id) = dyn_anims.animspecials[tempInt - 1];
+		switch (tempInt)	// old default (*value)s
+		{
+			case 1:
+				if(!is_set(newchar, ANI_FREESPECIAL)) {
+					newchar->special[newchar->
+								specials_loaded][0] =
+						FLAG_FORWARD;
+					newchar->special[newchar->
+								specials_loaded][1] =
+						FLAG_FORWARD;
+					newchar->special[newchar->
+								specials_loaded][2] =
+						FLAG_ATTACK;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 2] =
+						ANI_FREESPECIAL;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->specials_loaded++;
+				}
+				break;
+			case 2:
+				if(!is_set(newchar, ANI_FREESPECIAL2)) {
+					newchar->special[newchar->
+								specials_loaded][0] =
+						FLAG_MOVEDOWN;
+					newchar->special[newchar->
+								specials_loaded][1] =
+						FLAG_MOVEDOWN;
+					newchar->special[newchar->
+								specials_loaded][2] =
+						FLAG_ATTACK;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 2] =
+						ANI_FREESPECIAL2;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->specials_loaded++;
+				}
+				break;
+			case 3:
+				if(!is_set(newchar, ANI_FREESPECIAL3)) {
+					newchar->special[newchar->
+								specials_loaded][0] =
+						FLAG_MOVEUP;
+					newchar->special[newchar->
+								specials_loaded][1] =
+						FLAG_MOVEUP;
+					newchar->special[newchar->
+								specials_loaded][2] =
+						FLAG_ATTACK;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 2] =
+						ANI_FREESPECIAL3;
+					newchar->special[newchar->
+								specials_loaded]
+						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->specials_loaded++;
+				}
+				break;
+		}
 	} else {
 		return 1;
 	}
