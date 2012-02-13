@@ -15,7 +15,6 @@
 #undef exit
 
 char packfile[128] = { "bor.pak" };
-char paksDir[128] = { "Paks" };
 char savesDir[128] = { "Saves" };
 char logsDir[128] = { "Logs" };
 char screenShotsDir[128] = { "ScreenShots" };

@@ -31,6 +31,9 @@
 #define SDL_FreeAndNullVideoSurface(X) { SDL_FreeSurface(X); X=NULL; }
 #endif
 
+#define paksDir "Paks"
+
+
 //#define MEMTEST 1
 
 void initSDL();
@@ -38,7 +41,6 @@ void borExit(int reset);
 void openborMain(int argc, char **argv);
 
 extern char packfile[128];
-extern char paksDir[128];
 extern char savesDir[128];
 extern char logsDir[128];
 extern char screenShotsDir[128];

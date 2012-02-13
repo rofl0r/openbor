@@ -161,7 +161,7 @@ int findPaks(void) {
 #ifdef WII
 	dp = opendir("sd:/apps/OpenBOR/Paks");
 #else
-	dp = opendir("./Paks");
+	dp = opendir(paksDir);
 #endif
 	if(dp != NULL) {
 		while((ds = readdir(dp)) != NULL) {
@@ -601,12 +601,7 @@ void drawMenu() {
 		if(list < 18) {
 			shift = 0;
 			colors = GRAY;
-			strncpy(listing, "", (isWide ? 44 : 28));
-			if(strlen(filelist[list + dListScrollPosition].filename) - 4 < (isWide ? 44 : 28))
-				strncpy(listing, filelist[list + dListScrollPosition].filename,
-					strlen(filelist[list + dListScrollPosition].filename) - 4);
-			if(strlen(filelist[list + dListScrollPosition].filename) - 4 > (isWide ? 44 : 28))
-				strncpy(listing, filelist[list + dListScrollPosition].filename, (isWide ? 44 : 28));
+			strncpy(listing, filelist[list + dListScrollPosition].filename, (isWide ? 44 : 28));
 			if(list == dListCurrentPosition) {
 				shift = 2;
 				colors = RED;
