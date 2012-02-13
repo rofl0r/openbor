@@ -99,26 +99,25 @@ void freeAndNull(void** data) {
 	}
 }
 
+int is_dir(char* fn) {
+	struct stat st;
+	if(stat(fn, &st) != -1 && S_ISDIR(st.st_mode))
+		return 1;
+	return 0;
+}
+
 FILE *openborLog = NULL;
 FILE *scriptLog = NULL;
 char debug_msg[2048];
 unsigned long debug_time = 0xFFFFFFFF;
 
 void getBasePath(char *newName, char *name, int type) {
-#ifndef DC
 	char buf[128] = { "" };
-	switch (type) {
-		case 0:
-			COPY_ROOT_PATH(buf, name);
-			break;
-		case 1:
-			COPY_PAKS_PATH(buf, name);
-			break;
-	}
-	memcpy(newName, buf, sizeof(buf));
-#else
-	memcpy(newName, name, 128);
-#endif
+	(void) type;
+	snprintf(buf, sizeof(buf) - 1, "%s/%s", paksDir, name);
+	if(is_dir(buf)) 
+		strcat(buf, "/");
+	strncpy(newName, buf, sizeof(buf));
 }
 
 

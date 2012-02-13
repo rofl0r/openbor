@@ -36,6 +36,7 @@ void writeToScriptLog(const char *msg);
 
 int fileExists(char *fnam);
 int dirExists(char *dname, int create);
+int is_dir(char* fn);
 stringptr *readFromLogFile(int which);
 void freeAndNull(void** data);
 void lc(char *buf, size_t size);
