@@ -4157,68 +4157,34 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		if(tempInt < 1)
 			tempInt = 1;
 		(*ani_id) = dyn_anims.animspecials[tempInt - 1];
-		switch (tempInt)	// old default (*value)s
-		{
+		switch (tempInt) {	// old default (*value)s
 			case 1:
 				if(!is_set(newchar, ANI_FREESPECIAL)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_FORWARD;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_FORWARD;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->special[newchar->specials_loaded][0] = FLAG_FORWARD;
+					newchar->special[newchar->specials_loaded][1] = FLAG_FORWARD;
+					newchar->special[newchar->specials_loaded][2] = FLAG_ATTACK;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 2] = ANI_FREESPECIAL;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = 3;
 					newchar->specials_loaded++;
 				}
 				break;
 			case 2:
 				if(!is_set(newchar, ANI_FREESPECIAL2)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_MOVEDOWN;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_MOVEDOWN;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL2;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->special[newchar->specials_loaded][0] = FLAG_MOVEDOWN;
+					newchar->special[newchar->specials_loaded][1] = FLAG_MOVEDOWN;
+					newchar->special[newchar->specials_loaded][2] = FLAG_ATTACK;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 2] = ANI_FREESPECIAL2;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = 3;
 					newchar->specials_loaded++;
 				}
 				break;
 			case 3:
 				if(!is_set(newchar, ANI_FREESPECIAL3)) {
-					newchar->special[newchar->
-								specials_loaded][0] =
-						FLAG_MOVEUP;
-					newchar->special[newchar->
-								specials_loaded][1] =
-						FLAG_MOVEUP;
-					newchar->special[newchar->
-								specials_loaded][2] =
-						FLAG_ATTACK;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] =
-						ANI_FREESPECIAL3;
-					newchar->special[newchar->
-								specials_loaded]
-						[MAX_SPECIAL_INPUTS - 3] = 3;
+					newchar->special[newchar->specials_loaded][0] = FLAG_MOVEUP;
+					newchar->special[newchar->specials_loaded][1] = FLAG_MOVEUP;
+					newchar->special[newchar->specials_loaded][2] = FLAG_ATTACK;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 2] = ANI_FREESPECIAL3;
+					newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = 3;
 					newchar->specials_loaded++;
 				}
 				break;
