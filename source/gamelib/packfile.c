@@ -312,9 +312,8 @@ int isRawData() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-int openpackfile(const char *filename, const char *packfilename) {
 #ifdef DEBUG
+int openpackfile_(const char* caller_func, const char *filename, const char *packfilename) {
 	char *pointsto;
 
 	if(pOpenPackfile == openPackfileCached)
@@ -323,7 +322,9 @@ int openpackfile(const char *filename, const char *packfilename) {
 		pointsto = "openPackFile";
 	else
 		pointsto = "unknown destination";
-	PDEBUG("openpackfile called: f: %s, p: %s, dest: %s\n", filename, packfilename, pointsto);
+	PDEBUG("openpackfile called from %s(): f: %s, p: %s, dest: %s\n", caller_func, filename, packfilename, pointsto);
+#else
+int openpackfile(const char *filename, const char *packfilename) {
 #endif
 	return pOpenPackfile(filename, packfilename);
 }

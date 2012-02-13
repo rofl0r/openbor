@@ -55,7 +55,12 @@ typedef struct fileliststruct {
 extern int printFileUsageStatistics;
 
 // All of these return -1 on error
+#ifdef DEBUG
+int openpackfile_(const char* caller_func, const char *filename, const char *packfilename);
+#define openpackfile(x, y) openpackfile_(__FUNCTION__, x, y)
+#else
 int openpackfile(const char *filename, const char *packfilename);
+#endif
 int readpackfile(int handle, void *buf, int len);
 int closepackfile(int handle);
 int seekpackfile(int handle, int offset, int whence);
