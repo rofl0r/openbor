@@ -24,7 +24,7 @@
 */
 #include <assert.h>
 #ifndef SPK_SUPPORTED
-
+#include "sdlport.h"
 #include <fcntl.h>
 #include "debug.h"
 #include <string.h>
@@ -35,6 +35,8 @@
 #include "filecache.h"
 #include "globals.h"
 #include "openbor.h"
+
+#include <sys/stat.h>
 
 #define	stricmp	strcasecmp
 
@@ -100,6 +102,7 @@ typedef int (*SeekPackfile) (int, int, int);
 typedef int (*ClosePackfile) (int);
 
 int openPackfile(const char *, const char *);
+int openRealfile(const char *filename, const char *packfilename);
 int readPackfile(int, void *, int);
 int seekPackfile(int, int, int);
 int closePackfile(int);
@@ -179,78 +182,6 @@ int myfilenamecmp(const char *a, size_t asize, const char *b, size_t bsize) {
 	return -2;		// should never be reached
 }
 
-// Convert slashes (UNIX) to backslashes (DOS).
-// Return a pointer to buffer with filename converted to DOS format.
-static char *slashback(const char *sz) {
-	int i = 0;
-	static char new[256];
-	while(sz[i] && i < 255) {
-		new[i] = sz[i];
-		if(new[i] == '/')
-			new[i] = '\\';
-		++i;
-	}
-	new[i] = 0;
-	return new;
-}
-
-#ifndef WIN
-// Convert backslashes (DOS) to forward slashes (everything else).
-// Return a pointer to buffer with filename using forward slash as separator.
-static char *slashfwd(const char *sz) {
-	int i = 0;
-	static char new[256];
-	while(sz[i] && i < 255) {
-		new[i] = sz[i];
-		if(new[i] == '\\')
-			new[i] = '/';
-		++i;
-	}
-	new[i] = 0;
-	return new;
-}
-#endif
-
-char *casesearch(const char *dir, const char *filepath) {
-	DIR *d;
-	struct dirent *entry;;
-	char filename[256] = { "" }, *rest_of_path;
-	static char fullpath[256];
-	int i = 0;
-	PDEBUG("casesearch: %s, %s\n", dir, filepath);
-
-	if((d = opendir(dir)) == NULL)
-		return NULL;
-
-	// are we searching for a file or a directory?
-	rest_of_path = strchr(filepath, '/');
-	if(rest_of_path != NULL)	// directory
-	{
-		assert(rest_of_path - filepath > 0);
-		strncat(filename, filepath, rest_of_path - filepath);
-		rest_of_path++;
-	} else
-		strcpy(filename, filepath);	// file
-
-	while((entry = readdir(d)) != NULL) {
-		if(stricmp(entry->d_name, filename) == 0) {
-			i = 1;
-			break;
-		}
-	}
-
-	if(entry != NULL && entry->d_name != NULL)
-		sprintf(fullpath, "%s/%s", dir, entry->d_name);
-
-	if(closedir(d))
-		return NULL;
-	if(i == 0)
-		return NULL;
-
-	return rest_of_path == NULL ? fullpath : casesearch(fullpath, rest_of_path);
-}
-
-
 /////////////////////////////////////////////////////////////////////////////
 
 int getFreeHandle(void) {
@@ -269,12 +200,18 @@ void packfile_mode(int mode) {
 		pReadPackfile = readPackfile;
 		pSeekPackfile = seekPackfile;
 		pClosePackfile = closePackfile;
-		return;
+	} else {
+		pOpenPackfile = openPackfileCached;
+		pReadPackfile = readPackfileCached;
+		pSeekPackfile = seekPackfileCached;
+		pClosePackfile = closePackfileCached;
 	}
-	pOpenPackfile = openPackfileCached;
-	pReadPackfile = readPackfileCached;
-	pSeekPackfile = seekPackfileCached;
-	pClosePackfile = closePackfileCached;
+	if(packfile[strlen(packfile)-1] == '/') {
+		pOpenPackfile = openRealfile;
+		pReadPackfile = readPackfile;
+		pSeekPackfile = seekPackfile;
+		pClosePackfile = closePackfile;
+	}
 }
 
 
@@ -303,31 +240,36 @@ int openpackfile_(const char* caller_func, const char *filename, const char *pac
 #else
 int openpackfile(const char *filename, const char *packfilename) {
 #endif
+	packfile_mode(0);
 	return pOpenPackfile(filename, packfilename);
 }
 
-int openPackfile(const char *filename, const char *packfilename) {
+void sanitize(char* filename) {
+	unsigned i;
+	for(i = 0; filename[i]; i++) {
+		if(filename[i] == '\\')
+			filename[i] = '/';
+		else 
+			filename[i] = tolower(filename[i]);
+	}
+}
+
+int openRealfile(const char *filename, const char *packfilename) {
 	int h, handle;
-	unsigned int magic, version, headerstart, p;
-	pnamestruct pn;
-	char *fspath;
+	char buf[256];
+	unsigned l = strlen(packfilename);
 
 	h = getFreeHandle();
 	if(h == -1)
 		return -1;
-
-#ifdef WIN
-	// Convert slashes to backslashes
-	filename = slashback(filename);
-#else
-	// Convert backslashes to slashes
-	filename = slashfwd(filename);
-#endif
+	
+	snprintf(buf, sizeof buf, "%s/%s", packfilename, filename);
+	sanitize(buf + l);
 
 	packfilepointer[h] = 0;
 
 	// Separate file present?
-	if((handle = open(filename, O_RDONLY | O_BINARY, 777)) != -1) {
+	if((handle = open(buf, O_RDONLY | O_BINARY, 777)) != -1) {
 		if((packfilesize[h] = lseek(handle, 0, SEEK_END)) == -1) {
 			PDEBUG("err handles 1\n");
 			close(handle);
@@ -340,29 +282,26 @@ int openPackfile(const char *filename, const char *packfilename) {
 		}
 		packhandle[h] = handle;
 		return h;
+	} else {
+		perror(buf);
 	}
-	// Try a case-insensitive search for a separate file.
-	fspath = casesearch(".", filename);
-	if(fspath != NULL) {
-		if((handle = open(fspath, O_RDONLY | O_BINARY, 777)) != -1) {
-			if((packfilesize[h] = lseek(handle, 0, SEEK_END)) == -1) {
-				PDEBUG("err handles 3\n");
-				close(handle);
-				return -1;
-			}
-			if(lseek(handle, 0, SEEK_SET) == -1) {
-				PDEBUG("err handles 4\n");
-				close(handle);
-				return -1;
-			}
-			packhandle[h] = handle;
-			return h;
-		}
-	}
-#ifndef WIN
-	// Convert slashes to backslashes
-	filename = slashback(filename);
-#endif
+	return -1;
+}
+
+int openPackfile(const char *filename, const char *packfilename) {
+	int h, handle;
+	unsigned int magic, version, headerstart, p;
+	pnamestruct pn;
+	char buf[256];
+
+	h = getFreeHandle();
+	if(h == -1)
+		return -1;
+	
+	snprintf(buf, sizeof buf, "%s", filename);
+	sanitize(buf);
+
+	packfilepointer[h] = 0;
 
 	// Try to open packfile
 	if((handle = open(packfilename, O_RDONLY | O_BINARY, 777)) == -1) {
@@ -412,7 +351,7 @@ int openPackfile(const char *filename, const char *packfilename) {
 		pn.filestart = SwapLSB32(pn.filestart);
 		pn.pns_len = SwapLSB32(pn.pns_len);
 
-		if(stricmp(filename, pn.namebuf) == 0) {
+		if(strcmp(buf, pn.namebuf) == 0) {
 			packhandle[h] = handle;
 			packfilesize[h] = pn.filesize;
 			lseek(handle, pn.filestart, SEEK_SET);
@@ -926,9 +865,15 @@ int packfileeof(int handle) {
 /////////////////////////////////////////////////////////////////////////////
 
 int packfile_supported(struct dirent *ds) {
+	char buf[256];
 	if(stricmp(ds->d_name, "menu.pak") != 0) {
 		if(stristr(ds->d_name, ".pak"))
 			return 1;
+		else {
+			snprintf(buf, sizeof(buf), "%s/%s", paksDir, ds->d_name);
+			if(is_dir(buf) && ds->d_name[0] != '.')
+				return 2;
+		}
 	}
 	return 0;
 }
