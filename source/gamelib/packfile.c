@@ -121,32 +121,13 @@ static ClosePackfile pClosePackfile;
 char tolowerOneChar(const char *c) {
 	static const char diff = 'a' - 'A';
 	switch (*c) {
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
-		case 'M':
-		case 'N':
-		case 'O':
-		case 'P':
-		case 'Q':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'U':
-		case 'V':
-		case 'W':
-		case 'X':
-		case 'Y':
-		case 'Z':
+		case 'A': case 'B': case 'C': case 'D':
+		case 'E': case 'F': case 'G': case 'H':
+		case 'I': case 'J': case 'K': case 'L':
+		case 'M': case 'N': case 'O': case 'P':
+		case 'Q': case 'R': case 'S': case 'T':
+		case 'U': case 'V': case 'W': case 'X':
+		case 'Y': case 'Z': 
 			return *c + diff;
 		case '\\':
 			return '/';
@@ -282,12 +263,8 @@ int getFreeHandle(void) {
 	return h;
 }
 
-
 void packfile_mode(int mode) {
 	if(!mode) {
-#ifdef DC
-		fs_chdir("/cd");
-#endif
 		pOpenPackfile = openPackfile;
 		pReadPackfile = readPackfile;
 		pSeekPackfile = seekPackfile;
@@ -793,113 +770,16 @@ int seekPackfileCached(int handle, int offset, int whence) {
 	return pak_vfdpos[handle];
 }
 
-#ifdef PS2
-static void flushfd(int fd) {
-	int busy = 1;
-	while(busy)
-		sceIoctl(fd, SCE_FS_EXECUTING, &busy);
-}
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // returns number of sectors read successfully
 //
 static int pak_getsectors(void *dest, int lba, int n) {
-#ifdef PS2
-	sceLseek(pakfd, lba << 11, SCE_SEEK_SET);
-	flushfd(pakfd);
-	sceRead(pakfd, dest, n << 11);
-	flushfd(pakfd);
-#elif DC
-	if((lba + n) > ((paksize + 0x7FF) / 0x800)) {
-		n = ((paksize + 0x7FF) / 0x800) - lba;
-	}
-	if(pakfd >= 0) {
-		lseek(pakfd, lba << 11, SEEK_SET);
-		read(pakfd, dest, n << 11);
-	} else {
-		gdrom_readsectors(dest, (-pakfd) + lba, n);
-		while(gdrom_poll()) ;
-	}
-#else
 	int disCcWarns;
 	lseek(pakfd, lba << 11, SEEK_SET);
 	disCcWarns = read(pakfd, dest, n << 11);
-#endif
 	return n;
 }
-
-#ifdef DC
-/////////////////////////////////////////////////////////////////////////////
-//
-// returns 0 if they match
-//
-static int fncmp(const char *filename, const char *isofilename, int isolen) {
-	for(; isolen > 0; isolen--) {
-		char cf = *filename++;
-		char ci = *isofilename++;
-		if(!cf) {
-			// allowed to omit the version on filename
-			if(ci == ';' || ci == 0)
-				return 0;
-			return 1;
-		}
-		if(cf >= 'A' && cf <= 'Z')
-			cf += 'a' - 'A';
-		if(ci >= 'A' && ci <= 'Z')
-			ci += 'a' - 'A';
-		if(cf != ci)
-			return 1;
-	}
-	// allowed to omit the version on isofilename too O_o
-	if(*filename == ';' || *filename == 0)
-		return 0;
-	return 1;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// input: starting lba of the track
-// returns starting lba of the file, or 0 on failure
-//
-int find_iso_file(const char *filename, int lba, int *bytes) {
-	int dirlen;
-	unsigned char sector[4096];
-	int secofs;
-
-	// read the root descriptor
-	gdrom_readsectors(sector, lba + 16, 1);
-	while(gdrom_poll()) ;
-	// get the root directory extent and size
-	lba = 150 + readmsb32(sector + 156 + 6);
-	dirlen = readmsb32(sector + 156 + 14);
-
-	// at this point, lba is the lba of the root dir
-	secofs = 4096;
-	while(dirlen > 0) {
-		if(secofs >= 4096 || ((secofs + sector[secofs]) > 4096)) {
-			memcpy(sector, sector + 2048, 2048);
-			gdrom_readsectors(sector + 2048, lba, 1);
-			while(gdrom_poll()) ;
-			lba++;
-			secofs -= 2048;
-		}
-		if(!sector[secofs])
-			break;
-		if(!fncmp(filename, sector + secofs + 33, sector[secofs + 32])) {
-			lba = 150 + readmsb32(sector + secofs + 6);
-			if(bytes)
-				*bytes = readmsb32(sector + secofs + 14);
-			return lba;
-		}
-		secofs += sector[secofs];
-		dirlen -= sector[secofs];
-	}
-	// didn't find the file
-	return 0;
-}
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -949,47 +829,19 @@ int pak_init() {
 	pSeekPackfile = seekPackfileCached;
 	pClosePackfile = closePackfileCached;
 
-#if DC
-	if(cd_lba) {
-		paksize = 0;
-		pakfd = find_iso_file(packfile, cd_lba, &paksize);
-		if(pakfd <= 0) {
-			printf("unable to find pak file on cd\n");
-			return 0;
-		}
-		pakfd = -pakfd;
-	} else {
-#endif
 
-#ifdef PS2
-		pakfd = sceOpen(ps2gethostfilename(packfile), SCE_RDONLY | SCE_NOWAIT, 0);
-#else
-		pakfd = open(packfile, O_RDONLY | O_BINARY, 777);
-#endif
+	pakfd = open(packfile, O_RDONLY | O_BINARY, 777);
 
-		if(pakfd < 0) {
-			printf("error opening %s (%d) - could not get a valid device descriptor.\n%s\n", packfile,
-			       pakfd, strerror(errno));
-			return 0;
-		}
-#ifdef PS2
-		paksize = sceLseek(pakfd, 0, SCE_SEEK_END);
-#else
-		paksize = lseek(pakfd, 0, SEEK_END);
-#endif
-
-#ifdef DC
+	if(pakfd < 0) {
+		printf("error opening %s (%d) - could not get a valid device descriptor.\n%s\n", packfile,
+			pakfd, strerror(errno));
+		return 0;
 	}
-#endif
+	paksize = lseek(pakfd, 0, SEEK_END);
 
-	// Is it a valid Packfile
-#ifdef PS2
-	sceClose(pakfd);
-	pakfd = sceOpen(ps2gethostfilename(packfile), SCE_RDONLY, 0);
-#else
+	// TODO woot ? fix this
 	close(pakfd);
 	pakfd = open(packfile, O_RDONLY | O_BINARY, 777);
-#endif
 
 	// Read magic dword ("PACK")
 	if(read(pakfd, &magic, 4) != 4 || magic != SwapLSB32(PACKMAGIC)) {
