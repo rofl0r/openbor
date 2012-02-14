@@ -832,7 +832,7 @@ int load_saved_game(void) {
 	bothnewkeys = 0;
 
 	if((savedStatus = loadGameFile()))
-		getPakName(name, 0);
+		getSaveFileName(name, ST_SAVE);
 	for(saveslot = 0; saveslot < MAX_DIFFICULTIES; saveslot++)
 		if(savelevel[saveslot].flag && savelevel[saveslot].level)
 			break;

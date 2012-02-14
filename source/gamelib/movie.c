@@ -19,7 +19,7 @@ void movie_openfile(int save) {
 		return;
 	memset(moviebuffer, 0, sizeof(*moviebuffer) * MOVIEBUF_LEN);
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 3);
+	getSaveFileName(tmpname, ST_INP); // TODO shouldnt this be ST_SCR ?
 	strcat(path, tmpname);
 	if(save)
 		moviefile = fopen(path, "wb");

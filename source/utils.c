@@ -113,8 +113,11 @@ unsigned long debug_time = 0xFFFFFFFF;
 
 void getBasePath(char *newName, char *name, int type) {
 	char buf[128] = { "" };
-	(void) type;
-	snprintf(buf, sizeof(buf) - 1, "%s/%s", paksDir, name);
+	if(type) 
+		snprintf(buf, sizeof(buf) - 1, "%s/%s", paksDir, name);
+	else 
+		snprintf(buf, sizeof(buf) - 1, "%s/", name);
+	
 	if(is_dir(buf)) 
 		strcat(buf, "/");
 	strncpy(newName, buf, sizeof(buf));
@@ -229,28 +232,45 @@ void debug_printf(char *format, ...) {
 	debug_time = 0xFFFFFFFF;
 }
 
-const char* file_exts[] = {
-	".sav",
-	".hi",
-	".scr",
-	".inp",
-	".cfg",
+const char* savefile_exts[] = {
+	[ST_SAVE] = ".sav",
+	[ST_HISCORE] = ".hi",
+	[ST_SCRIPT] = ".scr",
+	[ST_INP] = ".inp",
+	[ST_CFG] = ".cfg",
 };
 
-const int file_exts_itemcount = ARRAY_SIZE(file_exts);
+int packfile_is_dir(void) {
+	return packfile[strlen(packfile) - 1] == '/';
+}
 
-void getPakName(char name[256], unsigned int type) {
+void getSaveFileName(char name[256], savefile_type type) {
 
 	char mod[256] = { "" };
 	const char* ext = "";
 	char* fn;
-	int l;
+	unsigned s, l;
 	
-	if(type < file_exts_itemcount)
-		ext = file_exts[type];
+	if(type < ST_MAX)
+		ext = savefile_exts[type];
 	
-	l = strlen(packfile) - 4;
-	memcpy(mod, packfile, l);
+	l = strlen(paksDir);
+	if(memcmp(packfile, paksDir, l))
+		s = 0;
+	else {
+		s = l;
+		if(paksDir[l - 1] != '/')
+			s++;
+	}
+	
+	l = strlen(packfile) - s;
+	if(!packfile_is_dir())
+		l -= 4; // strip off ".pak"
+	else 
+		l-=1; // strip off "/"
+		
+	
+	memcpy(mod, packfile + s, l);
 	memcpy(mod + l, ext, strlen(ext));
 	
 	if((fn = strrchr(mod, '/')) || (fn = strrchr(mod, '\\')))
@@ -264,7 +284,7 @@ void screenshot(s_screen * vscreen, unsigned char *pal, int ingame) {
 	char shotname[128] = { "" };
 	char modname[128] = { "" };
 
-	getPakName(modname, 99);
+	getSaveFileName(modname, 99);
 	do {
 		sprintf(shotname, "./ScreenShots/%s - %04u.png", modname, shotnum);
 		++shotnum;

@@ -1284,35 +1284,80 @@ void clearsettings(void) {
 	savedata = savedata_default;
 }
 
-
-void savesettings(void) {
+void save(char* dest, char* buf, size_t size) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[128] = { "" };
-	char tmpname[128] = { "" };
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 4);
-	strcat(path, tmpname);
+	strncat(path, dest, 128);
 	handle = fopen(path, "wb");
 	if(handle == NULL)
 		return;
 	disCcWarns = fwrite(&savedata, 1, sizeof(s_savedata), handle);
 	fclose(handle);
+}
+
+void savesettings(void) {
+	char tmpname[128] = { "" };
+	getSaveFileName(tmpname, ST_CFG);
+	save(tmpname, (char*) &savedata, sizeof(s_savedata));
 }
 
 void saveasdefault(void) {
+	save("default.cfg", (char*) &savedata, sizeof(s_savedata));
+}
+
+void saveGameFile(void) {
+	char tmpname[256] = { "" };
+	getSaveFileName(tmpname, ST_SAVE);
+	save(tmpname, (char*) &savelevel, sizeof(s_savelevel) * MAX_DIFFICULTIES);
+}
+
+void saveHighScoreFile(void) {
+	char tmpname[256] = { "" };
+	getSaveFileName(tmpname, ST_HISCORE);
+	save(tmpname, (char*) &savescore, sizeof(s_savescore));
+}
+
+void saveScriptFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
-	char path[128] = { "" };
+	int i, l, c;
+	char path[256] = { "" };
+	char tmpname[256] = { "" };
+	//named list
+	//if(max_global_vars<=0) return ;
 	getBasePath(path, "Saves", 0);
-	strncat(path, "default.cfg", 128);
+	getSaveFileName(tmpname, ST_SCRIPT);
+	strcat(path, tmpname);
+	l = strlen(path);	//s00, s01, s02 etc
+	path[l - 2] = '0' + (current_set / 10);
+	path[l - 1] = '0' + (current_set % 10);
 	handle = fopen(path, "wb");
 	if(handle == NULL)
 		return;
-	disCcWarns = fwrite(&savedata, 1, sizeof(s_savedata), handle);
+	//global variables count
+	for(i = 0, c = 0; i <= max_global_var_index; i++) {
+		if(!global_var_list[i]->owner)
+			c++;
+	}
+	disCcWarns = fwrite(&c, sizeof(c), 1, handle);
+	for(i = 0; i <= max_global_var_index; i++) {
+		if(!global_var_list[i]->owner)
+			disCcWarns = fwrite(global_var_list[i], sizeof(s_variantnode), 1, handle);
+	}
+	// indexed list
+	if(max_indexed_vars <= 0)
+		goto CLOSEF;
+	disCcWarns = fwrite(indexed_var_list + i, sizeof(ScriptVariant), max_indexed_vars, handle);
+	CLOSEF:
 	fclose(handle);
 }
 
+// TODO: omg, fix this
+// TODO: omg, fix this
+// TODO: omg, fix this
+// TODO: omg, fix this
 
 void loadsettings(void) {
 	int disCcWarns;
@@ -1320,7 +1365,7 @@ void loadsettings(void) {
 	char path[128] = { "" };
 	char tmpname[128] = { "" };
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 4);
+	getSaveFileName(tmpname, ST_CFG);
 	strcat(path, tmpname);
 	if(!(fileExists(path))) {
 		loadfromdefault();
@@ -1352,40 +1397,6 @@ void loadfromdefault(void) {
 		clearsettings();
 }
 
-void clearSavedGame(void) {
-	int i;
-
-	for(i = 0; i < MAX_DIFFICULTIES; i++) {
-		memset(savelevel + i, 0, sizeof(s_savelevel));
-		savelevel[i].compatibleversion = CV_SAVED_GAME;
-	}
-}
-
-void clearHighScore(void) {
-	unsigned i;
-	savescore.compatibleversion = CV_HIGH_SCORE;
-	
-	for(i = 0; i < 10; i++) {
-		savescore.highsc[i] = 0;
-		strcpy(savescore.hscoren[i], "None");
-	}
-}
-
-void saveGameFile(void) {
-	int disCcWarns;
-	FILE *handle = NULL;
-	char path[256] = { "" };
-	char tmpname[256] = { "" };
-	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 0);
-	strcat(path, tmpname);
-	//if(!savelevel[saveslot].level) return;
-	handle = fopen(path, "wb");
-	if(handle == NULL)
-		return;
-	disCcWarns = fwrite(&savelevel, sizeof(s_savelevel), MAX_DIFFICULTIES, handle);
-	fclose(handle);
-}
 
 
 int loadGameFile(void) {
@@ -1395,7 +1406,7 @@ int loadGameFile(void) {
 	char path[256] = { "" };
 	char tmpname[256] = { "" };
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 0);
+	getSaveFileName(tmpname, ST_SAVE);
 	strcat(path, tmpname);
 	handle = fopen(path, "rb");
 	if(handle == NULL)
@@ -1408,29 +1419,13 @@ int loadGameFile(void) {
 	return 1;
 }
 
-
-void saveHighScoreFile(void) {
-	int disCcWarns;
-	FILE *handle = NULL;
-	char path[256] = { "" };
-	char tmpname[256] = { "" };
-	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 1);
-	strcat(path, tmpname);
-	handle = fopen(path, "wb");
-	if(handle == NULL)
-		return;
-	disCcWarns = fwrite(&savescore, 1, sizeof(s_savescore), handle);
-	fclose(handle);
-}
-
 void loadHighScoreFile(void) {
 	int disCcWarns;
 	FILE *handle = NULL;
 	char path[256] = { "" };
 	char tmpname[256] = { "" };
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 1);
+	getSaveFileName(tmpname, ST_HISCORE);
 	strcat(path, tmpname);
 	clearHighScore();
 	handle = fopen(path, "rb");
@@ -1442,40 +1437,6 @@ void loadHighScoreFile(void) {
 		clearHighScore();
 }
 
-void saveScriptFile(void) {
-	int disCcWarns;
-	FILE *handle = NULL;
-	int i, l, c;
-	char path[256] = { "" };
-	char tmpname[256] = { "" };
-	//named list
-	//if(max_global_vars<=0) return ;
-	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 2);	//.scr
-	strcat(path, tmpname);
-	l = strlen(path);	//s00, s01, s02 etc
-	path[l - 2] = '0' + (current_set / 10);
-	path[l - 1] = '0' + (current_set % 10);
-	handle = fopen(path, "wb");
-	if(handle == NULL)
-		return;
-	//global variables count
-	for(i = 0, c = 0; i <= max_global_var_index; i++) {
-		if(!global_var_list[i]->owner)
-			c++;
-	}
-	disCcWarns = fwrite(&c, sizeof(c), 1, handle);
-	for(i = 0; i <= max_global_var_index; i++) {
-		if(!global_var_list[i]->owner)
-			disCcWarns = fwrite(global_var_list[i], sizeof(s_variantnode), 1, handle);
-	}
-	// indexed list
-	if(max_indexed_vars <= 0)
-		goto CLOSEF;
-	disCcWarns = fwrite(indexed_var_list + i, sizeof(ScriptVariant), max_indexed_vars, handle);
-	CLOSEF:
-	fclose(handle);
-}
 
 
 void loadScriptFile(void) {
@@ -1490,7 +1451,7 @@ void loadScriptFile(void) {
 	//named list
 	//if(max_global_vars<=0) return ;
 	getBasePath(path, "Saves", 0);
-	getPakName(tmpname, 2);	//.scr
+	getSaveFileName(tmpname, ST_SCRIPT);
 	strcat(path, tmpname);
 	l = strlen(path);	//s00, s01, s02 etc
 	path[l - 2] = '0' + (current_set / 10);
@@ -1523,6 +1484,27 @@ void loadScriptFile(void) {
 	disCcWarns = fread(indexed_var_list, size, 1, handle);
 	fclose(handle);
 }
+
+void clearSavedGame(void) {
+	int i;
+
+	for(i = 0; i < MAX_DIFFICULTIES; i++) {
+		memset(savelevel + i, 0, sizeof(s_savelevel));
+		savelevel[i].compatibleversion = CV_SAVED_GAME;
+	}
+}
+
+void clearHighScore(void) {
+	unsigned i;
+	savescore.compatibleversion = CV_HIGH_SCORE;
+	
+	for(i = 0; i < 10; i++) {
+		savescore.highsc[i] = 0;
+		strcpy(savescore.hscoren[i], "None");
+	}
+}
+
+
 
 // ----------------------- Sound ------------------------------
 
