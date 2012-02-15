@@ -1434,6 +1434,17 @@ typedef struct {
 } s_filestream;
 
 typedef struct {
+	float x;
+	float z;
+	float upperleft;
+	float lowerleft;
+	float upperright;
+	float lowerright;
+	float depth;
+	float alt;	
+} s_wall;
+
+typedef struct {
 	char *name;
 	int numspawns;
 	s_spawn_entry spawnpoints[LEVEL_MAX_SPAWNS];
@@ -1452,7 +1463,7 @@ typedef struct {
 	int numwalls;		// Stores number of walls loaded
 	float holes[LEVEL_MAX_HOLES][7];
 	int holesfound[LEVEL_MAX_HOLES];
-	float walls[LEVEL_MAX_WALLS][8];	// Now you can have walls for different walkable areas
+	s_wall walls[LEVEL_MAX_WALLS];	// Now you can have walls for different walkable areas
 	int wallsfound[LEVEL_MAX_WALLS];
 	int exit_blocked;
 	int exit_hole;

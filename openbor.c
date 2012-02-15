@@ -8289,14 +8289,9 @@ void load_level(char *filename) {
 					errormessage = "Too many walls in level (check LEVEL_MAX_WALLS)!";
 					goto lCleanup;
 				}
-				level->walls[level->numwalls][0] = GET_FLOAT_ARG(1);
-				level->walls[level->numwalls][1] = GET_FLOAT_ARG(2);
-				level->walls[level->numwalls][2] = GET_FLOAT_ARG(3);
-				level->walls[level->numwalls][3] = GET_FLOAT_ARG(4);
-				level->walls[level->numwalls][4] = GET_FLOAT_ARG(5);
-				level->walls[level->numwalls][5] = GET_FLOAT_ARG(6);
-				level->walls[level->numwalls][6] = GET_FLOAT_ARG(7);
-				level->walls[level->numwalls][7] = GET_FLOAT_ARG(8);
+				for(i = 0; i < sizeof(s_wall) / sizeof(float); i++) {
+					((float*) &level->walls[level->numwalls])[i] = GET_FLOAT_ARG(i + 1);
+				}
 				level->numwalls++;
 				break;
 			case CMD_LEVEL_PALETTE:
@@ -9659,7 +9654,7 @@ void ent_default_init(entity * e) {
 	if(e->modeldata.subject_to_platform > 0 && (other = check_platform_below(e->x, e->z, e->a + 1)) && other != e)
 		e->base += other->a + other->animation->platform[other->animpos][7];
 	else if(e->modeldata.subject_to_wall > 0 && (wall = checkwall_below(e->x, e->z, 9999999)) >= 0)
-		e->base += level->walls[wall][7];
+		e->base += level->walls[wall].alt;
 }
 
 void ent_spawn_ent(entity * ent) {
@@ -10429,16 +10424,13 @@ within the bottom/top and the left/right area.
 */
 int testwall(int wall, float x, float z) {
 	float coef1, coef2;
+
 //    if(wall >= level->numwalls || wall < 0) return 0;
-	if(z < level->walls[wall][1] && z > level->walls[wall][1] - level->walls[wall][6]) {
-		coef1 =
-		    (level->walls[wall][1] -
-		     z) * ((level->walls[wall][2] - level->walls[wall][3]) / level->walls[wall][6]);
-		coef2 =
-		    (level->walls[wall][1] -
-		     z) * ((level->walls[wall][4] - level->walls[wall][5]) / level->walls[wall][6]);
-		if(x > level->walls[wall][0] + level->walls[wall][3] + coef1
-		   && x < level->walls[wall][0] + level->walls[wall][5] + coef2)
+	if(z < level->walls[wall].z && z > level->walls[wall].z - level->walls[wall].depth) {
+		coef1 = (level->walls[wall].z - z) * ((level->walls[wall].upperleft - level->walls[wall].lowerleft) / level->walls[wall].depth);
+		coef2 = (level->walls[wall].z - z) * ((level->walls[wall].upperright - level->walls[wall].lowerright) / level->walls[wall].depth);
+		if(x > level->walls[wall].x + level->walls[wall].lowerleft + coef1
+		   && x < level->walls[wall].x + level->walls[wall].lowerright + coef2)
 			return 1;
 	}
 
@@ -10451,7 +10443,7 @@ int checkwalls(float x, float z, float a1, float a2) {
 
 	for(i = 0, c = 0; i < level->numwalls; i++)
 		c += (level->wallsfound[i] =
-		      (testwall(i, x, z) && level->walls[i][7] >= a1 && level->walls[i][7] <= a2));
+		      (testwall(i, x, z) && level->walls[i].alt >= a1 && level->walls[i].alt <= a2));
 
 	return c;
 }
@@ -10467,8 +10459,8 @@ int checkwall_below(float x, float z, float a) {
 	maxa = 0;
 	ind = -1;
 	for(i = 0; i < level->numwalls; i++) {
-		if(testwall(i, x, z) && level->walls[i][7] < a + 0.1 && level->walls[i][7] > maxa) {
-			maxa = level->walls[i][7];
+		if(testwall(i, x, z) && level->walls[i].alt < a + 0.1 && level->walls[i].alt > maxa) {
+			maxa = level->walls[i].alt;
 			ind = i;
 		}
 	}
@@ -11453,8 +11445,8 @@ void update_animation() {
 				//self->modeldata.subject_to_wall &&//we move this up to avoid some checking time
 				self->base =
 				    (seta + self->altbase >= 0) * (seta + self->altbase) + (self->a >=
-											    level->walls[wall][7]) *
-				    level->walls[wall][7];
+											    level->walls[wall].alt) *
+				    level->walls[wall].alt;
 			} else if(seta >= 0)
 				self->base = (seta + self->altbase >= 0) * (seta + self->altbase);
 			else if(self->animation != self->modeldata.animation[ANI_VAULT]
@@ -11961,12 +11953,12 @@ void display_ents() {
 							qx = (int) (e->x - advancex /* + temp1 */ );
 							qy = (int) (e->z + gfx_y_offset /* +  temp2 */ );
 						} else {
-							alty = (int) (e->a - level->walls[wall][7]);
-							temp1 = -1 * (e->a - level->walls[wall][7]) * light[0] / 256;	// xshift
+							alty = (int) (e->a - level->walls[wall].alt);
+							temp1 = -1 * (e->a - level->walls[wall].alt) * light[0] / 256;	// xshift
 							temp2 = (float) (-alty * light[1] / 256);	// zshift
 							qx = (int) (e->x - advancex /* + temp1 */ );
 							qy = (int) (e->z + gfx_y_offset /*+  temp2 */  -
-								    level->walls[wall][7]);
+								    level->walls[wall].alt);
 						}
 
 						wall2 = checkwall_below(e->x + temp1, e->z + temp2, e->a);	// check if the shadow drop into a hole or fall on another wall
@@ -11974,18 +11966,18 @@ void display_ents() {
 						{
 							if(wall >= 0 && wall2 >= 0) {
 								alty +=
-								    (int) (level->walls[wall][7] -
-									   level->walls[wall2][7]);
-								/*qx += -1*(level->walls[wall][7]-level->walls[wall2][7])*light[0]/256;
-								   qy += (level->walls[wall][7]-level->walls[wall2][7]) - (level->walls[wall][7]-level->walls[wall2][7])*light[1]/256; */
+								    (int) (level->walls[wall].alt -
+									   level->walls[wall2].alt);
+								/*qx += -1*(level->walls[wall].alt-level->walls[wall2].alt)*light[0]/256;
+								   qy += (level->walls[wall].alt-level->walls[wall2].alt) - (level->walls[wall].alt-level->walls[wall2].alt)*light[1]/256; */
 							} else if(wall >= 0) {
-								alty += (int) (level->walls[wall][7]);
-								/*qx += -1*level->walls[wall][7]*light[0]/256;
-								   qy += level->walls[wall][7] - level->walls[wall][7]*light[1]/256; */
+								alty += (int) (level->walls[wall].alt);
+								/*qx += -1*level->walls[wall].alt*light[0]/256;
+								   qy += level->walls[wall].alt - level->walls[wall].alt*light[1]/256; */
 							} else if(wall2 >= 0) {
-								alty -= (int) (level->walls[wall2][7]);
-								/*qx -= -1*level->walls[wall2][7]*light[0]/256;
-								   qy -= level->walls[wall2][7] - level->walls[wall2][7]*light[1]/256; */
+								alty -= (int) (level->walls[wall2].alt);
+								/*qx -= -1*level->walls[wall2].alt * light[0]/256;
+								   qy -= level->walls[wall2].alt - level->walls[wall2][7]*light[1]/256; */
 							}
 							sy = (2 * MIRROR_Z - qy) + 2 * gfx_y_offset;
 							z = SHADOW_Z;
@@ -12051,8 +12043,8 @@ void display_ents() {
 						} else if(level && wall >= 0)	// && e->a >= level->walls[wall][7])
 						{
 							qx = (int) (e->x - advancex);
-							qy = (int) (e->z - level->walls[wall][7] + gfx_y_offset);
-							sy = (int) ((2 * MIRROR_Z - e->z) - level->walls[wall][7] +
+							qy = (int) (e->z - level->walls[wall].alt + gfx_y_offset);
+							sy = (int) ((2 * MIRROR_Z - e->z) - level->walls[wall].alt +
 								    gfx_y_offset);
 							z = SHADOW_Z;
 							sz = PANEL_Z - HUD_Z;
@@ -13825,11 +13817,11 @@ int adjust_grabposition(entity * ent, entity * other, float dist, int grabin) {
 		return 0;
 	else if(wall1 >= 0 && wall2 < 0)
 		return 0;
-	else if(wall1 >= 0 && level->walls[wall1][7] > a)
+	else if(wall1 >= 0 && level->walls[wall1].alt > a)
 		return 0;
-	else if(wall2 >= 0 && level->walls[wall2][7] > a)
+	else if(wall2 >= 0 && level->walls[wall2].alt > a)
 		return 0;
-	else if(wall1 >= 0 && wall2 >= 0 && level->walls[wall1][7] != level->walls[wall2][7])
+	else if(wall1 >= 0 && wall2 >= 0 && level->walls[wall1].alt != level->walls[wall2].alt)
 		return 0;
 
 	if(wall1 < 0 && checkhole(x1, z1))
@@ -13980,26 +13972,26 @@ int common_trymove(float xdir, float zdir) {
 
 	// ------------------ wall checking ---------------------
 	if(self->modeldata.subject_to_wall) {
-		if((wall = checkwall(x, self->z)) >= 0 && level->walls[wall][7] > self->a) {
+		if((wall = checkwall(x, self->z)) >= 0 && level->walls[wall].alt > self->a) {
 			if(xdir > 0.5) {
 				xdir = 0.5;
 			} else if(xdir < -0.5) {
 				xdir = -0.5;
 			}
-			if((wall = checkwall(self->x + xdir, self->z)) >= 0 && level->walls[wall][7] > self->a) {
+			if((wall = checkwall(self->x + xdir, self->z)) >= 0 && level->walls[wall].alt > self->a) {
 				xdir = 0;
-				execute_onblockw_script(self, 1, (double) level->walls[wall][7]);
+				execute_onblockw_script(self, 1, (double) level->walls[wall].alt);
 			}
 		}
-		if((wall = checkwall(self->x, z)) >= 0 && level->walls[wall][7] > self->a) {
+		if((wall = checkwall(self->x, z)) >= 0 && level->walls[wall].alt > self->a) {
 			if(zdir > 0.5) {
 				zdir = 0.5;
 			} else if(zdir < -0.5) {
 				zdir = -0.5;
 			}
-			if((wall = checkwall(self->x, self->z + zdir)) >= 0 && level->walls[wall][7] > self->a) {
+			if((wall = checkwall(self->x, self->z + zdir)) >= 0 && level->walls[wall].alt > self->a) {
 				zdir = 0;
-				execute_onblockw_script(self, 2, (double) level->walls[wall][7]);
+				execute_onblockw_script(self, 2, (double) level->walls[wall].alt);
 			}
 		}
 	}
@@ -14224,7 +14216,7 @@ int common_try_jump() {
 			zdir = self->z;
 
 		if((wall = checkwall_below(xdir, zdir, 999999)) >= 0 &&
-		   level->walls[wall][7] <= self->a + rmax && !inair(self) && self->a < level->walls[wall][7]) {
+		   level->walls[wall].alt <= self->a + rmax && !inair(self) && self->a < level->walls[wall].alt) {
 			j = 1;
 		} else if(checkhole(self->x + (self->direction ? 2 : -2), zdir) &&
 			  checkwall(self->x + (self->direction ? 2 : -2), zdir) < 0 &&
@@ -14257,7 +14249,7 @@ int common_try_jump() {
 			zdir = self->z;
 
 		if((wall = checkwall_below(xdir, zdir, 999999)) >= 0 &&
-		   level->walls[wall][7] <= self->a + rmax && !inair(self) && self->a < level->walls[wall][7]) {
+		   level->walls[wall].alt <= self->a + rmax && !inair(self) && self->a < level->walls[wall].alt) {
 			j = 2;	//Set to perform runjump.
 		}
 		//Check for pit in range of RUNJUMP.
@@ -15091,7 +15083,7 @@ int arrow_move() {
 	if(level) {
 		if((level->exit_blocked && self->x > level->width - 30 - (PLAYER_MAX_Z - self->z)) ||
 		   (self->modeldata.subject_to_wall && (wall = checkwall(self->x, self->z)) >= 0
-		    && self->a < level->walls[wall][7])) {
+		    && self->a < level->walls[wall].alt)) {
 			// Added so projectiles bounce off blocked exits
 			if(validanim(self, ANI_FALL)) {
 				self->attacking = 0;
@@ -15170,7 +15162,7 @@ int star_move() {
 	if(validanim(self, ANI_FALL))	// Added so projectiles bounce off blocked exits
 	{
 		if((level->exit_blocked && self->x > level->width - 30 - (PLAYER_MAX_Z - self->z)) ||
-		   ((wall = checkwall(self->x, self->z)) >= 0 && self->a < level->walls[wall][7])) {
+		   ((wall = checkwall(self->x, self->z)) >= 0 && self->a < level->walls[wall].alt)) {
 			self->attacking = 0;
 			self->health -= 100000;
 			self->projectile = 0;
@@ -17187,7 +17179,7 @@ void dropweapon(int flag) {
 			if(other && other != self->weapent)
 				self->weapent->base += other->a + other->animation->platform[other->animpos][7];
 			else if(wall >= 0)
-				self->weapent->base += level->walls[wall][7];
+				self->weapent->base += level->walls[wall].alt;
 
 			if(validanim(self->weapent, ANI_RESPAWN))
 				ent_set_anim(self->weapent, ANI_RESPAWN, 0);
@@ -17918,9 +17910,9 @@ void spawnplayer(int index) {
 			p.x += videomodes.hRes;
 		if(PLAYER_MIN_Z == PLAYER_MAX_Z) {
 			wall = checkwall(advancex + p.x, p.z);
-			if(wall >= 0 && level->walls[wall][7] < MAX_WALL_HEIGHT)
+			if(wall >= 0 && level->walls[wall].alt < MAX_WALL_HEIGHT)
 				break;	//found
-			if(checkhole(advancex + p.x, p.z) || (wall >= 0 && level->walls[wall][7] >= MAX_WALL_HEIGHT))
+			if(checkhole(advancex + p.x, p.z) || (wall >= 0 && level->walls[wall].alt >= MAX_WALL_HEIGHT))
 				find = 0;
 			else
 				break;	// found
@@ -17931,10 +17923,10 @@ void spawnplayer(int index) {
 				if(p.z < PLAYER_MIN_Z)
 					p.z += PLAYER_MAX_Z - PLAYER_MIN_Z;
 				wall = checkwall(advancex + p.x, p.z);
-				if(wall >= 0 && level->walls[wall][7] < MAX_WALL_HEIGHT) {
+				if(wall >= 0 && level->walls[wall].alt < MAX_WALL_HEIGHT) {
 					find = 1;
 					break;
-				} else if(wall >= 0 && level->walls[wall][7] >= MAX_WALL_HEIGHT)
+				} else if(wall >= 0 && level->walls[wall].alt >= MAX_WALL_HEIGHT)
 					continue;
 				if(checkhole(advancex + p.x, p.z))
 					continue;

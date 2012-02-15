@@ -6424,7 +6424,7 @@ HRESULT openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 		return S_OK;
 
 	if((wall = checkwall_below((float) x, (float) z, 100000)) >= 0) {
-		(*pretvar)->dblVal = (DOUBLE) level->walls[wall][7];
+		(*pretvar)->dblVal = (DOUBLE) level->walls[wall].alt;
 	}
 	return S_OK;
 }
