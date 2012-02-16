@@ -270,18 +270,26 @@ typedef enum {
 	ANI_BLOCK, // New block animation
 	ANI_JUMPATTACK,
 	ANI_JUMPATTACK2,
+	ANI_JUMPATTACK3,
 	ANI_GET,
 	ANI_GRAB,
 	ANI_GRABATTACK,
 	ANI_GRABATTACK2,
 	ANI_THROW,
 	ANI_SPECIAL,
+	ANI_SPECIAL2,	// Animation played for when pressing forward special
+	ANI_SPECIAL3,	// special3 is an alias for jumpspecial
+	ANI_JUMPSPECIAL = ANI_SPECIAL3,
 	ANI_FREESPECIAL,
+	ANI_FREESPECIAL2,
+	ANI_FREESPECIAL3,
+	ANI_FREESPECIAL4,	// More freespecials added
+	ANI_FREESPECIAL5,	// More freespecials added
+	ANI_FREESPECIAL6,	// More freespecials added
+	ANI_FREESPECIAL7,	// More freespecials added
+	ANI_FREESPECIAL8,	// More freespecials added
 	ANI_SPAWN,	// 26-12-2004 new animation added here ani_spawn
 	ANI_PICK,	// 7-1-2005 used when players select their character at the select screen
-	ANI_FREESPECIAL2,
-	ANI_JUMPATTACK3,
-	ANI_FREESPECIAL3,
 	ANI_UP,	// Mar 2, 2005 - Animation for when going up
 	ANI_DOWN,	// Mar 2, 2005 - Animation for when going down
 	ANI_SHOCK,	// Animation played when knocked down by shock attack
@@ -289,7 +297,6 @@ typedef enum {
 	ANI_SHOCKPAIN,	// Animation played when not knocked down by shock attack
 	ANI_BURNPAIN,	// Animation played when not knocked down by shock attack
 	ANI_GRABBED,	// Animation played when grabbed
-	ANI_SPECIAL2,	// Animation played for when pressing forward special
 	ANI_RUN,	// Animation played when a player is running
 	ANI_RUNATTACK,	// Animation played when a player is running and presses attack
 	ANI_RUNJUMPATTACK,	// Animation played when a player is running and jumps and presses attack
@@ -297,11 +304,6 @@ typedef enum {
 	ANI_ATTACKDOWN,	// d d animation
 	ANI_ATTACKFORWARD,	// f f animation
 	ANI_ATTACKBACKWARD,	// Used for attacking backwards
-	ANI_FREESPECIAL4,	// More freespecials added
-	ANI_FREESPECIAL5,	// More freespecials added
-	ANI_FREESPECIAL6,	// More freespecials added
-	ANI_FREESPECIAL7,	// More freespecials added
-	ANI_FREESPECIAL8,	// More freespecials added
 	ANI_DODGE,	// Used for up up / down down SOR3 dodge moves for players
 	ANI_ATTACKBOTH,	// Used for when a player holds down attack and presses jump
 	ANI_GRABFORWARD,	// New grab attack for when a player holds down forward/attack
@@ -319,7 +321,6 @@ typedef enum {
 	ANI_CHARGEATTACK,	// Plays when player releases attack1 after holding >= chargetime.
 	ANI_VAULT,	// Now you can flip over people like in SOR.
 	ANI_JUMPCANT,
-	ANI_JUMPSPECIAL,
 	ANI_BURNDIE,
 	ANI_SHOCKDIE,
 	ANI_PAIN, //the pain anims must be in a sequence as they're used to calculate offsets in lcmHandleCommandAnim()

@@ -3801,13 +3801,8 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 //stringswitch_gen add lcm_cmdanim "faint"
 //stringswitch_gen add lcm_cmdanim "dodge"
 //stringswitch_gen add lcm_cmdanim "special"
-//stringswitch_gen add lcm_cmdanim "special1"
-//stringswitch_gen add lcm_cmdanim "special2"
-//stringswitch_gen add lcm_cmdanim "special3"
 //stringswitch_gen add lcm_cmdanim "jumpspecial"
 //stringswitch_gen add lcm_cmdanim "jumpattack"
-//stringswitch_gen add lcm_cmdanim "jumpattack2"
-//stringswitch_gen add lcm_cmdanim "jumpattack3"
 //stringswitch_gen add lcm_cmdanim "jumpforward"
 //stringswitch_gen add lcm_cmdanim "runjumpattack"
 //stringswitch_gen add lcm_cmdanim "runattack"
@@ -3830,15 +3825,10 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 //stringswitch_gen add lcm_cmdanim "grabbedbackwalk"
 //stringswitch_gen add lcm_cmdanim "grabbedturn"
 //stringswitch_gen add lcm_cmdanim "grabattack"
-//stringswitch_gen add lcm_cmdanim "grabattack2"
 //stringswitch_gen add lcm_cmdanim "grabforward"
-//stringswitch_gen add lcm_cmdanim "grabforward2"
 //stringswitch_gen add lcm_cmdanim "grabbackward"
-//stringswitch_gen add lcm_cmdanim "grabbackward2"
 //stringswitch_gen add lcm_cmdanim "grabup"
-//stringswitch_gen add lcm_cmdanim "grabup2"
 //stringswitch_gen add lcm_cmdanim "grabdown"
-//stringswitch_gen add lcm_cmdanim "grabdown2"
 //stringswitch_gen add lcm_cmdanim "spawn"
 //stringswitch_gen add lcm_cmdanim "respawn"
 //stringswitch_gen add lcm_cmdanim "throw"
@@ -3858,15 +3848,40 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 //stringswitch_gen add lcm_cmdanim "blockpain"
 //stringswitch_gen add lcm_cmdanim "duckattack"
 //stringswitch_gen add lcm_cmdanim "walkoff"
+//stringswitch_gen add lcm_cmdanim "attack"
+//stringswitch_gen add lcm_cmdanim "walk"
+//stringswitch_gen add lcm_cmdanim "up"
+//stringswitch_gen add lcm_cmdanim "down"
+//stringswitch_gen add lcm_cmdanim "backwalk"
+//stringswitch_gen add lcm_cmdanim "idle"
+//stringswitch_gen add lcm_cmdanim "follow"
+//stringswitch_gen add lcm_cmdanim "freespecial"
+
 
 #include "stringswitch_impl_lcm_cmdanim.c"
 
 // returns: 0: OK, -1: fatal, 1:warning, proceed to next line
 int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, int *ani_id, char** value, char** shutdownmessage, s_attack* attack) {
-	int tempInt;
+	int endsWithNumber = 0;
+	unsigned l = GET_ARGP_LEN(1);
+	int commandIndex = 1;
+	char lowercase_buf[32];
+	
 	*value = GET_ARGP(1);
-	lc(*value, GET_ARGP_LEN(1));
-
+	// if a command ends with a number, we set commandIndex to that number and remove it from the string
+	// this assumes that the ANI_ enum members are ordered like ATTACK1, ATTACK2, etc.
+	char_to_lower(lowercase_buf, *value, sizeof(lowercase_buf));
+	while(l > 0 && lowercase_buf[l - 1] >= '0' && lowercase_buf[l - 1] <= '9') {
+		endsWithNumber = 1;
+		l--;
+	}
+	if(endsWithNumber) {
+		commandIndex = atoi(lowercase_buf + l);
+		lowercase_buf[l] = 0;
+		if(commandIndex < 1)
+			commandIndex = 1;		
+	}
+	
 	// Create new animation
 	(*newanim) = alloc_anim();
 	if(!(*newanim)) {
@@ -3913,7 +3928,7 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*newanim)->custstar = (*newanim)->custpshotno = -1;
 	memset((*newanim)->quakeframe, 0, sizeof((*newanim)->quakeframe));
 	
-	stringswitch_d(lcm_cmdanim, (*value)) {
+	stringswitch_l(lcm_cmdanim, lowercase_buf, l) {
 		stringcase(lcm_cmdanim, waiting):
 			(*ani_id) = ANI_SELECT;
 			break;
@@ -3923,7 +3938,7 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, run):
 			(*ani_id) = ANI_RUN;
 			break;
-		stringcase(lcm_cmdanim, jump):	
+		stringcase(lcm_cmdanim, jump):
 			(*ani_id) = ANI_JUMP;
 			(*newanim)->range[0] = 50;	// Used for enemies that jump on walls
 			(*newanim)->range[1] = 60;	// Used for enemies that jump on walls
@@ -3934,9 +3949,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, land):
 			(*ani_id) = ANI_LAND;
 			break;
-		stringcase(lcm_cmdanim, pain):
-			(*ani_id) = ANI_PAIN;
-			break;
 		stringcase(lcm_cmdanim, spain):
 			// If shock attacks don't knock opponent down, play this
 			(*ani_id) = ANI_SHOCKPAIN;
@@ -3944,10 +3956,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, bpain):
 			// If burn attacks don't knock opponent down, play this
 			(*ani_id) = ANI_BURNPAIN;
-			break;
-		stringcase(lcm_cmdanim, fall):
-			(*ani_id) = ANI_FALL;	// If no new animation, load fall animation into both "respawn" & "fall"
-			(*newanim)->bounce = 4;
 			break;
 		stringcase(lcm_cmdanim, shock):
 			// If shock attacks do knock opponent down, play this
@@ -3958,10 +3966,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 			// If burn attacks do knock opponent down, play this
 			(*ani_id) = ANI_BURN;
 			(*newanim)->bounce = 4;
-			break;
-		stringcase(lcm_cmdanim, death):
-			//  If new animation is present, overwrite new_anim with it.
-			(*ani_id) = ANI_DIE;
 			break;
 		stringcase(lcm_cmdanim, sdie):
 			(*ani_id) = ANI_SHOCKDIE;
@@ -3981,17 +3985,11 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, rises):
 			(*ani_id) = ANI_RISES;
 			break;
-		stringcase(lcm_cmdanim, rise):
-			(*ani_id) = ANI_RISE;	// If no new animation, load fall animation into both "respawn" & "fall"
-			break;
 		stringcase(lcm_cmdanim, riseattackb):
 			(*ani_id) = ANI_RISEATTACKB;
 			break;
 		stringcase(lcm_cmdanim, riseattacks):
 			(*ani_id) = ANI_RISEATTACKS;
-			break;
-		stringcase(lcm_cmdanim, riseattack):
-			(*ani_id) = ANI_RISEATTACK;	// If no new animation, load fall animation into both "respawn" & "fall"
 			break;
 		stringcase(lcm_cmdanim, select):
 			(*ani_id) = ANI_PICK;
@@ -4019,31 +4017,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 			break;
 		stringcase(lcm_cmdanim, dodge):
 			(*ani_id) = ANI_DODGE;
-			break;
-		stringcase(lcm_cmdanim, special):
-		stringcase(lcm_cmdanim, special1):
-			(*ani_id) = ANI_SPECIAL;
-			(*newanim)->energycost[0] = 6;
-			break;
-		stringcase(lcm_cmdanim, special2):
-			(*ani_id) = ANI_SPECIAL2;
-			break;
-		stringcase(lcm_cmdanim, special3):
-		stringcase(lcm_cmdanim, jumpspecial):
-			(*ani_id) = ANI_JUMPSPECIAL;
-			break;
-		stringcase(lcm_cmdanim, jumpattack):
-			(*ani_id) = ANI_JUMPATTACK;
-			if(newchar->jumpheight == 4) {
-				(*newanim)->range[0] = 150;
-				(*newanim)->range[1] = 200;
-			}
-			break;
-		stringcase(lcm_cmdanim, jumpattack2):
-			(*ani_id) = ANI_JUMPATTACK2;
-			break;
-		stringcase(lcm_cmdanim, jumpattack3):
-			(*ani_id) = ANI_JUMPATTACK3;
 			break;
 		stringcase(lcm_cmdanim, jumpforward):
 			(*ani_id) = ANI_JUMPFORWARD;
@@ -4110,54 +4083,6 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, grabbedturn):
 			(*ani_id) = ANI_GRABBEDTURN;
 			break;
-		stringcase(lcm_cmdanim, grabattack):
-			(*ani_id) = ANI_GRABATTACK;
-			(*newanim)->attackone = 1;	// default to 1, attack one one opponent
-			break;
-		stringcase(lcm_cmdanim, grabattack2):
-			(*ani_id) = ANI_GRABATTACK2;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabforward):
-			// New grab attack for when pressing forward attack
-			(*ani_id) = ANI_GRABFORWARD;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabforward2):
-			// New grab attack for when pressing forward attack
-			(*ani_id) = ANI_GRABFORWARD2;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabbackward):
-			// New grab attack for when pressing backward attack
-			(*ani_id) = ANI_GRABBACKWARD;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabbackward2):
-			// New grab attack for when pressing backward attack
-			(*ani_id) = ANI_GRABBACKWARD2;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabup):
-			// New grab attack for when pressing up attack
-			(*ani_id) = ANI_GRABUP;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabup2):
-			// New grab attack for when pressing up attack
-			(*ani_id) = ANI_GRABUP2;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabdown):
-			// New grab attack for when pressing down attack
-			(*ani_id) = ANI_GRABDOWN;
-			(*newanim)->attackone = 1;
-			break;
-		stringcase(lcm_cmdanim, grabdown2):
-			// New grab attack for when pressing down attack
-			(*ani_id) = ANI_GRABDOWN2;
-			(*newanim)->attackone = 1;
-			break;
 		stringcase(lcm_cmdanim, spawn):
 			//  spawn/respawn works separately now
 			(*ani_id) = ANI_SPAWN;
@@ -4211,130 +4136,134 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		stringcase(lcm_cmdanim, blockpains):
 			(*ani_id) = ANI_BLOCKPAINS;
 			break;
-		stringcase(lcm_cmdanim, blockpain):
-			// If no new animation, load fall animation into both "respawn" & "fall"
-			(*ani_id) = ANI_BLOCKPAIN;
-			break;
 		stringcase(lcm_cmdanim, duckattack):
 			(*ani_id) = ANI_DUCKATTACK;
 			break;
 		stringcase(lcm_cmdanim, walkoff):
 			(*ani_id) = ANI_WALKOFF;
 			break;
-		default:
-			if(strnicmp((*value), "attack", 6) == 0 &&
-					(!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
-				tempInt = atoi((*value) + 6);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animattacks[tempInt - 1];
-			} else if(strnicmp((*value), "walk", 4) == 0 &&
-					(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-				tempInt = atoi((*value) + 4);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animwalks[tempInt - 1];
-			} else if(strnicmp((*value), "up", 2) == 0 &&
-					(!(*value)[2] || ((*value)[2] >= '1' && (*value)[2] <= '9'))) {
-				tempInt = atoi((*value) + 2);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animups[tempInt - 1];
-			} else if(strnicmp((*value), "down", 4) == 0 &&
-					(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-				tempInt = atoi((*value) + 4);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animdowns[tempInt - 1];
-			} else if(strnicmp((*value), "backwalk", 8) == 0 &&
-					(!(*value)[8] || ((*value)[8] >= '1' && (*value)[8] <= '9'))) {
-				tempInt = atoi((*value) + 8);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animbackwalks[tempInt - 1];
-			} else if(strnicmp((*value), "pain", 4) == 0 && (*value)[4] >= '1'
-					&& (*value)[4] <= '9') {
-				tempInt = atoi((*value) + 4);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_PAIN + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animpains[tempInt + STA_ATKS - 1];
-				}
-			} else if(strnicmp((*value), "idle", 4) == 0 &&
-				(!(*value)[4] || ((*value)[4] >= '1' && (*value)[4] <= '9'))) {
-				tempInt = atoi((*value) + 4);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animidles[tempInt - 1];
-			} else if(strnicmp((*value), "follow", 6) == 0
-					&& (!(*value)[6] || ((*value)[6] >= '1' && (*value)[6] <= '9'))) {
-				tempInt = atoi((*value) + 6);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animfollows[tempInt - 1];
-			} else if(strnicmp((*value), "rise", 4) == 0 && (*value)[4] >= '1'
-					&& (*value)[4] <= '9') {
-				tempInt = atoi((*value) + 4);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_RISE + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animrises[tempInt + STA_ATKS - 1];
-				}
-			} else if(strnicmp((*value), "death", 5) == 0 && (*value)[5] >= '1'
-					&& (*value)[5] <= '9') {
-				tempInt = atoi((*value) + 5);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_DIE + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animdies[tempInt + STA_ATKS - 1];
-				}
-			} else if(strnicmp((*value), "fall", 4) == 0 && (*value)[4] >= '1'
-					&& (*value)[4] <= '9') {
-				tempInt = atoi((*value) + 4);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_FALL + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animfalls[tempInt + STA_ATKS - 1];
-				}
+		
+		stringcase(lcm_cmdanim, attack):
+			(*ani_id) = dyn_anims.animattacks[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, walk):
+			(*ani_id) = dyn_anims.animwalks[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, up):
+			(*ani_id) = dyn_anims.animups[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, down):
+			(*ani_id) = dyn_anims.animdowns[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, backwalk):
+			(*ani_id) = dyn_anims.animbackwalks[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, idle):
+			(*ani_id) = dyn_anims.animidles[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, follow):
+			(*ani_id) = dyn_anims.animfollows[commandIndex - 1];
+			break;
+		stringcase(lcm_cmdanim, jumpattack):
+			(*ani_id) = ANI_JUMPATTACK + (commandIndex - 1);
+			if(commandIndex == 1 && newchar->jumpheight == 4) {
+				(*newanim)->range[0] = 150;
+				(*newanim)->range[1] = 200;
+			}
+			break;
+		stringcase(lcm_cmdanim, grabattack):
+			(*ani_id) = ANI_GRABATTACK + (commandIndex - 1);
+			(*newanim)->attackone = 1;	// default to 1, attack one one opponent
+			break;
+		stringcase(lcm_cmdanim, grabforward):
+			// New grab attack for when pressing forward attack
+			(*ani_id) = ANI_GRABFORWARD + (commandIndex - 1);
+			(*newanim)->attackone = 1;
+			break;
+		stringcase(lcm_cmdanim, grabbackward):
+			// New grab attack for when pressing backward attack
+			(*ani_id) = ANI_GRABBACKWARD + (commandIndex - 1);
+			(*newanim)->attackone = 1;
+			break;
+		stringcase(lcm_cmdanim, grabup):
+			// New grab attack for when pressing up attack
+			(*ani_id) = ANI_GRABUP + (commandIndex - 1);
+			(*newanim)->attackone = 1;
+			break;
+		stringcase(lcm_cmdanim, grabdown):
+			// New grab attack for when pressing down attack
+			(*ani_id) = ANI_GRABDOWN + (commandIndex - 1);
+			(*newanim)->attackone = 1;
+			break;
+		stringcase(lcm_cmdanim, jumpspecial):
+			commandIndex = 3; /* fall through to special */
+		stringcase(lcm_cmdanim, special):
+			(*ani_id) = ANI_SPECIAL + (commandIndex - 1);
+			if(commandIndex == 1) (*newanim)->energycost[0] = 6;
+			break;
+		stringcase(lcm_cmdanim, pain):
+			if(commandIndex < 11)
+				(*ani_id) = ANI_PAIN + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animpains[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, rise):
+			if(commandIndex < 11)
+				(*ani_id) = ANI_RISE + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animrises[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, death):
+			if(commandIndex < 11)
+				(*ani_id) = ANI_DIE + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animdies[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, fall):
+			if(commandIndex == 1) 
 				(*newanim)->bounce = 4;
-			} else if(strnicmp((*value), "riseattack", 10) == 0 && (*value)[10] >= '1'
-					&& (*value)[10] <= '9') {
-				tempInt = atoi((*value) + 10);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_RISEATTACK + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animriseattacks[tempInt + STA_ATKS - 1];
-				}
-			} else if(strnicmp((*value), "blockpain", 9) == 0 && (*value)[9] >= '1'
-					&& (*value)[9] <= '9') {
-				tempInt = atoi((*value) + 9);
-				if(tempInt > 0 && tempInt < 11) {
-					(*ani_id) = ANI_BLOCKPAIN + (tempInt - 1);
-				} else {
-					if(tempInt < MAX_ATKS - STA_ATKS + 1)
-						tempInt = MAX_ATKS - STA_ATKS + 1;
-					(*ani_id) = dyn_anims.animblkpains[tempInt + STA_ATKS - 1];
-				}
-			} else if(strnicmp((*value), "freespecial", 11) == 0
-					&& (!(*value)[11] || ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
+			if(commandIndex < 11)
+				(*ani_id) = ANI_FALL + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animfalls[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, riseattack):
+			if(commandIndex < 11)
+				(*ani_id) = ANI_RISEATTACK + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animriseattacks[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, blockpain):
+			if(commandIndex < 11)
+				(*ani_id) = ANI_BLOCKPAIN + (commandIndex - 1);
+			else {
+				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
+					commandIndex = MAX_ATKS - STA_ATKS + 1;
+				(*ani_id) = dyn_anims.animblkpains[commandIndex + STA_ATKS - 1];
+			}
+			break;
+		stringcase(lcm_cmdanim, freespecial):
+			{
 				int flag;
 				int ani;
-				
-				tempInt = atoi((*value) + 11);
-				if(tempInt < 1)
-					tempInt = 1;
-				(*ani_id) = dyn_anims.animspecials[tempInt - 1];
-				switch (tempInt) {	// old default (*value)s
+
+				(*ani_id) = dyn_anims.animspecials[commandIndex - 1];
+				switch (commandIndex) {
 					case 1:
 						flag = FLAG_FORWARD;
 						ani = ANI_FREESPECIAL;
@@ -4357,10 +4286,10 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 						}
 						break;
 				}
-			} else {
-				return 1;
 			}
 			break;
+		default:
+			return 1;
 	}
 
 	newchar->animation[(*ani_id)] = (*newanim);

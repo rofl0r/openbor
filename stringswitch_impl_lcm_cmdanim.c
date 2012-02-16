@@ -41,15 +41,11 @@ typedef enum {
 	stringswitch_enumerator_member_name(lcm_cmdanim, waiting),
 	stringswitch_enumerator_member_name(lcm_cmdanim, special),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbed),
-	stringswitch_enumerator_member_name(lcm_cmdanim, grabup2),
 	stringswitch_enumerator_member_name(lcm_cmdanim, respawn),
 	stringswitch_enumerator_member_name(lcm_cmdanim, runjump),
 	stringswitch_enumerator_member_name(lcm_cmdanim, hitwall),
 	stringswitch_enumerator_member_name(lcm_cmdanim, walkoff),
 	stringswitch_enumerator_member_name(lcm_cmdanim, jumpcant),
-	stringswitch_enumerator_member_name(lcm_cmdanim, special1),
-	stringswitch_enumerator_member_name(lcm_cmdanim, special2),
-	stringswitch_enumerator_member_name(lcm_cmdanim, special3),
 	stringswitch_enumerator_member_name(lcm_cmdanim, attackup),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabwalk),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabturn),
@@ -59,7 +55,6 @@ typedef enum {
 	stringswitch_enumerator_member_name(lcm_cmdanim, backwalk),
 	stringswitch_enumerator_member_name(lcm_cmdanim, chipdeath),
 	stringswitch_enumerator_member_name(lcm_cmdanim, runattack),
-	stringswitch_enumerator_member_name(lcm_cmdanim, grabdown2),
 	stringswitch_enumerator_member_name(lcm_cmdanim, jumpdelay),
 	stringswitch_enumerator_member_name(lcm_cmdanim, blockpain),
 	stringswitch_enumerator_member_name(lcm_cmdanim, guardbreak),
@@ -76,24 +71,19 @@ typedef enum {
 	stringswitch_enumerator_member_name(lcm_cmdanim, riseattacks),
 	stringswitch_enumerator_member_name(lcm_cmdanim, throwattack),
 	stringswitch_enumerator_member_name(lcm_cmdanim, jumpspecial),
-	stringswitch_enumerator_member_name(lcm_cmdanim, jumpattack2),
-	stringswitch_enumerator_member_name(lcm_cmdanim, jumpattack3),
 	stringswitch_enumerator_member_name(lcm_cmdanim, jumpforward),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbedwalk),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbedturn),
-	stringswitch_enumerator_member_name(lcm_cmdanim, grabattack2),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabforward),
 	stringswitch_enumerator_member_name(lcm_cmdanim, forwardjump),
 	stringswitch_enumerator_member_name(lcm_cmdanim, freespecial),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabwalkdown),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbackwalk),
-	stringswitch_enumerator_member_name(lcm_cmdanim, grabforward2),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbackward),
 	stringswitch_enumerator_member_name(lcm_cmdanim, chargeattack),
 	stringswitch_enumerator_member_name(lcm_cmdanim, runjumpattack),
 	stringswitch_enumerator_member_name(lcm_cmdanim, attackforward),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbedwalkup),
-	stringswitch_enumerator_member_name(lcm_cmdanim, grabbackward2),
 	stringswitch_enumerator_member_name(lcm_cmdanim, attackbackward),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbedwalkdown),
 	stringswitch_enumerator_member_name(lcm_cmdanim, grabbedbackwalk),
@@ -369,17 +359,10 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 					if(str[1]!='r') goto main_default;
 					if(str[2]!='a') goto main_default;
 					if(str[3]!='b') goto main_default;
-					switch(str[4]) {
-						case 'b':
-							if(str[5]!='e') goto main_default;
-							if(str[6]!='d') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabbed);
-						case 'u':
-							if(str[5]!='p') goto main_default;
-							if(str[6]!='2') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabup2);
-						default: goto main_default;
-					}
+					if(str[4]!='b') goto main_default;
+					if(str[5]!='e') goto main_default;
+					if(str[6]!='d') goto main_default;
+					return stringswitch_enumerator_member_name(lcm_cmdanim, grabbed);
 				case 'r':
 					switch(str[1]) {
 						case 'e':
@@ -425,22 +408,6 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 							if(str[6]!='n') goto main_default;
 							if(str[7]!='d') goto main_default;
 							return stringswitch_enumerator_member_name(lcm_cmdanim, jumpland);
-						default: goto main_default;
-					}
-				case 's':
-					if(str[1]!='p') goto main_default;
-					if(str[2]!='e') goto main_default;
-					if(str[3]!='c') goto main_default;
-					if(str[4]!='i') goto main_default;
-					if(str[5]!='a') goto main_default;
-					if(str[6]!='l') goto main_default;
-					switch(str[7]) {
-						case '1':
-							return stringswitch_enumerator_member_name(lcm_cmdanim, special1);
-						case '2':
-							return stringswitch_enumerator_member_name(lcm_cmdanim, special2);
-						case '3':
-							return stringswitch_enumerator_member_name(lcm_cmdanim, special3);
 						default: goto main_default;
 					}
 				case 'a':
@@ -516,16 +483,6 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 					if(str[7]!='c') goto main_default;
 					if(str[8]!='k') goto main_default;
 					return stringswitch_enumerator_member_name(lcm_cmdanim, runattack);
-				case 'g':
-					if(str[1]!='r') goto main_default;
-					if(str[2]!='a') goto main_default;
-					if(str[3]!='b') goto main_default;
-					if(str[4]!='d') goto main_default;
-					if(str[5]!='o') goto main_default;
-					if(str[6]!='w') goto main_default;
-					if(str[7]!='n') goto main_default;
-					if(str[8]!='2') goto main_default;
-					return stringswitch_enumerator_member_name(lcm_cmdanim, grabdown2);
 				case 'j':
 					if(str[1]!='u') goto main_default;
 					if(str[2]!='m') goto main_default;
@@ -698,19 +655,6 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 							if(str[9]!='a') goto main_default;
 							if(str[10]!='l') goto main_default;
 							return stringswitch_enumerator_member_name(lcm_cmdanim, jumpspecial);
-						case 'a':
-							if(str[5]!='t') goto main_default;
-							if(str[6]!='t') goto main_default;
-							if(str[7]!='a') goto main_default;
-							if(str[8]!='c') goto main_default;
-							if(str[9]!='k') goto main_default;
-							switch(str[10]) {
-								case '2':
-									return stringswitch_enumerator_member_name(lcm_cmdanim, jumpattack2);
-								case '3':
-									return stringswitch_enumerator_member_name(lcm_cmdanim, jumpattack3);
-								default: goto main_default;
-							}
 						case 'f':
 							if(str[5]!='o') goto main_default;
 							if(str[6]!='r') goto main_default;
@@ -742,14 +686,6 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 									return stringswitch_enumerator_member_name(lcm_cmdanim, grabbedturn);
 								default: goto main_default;
 							}
-						case 'a':
-							if(str[5]!='t') goto main_default;
-							if(str[6]!='t') goto main_default;
-							if(str[7]!='a') goto main_default;
-							if(str[8]!='c') goto main_default;
-							if(str[9]!='k') goto main_default;
-							if(str[10]!='2') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabattack2);
 						case 'f':
 							if(str[5]!='o') goto main_default;
 							if(str[6]!='r') goto main_default;
@@ -819,15 +755,6 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 									return stringswitch_enumerator_member_name(lcm_cmdanim, grabbackward);
 								default: goto main_default;
 							}
-						case 'f':
-							if(str[5]!='o') goto main_default;
-							if(str[6]!='r') goto main_default;
-							if(str[7]!='w') goto main_default;
-							if(str[8]!='a') goto main_default;
-							if(str[9]!='r') goto main_default;
-							if(str[10]!='d') goto main_default;
-							if(str[11]!='2') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabforward2);
 						default: goto main_default;
 					}
 				case 'c':
@@ -880,27 +807,15 @@ static int stringswitch_enumerator_eval_func(lcm_cmdanim) (char* str, size_t l) 
 					if(str[2]!='a') goto main_default;
 					if(str[3]!='b') goto main_default;
 					if(str[4]!='b') goto main_default;
-					switch(str[5]) {
-						case 'e':
-							if(str[6]!='d') goto main_default;
-							if(str[7]!='w') goto main_default;
-							if(str[8]!='a') goto main_default;
-							if(str[9]!='l') goto main_default;
-							if(str[10]!='k') goto main_default;
-							if(str[11]!='u') goto main_default;
-							if(str[12]!='p') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabbedwalkup);
-						case 'a':
-							if(str[6]!='c') goto main_default;
-							if(str[7]!='k') goto main_default;
-							if(str[8]!='w') goto main_default;
-							if(str[9]!='a') goto main_default;
-							if(str[10]!='r') goto main_default;
-							if(str[11]!='d') goto main_default;
-							if(str[12]!='2') goto main_default;
-							return stringswitch_enumerator_member_name(lcm_cmdanim, grabbackward2);
-						default: goto main_default;
-					}
+					if(str[5]!='e') goto main_default;
+					if(str[6]!='d') goto main_default;
+					if(str[7]!='w') goto main_default;
+					if(str[8]!='a') goto main_default;
+					if(str[9]!='l') goto main_default;
+					if(str[10]!='k') goto main_default;
+					if(str[11]!='u') goto main_default;
+					if(str[12]!='p') goto main_default;
+					return stringswitch_enumerator_member_name(lcm_cmdanim, grabbedwalkup);
 				default: goto main_default;
 			}
 		case 14:
