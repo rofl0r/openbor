@@ -2851,8 +2851,7 @@ int addframe(s_anim * a, int spriteindex, int framecount, short delay, unsigned 
 
 	if((bbox[2] - bbox[0]) && (bbox[3] - bbox[1])) {
 		if(!a->bbox_coords) {
-			a->bbox_coords = malloc(framecount * sizeof(*a->bbox_coords));
-			memset(a->bbox_coords, 0, framecount * sizeof(*a->bbox_coords));
+			a->bbox_coords = calloc(framecount, sizeof(*a->bbox_coords));
 		}
 		memcpy(a->bbox_coords[currentframe], bbox, sizeof(*a->bbox_coords));
 		a->vulnerable[currentframe] = 1;
@@ -2860,16 +2859,14 @@ int addframe(s_anim * a, int spriteindex, int framecount, short delay, unsigned 
 	if((attack->attack_coords[2] - attack->attack_coords[0]) &&
 	   (attack->attack_coords[3] - attack->attack_coords[1])) {
 		if(!a->attacks) {
-			a->attacks = malloc(framecount * sizeof(s_attack *));
-			memset(a->attacks, 0, framecount * sizeof(s_attack *));
+			a->attacks = calloc(framecount, sizeof(s_attack *));
 		}
 		a->attacks[currentframe] = malloc(sizeof(s_attack));
 		memcpy(a->attacks[currentframe], attack, sizeof(s_attack));
 	}
 	if(drawmethod->flag) {
 		if(!a->drawmethods) {
-			a->drawmethods = malloc(framecount * sizeof(s_drawmethod *));
-			memset(a->drawmethods, 0, framecount * sizeof(s_drawmethod *));
+			a->drawmethods = calloc(framecount, sizeof(s_drawmethod *));
 		}
 		setDrawMethod(a, currentframe, malloc(sizeof(s_drawmethod)));
 		//a->drawmethods[currenframe] = malloc(sizeof(s_drawmethod));
@@ -2877,26 +2874,22 @@ int addframe(s_anim * a, int spriteindex, int framecount, short delay, unsigned 
 		//memcpy(a->drawmethods[currentframe], drawmethod, sizeof(s_drawmethod));
 	}
 	if(idle && !a->idle) {
-		a->idle = malloc(framecount * sizeof(*a->idle));
-		memset(a->idle, 0, framecount * sizeof(*a->idle));
+		a->idle = calloc(framecount, sizeof(*a->idle));
 	}
 	if(a->idle)
 		a->idle[currentframe] = idle;
 	if(move && !a->move) {
-		a->move = malloc(framecount * sizeof(*a->move));
-		memset(a->move, 0, framecount * sizeof(*a->move));
+		a->move = calloc(framecount, sizeof(*a->move));
 	}
 	if(a->move)
 		a->move[currentframe] = move;
 	if(movez && !a->movez) {
-		a->movez = malloc(framecount * sizeof(*a->movez));
-		memset(a->movez, 0, framecount * sizeof(*a->movez));
+		a->movez = calloc(framecount, sizeof(*a->movez));
 	}
 	if(a->movez)
 		a->movez[currentframe] = movez;	// Move command for the "z" axis
 	if(movea && !a->movea) {
-		a->movea = malloc(framecount * sizeof(*a->movea));
-		memset(a->movea, 0, framecount * sizeof(*a->movea));
+		a->movea = calloc(framecount, sizeof(*a->movea));
 	}
 	if(a->movea)
 		a->movea[currentframe] = movea;	// Move command for moving along the "a" axis
@@ -2914,16 +2907,14 @@ int addframe(s_anim * a, int spriteindex, int framecount, short delay, unsigned 
 		a->shadow[currentframe] = frameshadow;	// shadow index for each frame
 	if(shadow_coords[0] || shadow_coords[1]) {
 		if(!a->shadow_coords) {
-			a->shadow_coords = malloc(framecount * sizeof(*a->shadow_coords));
-			memset(a->shadow_coords, 0, framecount * sizeof(*a->shadow_coords));
+			a->shadow_coords = calloc(framecount, sizeof(*a->shadow_coords));
 		}
 		memcpy(a->shadow_coords[currentframe], shadow_coords, sizeof(*a->shadow_coords));
 	}
 	if(platform[7])		//height
 	{
 		if(!a->platform) {
-			a->platform = malloc(framecount * sizeof(*a->platform));
-			memset(a->platform, 0, framecount * sizeof(*a->platform));
+			a->platform = calloc(framecount, sizeof(*a->platform));
 		}
 		memcpy(a->platform[currentframe], platform, sizeof(*a->platform));	// Used so entity can be landed on
 	}
