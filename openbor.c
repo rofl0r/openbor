@@ -3701,6 +3701,46 @@ void lcmSetCachedModelIndexOrMinusOne(char* value, int* dest) {
 
 #include "stringswitch_impl_lcm_cmdcom.c"
 
+// returns 1 if one of the values in the stringswitch was found, 0 otherwise.
+static int switchComAndCancelCommon(char** value, s_model *newchar, int i) {
+	stringswitch_d(lcm_cmdcom, (*value)) {
+		stringcase(lcm_cmdcom, u):
+			newchar->special[newchar->specials_loaded][i] = FLAG_MOVEUP;
+			break;
+		stringcase(lcm_cmdcom, d):
+			newchar->special[newchar->specials_loaded][i] = FLAG_MOVEDOWN;
+			break;
+		stringcase(lcm_cmdcom, f):
+			newchar->special[newchar->specials_loaded][i] = FLAG_FORWARD;
+			break;
+		stringcase(lcm_cmdcom, b):
+			newchar->special[newchar->specials_loaded][i] = FLAG_BACKWARD;
+			break;
+		stringcase(lcm_cmdcom, a):
+			newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK;
+			break;
+		stringcase(lcm_cmdcom, a2):
+			newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK2;
+			break;
+		stringcase(lcm_cmdcom, a3):
+			newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK3;
+			break;
+		stringcase(lcm_cmdcom, a4):
+			newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK4;
+			break;
+		stringcase(lcm_cmdcom, j):
+			newchar->special[newchar->specials_loaded][i] = FLAG_JUMP;
+			break;
+		stringcase(lcm_cmdcom, s):
+		stringcase(lcm_cmdcom, k):
+			newchar->special[newchar->specials_loaded][i] = FLAG_SPECIAL;
+			break;
+		default:
+			return 0;
+	}
+	return 1;
+}
+
 // returns: 0: OK, -1: fatal, 1:warning, proceed to next line
 int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char** shutdownmessage) {
 	// Section for custom freespecials starts here
@@ -3712,52 +3752,20 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 		if(!(*value)[0])
 			break;
 		lc(*value, GET_ARGP_LEN(t));
-		stringswitch_d(lcm_cmdcom, (*value)) {
-			stringcase(lcm_cmdcom, u):
-				newchar->special[newchar->specials_loaded][i] = FLAG_MOVEUP;
-				break;
-			stringcase(lcm_cmdcom, d):
-				newchar->special[newchar->specials_loaded][i] = FLAG_MOVEDOWN;
-				break;
-			stringcase(lcm_cmdcom, f):
-				newchar->special[newchar->specials_loaded][i] = FLAG_FORWARD;
-				break;
-			stringcase(lcm_cmdcom, b):
-				newchar->special[newchar->specials_loaded][i] = FLAG_BACKWARD;
-				break;
-			stringcase(lcm_cmdcom, a):
-				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK;
-				break;
-			stringcase(lcm_cmdcom, a2):
-				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK2;
-				break;
-			stringcase(lcm_cmdcom, a3):
-				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK3;
-				break;
-			stringcase(lcm_cmdcom, a4):
-				newchar->special[newchar->specials_loaded][i] = FLAG_ATTACK4;
-				break;
-			stringcase(lcm_cmdcom, j):
-				newchar->special[newchar->specials_loaded][i] = FLAG_JUMP;
-				break;
-			stringcase(lcm_cmdcom, s):
-			stringcase(lcm_cmdcom, k):
-				newchar->special[newchar->specials_loaded][i] = FLAG_SPECIAL;
-				break;
-			default:
-				if((!strnicmp(*value, "freespecial", 11)) && 
-					(
-						!(*value)[11] || 
-						((*value)[11] >= '1' && (*value)[11] <= '9')
-					)
-				) {
-					tempInt = atoi((*value) + 11);
-					if(tempInt < 1)
-						tempInt = 1;
-					newchar->special[newchar->specials_loaded]
-						[MAX_SPECIAL_INPUTS - 2] = dyn_anims.animspecials[tempInt - 1];
-				} else 
-					return 1;
+		if(!switchComAndCancelCommon(value, newchar, i)) {
+			if((!strnicmp(*value, "freespecial", 11)) && 
+				(
+					!(*value)[11] || 
+					((*value)[11] >= '1' && (*value)[11] <= '9')
+				)
+			) {
+				tempInt = atoi((*value) + 11);
+				if(tempInt < 1)
+					tempInt = 1;
+				newchar->special[newchar->specials_loaded]
+					[MAX_SPECIAL_INPUTS - 2] = dyn_anims.animspecials[tempInt - 1];
+			} else 
+				return 1;			
 		}
 	}
 	newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 3] = i - 1;	// max steps
@@ -3768,6 +3776,48 @@ int lcmHandleCommandCom(ArgList * arglist, s_model *newchar, char** value, char*
 	}
 	return 0;
 }
+
+// returns: 0: OK, -1: fatal, 1:warning, proceed to next line
+int lcmHandleCommandCancel(ArgList * arglist, s_model *newchar, s_anim* newanim, char** value, int ani_id, char** shutdownmessage, char* filename, char* command) {
+	int i;	// OX. Modified copy/paste of COM settings code
+	int t;
+	int tempInt;
+	newanim->cancel = 3;
+	for(i = 0, t = 4; i < MAX_SPECIAL_INPUTS - 6; i++, t++) {
+		*value = GET_ARGP(t);
+		if(!(*value)[0])
+			break;
+		lc((*value), GET_ARGP_LEN(t));
+		if(!switchComAndCancelCommon(value, newchar, i)) {
+			if(strnicmp((*value), "freespecial", 11) == 0
+					&& (!(*value)[11]
+					|| ((*value)[11] >= '1' && (*value)[11] <= '9'))) {
+				tempInt = atoi((*value) + 11);
+				if(tempInt < 1)
+					tempInt = 1;
+				newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 5] = dyn_anims.animspecials[tempInt - 1];
+				newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 7] = GET_INT_ARGP(1);	// stores start frame
+				newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 8] = GET_INT_ARGP(2);	// stores end frame
+				newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 9] = ani_id;	// stores current anim
+				newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 10] = GET_INT_ARGP(3);	// stores hits
+			} else {
+				*shutdownmessage = "Invalid cancel command!";
+				return -1;
+			}
+		}
+
+	}
+	newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 6] = i - 1;	// max steps
+	newchar->specials_loaded++;
+	if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
+		*shutdownmessage =
+			"Too many Freespecials and/or Cancels. Please increase Maxfreespecials";
+		return -1;
+	}
+	return 0;
+}
+
+
 
 //stringswitch_gen add lcm_cmdanim "waiting"
 //stringswitch_gen add lcm_cmdanim "sleep"
@@ -5354,74 +5404,7 @@ s_model *load_cached_model(char *name, char *owner, char unload) {
 					newanim->dropframe = GET_INT_ARG(1);
 					break;
 				case CMD_MODEL_CANCEL:
-					{
-						int i;	// OX. Modified copy/paste of COM settings code
-						int t;
-						newanim->cancel = 3;
-						for(i = 0, t = 4; i < MAX_SPECIAL_INPUTS - 6; i++, t++) {
-							value = GET_ARG(t);
-							if(!value[0])
-								break;
-							if(stricmp(value, "u") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_MOVEUP;
-							} else if(stricmp(value, "d") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_MOVEDOWN;
-							} else if(stricmp(value, "f") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_FORWARD;
-							} else if(stricmp(value, "b") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_BACKWARD;
-							} else if(stricmp(value, "a") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK;
-							} else if(stricmp(value, "a2") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK2;
-							} else if(stricmp(value, "a3") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK3;
-							} else if(stricmp(value, "a4") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_ATTACK4;
-							} else if(stricmp(value, "j") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_JUMP;
-							} else if(stricmp(value, "s") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_SPECIAL;
-							} else if(stricmp(value, "k") == 0) {
-								newchar->special[newchar->specials_loaded][i] =
-								    FLAG_SPECIAL;
-							} else if(strnicmp(value, "freespecial", 11) == 0
-								  && (!value[11]
-								      || (value[11] >= '1' && value[11] <= '9'))) {
-								tempInt = atoi(value + 11);
-								if(tempInt < 1)
-									tempInt = 1;
-								newchar->special[newchar->
-										 specials_loaded][MAX_SPECIAL_INPUTS -
-												  5] =
-								    dyn_anims.animspecials[tempInt - 1];
-								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 7] = GET_INT_ARG(1);	// stores start frame
-								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 8] = GET_INT_ARG(2);	// stores end frame
-								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 9] = ani_id;	// stores current anim
-								newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 10] = GET_INT_ARG(3);	// stores hits
-							} else {
-								shutdownmessage = "Invalid cancel command!";
-								goto lCleanup;
-							}
-						}
-						newchar->special[newchar->specials_loaded][MAX_SPECIAL_INPUTS - 6] = i - 1;	// max steps
-						newchar->specials_loaded++;
-						if(newchar->specials_loaded > dyn_anim_custom_maxvalues.max_freespecials) {
-							shutdownmessage =
-							    "Too many Freespecials and/or Cancels. Please increase Maxfreespecials";
-							goto lCleanup;
-						}
-					}
+					if(lcmHandleCommandCancel(&arglist, newchar, newanim, &value, ani_id, &shutdownmessage, filename, command) == -1) goto lCleanup;
 					break;
 				case CMD_MODEL_SOUND:
 					soundtoplay = sound_load_sample(GET_ARG(1), packfile, 0);
