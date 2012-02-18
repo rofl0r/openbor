@@ -1442,7 +1442,19 @@ typedef struct {
 	float upperright;
 	float lowerright;
 	float depth;
-	float alt;	
+} s_hole;
+
+// attention, s_wall must have all the members of s_hole in the same order
+// as it is used in checkwall_or_hole()
+typedef struct {
+	float x;
+	float z;
+	float upperleft;
+	float lowerleft;
+	float upperright;
+	float lowerright;
+	float depth;
+	float alt;
 } s_wall;
 
 typedef struct {
@@ -1462,7 +1474,7 @@ typedef struct {
 	int camerazoffset;
 	int numholes;
 	int numwalls;		// Stores number of walls loaded
-	float holes[LEVEL_MAX_HOLES][7];
+	s_hole holes[LEVEL_MAX_HOLES];
 	int holesfound[LEVEL_MAX_HOLES];
 	s_wall walls[LEVEL_MAX_WALLS];	// Now you can have walls for different walkable areas
 	int wallsfound[LEVEL_MAX_WALLS];

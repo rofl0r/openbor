@@ -7686,6 +7686,15 @@ char *llHandleCommandSpawnscript(ArgList * arglist, s_spawn_entry * next) {
 	return result;
 }
 
+static const s_hole default_hole_coords = {
+	.x = 0,
+	.z = 240,
+	.upperleft = 12,
+	.lowerleft = 1,
+	.upperright = 200,
+	.lowerright = 287,
+	.depth = 45,
+};
 
 void load_level(char *filename) {
 	char *buf;
@@ -8152,6 +8161,7 @@ void load_level(char *filename) {
 				}
 				break;
 			case CMD_LEVEL_HOLE:
+				// TODO: apparently the first parameter can be a filename, so adjust value assignment accordingly if it is a string
 				value = GET_ARG(1);	// ltb    1-18-05  adjustable hole sprites
 
 				if(holesprite < 0) {
@@ -8165,26 +8175,11 @@ void load_level(char *filename) {
 					errormessage = "Too many holes in level (check LEVEL_MAX_HOLES)!";
 					goto lCleanup;
 				}
-				level->holes[level->numholes][0] = GET_FLOAT_ARG(1);
-				level->holes[level->numholes][1] = GET_FLOAT_ARG(2);
-				level->holes[level->numholes][2] = GET_FLOAT_ARG(3);
-				level->holes[level->numholes][3] = GET_FLOAT_ARG(4);
-				level->holes[level->numholes][4] = GET_FLOAT_ARG(5);
-				level->holes[level->numholes][5] = GET_FLOAT_ARG(6);
-				level->holes[level->numholes][6] = GET_FLOAT_ARG(7);
-
-				if(!level->holes[level->numholes][1])
-					level->holes[level->numholes][1] = 240;
-				if(!level->holes[level->numholes][2])
-					level->holes[level->numholes][2] = 12;
-				if(!level->holes[level->numholes][3])
-					level->holes[level->numholes][3] = 1;
-				if(!level->holes[level->numholes][4])
-					level->holes[level->numholes][4] = 200;
-				if(!level->holes[level->numholes][5])
-					level->holes[level->numholes][5] = 287;
-				if(!level->holes[level->numholes][6])
-					level->holes[level->numholes][6] = 45;
+				for(i = 0; i < sizeof(s_hole) / sizeof(float); i++) {
+					((float*) &level->holes[level->numholes])[i] = GET_FLOAT_ARG(i + 1);
+					if(! ((float*) &level->holes[level->numholes])[i])
+						((float*) &level->holes[level->numholes])[i] = ((float*) &default_hole_coords)[i];
+				}
 				level->numholes++;
 				break;
 			case CMD_LEVEL_WALL:
@@ -10264,28 +10259,29 @@ int checkhit(entity * attacker, entity * target, int counter) {
 	return 1;
 }
 
-
-
 /*
 Calculates the coef relative to the bottom left point. This is done by figuring out how far the entity is from
 the bottom of the platform and multiplying the result by the difference of the bottom left point and the top
 left point divided by depth of the platform. The same is done for the right side, and checks to see if they are
 within the bottom/top and the left/right area.
 */
-int testhole(int hole, float x, float z) {
+static int testhole_or_wall(s_hole* area, float x, float z) {
 	float coef1, coef2;
-	if(z < level->holes[hole][1] && z > level->holes[hole][1] - level->holes[hole][6]) {
-		coef1 =
-		    (level->holes[hole][1] -
-		     z) * ((level->holes[hole][2] - level->holes[hole][3]) / level->holes[hole][6]);
-		coef2 =
-		    (level->holes[hole][1] -
-		     z) * ((level->holes[hole][4] - level->holes[hole][5]) / level->holes[hole][6]);
-		if(x > level->holes[hole][0] + level->holes[hole][3] + coef1
-		   && x < level->holes[hole][0] + level->holes[hole][5] + coef2)
+	if(z < area->z && z > area->z - area->depth) {
+		coef1 = (area->z - z) * ((area->upperleft - area->lowerleft) / area->depth);
+		coef2 = (area->z - z) * ((area->upperright - area->lowerright) / area->depth);
+		if(x > area->x + area->lowerleft + coef1
+		   && x < area->x + area->lowerright + coef2)
 			return 1;
 	}
 	return 0;
+}
+int testhole(int hole, float x, float z) {
+	return testhole_or_wall(&level->holes[hole], x, z);
+}
+
+int testwall(int wall, float x, float z) {
+	return testhole_or_wall((s_hole*) (&level->walls[wall]), x, z);
 }
 
 /// find all holes here and return the count
@@ -10319,26 +10315,7 @@ int checkhole(float x, float z) {
 	return 0;
 }
 
-/*
-Calculates the coef relative to the bottom left point. This is done by figuring out how far the entity is from
-the bottom of the platform and multiplying the result by the difference of the bottom left point and the top
-left point divided by depth of the platform. The same is done for the right side, and checks to see if they are
-within the bottom/top and the left/right area.
-*/
-int testwall(int wall, float x, float z) {
-	float coef1, coef2;
 
-//    if(wall >= level->numwalls || wall < 0) return 0;
-	if(z < level->walls[wall].z && z > level->walls[wall].z - level->walls[wall].depth) {
-		coef1 = (level->walls[wall].z - z) * ((level->walls[wall].upperleft - level->walls[wall].lowerleft) / level->walls[wall].depth);
-		coef2 = (level->walls[wall].z - z) * ((level->walls[wall].upperright - level->walls[wall].lowerright) / level->walls[wall].depth);
-		if(x > level->walls[wall].x + level->walls[wall].lowerleft + coef1
-		   && x < level->walls[wall].x + level->walls[wall].lowerright + coef2)
-			return 1;
-	}
-
-	return 0;
-}
 
 // find all walls here within altitude1 and 2, return the count
 int checkwalls(float x, float z, float a1, float a2) {
@@ -18537,8 +18514,8 @@ void draw_scrolled_bg() {
 	pscreenmethod->alpha = 0;
 
 	for(i = 0; i < level->numholes; i++)
-		spriteq_add_sprite((int) (level->holes[i][0] - advancex),
-				   (int) (level->holes[i][1] - level->holes[i][6] + 4 + gfx_y_offset), HOLE_Z,
+		spriteq_add_sprite((int) (level->holes[i].x - advancex),
+				   (int) (level->holes[i].z - level->holes[i].depth + 4 + gfx_y_offset), HOLE_Z,
 				   holesprite, pscreenmethod, 0);
 
 	if(frontpanels_loaded) {
