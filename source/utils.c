@@ -308,66 +308,6 @@ char *commaprint(u64 n) {
 	return p;
 }
 
-//! Increase or Decrease an array à la \e vector
-/**
-	\param f_caller : name of the calling function for logging purpose
-	\param array : the array to consider
-	\param new_size : new size needed for the array (in BYTE) :
-		-# if new_size <= 0 : Deallocation of the array
-		-# new_size < \a curr_size_allocated - \a grow_step => Decrease of the array
-		-# new_size >= \a curr_size_allocated => Increase of the array
-	\param curr_size_allocated : current allocated size to the array (in BYTE)
-	\param grow_step : bloc size of expansion of the array (in BYTE)
-*/
-void Array_Check_Size(const char *f_caller, char **array, int new_size, int *curr_size_allocated, int grow_step) {
-	// Deallocation
-	if(new_size <= 0) {
-		if(*array != NULL) {
-			free(*array);
-			*array = NULL;
-		}
-		*curr_size_allocated = 0;
-	}
-	// First allocation
-	else if(*array == NULL) {
-		*curr_size_allocated = grow_step;
-		*array = malloc(*curr_size_allocated);
-		if(*array == NULL)
-			shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
-		memset(*array, 0, *curr_size_allocated);
-		return;
-	}
-	// No need to decrease or increase the array
-	else if(new_size > (*curr_size_allocated - grow_step) && new_size <= *curr_size_allocated)
-		return;
-
-	//-------------------------------------------
-	// Must increase or decrease the array size
-
-	int old_size = *curr_size_allocated;
-
-	// Recompute needed size
-	*curr_size_allocated = ((int) ceil((float) new_size / (float) grow_step)) * grow_step;
-
-	// Alloc a new array
-	void *copy = malloc(*curr_size_allocated);
-	if(copy == NULL)
-		shutdown(1, "Out Of Memory!  Failed in %s\n", f_caller);
-
-	// Copy the previous content of the array
-	memcpy(copy, *array, ((old_size < new_size) ? old_size : new_size));
-
-	// Init the new allocations
-	if(old_size < *curr_size_allocated)
-		memset(copy + old_size, 0, *curr_size_allocated - old_size);
-
-	// Free previous array memory
-	free(*array);
-
-	// ReAssign the new allocated array
-	*array = copy;
-}
-
 void char_to_lower(char *dst, char *src, size_t maxlen) {
 	unsigned i;
 	for(i = 0; i < maxlen; i++) {
