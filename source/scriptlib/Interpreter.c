@@ -67,7 +67,7 @@ void Interpreter_Clear(Interpreter * pinterpreter) {
 *  Parameters: scriptText -- an const char* containing the script to be parsed.
 *              startingLineNumber -- The line number the script starts on
 *                                    (For use in HTML-based scripts)
-*              dwSourceContext -- DWORD which contains a host provided context
+*              dwSourceContext -- u32 which contains a host provided context
 *                                 for the script being parsed.
 *  Returns: E_FAIL if parser errors found else S_OK
 ******************************************************************************/

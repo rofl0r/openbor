@@ -14,7 +14,7 @@
 
 typedef struct Symbol {
 	CHAR name[MAX_STR_LEN + 1];
-	DWORD dwFlags;
+	u32 dwFlags;
 	ScriptVariant var;
 	Instruction *theRef;
 } Symbol;
@@ -26,7 +26,7 @@ typedef struct SymbolTable {
 	CHAR name[MAX_STR_LEN + 1];
 } SymbolTable;
 
-void Symbol_Init(Symbol * symbol, const char* theName, DWORD flags, ScriptVariant * pvar, Instruction * theRef);
+void Symbol_Init(Symbol * symbol, const char* theName, u32 flags, ScriptVariant * pvar, Instruction * theRef);
 void SymbolTable_Init(SymbolTable * stable, const char* theName);
 void SymbolTable_Clear(SymbolTable * stable);
 BOOL SymbolTable_FindSymbol(SymbolTable * stable, const char* symbolName, Symbol ** pp_theSymbol);

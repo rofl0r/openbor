@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 
-void Symbol_Init(Symbol * symbol, const char* theName, DWORD flags, ScriptVariant * pvar, Instruction * theRef) {
+void Symbol_Init(Symbol * symbol, const char* theName, u32 flags, ScriptVariant * pvar, Instruction * theRef) {
 	memset(symbol, 0, sizeof(Symbol));
 	if(theName)
 		strcpy(symbol->name, theName);

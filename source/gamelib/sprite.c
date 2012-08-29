@@ -19,7 +19,7 @@
 
  Format of the line offset table:
 
-	Every DWORD in the line offset table points to the start of the
+	Every u32 in the line offset table points to the start of the
 	corresponding line as follows:
 
 	lineptr = tableptr + *tableptr;
@@ -28,15 +28,15 @@
  Format of the RLE-encoded image data:
 
 	* The data is encoded per line.
-	* The data is DWORD-aligned.
+	* The data is u32-aligned.
 	* When decoding a line, the destination pointer will be reset
 	  to it's original position when the end of the line is reached.
 	  The data must be formatted properly for this.
 
 
 	RLE data block format:
-	DWORD		advance pointer	"clearcount"
-	DWORD		pixel count "viscount"
+	u32		advance pointer	"clearcount"
+	u32		pixel count "viscount"
 	(4*?) BYTES	pixels
 
 	The final clearcount in a line will have a zero or negative value.
@@ -158,7 +158,7 @@ static void ps_bothclip(int x, int y, int width, int height, unsigned long *line
 
 			if(viscount >= screenwidth) {
 				// Fill entire width of screen (dest-aligned).
-				// In ASM, this will copy DWORDs.
+				// In ASM, this will copy u32s.
 				viscount = screenwidth;
 				do {
 					*dest_c = *charptr;
@@ -171,7 +171,7 @@ static void ps_bothclip(int x, int y, int width, int height, unsigned long *line
 			widthcount -= viscount;
 
 			// Draw this run's remaining pixels to the screen.
-			// Dest-aligned, will copy DWORDs in ASM.
+			// Dest-aligned, will copy u32s in ASM.
 			do {
 				*dest_c = *charptr;
 				++dest_c;
@@ -209,7 +209,7 @@ static void ps_bothclip(int x, int y, int width, int height, unsigned long *line
 			viscount_bytes = viscount & 3;
 
 #if 0
-			// Move DWORDS
+			// Move u32S
 			if((int) dest_c & 3) {
 				while(viscount_dwords) {
 					pixelblock = *data++;
@@ -475,7 +475,7 @@ static void ps_leftclip(int x, int y, int width, int height, unsigned long *line
 			dest_c -= x;
 
 			// Draw this run's remaining pixels to the screen.
-			// Dest-aligned, will copy DWORDs in ASM.
+			// Dest-aligned, will copy u32s in ASM.
 			do {
 				*dest_c = *charptr;
 				++dest_c;
@@ -502,7 +502,7 @@ static void ps_leftclip(int x, int y, int width, int height, unsigned long *line
 			viscount_dwords = viscount >> 2;
 			viscount_bytes = viscount & 3;
 #if 0
-			// Move DWORDS
+			// Move u32S
 			if((int) dest_c & 3) {
 				while(viscount_dwords) {
 					pixelblock = *data++;
@@ -654,7 +654,7 @@ void putsprite(int x, int y, s_sprite * frame, s_screen * screen) {
 			} else
 #endif
 			{
-				// Move DWORDS
+				// Move u32S
 				while(viscount_dwords) {
 					*(unsigned long *) dest_c = *data++;
 					dest_c += 4;
