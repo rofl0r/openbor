@@ -559,40 +559,40 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 		case _e_totalram: case _e_freeram: case _e_usedram:
 			ScriptVariant_ChangeType(var, VT_INTEGER);
 			switch (index) {
-				case _e_count_enemies: var->lVal = (LONG) count_ents(TYPE_ENEMY); break;
-				case _e_count_players: var->lVal = (LONG) count_ents(TYPE_PLAYER); break;
-				case _e_count_npcs: var->lVal = (LONG) count_ents(TYPE_NPC); break;
-				case _e_count_entities: var->lVal = (LONG) ent_count; break;
-				case _e_ent_max: var->lVal = (LONG) ent_max; break;
-				case _e_in_level: var->lVal = (LONG) (level == NULL); break;
-				case _e_elapsed_time: var->lVal = (LONG) borTime; break;
-				case _e_in_selectscreen: var->lVal = (LONG) (selectScreen); break;
-				case _e_lasthitc: var->lVal = (LONG) (lasthitc); break;
-				case _e_lasthitt: var->lVal = (LONG) (lasthitt); break;
-				case _e_hResolution: var->lVal = (LONG) videomodes.hRes; break;
-				case _e_vResolution: var->lVal = (LONG) videomodes.vRes; break;
-				case _e_current_set: var->lVal = (LONG) (current_set); break;
-				case _e_current_level: var->lVal = (LONG) (current_level); break;
-				case _e_current_palette: var->lVal = (LONG) (current_palette); break;
-				case _e_current_stage: var->lVal = (LONG) (current_stage); break;
-				case _e_maxentityvars: var->lVal = (LONG) max_entity_vars; break;
-				case _e_maxglobalvars: var->lVal = (LONG) max_global_vars; break;
-				case _e_maxindexedvars: var->lVal = (LONG) max_indexed_vars; break;
-				case _e_maxplayers: var->lVal = (LONG) maxplayers[current_set]; break;
-				case _e_maxscriptvars: var->lVal = (LONG) max_script_vars; break;
-				case _e_models_cached: var->lVal = (LONG) models_cached; break;
-				case _e_models_loaded: var->lVal = (LONG) models_loaded; break;
-				case _e_numpalettes: var->lVal = (LONG) (level->numpalettes); break;
-				case _e_pixelformat: var->lVal = (LONG) pixelformat; break;			
-				case _e_player_max_z: var->lVal = (LONG) (PLAYER_MAX_Z); break;
-				case _e_player_min_z: var->lVal = (LONG) (PLAYER_MIN_Z); break;
-				case _e_lightx: var->lVal = (LONG) (light[0]); break;
-				case _e_lightz: var->lVal = (LONG) (light[1]); break;
-				case _e_shadowalpha: var->lVal = (LONG) shadowalpha; break;
-				case _e_shadowcolor: var->lVal = (LONG) colors.shadow; break;
-				case _e_slowmotion: var->lVal = (LONG) slowmotion[0]; break;
-				case _e_slowmotion_duration: var->lVal = (LONG) slowmotion[1]; break;
-				case _e_game_paused: var->lVal = (LONG) pause; break;
+				case _e_count_enemies: var->lVal = (s32) count_ents(TYPE_ENEMY); break;
+				case _e_count_players: var->lVal = (s32) count_ents(TYPE_PLAYER); break;
+				case _e_count_npcs: var->lVal = (s32) count_ents(TYPE_NPC); break;
+				case _e_count_entities: var->lVal = (s32) ent_count; break;
+				case _e_ent_max: var->lVal = (s32) ent_max; break;
+				case _e_in_level: var->lVal = (s32) (level == NULL); break;
+				case _e_elapsed_time: var->lVal = (s32) borTime; break;
+				case _e_in_selectscreen: var->lVal = (s32) (selectScreen); break;
+				case _e_lasthitc: var->lVal = (s32) (lasthitc); break;
+				case _e_lasthitt: var->lVal = (s32) (lasthitt); break;
+				case _e_hResolution: var->lVal = (s32) videomodes.hRes; break;
+				case _e_vResolution: var->lVal = (s32) videomodes.vRes; break;
+				case _e_current_set: var->lVal = (s32) (current_set); break;
+				case _e_current_level: var->lVal = (s32) (current_level); break;
+				case _e_current_palette: var->lVal = (s32) (current_palette); break;
+				case _e_current_stage: var->lVal = (s32) (current_stage); break;
+				case _e_maxentityvars: var->lVal = (s32) max_entity_vars; break;
+				case _e_maxglobalvars: var->lVal = (s32) max_global_vars; break;
+				case _e_maxindexedvars: var->lVal = (s32) max_indexed_vars; break;
+				case _e_maxplayers: var->lVal = (s32) maxplayers[current_set]; break;
+				case _e_maxscriptvars: var->lVal = (s32) max_script_vars; break;
+				case _e_models_cached: var->lVal = (s32) models_cached; break;
+				case _e_models_loaded: var->lVal = (s32) models_loaded; break;
+				case _e_numpalettes: var->lVal = (s32) (level->numpalettes); break;
+				case _e_pixelformat: var->lVal = (s32) pixelformat; break;			
+				case _e_player_max_z: var->lVal = (s32) (PLAYER_MAX_Z); break;
+				case _e_player_min_z: var->lVal = (s32) (PLAYER_MIN_Z); break;
+				case _e_lightx: var->lVal = (s32) (light[0]); break;
+				case _e_lightz: var->lVal = (s32) (light[1]); break;
+				case _e_shadowalpha: var->lVal = (s32) shadowalpha; break;
+				case _e_shadowcolor: var->lVal = (s32) colors.shadow; break;
+				case _e_slowmotion: var->lVal = (s32) slowmotion[0]; break;
+				case _e_slowmotion_duration: var->lVal = (s32) slowmotion[1]; break;
+				case _e_game_paused: var->lVal = (s32) pause; break;
 				case _e_totalram: var->lVal = 64 * 1024; break;
 				case _e_freeram: var->lVal = 63 * 1024; break;
 				case _e_usedram: var->lVal = 1024; break;
@@ -606,10 +606,10 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 				return 0;
 			ScriptVariant_ChangeType(var, VT_INTEGER);
 			switch (index) {
-				case _e_game_speed: var->lVal = (LONG) GAME_SPEED; break;
-				case _e_gfx_y_offset: var->lVal = (LONG) gfx_y_offset; break;
-				case _e_levelwidth: var->lVal = (LONG) (level->width); break;
-				case _e_levelheight: var->lVal = (LONG) (panel_height); break;
+				case _e_game_speed: var->lVal = (s32) GAME_SPEED; break;
+				case _e_gfx_y_offset: var->lVal = (s32) gfx_y_offset; break;
+				case _e_levelwidth: var->lVal = (s32) (level->width); break;
+				case _e_levelheight: var->lVal = (s32) (panel_height); break;
 				default: assert(0); break;
 			}
 			break;
@@ -625,7 +625,7 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 // change a system variant, used by script
 int changesyspropertybyindex(int index, ScriptVariant * value) {
 	//char* tempstr = NULL;
-	LONG ltemp;
+	s32 ltemp;
 	//DOUBLE dbltemp;
 
 	// This enum is replicated in mapstrings_changesystemvariant in
@@ -880,7 +880,7 @@ static void execute_script_default(s_script_args* args, Script* dest_script) {
 						tempvar.ptrVal = (VOID *) tuples[i].value;
 						break;
 					case VT_INTEGER:
-						tempvar.lVal = (LONG) tuples[i].value;
+						tempvar.lVal = (s32) tuples[i].value;
 						break;
 					case VT_DECIMAL:
 						memcpy(&tmp_float, &tuples[i].value, sizeof(float));
@@ -9274,7 +9274,7 @@ void addscore(int playerindex, int add) {
 	if(Script_IsInitialized(game_scripts.score_script + playerindex)) {
 		ScriptVariant_Clear(&var);
 		ScriptVariant_ChangeType(&var, VT_INTEGER);
-		var.lVal = (LONG) add;
+		var.lVal = (s32) add;
 		Script_Set_Local_Variant("score", &var);
 		Script_Execute(game_scripts.score_script + playerindex);
 		ScriptVariant_Clear(&var);

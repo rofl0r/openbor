@@ -17,7 +17,7 @@ typedef struct Parser {
 	ParserSet theParserSet;	//A pointer to this parsers' parserSet
 	Token theNextToken;	//A pointer to the next token
 	List *pIList;		//A pointer to the instruction list
-	LONG LabelCount;	//A counter to track the number of labels
+	s32 LabelCount;	//A counter to track the number of labels
 	Stack LabelStack;	//A stack of labels for use in jumps
 	CHAR theRetLabel[MAX_STR_LEN + 1];	//A label which holds the target of returns
 	Token theFieldToken;	//A pointer to the field source token

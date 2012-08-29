@@ -143,7 +143,7 @@ void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
 		switch(cvt)
 		{
 		case VT_INTEGER:
-			var->dblVal = (LONG)var->lVal;
+			var->dblVal = (s32)var->lVal;
 			break;
 		case VT_STR:
 			var->strVal = StrCache_Pop();
@@ -162,11 +162,11 @@ void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
 
 }
 
-s32 ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal) {
+s32 ScriptVariant_IntegerValue(ScriptVariant * var, s32 * pVal) {
 	if(var->vt == VT_INTEGER) {
 		*pVal = var->lVal;
 	} else if(var->vt == VT_DECIMAL) {
-		*pVal = (LONG) var->dblVal;
+		*pVal = (s32) var->dblVal;
 	} else
 		return E_FAIL;
 
@@ -453,7 +453,7 @@ ScriptVariant *ScriptVariant_Add(ScriptVariant * svar, ScriptVariant * rightChil
 			retvar.dblVal = dbl1 + dbl2;
 		} else {
 			ScriptVariant_ChangeType(&retvar, VT_INTEGER);
-			retvar.lVal = (LONG) (dbl1 + dbl2);
+			retvar.lVal = (s32) (dbl1 + dbl2);
 		}
 	} else if(svar->vt == VT_STR || rightChild->vt == VT_STR) {
 		ScriptVariant_ChangeType(&retvar, VT_STR);
@@ -476,7 +476,7 @@ ScriptVariant *ScriptVariant_Sub(ScriptVariant * svar, ScriptVariant * rightChil
 			retvar.dblVal = dbl1 - dbl2;
 		} else {
 			retvar.vt = VT_INTEGER;
-			retvar.lVal = (LONG) (dbl1 - dbl2);
+			retvar.lVal = (s32) (dbl1 - dbl2);
 		}
 	} else {
 		ScriptVariant_Init(&retvar);
@@ -494,7 +494,7 @@ ScriptVariant *ScriptVariant_Mul(ScriptVariant * svar, ScriptVariant * rightChil
 			retvar.dblVal = dbl1 * dbl2;
 		} else {
 			retvar.vt = VT_INTEGER;
-			retvar.lVal = (LONG) (dbl1 * dbl2);
+			retvar.lVal = (s32) (dbl1 * dbl2);
 		}
 	} else {
 		ScriptVariant_Init(&retvar);
@@ -514,7 +514,7 @@ ScriptVariant *ScriptVariant_Div(ScriptVariant * svar, ScriptVariant * rightChil
 			retvar.dblVal = dbl1 / dbl2;
 		} else {
 			retvar.vt = VT_INTEGER;
-			retvar.lVal = (LONG) (dbl1 / dbl2);
+			retvar.lVal = (s32) (dbl1 / dbl2);
 		}
 	} else {
 		ScriptVariant_Init(&retvar);
@@ -525,7 +525,7 @@ ScriptVariant *ScriptVariant_Div(ScriptVariant * svar, ScriptVariant * rightChil
 
 ScriptVariant *ScriptVariant_Mod(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	LONG l1, l2;
+	s32 l1, l2;
 	if(ScriptVariant_IntegerValue(svar, &l1) == S_OK && ScriptVariant_IntegerValue(rightChild, &l2) == S_OK) {
 		retvar.vt = VT_INTEGER;
 		retvar.lVal = l1 % l2;

@@ -123,14 +123,14 @@ void Instruction_ConvertConstant(Instruction * pins) {
 		ScriptVariant_ChangeType(pvar, VT_INTEGER);
 		if(pins->theToken->theType != END_OF_TOKENS) {
 			if(pins->theToken->theType == TOKEN_HEXCONSTANT)
-				pvar->lVal = (LONG) htoi(pins->theToken->theSource);
+				pvar->lVal = (s32) htoi(pins->theToken->theSource);
 			else
-				pvar->lVal = (LONG) atoi(pins->theToken->theSource);
+				pvar->lVal = (s32) atoi(pins->theToken->theSource);
 		} else {
 			if(pins->Label[1] == 'x' || pins->Label[1] == 'X')
-				pvar->lVal = (LONG) htoi(pins->Label);
+				pvar->lVal = (s32) htoi(pins->Label);
 			else
-				pvar->lVal = (LONG) atoi(pins->Label);
+				pvar->lVal = (s32) atoi(pins->Label);
 		}
 	} else if(pins->OpCode == CONSTSTR) {
 		pvar = (ScriptVariant *) malloc(sizeof(ScriptVariant));
