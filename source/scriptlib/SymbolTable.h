@@ -13,7 +13,7 @@
 #include "List.h"
 
 typedef struct Symbol {
-	CHAR name[MAX_STR_LEN + 1];
+	char name[MAX_STR_LEN + 1];
 	u32 dwFlags;
 	ScriptVariant var;
 	Instruction *theRef;
@@ -23,7 +23,7 @@ typedef struct Symbol {
 typedef struct SymbolTable {
 	List SymbolList;
 	int nextSymbolCount;
-	CHAR name[MAX_STR_LEN + 1];
+	char name[MAX_STR_LEN + 1];
 } SymbolTable;
 
 void Symbol_Init(Symbol * symbol, const char* theName, u32 flags, ScriptVariant * pvar, Instruction * theRef);

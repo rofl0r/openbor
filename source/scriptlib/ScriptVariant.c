@@ -13,7 +13,7 @@
 
 // use string cache to cut the memory usage down, because not all variants are string, no need to give each of them an array
 #define STRCACHE_INC      64
-CHAR **strcache = NULL;
+char **strcache = NULL;
 int strcache_size = 0;
 int strcache_top = -1;
 int *strcache_index = NULL;
@@ -41,12 +41,12 @@ void StrCache_Clear() {
 void StrCache_Init() {
 	int i;
 	StrCache_Clear();	// just in case
-	strcache = malloc(sizeof(CHAR *) * STRCACHE_INC);
+	strcache = malloc(sizeof(char *) * STRCACHE_INC);
 	//if(!strcache) shutdown(1, "out of memory");
 	strcache_index = malloc(sizeof(int) * STRCACHE_INC);
 	//if(!strcache_index) shutdown(1, "out of memory");
 	for(i = 0; i < STRCACHE_INC; i++) {
-		strcache[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(CHAR));
+		strcache[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(char));
 		//if(!strcache[i]) shutdown(1, "out of memory");
 		strcache[i][0] = 0;
 		strcache_index[i] = i;
@@ -65,7 +65,7 @@ void StrCache_Collect(int index) {
 }
 
 int StrCache_Pop() {
-	CHAR **temp;
+	char **temp;
 	int *tempi;
 	int i;
 	if(strcache_size == 0) {
@@ -73,10 +73,10 @@ int StrCache_Pop() {
 	}
 	if(strcache_top < 0)	// realloc
 	{
-		temp = malloc(sizeof(CHAR *) * (strcache_size + STRCACHE_INC));
+		temp = malloc(sizeof(char *) * (strcache_size + STRCACHE_INC));
 		//if(!temp) shutdown(1, "out of memory");
 		for(i = strcache_size; i < strcache_size + STRCACHE_INC; i++) {
-			temp[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(CHAR));
+			temp[i] = malloc((MAX_STR_VAR_LEN + 1) * sizeof(char));
 			//if(!strcache[i]) shutdown(1, "out of memory");
 			temp[i][0] = 0;
 		}
@@ -98,7 +98,7 @@ int StrCache_Pop() {
 	return strcache_index[strcache_top--];
 }
 
-CHAR *StrCache_Get(int index) {
+char *StrCache_Get(int index) {
 	if(index < strcache_size) {
 		return strcache[index];
 	}
@@ -441,7 +441,7 @@ ScriptVariant *ScriptVariant_Add(ScriptVariant * svar, ScriptVariant * rightChil
 	static ScriptVariant retvar;
 	static int flag = 1;
 	DOUBLE dbl1, dbl2;
-	CHAR buf[MAX_STR_VAR_LEN + 1];
+	char buf[MAX_STR_VAR_LEN + 1];
 	if(flag) {
 		ScriptVariant_Init(&retvar);
 		flag = 0;

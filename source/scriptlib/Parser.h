@@ -19,7 +19,7 @@ typedef struct Parser {
 	List *pIList;		//A pointer to the instruction list
 	s32 LabelCount;	//A counter to track the number of labels
 	Stack LabelStack;	//A stack of labels for use in jumps
-	CHAR theRetLabel[MAX_STR_LEN + 1];	//A label which holds the target of returns
+	char theRetLabel[MAX_STR_LEN + 1];	//A label which holds the target of returns
 	Token theFieldToken;	//A pointer to the field source token
 	int paramCount;
 	char currentPath[256];	// current path info of the text

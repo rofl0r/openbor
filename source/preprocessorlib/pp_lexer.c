@@ -75,7 +75,7 @@ void pp_token_Init(pp_token * ptoken, PP_TOKEN_TYPE theType, const char* theSour
 void pp_lexer_Init(pp_lexer * plexer, const char* theSource, TEXTPOS theStartingPosition) {
 	plexer->ptheSource = theSource;
 	plexer->theTextPosition = theStartingPosition;
-	plexer->pcurChar = (CHAR *) plexer->ptheSource;
+	plexer->pcurChar = (char *) plexer->ptheSource;
 	plexer->offset = 0;
 	plexer->tokOffset = 0;
 }
@@ -95,7 +95,7 @@ void pp_lexer_Clear(pp_lexer * plexer) {
 ******************************************************************************/
 s32 pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken) {
 	for(;;) {
-		memset(plexer->theTokenSource, 0, MAX_TOKEN_LENGTH * sizeof(CHAR));
+		memset(plexer->theTokenSource, 0, MAX_TOKEN_LENGTH * sizeof(char));
 		plexer->theTokenPosition = plexer->theTextPosition;
 		plexer->tokOffset = plexer->offset;
 

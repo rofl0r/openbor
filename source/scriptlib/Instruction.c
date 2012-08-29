@@ -27,7 +27,7 @@ void Instruction_InitViaLabel(Instruction * pins, OpCode code, const char* label
 	pins->theToken = malloc(sizeof(Token));
 	memset(pins->theToken, 0, sizeof(Token));
 	pins->theToken->theType = END_OF_TOKENS;
-	pins->Label = malloc(sizeof(CHAR) * (MAX_STR_LEN + 1));
+	pins->Label = malloc(sizeof(char) * (MAX_STR_LEN + 1));
 	strcpy(pins->Label, label);
 }
 

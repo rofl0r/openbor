@@ -91,9 +91,9 @@ void Parser_ParseExpression(Parser * pparser, List * pIList, char* scriptText, u
 
 	//Append a semi-colon to the end of the expression, in order to use the
 	//same grammar as regular script text.
-	char* expressionText = (CHAR *) malloc(sizeof(CHAR) * strlen(scriptText) + 2);
-	strcpy((CHAR *) expressionText, scriptText);
-	strcat((CHAR *) expressionText, ";");
+	char* expressionText = (char *) malloc(sizeof(char) * strlen(scriptText) + 2);
+	strcpy((char *) expressionText, scriptText);
+	strcat((char *) expressionText, ";");
 
 	//Create a new CLexer for this script text.
 	thePosition.row = startingLineNumber;
@@ -184,13 +184,13 @@ Label Parser_CreateLabel(Parser * pparser) {
 	//Allocate a buffer for the new Label.  A long can take 10 characters at
 	//most, so allocate that plus two extra for the "" and the null
 	//terminator
-	Label theLabel = (CHAR *) malloc(12);
+	Label theLabel = (char *) malloc(12);
 	memset((void *) theLabel, 0, 12);
 
 	//Increment the label count.
 	pparser->LabelCount++;
 
-	sprintf((CHAR *) theLabel, "L%d", pparser->LabelCount);
+	sprintf((char *) theLabel, "L%d", pparser->LabelCount);
 
 	return theLabel;
 }
@@ -430,7 +430,7 @@ void Parser_Param_list(Parser * pparser) {
 
 void Parser_Param_list2(Parser * pparser) {
 	int i;
-	CHAR buf[4];
+	char buf[4];
 	Instruction *pinstruction;
 	if(Parser_Check(pparser, TOKEN_COMMA)) {
 		Parser_Match(pparser);
@@ -538,7 +538,7 @@ void Parser_Comp_stmt_Label(Parser * pparser, Label theLabel) {
 		Parser_Match(pparser);
 		Parser_AddInstructionViaToken(pparser, PUSH, (Token *) NULL, NULL);
 		label = Parser_CreateLabel(pparser);
-		strcpy((CHAR *) theLabel, label);
+		strcpy((char *) theLabel, label);
 		Parser_Comp_stmt2(pparser);
 		Parser_Comp_stmt3(pparser);
 		Parser_AddInstructionViaToken(pparser, NOOP, (Token *) NULL, label);
@@ -1153,7 +1153,7 @@ void Parser_Arg_expr_list2(Parser * pparser, int argCount, int range) {
 	//We push the arguments onto the stack backwards so they come off right,
 	//So back up one instruction before inserting.
 	int argRange, i;
-	CHAR buffer[4];
+	char buffer[4];
 	List_GotoPrevious(pparser->pIList);
 
 	if(Parser_Check(pparser, TOKEN_COMMA)) {

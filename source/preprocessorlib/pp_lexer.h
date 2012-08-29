@@ -66,7 +66,7 @@ typedef struct TEXTPOS {
 ******************************************************************************/
 typedef struct pp_token {
 	PP_TOKEN_TYPE theType;
-	CHAR theSource[MAX_TOKEN_LENGTH + 1];
+	char theSource[MAX_TOKEN_LENGTH + 1];
 	TEXTPOS theTextPosition;
 	u32 charOffset;
 } pp_token;
@@ -88,9 +88,9 @@ typedef struct pp_lexer {
 	TEXTPOS theTextPosition;
 	u32 offset;
 	u32 tokOffset;
-	CHAR *pcurChar;
+	char *pcurChar;
 	//Character buffer for the tokens
-	CHAR theTokenSource[MAX_TOKEN_LENGTH];
+	char theTokenSource[MAX_TOKEN_LENGTH];
 	TEXTPOS theTokenPosition;
 } pp_lexer;
 

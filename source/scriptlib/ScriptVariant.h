@@ -31,7 +31,7 @@ typedef struct ScriptVariant {
 } ScriptVariant;
 
 
-extern CHAR **strcache;
+extern char **strcache;
 extern int strcache_size;
 extern int *strcache_index;
 
@@ -41,7 +41,7 @@ void StrCache_Clear();
 //void StrCache_Init();
 void StrCache_Collect(int index);
 int StrCache_Pop();
-CHAR *StrCache_Get(int index);
+char *StrCache_Get(int index);
 void ScriptVariant_Clear(ScriptVariant * var);
 
 void ScriptVariant_Init(ScriptVariant * var);

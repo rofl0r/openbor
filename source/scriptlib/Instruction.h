@@ -25,7 +25,7 @@ typedef enum OpCode { CONSTSTR, CONSTDBL, CONSTINT, LOAD, SAVE, INC, DEC, FIELD,
 typedef struct Instruction {
 	OpCode OpCode;
 	Token *theToken;
-	CHAR *Label;		//[MAX_STR_LEN+1];
+	char *Label;		//[MAX_STR_LEN+1];
 	ScriptVariant *theVal;
 	ScriptVariant *theVal2;
 	ScriptVariant *theRef;

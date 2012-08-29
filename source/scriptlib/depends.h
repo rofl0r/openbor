@@ -16,7 +16,6 @@
 #define COMPILED_SCRIPT 1
 #endif
 
-typedef char CHAR;
 typedef float FLOAT;
 typedef double DOUBLE;
 

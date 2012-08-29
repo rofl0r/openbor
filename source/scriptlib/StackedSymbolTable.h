@@ -13,7 +13,7 @@
 #include "Stack.h"
 typedef struct StackedSymbolTable {
 	Stack SymbolTableStack;
-	CHAR name[MAX_STR_LEN + 1];
+	char name[MAX_STR_LEN + 1];
 } StackedSymbolTable;
 
 void StackedSymbolTable_Init(StackedSymbolTable * sstable, const char* theName);
