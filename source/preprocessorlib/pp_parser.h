@@ -89,18 +89,18 @@ pp_parser *pp_parser_alloc(pp_parser * parent, const char *filename, char *sourc
 pp_parser *pp_parser_alloc_macro(pp_parser * parent, char *macroContents, int numParams, pp_parser_type type);
 
 pp_token *pp_parser_emit_token(pp_parser * self);
-HRESULT pp_parser_readline(pp_parser * self, char *buf, int bufsize);
-HRESULT pp_parser_stringify(pp_parser * self);
+s32 pp_parser_readline(pp_parser * self, char *buf, int bufsize);
+s32 pp_parser_stringify(pp_parser * self);
 void pp_parser_concatenate(pp_parser * self, const char *token1, const char *token2);
-HRESULT pp_parser_parse_directive(pp_parser * self);
-HRESULT pp_parser_include(pp_parser * self, char *filename);
-HRESULT pp_parser_define(pp_parser * self, char *name);
-HRESULT pp_parser_conditional(pp_parser * self, PP_TOKEN_TYPE directive);
+s32 pp_parser_parse_directive(pp_parser * self);
+s32 pp_parser_include(pp_parser * self, char *filename);
+s32 pp_parser_define(pp_parser * self, char *name);
+s32 pp_parser_conditional(pp_parser * self, PP_TOKEN_TYPE directive);
 bool pp_parser_eval_conditional(pp_parser * self, PP_TOKEN_TYPE directive);
 void pp_parser_insert_macro(pp_parser * self, char *name);
-HRESULT pp_parser_insert_function_macro(pp_parser * self, char *name);
+s32 pp_parser_insert_function_macro(pp_parser * self, char *name);
 
-HRESULT pp_error(pp_parser * self, char *format, ...);
+s32 pp_error(pp_parser * self, char *format, ...);
 void pp_warning(pp_parser * self, char *format, ...);
 
 #endif

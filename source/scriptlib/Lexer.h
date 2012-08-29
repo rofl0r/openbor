@@ -66,11 +66,11 @@ typedef struct Lexer {
 void Token_Init(Token * ptoken, MY_TOKEN_TYPE theType, LPCSTR theSource, TEXTPOS theTextPosition, ULONG charOffset);
 void Lexer_Init(Lexer * plexer, pp_context * pcontext, LPCSTR thePath, LPSTR theSource, TEXTPOS theStartingPosition);
 void Lexer_Clear(Lexer * plexer);
-HRESULT Lexer_GetNextToken(Lexer * plexer, Token * theNextToken);
-HRESULT Lexer_GetTokenIdentifier(Lexer * plexer, Token * theNextToken);
-HRESULT Lexer_GetTokenNumber(Lexer * plexer, Token * theNextToken);
-HRESULT Lexer_GetTokenStringLiteral(Lexer * plexer, Token * theNextToken);
-HRESULT Lexer_GetTokenSymbol(Lexer * plexer, Token * theNextToken);
-HRESULT Lexer_SkipComment(Lexer * lexer, COMMENT_TYPE theType);
+s32 Lexer_GetNextToken(Lexer * plexer, Token * theNextToken);
+s32 Lexer_GetTokenIdentifier(Lexer * plexer, Token * theNextToken);
+s32 Lexer_GetTokenNumber(Lexer * plexer, Token * theNextToken);
+s32 Lexer_GetTokenStringLiteral(Lexer * plexer, Token * theNextToken);
+s32 Lexer_GetTokenSymbol(Lexer * plexer, Token * theNextToken);
+s32 Lexer_SkipComment(Lexer * lexer, COMMENT_TYPE theType);
 
 #endif

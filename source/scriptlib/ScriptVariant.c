@@ -162,7 +162,7 @@ void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
 
 }
 
-HRESULT ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal) {
+s32 ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal) {
 	if(var->vt == VT_INTEGER) {
 		*pVal = var->lVal;
 	} else if(var->vt == VT_DECIMAL) {
@@ -173,7 +173,7 @@ HRESULT ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal) {
 	return S_OK;
 }
 
-HRESULT ScriptVariant_DecimalValue(ScriptVariant * var, DOUBLE * pVal) {
+s32 ScriptVariant_DecimalValue(ScriptVariant * var, DOUBLE * pVal) {
 	if(var->vt == VT_INTEGER) {
 		*pVal = (DOUBLE) var->lVal;
 	} else if(var->vt == VT_DECIMAL) {

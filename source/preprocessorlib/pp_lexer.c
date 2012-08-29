@@ -93,7 +93,7 @@ void pp_lexer_Clear(pp_lexer * plexer) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken) {
+s32 pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken) {
 	for(;;) {
 		memset(plexer->theTokenSource, 0, MAX_TOKEN_LENGTH * sizeof(CHAR));
 		plexer->theTokenPosition = plexer->theTextPosition;
@@ -302,7 +302,7 @@ HRESULT pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_GetTokenIdentifier(pp_lexer * plexer, pp_token * theNextToken) {
+s32 pp_lexer_GetTokenIdentifier(pp_lexer * plexer, pp_token * theNextToken) {
 	int len = 0;
 
 	//copy the source that makes up this token
@@ -421,7 +421,7 @@ HRESULT pp_lexer_GetTokenIdentifier(pp_lexer * plexer, pp_token * theNextToken) 
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_GetTokenNumber(pp_lexer * plexer, pp_token * theNextToken) {
+s32 pp_lexer_GetTokenNumber(pp_lexer * plexer, pp_token * theNextToken) {
 	//copy the source that makes up this token
 	//a constant is one of these:
 
@@ -494,7 +494,7 @@ HRESULT pp_lexer_GetTokenNumber(pp_lexer * plexer, pp_token * theNextToken) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_GetTokenStringLiteral(pp_lexer * plexer, pp_token * theNextToken) {
+s32 pp_lexer_GetTokenStringLiteral(pp_lexer * plexer, pp_token * theNextToken) {
 	//copy the source that makes up this token
 	//an identifier is a string of letters, digits and/or underscores
 	//consume that first quote mark
@@ -525,7 +525,7 @@ HRESULT pp_lexer_GetTokenStringLiteral(pp_lexer * plexer, pp_token * theNextToke
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_GetTokenSymbol(pp_lexer * plexer, pp_token * theNextToken) {
+s32 pp_lexer_GetTokenSymbol(pp_lexer * plexer, pp_token * theNextToken) {
 	//">>="
 	if(!strncmp(plexer->pcurChar, ">>=", 3)) {
 		CONSUMECHARACTER;
@@ -768,7 +768,7 @@ HRESULT pp_lexer_GetTokenSymbol(pp_lexer * plexer, pp_token * theNextToken) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT pp_lexer_SkipComment(pp_lexer * plexer, COMMENT_TYPE theType) {
+s32 pp_lexer_SkipComment(pp_lexer * plexer, COMMENT_TYPE theType) {
 
 	if(theType == COMMENT_SLASH) {
 		do {

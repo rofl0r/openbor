@@ -53,7 +53,7 @@ char *readscript(const char *path) {
 	return NULL;
 }
 
-HRESULT ImportNode_Init(ImportNode * node, const char *path) {
+s32 ImportNode_Init(ImportNode * node, const char *path) {
 	char *scriptText;
 	node->numRefs = 0;
 

@@ -14,7 +14,7 @@
 #include "Parser.h"
 #include "SolidList.h"
 
-typedef HRESULT(*SCRIPTFUNCTION) (ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount);
+typedef s32(*SCRIPTFUNCTION) (ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount);
 
 typedef struct Interpreter {
 	StackedSymbolTable theSymbolTable;
@@ -43,15 +43,15 @@ typedef struct Interpreter {
 
 void Interpreter_Init(Interpreter * pinterpreter, LPCSTR name, List * pflist);
 void Interpreter_Clear(Interpreter * pinterpreter);
-HRESULT Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path);
-HRESULT Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue, int refFlag);
-HRESULT Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue);
-HRESULT Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant ** pValue);
-HRESULT Interpreter_EvaluateImmediate(Interpreter * pinterpreter);
-HRESULT Interpreter_EvaluateCall(Interpreter * pinterpreter);
-HRESULT Interpreter_CompileInstructions(Interpreter * pinterpreter);
-HRESULT Interpreter_Call(Interpreter * pinterpreter);
-HRESULT Interpreter_EvalInstruction(Interpreter * pinterpreter);
+s32 Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path);
+s32 Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue, int refFlag);
+s32 Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue);
+s32 Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant ** pValue);
+s32 Interpreter_EvaluateImmediate(Interpreter * pinterpreter);
+s32 Interpreter_EvaluateCall(Interpreter * pinterpreter);
+s32 Interpreter_CompileInstructions(Interpreter * pinterpreter);
+s32 Interpreter_Call(Interpreter * pinterpreter);
+s32 Interpreter_EvalInstruction(Interpreter * pinterpreter);
 void Interpreter_Reset(Interpreter * pinterpreter);
 void Interpreter_ClearImports(Interpreter * pinterpreter);
 

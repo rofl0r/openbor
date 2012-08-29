@@ -32,7 +32,7 @@ typedef struct Instruction {
 	ScriptVariant *theRef2;
 	List *theRefList;
 	SolidList *theSolidListOfRefList;
-	 HRESULT(*functionRef) (ScriptVariant **, ScriptVariant **, int);
+	 s32(*functionRef) (ScriptVariant **, ScriptVariant **, int);
 	union {
 		int theJumpTargetIndex;
 		struct Instruction **ptheJumpTarget;

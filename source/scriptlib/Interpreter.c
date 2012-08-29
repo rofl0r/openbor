@@ -71,7 +71,7 @@ void Interpreter_Clear(Interpreter * pinterpreter) {
 *                                 for the script being parsed.
 *  Returns: E_FAIL if parser errors found else S_OK
 ******************************************************************************/
-HRESULT Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path) {
+s32 Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path) {
 
 	//Parse the script
 	Parser_ParseText(&(pinterpreter->theParser), &(pinterpreter->theContext),
@@ -94,8 +94,8 @@ HRESULT Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULON
 *           E_INVALIDARG
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue, int refFlag) {
-	HRESULT hr = E_FAIL;
+s32 Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue, int refFlag) {
+	s32 hr = E_FAIL;
 	Instruction *pref = NULL;
 	Symbol *pSymbol = NULL;
 	//Check arguments
@@ -130,8 +130,8 @@ HRESULT Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, Script
 *           E_INVALIDARG
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue) {
-	HRESULT hr = E_FAIL;
+s32 Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue) {
+	s32 hr = E_FAIL;
 
 	//Get the CSymbol that contains the VARIANT we need
 	Symbol *pSymbol = NULL;
@@ -145,8 +145,8 @@ HRESULT Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, Script
 	return hr;
 }
 
-HRESULT Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant ** ppValue) {
-	HRESULT hr = E_FAIL;
+s32 Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant ** ppValue) {
+	s32 hr = E_FAIL;
 
 	//Get the CSymbol that contains the VARIANT we need
 	Symbol *pSymbol = NULL;
@@ -170,8 +170,8 @@ HRESULT Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, S
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_Call(Interpreter * pinterpreter) {
-	HRESULT hr = E_FAIL;
+s32 Interpreter_Call(Interpreter * pinterpreter) {
+	s32 hr = E_FAIL;
 	Instruction **temp = pinterpreter->pCurrentCall;
 	Instruction **pCurrentCall = (Instruction **) (pinterpreter->pCurrentInstruction);
 	Instruction *currentCall;
@@ -223,9 +223,9 @@ HRESULT Interpreter_Call(Interpreter * pinterpreter) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_EvaluateImmediate(Interpreter * pinterpreter) {
+s32 Interpreter_EvaluateImmediate(Interpreter * pinterpreter) {
 	BOOL bImmediate = FALSE;
-	HRESULT hr = S_OK;
+	s32 hr = S_OK;
 	Instruction *pInstruction = NULL;
 	int size, index;
 
@@ -278,8 +278,8 @@ HRESULT Interpreter_EvaluateImmediate(Interpreter * pinterpreter) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_EvaluateCall(Interpreter * pinterpreter) {
-	HRESULT hr = S_OK;
+s32 Interpreter_EvaluateCall(Interpreter * pinterpreter) {
+	s32 hr = S_OK;
 	//Evaluate instructions until an error occurs or until the m_bCallCompleted
 	//flag is set to true.
 	while((SUCCEEDED(hr)) && (!pinterpreter->bCallCompleted)) {
@@ -334,7 +334,7 @@ HRESULT Interpreter_EvaluateCall(Interpreter * pinterpreter) {
 #define BINARYOP(x)  \
 	ScriptVariant_Copy(pInstruction->theVal, x(pInstruction->theRef, pInstruction->theRef2));
 
-HRESULT Interpreter_CompileInstructions(Interpreter * pinterpreter) {
+s32 Interpreter_CompileInstructions(Interpreter * pinterpreter) {
 	int i, j, size;
 	Instruction *pInstruction = NULL;
 	Token *pToken;
@@ -344,7 +344,7 @@ HRESULT Interpreter_CompileInstructions(Interpreter * pinterpreter) {
 	ScriptVariant *pSVar2 = NULL;
 	ScriptVariant *pRetVal = NULL;
 	ImportNode *pImport = NULL;
-	HRESULT hr = S_OK;
+	s32 hr = S_OK;
 
 	// Import any scripts named in #import directives (parsed by the preprocessor)
 	size = pinterpreter->theContext.imports.size;
@@ -685,8 +685,8 @@ HRESULT Interpreter_CompileInstructions(Interpreter * pinterpreter) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT Interpreter_EvalInstruction(Interpreter * pinterpreter) {
-	HRESULT hr = S_OK;
+s32 Interpreter_EvalInstruction(Interpreter * pinterpreter) {
+	s32 hr = S_OK;
 	Instruction *pInstruction = NULL;
 	Instruction *currentCall;
 	Instruction *returnEntry;

@@ -955,7 +955,7 @@ void Script_LoadSystemFunctions() {
 ////////////   system functions
 //////////////////////////////////////////////////////////
 //isempty(var);
-HRESULT system_isempty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_isempty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	*pretvar = NULL;
 	if(paramCount != 1)
 		return E_FAIL;
@@ -967,19 +967,19 @@ HRESULT system_isempty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int p
 }
 
 //NULL();
-HRESULT system_NULL(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_NULL(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant_Clear(*pretvar);
 
 	return S_OK;
 }
-HRESULT system_rand(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_rand(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant_ChangeType(*pretvar, VT_INTEGER);
 	(*pretvar)->lVal = (LONG) rand32();
 	return S_OK;
 }
 
 //getglobalvar(varname);
-HRESULT system_getglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_getglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *ptmpvar;
 	if(paramCount != 1) {
 		*pretvar = NULL;
@@ -999,14 +999,14 @@ HRESULT system_getglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 }
 
 //maxglobalvarindex();
-HRESULT system_maxglobalvarindex(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_maxglobalvarindex(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant_ChangeType(*pretvar, VT_INTEGER);
 	(*pretvar)->lVal = (LONG) max_global_var_index;
 	return S_OK;
 }
 
 //setglobalvar(varname, value);
-HRESULT system_setglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_setglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	if(paramCount != 2) {
 		*pretvar = NULL;
 		return E_FAIL;
@@ -1024,7 +1024,7 @@ HRESULT system_setglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 }
 
 //getlocalvar(varname);
-HRESULT system_getlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_getlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *ptmpvar;
 
 	if(paramCount != 1) {
@@ -1045,7 +1045,7 @@ HRESULT system_getlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //setlocalvar(varname, value);
-HRESULT system_setlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_setlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	if(paramCount < 2) {
 		*pretvar = NULL;
 		return E_FAIL;
@@ -1063,21 +1063,21 @@ HRESULT system_setlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //clearlocalvar();
-HRESULT system_clearlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_clearlocalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	*pretvar = NULL;
 	Script_Local_Clear();
 	return S_OK;
 }
 
 //clearglobalvar();
-HRESULT system_clearglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_clearglobalvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	*pretvar = NULL;
 	max_global_var_index = -1;
 	return S_OK;
 }
 
 //clearindexedvar();
-HRESULT system_clearindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_clearindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	*pretvar = NULL;
 	for(i = 0; i < max_indexed_vars; i++)
@@ -1086,7 +1086,7 @@ HRESULT system_clearindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretva
 }
 
 //free();
-HRESULT system_free(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 system_free(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	*pretvar = NULL;
 	if(paramCount < 1)
 		return E_FAIL;
@@ -1227,7 +1227,7 @@ void mapstrings_systemvariant(ScriptVariant ** varlist, int paramCount) {
 
 //sample function, used for getting a system variant
 //openborvariant(varname);
-HRESULT openbor_systemvariant(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_systemvariant(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	//used for getting the index from the enum of properties
 	int variantindex = -1;
 	//the paramCount used for checking.
@@ -1308,7 +1308,7 @@ void mapstrings_changesystemvariant(ScriptVariant ** varlist, int paramCount) {
 
 //used for changing a system variant
 //changeopenborvariant(varname, value);
-HRESULT openbor_changesystemvariant(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changesystemvariant(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	//used for getting the enum constant corresponding to the desired variable
 	int variantindex = 0;
 	//reference to the arguments
@@ -1340,7 +1340,7 @@ HRESULT openbor_changesystemvariant(ScriptVariant ** varlist, ScriptVariant ** p
 
 // use font_printf to draw string
 //drawstring(x, y, font, string, z);
-HRESULT openbor_drawstring(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawstring(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	char buf[256];
 	LONG value[4];
@@ -1370,7 +1370,7 @@ HRESULT openbor_drawstring(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 
 //use screen_printf
 //drawstringtoscreen(screen, x, y, font, string);
-HRESULT openbor_drawstringtoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawstringtoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	s_screen *scr;
 	char buf[256];
@@ -1403,7 +1403,7 @@ HRESULT openbor_drawstringtoscreen(ScriptVariant ** varlist, ScriptVariant ** pr
 
 // debug purpose
 //log(string);
-HRESULT openbor_log(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_log(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char buf[256];
 	*pretvar = NULL;
 
@@ -1420,7 +1420,7 @@ HRESULT openbor_log(ScriptVariant ** varlist, ScriptVariant ** pretvar, int para
 }
 
 //drawbox(x, y, width, height, z, color, lut);
-HRESULT openbor_drawbox(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawbox(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[6], l;
 	*pretvar = NULL;
@@ -1454,7 +1454,7 @@ HRESULT openbor_drawbox(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 }
 
 //drawboxtoscreen(screen, x, y, width, height, color, lut);
-HRESULT openbor_drawboxtoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawboxtoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	s_screen *s;
 	LONG value[5], l;
@@ -1503,7 +1503,7 @@ HRESULT openbor_drawboxtoscreen(ScriptVariant ** varlist, ScriptVariant ** pretv
 }
 
 //drawline(x1, y1, x2, y2, z, color, lut);
-HRESULT openbor_drawline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[6], l;
 	*pretvar = NULL;
@@ -1537,7 +1537,7 @@ HRESULT openbor_drawline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int
 }
 
 //drawlinetoscreen(screen, x1, y1, x2, y2, color, lut);
-HRESULT openbor_drawlinetoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawlinetoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[5], l;
 	s_screen *s;
@@ -1585,7 +1585,7 @@ HRESULT openbor_drawlinetoscreen(ScriptVariant ** varlist, ScriptVariant ** pret
 }
 
 //drawsprite(sprite, x, y, z, sortid);
-HRESULT openbor_drawsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[4];
 	s_sprite *spr;
@@ -1617,7 +1617,7 @@ HRESULT openbor_drawsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //drawspritetoscreen(sprite, screen, x, y);
-HRESULT openbor_drawspritetoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawspritetoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[2];
 	s_sprite *spr;
@@ -1654,7 +1654,7 @@ HRESULT openbor_drawspritetoscreen(ScriptVariant ** varlist, ScriptVariant ** pr
 }
 
 //drawdot(x, y, z, color, lut);
-HRESULT openbor_drawdot(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawdot(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[4], l;
 	*pretvar = NULL;
@@ -1687,7 +1687,7 @@ HRESULT openbor_drawdot(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 }
 
 //drawdottoscreen(screen, x, y, color, lut);
-HRESULT openbor_drawdottoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawdottoscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[3], l;
 	s_screen *s;
@@ -1737,7 +1737,7 @@ HRESULT openbor_drawdottoscreen(ScriptVariant ** varlist, ScriptVariant ** pretv
 
 
 //drawscreen(screen, x, y, z, lut);
-HRESULT openbor_drawscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_drawscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[3], l;
 	s_screen *s;
@@ -1784,7 +1784,7 @@ HRESULT openbor_drawscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //getindexedvar(int index);
-HRESULT openbor_getindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 
 	if(paramCount < 1 || max_indexed_vars <= 0) {
@@ -1809,7 +1809,7 @@ HRESULT openbor_getindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //setindexedvar(int index, var);
-HRESULT openbor_setindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 
 	if(paramCount < 2 || max_indexed_vars <= 0) {
@@ -1837,7 +1837,7 @@ HRESULT openbor_setindexedvar(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //getscriptvar(int index);
-HRESULT openbor_getscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 
 	if(paramCount < 1 || max_script_vars <= 0 || !pcurrentscript || !pcurrentscript->vars) {
@@ -1862,7 +1862,7 @@ HRESULT openbor_getscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //setscriptvar(int index, var);
-HRESULT openbor_setscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 
 	if(paramCount < 2 || max_script_vars <= 0 || !pcurrentscript || !pcurrentscript->vars) {
@@ -1890,7 +1890,7 @@ HRESULT openbor_setscriptvar(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //getentityvar(entity, int index);
-HRESULT openbor_getentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG ind;
 	entity *ent;
@@ -1932,7 +1932,7 @@ HRESULT openbor_getentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //setentityvar(int index, var);
-HRESULT openbor_setentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG ind;
 	entity *ent;
@@ -1976,7 +1976,7 @@ HRESULT openbor_setentityvar(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //strinfirst(char string, char search_string);
-HRESULT openbor_strinfirst(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_strinfirst(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *tempstr = NULL;
 
 	if(paramCount < 2) {
@@ -2004,7 +2004,7 @@ HRESULT openbor_strinfirst(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //strinlast(char string, char search_string);
-HRESULT openbor_strinlast(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_strinlast(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *tempstr = NULL;
 
 	if(paramCount < 2) {
@@ -2032,7 +2032,7 @@ HRESULT openbor_strinlast(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //strleft(char string, int i);
-HRESULT openbor_strleft(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_strleft(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char tempstr[66] = { 0 };
 
 	if(paramCount < 2) {
@@ -2059,7 +2059,7 @@ HRESULT openbor_strleft(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 }
 
 //strlength(char string);
-HRESULT openbor_strlength(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_strlength(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	if(paramCount < 1) {
 		*pretvar = NULL;
 		return E_FAIL;
@@ -2078,7 +2078,7 @@ HRESULT openbor_strlength(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //strright(char string, int i);
-HRESULT openbor_strright(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_strright(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *tempstr = NULL;
 
 	if(paramCount < 2) {
@@ -2105,7 +2105,7 @@ HRESULT openbor_strright(ScriptVariant ** varlist, ScriptVariant ** pretvar, int
 	return S_OK;
 }
 
-HRESULT openbor_getmodelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getmodelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int iArg;
 
 	if(paramCount < 2) {
@@ -2155,7 +2155,7 @@ HRESULT openbor_getmodelproperty(ScriptVariant ** varlist, ScriptVariant ** pret
 	return S_OK;
 }
 
-HRESULT openbor_changemodelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changemodelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int iArg;
 	LONG ltemp;
 
@@ -2780,7 +2780,7 @@ void mapstrings_getentityproperty(ScriptVariant ** varlist, int paramCount) {
 }
 
 //getentityproperty(pentity, propname);
-HRESULT openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	char *tempstr = NULL;
 	ScriptVariant *arg = NULL;
@@ -4729,7 +4729,7 @@ void mapstrings_changeentityproperty(ScriptVariant ** varlist, int paramCount) {
 }
 
 //changeentityproperty(pentity, propname, value1[ ,value2, value3, ...]);
-HRESULT openbor_changeentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changeentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	s_model *tempmodel;
 	char *tempstr = NULL;
@@ -6051,7 +6051,7 @@ HRESULT openbor_changeentityproperty(ScriptVariant ** varlist, ScriptVariant ** 
 }
 
 //tossentity(entity, height, speedx, speedz)
-HRESULT openbor_tossentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_tossentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	DOUBLE height = 0, speedx = 0, speedz = 0;
 
@@ -6133,7 +6133,7 @@ void mapstrings_getplayerproperty(ScriptVariant ** varlist, int paramCount) {
 }
 
 //getplayerproperty(index, propname);
-HRESULT openbor_getplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ltemp;
 	int index;
 	entity *ent = NULL;
@@ -6263,7 +6263,7 @@ void mapstrings_changeplayerproperty(ScriptVariant ** varlist, int paramCount) {
 }
 
 //changeplayerproperty(index, propname, value[, value2, value3,...]);
-HRESULT openbor_changeplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changeplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ltemp, ltemp2;
 	int index;
 	entity *ent = NULL;
@@ -6377,7 +6377,7 @@ HRESULT openbor_changeplayerproperty(ScriptVariant ** varlist, ScriptVariant ** 
 }
 
 //checkhole(x,z), return 1 if there's hole here
-HRESULT openbor_checkhole(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_checkhole(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	DOUBLE x, z;
 
@@ -6402,7 +6402,7 @@ HRESULT openbor_checkhole(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //checkwall(x,z), return wall height, or 0
-HRESULT openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	DOUBLE x, z;
 	int wall;
@@ -6430,7 +6430,7 @@ HRESULT openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //checkplatformbelow(x,z,a), return the highest platfrom entity below
-HRESULT openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	DOUBLE x, z, a;
 
@@ -6459,7 +6459,7 @@ HRESULT openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pr
 	return S_OK;
 }
 
-HRESULT openbor_openfilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_openfilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *filename = NULL;
 	ScriptVariant *arg = NULL;
 	LONG location = 0;
@@ -6536,7 +6536,7 @@ HRESULT openbor_openfilestream(ScriptVariant ** varlist, ScriptVariant ** pretva
 	return S_OK;
 }
 
-HRESULT openbor_getfilestreamline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getfilestreamline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char line[MAX_STR_VAR_LEN];
 	int length;
 	ScriptVariant *arg = NULL;
@@ -6575,7 +6575,7 @@ HRESULT openbor_getfilestreamline(ScriptVariant ** varlist, ScriptVariant ** pre
 	return S_OK;
 }
 
-HRESULT openbor_getfilestreamargument(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getfilestreamargument(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG filestreamindex, argument;
 	char *argtype = NULL;
@@ -6626,7 +6626,7 @@ HRESULT openbor_getfilestreamargument(ScriptVariant ** varlist, ScriptVariant **
 	return S_OK;
 }
 
-HRESULT openbor_filestreamnextline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_filestreamnextline(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG filestreamindex;
 
@@ -6649,7 +6649,7 @@ HRESULT openbor_filestreamnextline(ScriptVariant ** varlist, ScriptVariant ** pr
 	return S_OK;
 }
 
-HRESULT openbor_getfilestreamposition(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getfilestreamposition(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG filestreamindex;
 
@@ -6667,7 +6667,7 @@ HRESULT openbor_getfilestreamposition(ScriptVariant ** varlist, ScriptVariant **
 	return S_OK;
 }
 
-HRESULT openbor_setfilestreamposition(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setfilestreamposition(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
 	LONG filestreamindex, position;
 
@@ -6689,7 +6689,7 @@ HRESULT openbor_setfilestreamposition(ScriptVariant ** varlist, ScriptVariant **
 	return S_OK;
 }
 
-HRESULT openbor_filestreamappend(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_filestreamappend(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG filestreamindex;
 	ScriptVariant *arg = NULL;
 	LONG appendtype;
@@ -6752,7 +6752,7 @@ HRESULT openbor_filestreamappend(ScriptVariant ** varlist, ScriptVariant ** pret
 	return S_OK;
 }
 
-HRESULT openbor_createfilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_createfilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant_Clear(*pretvar);
 
 	if(!level->numfilestreams)
@@ -6774,7 +6774,7 @@ HRESULT openbor_createfilestream(ScriptVariant ** varlist, ScriptVariant ** pret
 	return S_OK;
 }
 
-HRESULT openbor_savefilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_savefilestream(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i, x, y;
 	LONG filestreamindex;
 	ScriptVariant *arg = NULL;
@@ -6848,7 +6848,7 @@ HRESULT openbor_savefilestream(ScriptVariant ** varlist, ScriptVariant ** pretva
 }
 
 //damageentity(entity, other, force, drop, type)
-HRESULT openbor_damageentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_damageentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	entity *other = NULL;
 	entity *temp = NULL;
@@ -6916,7 +6916,7 @@ HRESULT openbor_damageentity(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //killentity(entity)
-HRESULT openbor_killentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_killentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 
 	if(paramCount < 1) {
@@ -6937,7 +6937,7 @@ HRESULT openbor_killentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //findtarget(entity, int animation);
-HRESULT openbor_findtarget(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_findtarget(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	entity *tempself, *target;
 	LONG anim = -1;
@@ -6968,7 +6968,7 @@ HRESULT openbor_findtarget(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //checkrange(entity, target, int ani);
-HRESULT openbor_checkrange(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_checkrange(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL, *target = NULL;
 	LONG ani = 0;
 
@@ -7008,7 +7008,7 @@ HRESULT openbor_checkrange(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //clearspawnentry();
-HRESULT openbor_clearspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_clearspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	*pretvar = NULL;
 	memset(&spawnentry, 0, sizeof(s_spawn_entry));
 	spawnentry.index = spawnentry.itemindex = spawnentry.weaponindex = -1;
@@ -7080,7 +7080,7 @@ void mapstrings_setspawnentry(ScriptVariant ** varlist, int paramCount) {
 }
 
 //setspawnentry(propname, value1[, value2, value3, ...]);
-HRESULT openbor_setspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ltemp;
 	s_model *tempmodel;
 	DOUBLE dbltemp;
@@ -7303,7 +7303,7 @@ HRESULT openbor_setspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //spawn();
-HRESULT openbor_spawn(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_spawn(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent;
 
 	ent = smartspawn(&spawnentry);
@@ -7318,7 +7318,7 @@ HRESULT openbor_spawn(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 }
 
 //entity * projectile(char *name, float x, float z, float a, int direction, int type, int ptype, int map);
-HRESULT openbor_projectile(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_projectile(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[7];
 	entity *ent;
@@ -7769,7 +7769,7 @@ static int** ani_targets[] = {
 
 //openborconstant(constname);
 //translate a constant by string, used to retrieve a constant or macro of openbor
-HRESULT openbor_transconst(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_transconst(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *constname = NULL;
 	int temp;
 	char const_name_cp[64];
@@ -7866,7 +7866,7 @@ HRESULT openbor_transconst(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //int rgbcolor(int r, int g, int b);
-HRESULT openbor_rgbcolor(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_rgbcolor(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG r, g, b;
 
 	if(paramCount != 3)
@@ -7934,7 +7934,7 @@ void mapstrings_playerkeys(ScriptVariant ** varlist, int paramCount) {
 }
 
 //playerkeys(playerindex, newkey?, key1, key2, ...);
-HRESULT openbor_playerkeys(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_playerkeys(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ltemp;
 	int index, newkey;
 	int i;
@@ -8027,7 +8027,7 @@ HRESULT openbor_playerkeys(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //playmusic(name, loop)
-HRESULT openbor_playmusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_playmusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int loop = 0;
 	LONG offset = 0;
 	char *thename = NULL;
@@ -8058,7 +8058,7 @@ HRESULT openbor_playmusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //fademusic(fade, name, loop, offset)
-HRESULT openbor_fademusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_fademusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	DOUBLE value = 0;
 	LONG values[2] = { 0, 0 };
 	*pretvar = NULL;
@@ -8087,7 +8087,7 @@ HRESULT openbor_fademusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 }
 
 //setmusicvolume(left, right)
-HRESULT openbor_setmusicvolume(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setmusicvolume(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG channels[2];
 
 	if(paramCount < 1) {
@@ -8112,7 +8112,7 @@ HRESULT openbor_setmusicvolume(ScriptVariant ** varlist, ScriptVariant ** pretva
 }
 
 //setmusicvolume(left, right)
-HRESULT openbor_setmusictempo(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setmusictempo(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG new_tempo;
 
 	if(paramCount < 1) {
@@ -8127,7 +8127,7 @@ HRESULT openbor_setmusictempo(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //pausemusic(value)
-HRESULT openbor_pausemusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_pausemusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int pause = 0;
 	if(paramCount < 1) {
 		return S_OK;
@@ -8140,7 +8140,7 @@ HRESULT openbor_pausemusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //playsample(id, priority, lvolume, rvolume, speed, loop)
-HRESULT openbor_playsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_playsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int i;
 	LONG value[6];
 
@@ -8174,7 +8174,7 @@ HRESULT openbor_playsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 // int loadsample(filename, log)
-HRESULT openbor_loadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_loadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	int arg = 0;
 
 	if(paramCount < 1) {
@@ -8203,7 +8203,7 @@ HRESULT openbor_loadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 // void unloadsample(id)
-HRESULT openbor_unloadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_unloadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG id;
 	*pretvar = NULL;
 	if(paramCount != 1)
@@ -8221,7 +8221,7 @@ HRESULT openbor_unloadsample(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 }
 
 //fadeout(type, speed);
-HRESULT openbor_fadeout(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_fadeout(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG type;
 	LONG speed;
 	*pretvar = NULL;
@@ -8241,7 +8241,7 @@ HRESULT openbor_fadeout(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 }
 
 //changepalette(index);
-HRESULT openbor_changepalette(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changepalette(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG index;
 
 	*pretvar = NULL;
@@ -8262,7 +8262,7 @@ HRESULT openbor_changepalette(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //changelight(x, z);
-HRESULT openbor_changelight(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changelight(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG x, z;
 	extern int light[2];
 	ScriptVariant *arg = NULL;
@@ -8294,7 +8294,7 @@ HRESULT openbor_changelight(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 //changeshadowcolor(color, alpha);
 // color = 0 means no gfxshadow, -1 means don't fill the shadow with colour
 // alpha default to 2, <=0 means no alpha effect
-HRESULT openbor_changeshadowcolor(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changeshadowcolor(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG c, a;
 	extern int shadowalpha;
 
@@ -8350,7 +8350,7 @@ void mapstrings_gettextobjproperty(ScriptVariant ** varlist, int paramCount) {
 		   "Property name '%s' is not supported by function gettextobjproperty.\n");
 }
 
-HRESULT openbor_gettextobjproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_gettextobjproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 
@@ -8459,7 +8459,7 @@ void mapstrings_changetextobjproperty(ScriptVariant ** varlist, int paramCount) 
 		   "Property name '%s' is not supported by function changetextobjproperty.\n");
 }
 
-HRESULT openbor_changetextobjproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changetextobjproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 	LONG ltemp;
@@ -8560,7 +8560,7 @@ HRESULT openbor_changetextobjproperty(ScriptVariant ** varlist, ScriptVariant **
 }
 
 // changelevelproperty(name, value)
-HRESULT openbor_settextobj(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_settextobj(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	LONG ltemp;
 
@@ -8625,7 +8625,7 @@ HRESULT openbor_settextobj(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 	return E_FAIL;
 }
 
-HRESULT openbor_cleartextobj(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_cleartextobj(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 
 	if(paramCount < 1)
@@ -8710,7 +8710,7 @@ void mapstrings_getbglayerproperty(ScriptVariant ** varlist, int paramCount) {
 		   "Property name '%s' is not supported by function getbglayerproperty.\n");
 }
 
-HRESULT openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 
@@ -8899,7 +8899,7 @@ void mapstrings_changebglayerproperty(ScriptVariant ** varlist, int paramCount) 
 		   "Property name '%s' is not supported by function changebglayerproperty.\n");
 }
 
-HRESULT openbor_changebglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changebglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 	LONG ltemp;
@@ -9123,7 +9123,7 @@ void mapstrings_getfglayerproperty(ScriptVariant ** varlist, int paramCount) {
 		   "Property name '%s' is not supported by function getfglayerproperty.\n");
 }
 
-HRESULT openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 
@@ -9313,7 +9313,7 @@ void mapstrings_changefglayerproperty(ScriptVariant ** varlist, int paramCount) 
 		   "Property name '%s' is not supported by function changefglayerproperty.\n");
 }
 
-HRESULT openbor_changefglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changefglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	int propind;
 	LONG ltemp;
@@ -9486,7 +9486,7 @@ HRESULT openbor_changefglayerproperty(ScriptVariant ** varlist, ScriptVariant **
 	return E_FAIL;
 }
 
-HRESULT openbor_getlevelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getlevelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *propname = NULL;
 	int propind;
 
@@ -9548,7 +9548,7 @@ HRESULT openbor_getlevelproperty(ScriptVariant ** varlist, ScriptVariant ** pret
 }
 
 //changelevelproperty(name, value)
-HRESULT openbor_changelevelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_changelevelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	char *propname = NULL;
 	LONG ltemp;
 	ScriptVariant *arg = NULL;
@@ -9596,7 +9596,7 @@ HRESULT openbor_changelevelproperty(ScriptVariant ** varlist, ScriptVariant ** p
 }
 
 //jumptobranch(name, immediate)
-HRESULT openbor_jumptobranch(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_jumptobranch(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ltemp;
 	extern char branch_name[MAX_NAME_LEN + 1];
 	extern int endgame;
@@ -9626,7 +9626,7 @@ HRESULT openbor_jumptobranch(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 
 //bindentity(entity, target, x, z, a, direction, bindanim);
 //bindentity(entity, NULL()); // unbind
-HRESULT openbor_bindentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_bindentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
 	entity *other = NULL;
 	ScriptVariant *arg = NULL;
@@ -9704,7 +9704,7 @@ HRESULT openbor_bindentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //allocscreen(int w, int h);
-HRESULT openbor_allocscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_allocscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG w, h;
 	s_screen *screen;
 
@@ -9738,7 +9738,7 @@ HRESULT openbor_allocscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 }
 
 //clearscreen(s_screen* screen)
-HRESULT openbor_clearscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_clearscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	s_screen *screen;
 
 	*pretvar = NULL;
@@ -9763,7 +9763,7 @@ HRESULT openbor_clearscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 }
 
 //setdrawmethod(entity, int flag, int scalex, int scaley, int flipx, int flipy, int shiftx, int alpha, int remap, int fillcolor, int rotate, int fliprotate, int transparencybg, void* colourmap);
-HRESULT openbor_setdrawmethod(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setdrawmethod(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG value[12];
 	entity *e;
 	s_drawmethod *pmethod;
@@ -9822,7 +9822,7 @@ HRESULT openbor_setdrawmethod(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //updateframe(entity, int frame);
-HRESULT openbor_updateframe(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_updateframe(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG f;
 	entity *e;
 	void update_frame(entity * ent, int f);
@@ -9854,7 +9854,7 @@ HRESULT openbor_updateframe(ScriptVariant ** varlist, ScriptVariant ** pretvar, 
 }
 
 //performattack(entity, int anim, int resetable);
-HRESULT openbor_performattack(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_performattack(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG anim, resetable = 0;
 	entity *e;
 
@@ -9898,7 +9898,7 @@ HRESULT openbor_performattack(ScriptVariant ** varlist, ScriptVariant ** pretvar
 }
 
 //setidle(entity, int anim, int resetable, int stalladd);
-HRESULT openbor_setidle(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_setidle(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG anim, resetable = 0, stalladd;
 	entity *e;
 	extern unsigned int time;
@@ -9949,7 +9949,7 @@ HRESULT openbor_setidle(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 }
 
 //getentity(int index_from_list)
-HRESULT openbor_getentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_getentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG ind;
 	extern entity *ent_list[MAX_ENTS];
 
@@ -9976,7 +9976,7 @@ HRESULT openbor_getentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 
 
 //loadmodel(name)
-HRESULT openbor_loadmodel(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_loadmodel(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG unload = 0;
 	if(paramCount < 1)
 		goto loadmodel_error;
@@ -10002,7 +10002,7 @@ HRESULT openbor_loadmodel(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 
 // load a sprite which doesn't belong to the sprite_cache
 // loadsprite(path)
-HRESULT openbor_loadsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_loadsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	extern s_sprite *loadsprite2(char *filename, int *width, int *height);
 	if(paramCount != 1)
 		goto loadsprite_error;
@@ -10025,7 +10025,7 @@ HRESULT openbor_loadsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, i
 }
 
 //playgif(path, int x, int y, int noskip)
-HRESULT openbor_playgif(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
+s32 openbor_playgif(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	LONG temp[3] = { 0, 0, 0 };	//x,y,noskip
 	int i;
 	extern unsigned char pal[1024];

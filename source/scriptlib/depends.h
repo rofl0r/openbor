@@ -18,7 +18,6 @@
 
 typedef const char *LPCSTR;
 typedef char *LPSTR;
-typedef s32 HRESULT;
 typedef u32 DWORD;
 typedef u32 ULONG;
 typedef s32 LONG;
@@ -47,22 +46,22 @@ typedef void VOID;
 #ifdef S_OK
 #undef S_OK
 #endif
-#define S_OK   ((HRESULT)0)
+#define S_OK   ((s32)0)
 
 #ifdef E_FAIL
 #undef E_FAIL
 #endif
-#define E_FAIL ((HRESULT)-1)
+#define E_FAIL ((s32)-1)
 
 #ifdef FAILED
 #undef FAILED
 #endif
-#define FAILED(status) (((HRESULT)(status))<0)
+#define FAILED(status) (((s32)(status))<0)
 
 #ifdef SUCCEEDED
 #undef SUCCEEDED
 #endif
-#define SUCCEEDED(status) (((HRESULT)(status))>=0)
+#define SUCCEEDED(status) (((s32)(status))>=0)
 #endif
 
 #ifndef FALSE

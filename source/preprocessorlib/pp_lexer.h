@@ -100,11 +100,11 @@ void pp_token_Init(pp_token * ptoken, PP_TOKEN_TYPE theType, LPCSTR theSource, T
 		   ULONG charOffset);
 void pp_lexer_Init(pp_lexer * plexer, LPCSTR theSource, TEXTPOS theStartingPosition);
 void pp_lexer_Clear(pp_lexer * plexer);
-HRESULT pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken);
-HRESULT pp_lexer_GetTokenIdentifier(pp_lexer * plexer, pp_token * theNextToken);
-HRESULT pp_lexer_GetTokenNumber(pp_lexer * plexer, pp_token * theNextToken);
-HRESULT pp_lexer_GetTokenStringLiteral(pp_lexer * plexer, pp_token * theNextToken);
-HRESULT pp_lexer_GetTokenSymbol(pp_lexer * plexer, pp_token * theNextToken);
-HRESULT pp_lexer_SkipComment(pp_lexer * lexer, COMMENT_TYPE theType);
+s32 pp_lexer_GetNextToken(pp_lexer * plexer, pp_token * theNextToken);
+s32 pp_lexer_GetTokenIdentifier(pp_lexer * plexer, pp_token * theNextToken);
+s32 pp_lexer_GetTokenNumber(pp_lexer * plexer, pp_token * theNextToken);
+s32 pp_lexer_GetTokenStringLiteral(pp_lexer * plexer, pp_token * theNextToken);
+s32 pp_lexer_GetTokenSymbol(pp_lexer * plexer, pp_token * theNextToken);
+s32 pp_lexer_SkipComment(pp_lexer * lexer, COMMENT_TYPE theType);
 
 #endif

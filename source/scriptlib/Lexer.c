@@ -20,7 +20,7 @@ void Token_Init(Token * ptoken, MY_TOKEN_TYPE theType, LPCSTR theSource, TEXTPOS
 }
 
 //Construct from a pp_token
-HRESULT Token_InitFromPreprocessor(Token * ptoken, pp_token * ppToken) {
+s32 Token_InitFromPreprocessor(Token * ptoken, pp_token * ppToken) {
 	ptoken->theTextPosition = ppToken->theTextPosition;
 	ptoken->charOffset = ppToken->charOffset;
 	strncpy(ptoken->theSource, ppToken->theSource, MAX_TOKEN_LENGTH);
@@ -379,7 +379,7 @@ void Lexer_Clear(Lexer * plexer) {
 *  Returns: S_OK
 *           E_FAIL
 ******************************************************************************/
-HRESULT Lexer_GetNextToken(Lexer * plexer, Token * theNextToken) {
+s32 Lexer_GetNextToken(Lexer * plexer, Token * theNextToken) {
 	pp_token *ppToken;
 
 	// get the next non-whitespace, non-newline token from the preprocessor
