@@ -69,7 +69,7 @@ HRESULT ImportNode_Init(ImportNode * node, const char *path) {
 	return S_OK;
 
 	error:
-	printf("Script error: unable to import script file '%s'\n");
+	printf("Script error: unable to import script file '%s'\n", path);
 	return E_FAIL;
 }
 
