@@ -23,7 +23,7 @@ typedef struct ScriptVariant {
 	union			//value
 	{
 		s32 lVal;
-		VOID *ptrVal;
+		void *ptrVal;
 		double dblVal;
 		int strVal;
 	};

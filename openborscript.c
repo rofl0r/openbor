@@ -2130,7 +2130,7 @@ s32 openbor_getmodelproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 		case 1:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) model_cache[iArg].model;
+				(*pretvar)->ptrVal = (void*) model_cache[iArg].model;
 			}
 		case 2:
 			{
@@ -2970,7 +2970,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				spr = sprite_map[i].sprite;
 				spr->centerx = sprite_map[i].centerx;
 				spr->centery = sprite_map[i].centery;
-				(*pretvar)->ptrVal = (VOID *) (spr);
+				(*pretvar)->ptrVal = (void*) (spr);
 				break;
 			}
 		case _gep_playerindex:
@@ -2983,13 +2983,13 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_colourmap:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) (ent->colourmap);
+				(*pretvar)->ptrVal = (void*) (ent->colourmap);
 				break;
 			}
 		case _gep_colourtable:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) (ent->modeldata.colourmap[varlist[2]->lVal]);
+				(*pretvar)->ptrVal = (void*) (ent->modeldata.colourmap[varlist[2]->lVal]);
 				break;
 			}
 		case _gep_map:
@@ -3077,7 +3077,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 					spr = sprite_map[i].sprite;
 					spr->centerx = sprite_map[i].centerx;
 					spr->centery = sprite_map[i].centery;
-					(*pretvar)->ptrVal = (VOID *) (spr);
+					(*pretvar)->ptrVal = (void*) (spr);
 				} else {
 					ScriptVariant_ChangeType(*pretvar, VT_INTEGER);
 					(*pretvar)->lVal = -1;
@@ -3421,7 +3421,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_animation:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) ent->animation;
+				(*pretvar)->ptrVal = (void*) ent->animation;
 				break;
 			}
 		case _gep_animnum:
@@ -3922,7 +3922,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 						break;
 					case _gep_attack_staydown:
 						ScriptVariant_ChangeType(*pretvar, VT_PTR);
-						(*pretvar)->ptrVal = (VOID *) attack->staydown;
+						(*pretvar)->ptrVal = (void*) attack->staydown;
 						break;
 					case _gep_attack_steal:
 						ScriptVariant_ChangeType(*pretvar, VT_INTEGER);
@@ -4015,7 +4015,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->owner)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->owner;
+					(*pretvar)->ptrVal = (void*) ent->owner;
 				}
 				break;
 			}
@@ -4024,7 +4024,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->parent)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->parent;
+					(*pretvar)->ptrVal = (void*) ent->parent;
 				}
 				break;
 			}
@@ -4041,7 +4041,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->subentity)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->subentity;
+					(*pretvar)->ptrVal = (void*) ent->subentity;
 				}
 				break;
 			}
@@ -4050,7 +4050,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->opponent)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->opponent;
+					(*pretvar)->ptrVal = (void*) ent->opponent;
 				}
 				break;
 			}
@@ -4059,7 +4059,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->grabbing)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->grabbing;
+					(*pretvar)->ptrVal = (void*) ent->grabbing;
 				}
 				break;
 			}
@@ -4068,7 +4068,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				if(ent->link)	// always return an empty var if it is NULL
 				{
 					ScriptVariant_ChangeType(*pretvar, VT_PTR);
-					(*pretvar)->ptrVal = (VOID *) ent->link;
+					(*pretvar)->ptrVal = (void*) ent->link;
 				}
 				break;
 			}
@@ -4300,7 +4300,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 					case _gep_dot_owner:
 						{
 							ScriptVariant_ChangeType(*pretvar, VT_PTR);
-							(*pretvar)->ptrVal = (VOID *) ent->dot_owner[i];
+							(*pretvar)->ptrVal = (void*) ent->dot_owner[i];
 							break;
 						}
 						break;
@@ -4321,7 +4321,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_weapent:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) ent->weapent;
+				(*pretvar)->ptrVal = (void*) ent->weapent;
 				break;
 			}
 		default:
@@ -6174,7 +6174,7 @@ s32 openbor_getplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gpp_entity:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_PTR);
-				(*pretvar)->ptrVal = (VOID *) ent;
+				(*pretvar)->ptrVal = (void*) ent;
 				break;
 			}
 		case _gpp_name:
@@ -6455,7 +6455,7 @@ s32 openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pretva
 		return S_OK;
 
 	ScriptVariant_ChangeType(*pretvar, VT_PTR);
-	(*pretvar)->ptrVal = (VOID *) check_platform_below((float) x, (float) z, (float) a);
+	(*pretvar)->ptrVal = (void*) check_platform_below((float) x, (float) z, (float) a);
 	return S_OK;
 }
 
@@ -6962,7 +6962,7 @@ s32 openbor_findtarget(ScriptVariant ** varlist, ScriptVariant ** pretvar, int p
 	if(!target)
 		ScriptVariant_Clear(*pretvar);
 	else
-		(*pretvar)->ptrVal = (VOID *) target;
+		(*pretvar)->ptrVal = (void*) target;
 	self = tempself;
 	return S_OK;
 }
@@ -7310,7 +7310,7 @@ s32 openbor_spawn(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramC
 
 	if(ent) {
 		ScriptVariant_ChangeType(*pretvar, VT_PTR);
-		(*pretvar)->ptrVal = (VOID *) ent;
+		(*pretvar)->ptrVal = (void*) ent;
 	} else
 		ScriptVariant_Clear(*pretvar);
 
@@ -7353,7 +7353,7 @@ s32 openbor_projectile(ScriptVariant ** varlist, ScriptVariant ** pretvar, int p
 	}
 
 	ScriptVariant_ChangeType(*pretvar, VT_PTR);
-	(*pretvar)->ptrVal = (VOID *) ent;
+	(*pretvar)->ptrVal = (void*) ent;
 
 	return S_OK;
 
@@ -9721,7 +9721,7 @@ s32 openbor_allocscreen(ScriptVariant ** varlist, ScriptVariant ** pretvar, int 
 	screen = allocscreen((int) w, (int) h, screenformat);
 	if(screen)
 		clearscreen(screen);
-	(*pretvar)->ptrVal = (VOID *) screen;
+	(*pretvar)->ptrVal = (void*) screen;
 
 	if((*pretvar)->ptrVal == NULL) {
 		printf("Not enough memory: allocscreen(%d, %d)\n", (int) w, (int) h);
@@ -9963,7 +9963,7 @@ s32 openbor_getentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 
 	if((int) ind < MAX_ENTS && (int) ind >= 0) {
 		ScriptVariant_ChangeType(*pretvar, VT_PTR);
-		(*pretvar)->ptrVal = (VOID *) ent_list[(int) ind];
+		(*pretvar)->ptrVal = (void*) ent_list[(int) ind];
 	}
 	//else, it should return an empty value
 	return S_OK;
@@ -9989,7 +9989,7 @@ s32 openbor_loadmodel(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 			goto loadmodel_error;
 
 	(*pretvar)->ptrVal =
-	    (VOID *) load_cached_model(StrCache_Get(varlist[0]->strVal), "openbor_loadmodel", (char) unload);
+	    (void*) load_cached_model(StrCache_Get(varlist[0]->strVal), "openbor_loadmodel", (char) unload);
 	//else, it should return an empty value
 	return S_OK;
 
@@ -10011,7 +10011,7 @@ s32 openbor_loadsprite(ScriptVariant ** varlist, ScriptVariant ** pretvar, int p
 		goto loadsprite_error;
 
 	ScriptVariant_ChangeType(*pretvar, VT_PTR);
-	if(((*pretvar)->ptrVal = (VOID *) loadsprite2(StrCache_Get(varlist[0]->strVal), NULL, NULL))) {
+	if(((*pretvar)->ptrVal = (void*) loadsprite2(StrCache_Get(varlist[0]->strVal), NULL, NULL))) {
 		List_InsertAfter(&scriptheap, (void *) ((*pretvar)->ptrVal), "openbor_loadsprite");
 	}
 	//else, it should return an empty value

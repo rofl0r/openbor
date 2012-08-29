@@ -17,11 +17,6 @@
 #define COMPILED_SCRIPT 1
 #endif
 
-#ifdef VOID
-#undef VOID
-#endif
-typedef void VOID;
-
 #ifndef NULL
 #define NULL 0
 #endif

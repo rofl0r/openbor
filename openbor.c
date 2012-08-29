@@ -541,10 +541,10 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 		case _e_player3: case _e_player4:
 			ScriptVariant_ChangeType(var, VT_PTR);
 			switch(index) {
-				case _e_player: case _e_player1: var->ptrVal = (VOID *) player; break;
-				case _e_player2: var->ptrVal = (VOID *) (player + 1); break;
-				case _e_player3: var->ptrVal = (VOID *) (player + 2); break;
-				case _e_player4: var->ptrVal = (VOID *) (player + 3); break;
+				case _e_player: case _e_player1: var->ptrVal = (void*) player; break;
+				case _e_player2: var->ptrVal = (void*) (player + 1); break;
+				case _e_player3: var->ptrVal = (void*) (player + 2); break;
+				case _e_player4: var->ptrVal = (void*) (player + 3); break;
 				default: assert (0);
 			}
 			break;
@@ -877,7 +877,7 @@ static void execute_script_default(s_script_args* args, Script* dest_script) {
 				ScriptVariant_ChangeType(&tempvar, tuples[i].vt);
 				switch(tuples[i].vt) {
 					case VT_PTR:
-						tempvar.ptrVal = (VOID *) tuples[i].value;
+						tempvar.ptrVal = (void*) tuples[i].value;
 						break;
 					case VT_INTEGER:
 						tempvar.lVal = (s32) tuples[i].value;
@@ -1207,7 +1207,7 @@ void execute_spawn_script(s_spawn_entry * p, entity * e) {
 		if(e) {
 			ScriptVariant_Init(&tempvar);
 			ScriptVariant_ChangeType(&tempvar, VT_PTR);
-			tempvar.ptrVal = (VOID *) e;
+			tempvar.ptrVal = (void*) e;
 			Script_Set_Local_Variant("self", &tempvar);
 		}
 		Script_Execute(tempnode->spawn_script);
