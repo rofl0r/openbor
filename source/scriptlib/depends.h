@@ -23,10 +23,6 @@ typedef double DOUBLE;
 typedef int BOOL;
 #endif
 
-#ifndef XBOX
-typedef short WCHAR;
-#endif
-
 #ifdef VOID
 #undef VOID
 #endif
