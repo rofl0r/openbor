@@ -114,9 +114,9 @@ void Instruction_ConvertConstant(Instruction * pins) {
 		ScriptVariant_Init(pvar);
 		ScriptVariant_ChangeType(pvar, VT_DECIMAL);
 		if(pins->theToken->theType != END_OF_TOKENS)
-			pvar->dblVal = (DOUBLE) atof(pins->theToken->theSource);
+			pvar->dblVal = (double) atof(pins->theToken->theSource);
 		else
-			pvar->dblVal = (DOUBLE) atof(pins->Label);
+			pvar->dblVal = (double) atof(pins->Label);
 	} else if(pins->OpCode == CONSTINT || pins->OpCode == CHECKARG) {
 		pvar = (ScriptVariant *) malloc(sizeof(ScriptVariant));
 		ScriptVariant_Init(pvar);

@@ -130,7 +130,7 @@ void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt) {
 		switch(cvt)
 		{
 		case VT_DECIMAL:
-			var->dblVal = (DOUBLE)var->lVal;
+			var->dblVal = (double)var->lVal;
 			break;
 		case VT_STR:
 			var->strVal = StrCache_Pop();
@@ -173,9 +173,9 @@ s32 ScriptVariant_IntegerValue(ScriptVariant * var, s32 * pVal) {
 	return S_OK;
 }
 
-s32 ScriptVariant_DecimalValue(ScriptVariant * var, DOUBLE * pVal) {
+s32 ScriptVariant_DecimalValue(ScriptVariant * var, double * pVal) {
 	if(var->vt == VT_INTEGER) {
-		*pVal = (DOUBLE) var->lVal;
+		*pVal = (double) var->lVal;
 	} else if(var->vt == VT_DECIMAL) {
 		*pVal = var->dblVal;
 	} else
@@ -309,7 +309,7 @@ ScriptVariant *ScriptVariant_And(ScriptVariant * svar, ScriptVariant * rightChil
 }
 
 ScriptVariant *ScriptVariant_Eq(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -330,7 +330,7 @@ ScriptVariant *ScriptVariant_Eq(ScriptVariant * svar, ScriptVariant * rightChild
 
 
 ScriptVariant *ScriptVariant_Ne(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -351,7 +351,7 @@ ScriptVariant *ScriptVariant_Ne(ScriptVariant * svar, ScriptVariant * rightChild
 
 
 ScriptVariant *ScriptVariant_Lt(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -373,7 +373,7 @@ ScriptVariant *ScriptVariant_Lt(ScriptVariant * svar, ScriptVariant * rightChild
 
 
 ScriptVariant *ScriptVariant_Gt(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -396,7 +396,7 @@ ScriptVariant *ScriptVariant_Gt(ScriptVariant * svar, ScriptVariant * rightChild
 
 
 ScriptVariant *ScriptVariant_Ge(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -417,7 +417,7 @@ ScriptVariant *ScriptVariant_Ge(ScriptVariant * svar, ScriptVariant * rightChild
 
 
 ScriptVariant *ScriptVariant_Le(ScriptVariant * svar, ScriptVariant * rightChild) {
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	static ScriptVariant retvar;
 	retvar.vt = VT_INTEGER;
 
@@ -440,7 +440,7 @@ ScriptVariant *ScriptVariant_Le(ScriptVariant * svar, ScriptVariant * rightChild
 ScriptVariant *ScriptVariant_Add(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
 	static int flag = 1;
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	char buf[MAX_STR_VAR_LEN + 1];
 	if(flag) {
 		ScriptVariant_Init(&retvar);
@@ -469,7 +469,7 @@ ScriptVariant *ScriptVariant_Add(ScriptVariant * svar, ScriptVariant * rightChil
 
 ScriptVariant *ScriptVariant_Sub(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
 			retvar.vt = VT_DECIMAL;
@@ -487,7 +487,7 @@ ScriptVariant *ScriptVariant_Sub(ScriptVariant * svar, ScriptVariant * rightChil
 
 ScriptVariant *ScriptVariant_Mul(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		if(svar->vt == VT_DECIMAL || rightChild->vt == VT_DECIMAL) {
 			retvar.vt = VT_DECIMAL;
@@ -505,7 +505,7 @@ ScriptVariant *ScriptVariant_Mul(ScriptVariant * svar, ScriptVariant * rightChil
 
 ScriptVariant *ScriptVariant_Div(ScriptVariant * svar, ScriptVariant * rightChild) {
 	static ScriptVariant retvar;
-	DOUBLE dbl1, dbl2;
+	double dbl1, dbl2;
 	if(ScriptVariant_DecimalValue(svar, &dbl1) == S_OK && ScriptVariant_DecimalValue(rightChild, &dbl2) == S_OK) {
 		if(dbl2 == 0) {
 			ScriptVariant_Init(&retvar);

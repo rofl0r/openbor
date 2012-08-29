@@ -16,8 +16,6 @@
 #define COMPILED_SCRIPT 1
 #endif
 
-typedef double DOUBLE;
-
 #ifndef WII
 typedef int BOOL;
 #endif

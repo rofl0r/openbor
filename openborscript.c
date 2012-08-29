@@ -2960,7 +2960,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_speed:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->modeldata.speed;
+				(*pretvar)->dblVal = (double) ent->modeldata.speed;
 				break;
 			}
 		case _gep_sprite:
@@ -3100,43 +3100,43 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_x:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->x;
+				(*pretvar)->dblVal = (double) ent->x;
 				break;
 			}
 		case _gep_z:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->z;
+				(*pretvar)->dblVal = (double) ent->z;
 				break;
 			}
 		case _gep_a:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->a;
+				(*pretvar)->dblVal = (double) ent->a;
 				break;
 			}
 		case _gep_xdir:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->xdir;
+				(*pretvar)->dblVal = (double) ent->xdir;
 				break;
 			}
 		case _gep_zdir:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->zdir;
+				(*pretvar)->dblVal = (double) ent->zdir;
 				break;
 			}
 		case _gep_tossv:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->tossv;
+				(*pretvar)->dblVal = (double) ent->tossv;
 				break;
 			}
 		case _gep_base:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->base;
+				(*pretvar)->dblVal = (double) ent->base;
 				break;
 			}
 		case _gep_direction:
@@ -3266,7 +3266,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_throwdist:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->modeldata.throwdist;
+				(*pretvar)->dblVal = (double) ent->modeldata.throwdist;
 				break;
 			}
 		case _gep_throwframewait:
@@ -3278,7 +3278,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_throwheight:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->modeldata.throwheight;
+				(*pretvar)->dblVal = (double) ent->modeldata.throwheight;
 				break;
 			}
 		case _gep_aiflag:
@@ -3494,7 +3494,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_knockdowncount:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->knockdowncount;
+				(*pretvar)->dblVal = (double) ent->knockdowncount;
 				break;
 			}
 		case _gep_komap:
@@ -3515,7 +3515,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_lifespancountdown:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->lifespancountdown;
+				(*pretvar)->dblVal = (double) ent->lifespancountdown;
 				break;
 			}
 		case _gep_blink:
@@ -3599,37 +3599,37 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 					case _gep_defense_blockpower:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_blockpower[(int) ltemp];
+							    (double) ent->modeldata.defense_blockpower[(int) ltemp];
 							break;
 						}
 					case _gep_defense_blockratio:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_blockratio[(int) ltemp];
+							    (double) ent->modeldata.defense_blockratio[(int) ltemp];
 							break;
 						}
 					case _gep_defense_blockthreshold:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_blockthreshold[(int) ltemp];
+							    (double) ent->modeldata.defense_blockthreshold[(int) ltemp];
 							break;
 						}
 					case _gep_defense_blocktype:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_blocktype[(int) ltemp];
+							    (double) ent->modeldata.defense_blocktype[(int) ltemp];
 							break;
 						}
 					case _gep_defense_knockdown:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_knockdown[(int) ltemp];
+							    (double) ent->modeldata.defense_knockdown[(int) ltemp];
 							break;
 						}
 					case _gep_defense_pain:
 						{
 							(*pretvar)->dblVal =
-							    (DOUBLE) ent->modeldata.defense_pain[(int) ltemp];
+							    (double) ent->modeldata.defense_pain[(int) ltemp];
 							break;
 						}
 					default:
@@ -3846,7 +3846,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 						break;
 					case _gep_attack_dropv:
 						ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-						(*pretvar)->dblVal = (DOUBLE) attack->dropv[varlist[6]->lVal];
+						(*pretvar)->dblVal = (double) attack->dropv[varlist[6]->lVal];
 						break;
 					case _gep_attack_force:
 						ScriptVariant_ChangeType(*pretvar, VT_INTEGER);
@@ -4001,13 +4001,13 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 						ltemp = (s32) 0;
 				}
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->modeldata.offense_factors[(int) ltemp];
+				(*pretvar)->dblVal = (double) ent->modeldata.offense_factors[(int) ltemp];
 				break;
 			}
 		case _gep_antigravity:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->antigravity;
+				(*pretvar)->dblVal = (double) ent->antigravity;
 				break;
 			}
 		case _gep_owner:
@@ -4105,7 +4105,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 		case _gep_scroll:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->modeldata.scroll;
+				(*pretvar)->dblVal = (double) ent->modeldata.scroll;
 				break;
 			}
 		case _gep_damage_on_landing:
@@ -4156,12 +4156,12 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				switch (arg->lVal) {
 					default:
 						if(ent->modeldata.stats[arg1->lVal]) {
-							(*pretvar)->dblVal = (DOUBLE) ent->modeldata.stats[arg1->lVal];
+							(*pretvar)->dblVal = (double) ent->modeldata.stats[arg1->lVal];
 						}
 						break;
 					case 1:
 						if(ent->stats[arg1->lVal]) {
-							(*pretvar)->dblVal = (DOUBLE) ent->stats[arg1->lVal];
+							(*pretvar)->dblVal = (double) ent->stats[arg1->lVal];
 						}
 						break;
 				}
@@ -4179,7 +4179,7 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 				}
 
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) ent->staydown[arg->lVal];
+				(*pretvar)->dblVal = (double) ent->staydown[arg->lVal];
 			}
 		case _gep_gfxshadow:
 			{
@@ -4209,19 +4209,19 @@ s32 openbor_getentityproperty(ScriptVariant ** varlist, ScriptVariant ** pretvar
 					case _gep_running_speed:
 						{
 							ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-							(*pretvar)->dblVal = (DOUBLE) ent->modeldata.runspeed;
+							(*pretvar)->dblVal = (double) ent->modeldata.runspeed;
 							break;
 						}
 					case _gep_running_jumpy:
 						{
 							ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-							(*pretvar)->dblVal = (DOUBLE) ent->modeldata.runjumpheight;
+							(*pretvar)->dblVal = (double) ent->modeldata.runjumpheight;
 							break;
 						}
 					case _gep_running_jumpx:
 						{
 							ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-							(*pretvar)->dblVal = (DOUBLE) ent->modeldata.runjumpdist;
+							(*pretvar)->dblVal = (double) ent->modeldata.runjumpdist;
 							break;
 						}
 					case _gep_running_land:
@@ -4734,7 +4734,7 @@ s32 openbor_changeentityproperty(ScriptVariant ** varlist, ScriptVariant ** pret
 	s_model *tempmodel;
 	char *tempstr = NULL;
 	s32 ltemp, ltemp2;
-	DOUBLE dbltemp;
+	double dbltemp;
 	int propind;
 	int i = 0;
 	static const void *think[] = {	// 2011_03_03, DC: Think types.
@@ -6053,7 +6053,7 @@ s32 openbor_changeentityproperty(ScriptVariant ** varlist, ScriptVariant ** pret
 //tossentity(entity, height, speedx, speedz)
 s32 openbor_tossentity(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	entity *ent = NULL;
-	DOUBLE height = 0, speedx = 0, speedz = 0;
+	double height = 0, speedx = 0, speedz = 0;
 
 	if(paramCount < 1) {
 		*pretvar = NULL;
@@ -6379,7 +6379,7 @@ s32 openbor_changeplayerproperty(ScriptVariant ** varlist, ScriptVariant ** pret
 //checkhole(x,z), return 1 if there's hole here
 s32 openbor_checkhole(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
-	DOUBLE x, z;
+	double x, z;
 
 	if(paramCount < 2) {
 		*pretvar = NULL;
@@ -6404,7 +6404,7 @@ s32 openbor_checkhole(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 //checkwall(x,z), return wall height, or 0
 s32 openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
-	DOUBLE x, z;
+	double x, z;
 	int wall;
 
 	if(paramCount < 2) {
@@ -6413,7 +6413,7 @@ s32 openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 	}
 
 	ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-	(*pretvar)->dblVal = (DOUBLE) 0;
+	(*pretvar)->dblVal = (double) 0;
 
 	arg = varlist[0];
 	if(FAILED(ScriptVariant_DecimalValue(arg, &x)))
@@ -6424,7 +6424,7 @@ s32 openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 		return S_OK;
 
 	if((wall = checkwall_below((float) x, (float) z, 100000)) >= 0) {
-		(*pretvar)->dblVal = (DOUBLE) level->walls[wall].alt;
+		(*pretvar)->dblVal = (double) level->walls[wall].alt;
 	}
 	return S_OK;
 }
@@ -6432,7 +6432,7 @@ s32 openbor_checkwall(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 //checkplatformbelow(x,z,a), return the highest platfrom entity below
 s32 openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	ScriptVariant *arg = NULL;
-	DOUBLE x, z, a;
+	double x, z, a;
 
 	if(paramCount < 3) {
 		*pretvar = NULL;
@@ -6440,7 +6440,7 @@ s32 openbor_checkplatformbelow(ScriptVariant ** varlist, ScriptVariant ** pretva
 	}
 
 	ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-	(*pretvar)->dblVal = (DOUBLE) 0;
+	(*pretvar)->dblVal = (double) 0;
 
 	arg = varlist[0];
 	if(FAILED(ScriptVariant_DecimalValue(arg, &x)))
@@ -6615,7 +6615,7 @@ s32 openbor_getfilestreamargument(ScriptVariant ** varlist, ScriptVariant ** pre
 	} else if(stricmp(argtype, "float") == 0) {
 		ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
 		(*pretvar)->dblVal =
-		    (DOUBLE)
+		    (double)
 		    atof(findarg
 			 (level->filestreams[filestreamindex].buf + level->filestreams[filestreamindex].pos, argument));
 	} else {
@@ -6694,7 +6694,7 @@ s32 openbor_filestreamappend(ScriptVariant ** varlist, ScriptVariant ** pretvar,
 	ScriptVariant *arg = NULL;
 	s32 appendtype;
 	s32 ltemp;
-	DOUBLE dbltemp;
+	double dbltemp;
 	char *temp;
 	char append[MAX_STR_VAR_LEN];
 
@@ -7083,7 +7083,7 @@ void mapstrings_setspawnentry(ScriptVariant ** varlist, int paramCount) {
 s32 openbor_setspawnentry(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	s32 ltemp;
 	s_model *tempmodel;
-	DOUBLE dbltemp;
+	double dbltemp;
 	int temp, prop;
 	ScriptVariant *arg = NULL;
 
@@ -8059,7 +8059,7 @@ s32 openbor_playmusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int pa
 
 //fademusic(fade, name, loop, offset)
 s32 openbor_fademusic(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
-	DOUBLE value = 0;
+	double value = 0;
 	s32 values[2] = { 0, 0 };
 	*pretvar = NULL;
 	if(paramCount < 1)
@@ -8754,7 +8754,7 @@ s32 openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gbglp_bgspeedratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->bglayers[ind].bgspeedratio;
+				(*pretvar)->dblVal = (double) level->bglayers[ind].bgspeedratio;
 				break;
 			}
 		case _gbglp_enabled:
@@ -8785,7 +8785,7 @@ s32 openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gbglp_wavespeed:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->bglayers[ind].wavespeed;
+				(*pretvar)->dblVal = (double) level->bglayers[ind].wavespeed;
 				break;
 			}
 		case _gbglp_xoffset:
@@ -8797,7 +8797,7 @@ s32 openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gbglp_xratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->bglayers[ind].xratio;
+				(*pretvar)->dblVal = (double) level->bglayers[ind].xratio;
 				break;
 			}
 		case _gbglp_xrepeat:
@@ -8821,7 +8821,7 @@ s32 openbor_getbglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gbglp_zratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->bglayers[ind].zratio;
+				(*pretvar)->dblVal = (double) level->bglayers[ind].zratio;
 				break;
 			}
 		case _gbglp_zrepeat:
@@ -8903,7 +8903,7 @@ s32 openbor_changebglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pre
 	s32 ind;
 	int propind;
 	s32 ltemp;
-	DOUBLE dbltemp;
+	double dbltemp;
 
 	if(paramCount < 3)
 		goto changebglayerproperty_error;
@@ -9168,7 +9168,7 @@ s32 openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gfglp_bgspeedratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->fglayers[ind].bgspeedratio;
+				(*pretvar)->dblVal = (double) level->fglayers[ind].bgspeedratio;
 				break;
 			}
 		case _gfglp_enabled:
@@ -9199,7 +9199,7 @@ s32 openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gfglp_wavespeed:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->fglayers[ind].wavespeed;
+				(*pretvar)->dblVal = (double) level->fglayers[ind].wavespeed;
 				break;
 			}
 		case _gfglp_xoffset:
@@ -9211,7 +9211,7 @@ s32 openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gfglp_xratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->fglayers[ind].xratio;
+				(*pretvar)->dblVal = (double) level->fglayers[ind].xratio;
 				break;
 			}
 		case _gfglp_xrepeat:
@@ -9235,7 +9235,7 @@ s32 openbor_getfglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pretva
 		case _gfglp_zratio:
 			{
 				ScriptVariant_ChangeType(*pretvar, VT_DECIMAL);
-				(*pretvar)->dblVal = (DOUBLE) level->fglayers[ind].zratio;
+				(*pretvar)->dblVal = (double) level->fglayers[ind].zratio;
 				break;
 			}
 		case _gfglp_zrepeat:
@@ -9317,7 +9317,7 @@ s32 openbor_changefglayerproperty(ScriptVariant ** varlist, ScriptVariant ** pre
 	s32 ind;
 	int propind;
 	s32 ltemp;
-	DOUBLE dbltemp;
+	double dbltemp;
 
 	if(paramCount < 3)
 		goto changefglayerproperty_error;

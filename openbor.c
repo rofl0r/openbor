@@ -522,13 +522,13 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 					if(!level)
 						return 0;
 					if(index == _e_xpos)
-						var->dblVal = (DOUBLE) advancex;
+						var->dblVal = (double) advancex;
 					else
-						var->dblVal = (DOUBLE) advancey;
+						var->dblVal = (double) advancey;
 					break;
-				case _e_lasthita: var->dblVal = (DOUBLE) (lasthita); break;
-				case _e_lasthitx: var->dblVal = (DOUBLE) (lasthitx); break;
-				case _e_lasthitz: var->dblVal = (DOUBLE) (lasthitz); break;
+				case _e_lasthita: var->dblVal = (double) (lasthita); break;
+				case _e_lasthitx: var->dblVal = (double) (lasthitx); break;
+				case _e_lasthitz: var->dblVal = (double) (lasthitz); break;
 				default:
 					assert(0);
 			}
@@ -626,7 +626,7 @@ int getsyspropertybyindex(ScriptVariant * var, int index) {
 int changesyspropertybyindex(int index, ScriptVariant * value) {
 	//char* tempstr = NULL;
 	s32 ltemp;
-	//DOUBLE dbltemp;
+	//double dbltemp;
 
 	// This enum is replicated in mapstrings_changesystemvariant in
 	// openborscript.c. If you change one, you must change the other as well!!!!
@@ -884,7 +884,7 @@ static void execute_script_default(s_script_args* args, Script* dest_script) {
 						break;
 					case VT_DECIMAL:
 						memcpy(&tmp_float, &tuples[i].value, sizeof(float));
-						tempvar.dblVal = (DOUBLE) tmp_float;
+						tempvar.dblVal = (double) tmp_float;
 						break;
 					default:
 						assert(0);
