@@ -31,35 +31,12 @@
 
 #define MKDIR(x) mkdir(x, 0777)
 
-#ifdef XBOX
-#define CHECK_LOGFILE(type)  type ? fileExists("d:\\Logs\\OpenBorLog.txt") : fileExists("d:\\Logs\\ScriptLog.txt")
-#define OPEN_LOGFILE(type)   type ? fopen("d:\\Logs\\OpenBorLog.txt", "wt") : fopen("d:\\Logs\\ScriptLog.txt", "wt")
-#define APPEND_LOGFILE(type) type ? fopen("d:\\Logs\\OpenBorLog.txt", "at") : fopen("d:\\Logs\\ScriptLog.txt", "at")
-#define READ_LOGFILE(type)   type ? fopen("d:\\Logs\\OpenBorLog.txt", "rt") : fopen("d:\\Logs\\ScriptLog.txt", "rt")
-#define COPY_ROOT_PATH(buf, name) strncpy(buf, "d:\\", 3); strncat(buf, name, strlen(name)); strncat(buf, "\\", 1)
-#define COPY_PAKS_PATH(buf, name) strncpy(buf, "d:\\Paks\\", 8); strncat(buf, name, strlen(name))
-#elif WII && !SDL
-#define CHECK_LOGFILE(type)  type ? fileExists(getFullPath("Logs/OpenBorLog.txt")) : fileExists(getFullPath("Logs/ScriptLog.txt"))
-#define OPEN_LOGFILE(type)   type ? fopen(getFullPath("Logs/OpenBorLog.txt"), "wt") : fopen(getFullPath("Logs/ScriptLog.txt"), "wt")
-#define APPEND_LOGFILE(type) type ? fopen(getFullPath("Logs/OpenBorLog.txt"), "at") : fopen(getFullPath("Logs/ScriptLog.txt"), "at")
-#define READ_LOGFILE(type)   type ? fopen(getFullPath("Logs/OpenBorLog.txt"), "rt") : fopen(getFullPath("Logs/ScriptLog.txt"), "rt")
-#define COPY_ROOT_PATH(buf, name) strcpy(buf, rootDir); strncat(buf, name, strlen(name)); strncat(buf, "/", 1);
-#define COPY_PAKS_PATH(buf, name) strncpy(buf, paksDir, strlen(paksDir)); strncat(buf, "/", 1); strncat(buf, name, strlen(name));
-#elif WII && SDL
-#define CHECK_LOGFILE(type)  type ? fileExists("sd:/apps/OpenBOR/Logs/OpenBorLog.txt") : fileExists("sd:/apps/OpenBOR/Logs/ScriptLog.txt")
-#define OPEN_LOGFILE(type)   type ? fopen("sd:/apps/OpenBOR/Logs/OpenBorLog.txt", "wt") : fopen("sd:/apps/OpenBOR/Logs/ScriptLog.txt", "wt")
-#define APPEND_LOGFILE(type) type ? fopen("sd:/apps/OpenBOR/Logs/OpenBorLog.txt", "at") : fopen("sd:/apps/OpenBOR/Logs/ScriptLog.txt", "at")
-#define READ_LOGFILE(type)   type ? fopen("sd:/apps/OpenBOR/Logs/OpenBorLog.txt", "rt") : fopen("sd:/apps/OpenBOR/Logs/ScriptLog.txt", "rt")
-#define COPY_ROOT_PATH(buf, name) strncpy(buf, "sd:/apps/OpenBOR/", 17); strncat(buf, name, strlen(name)); strncat(buf, "/", 1);
-#define COPY_PAKS_PATH(buf, name) strncpy(buf, "sd:/apps/OpenBOR/Paks/", 22); strncat(buf, name, strlen(name));
-#else
 #define CHECK_LOGFILE(type)  type ? fileExists("./Logs/OpenBorLog.txt") : fileExists("./Logs/ScriptLog.txt")
 #define OPEN_LOGFILE(type)   type ? fopen("./Logs/OpenBorLog.txt", "wt") : fopen("./Logs/ScriptLog.txt", "wt")
 #define APPEND_LOGFILE(type) type ? fopen("./Logs/OpenBorLog.txt", "at") : fopen("./Logs/ScriptLog.txt", "at")
 #define READ_LOGFILE(type)   type ? fopen("./Logs/OpenBorLog.txt", "rt") : fopen("./Logs/ScriptLog.txt", "rt")
-#define COPY_ROOT_PATH(buf, name) strncpy(buf, "./", 2); strncat(buf, name, strlen(name)); strncat(buf, "/", 1);
-#define COPY_PAKS_PATH(buf, name) strncpy(buf, "./Paks/", 7); strncat(buf, name, strlen(name));
-#endif
+#define COPY_ROOT_PATH(buf, name) strcpy(buf, "./"); strcat(buf, name); strcat(buf, "/");
+#define COPY_PAKS_PATH(buf, name) strcpy(buf, "./Paks/"); strcat(buf, name);
 
 void debugBuf(unsigned char *buf, size_t size, int columns) {
 	size_t pos = 0;
@@ -123,15 +100,8 @@ void getBasePath(char *newName, char *name, int type) {
 	strncpy(newName, buf, sizeof(buf));
 }
 
-
-
-#ifndef DC
 int dirExists(char *dname, int create) {
 	char realName[128] = { "" };
-#ifdef XBOX
-	getBasePath(realName, dname, 0);
-	return CreateDirectory(realName, NULL);
-#else
 	DIR *fd1 = NULL;
 	int fd2 = -1;
 	strncpy(realName, dname, 128);
@@ -144,12 +114,8 @@ int dirExists(char *dname, int create) {
 		fd2 = MKDIR(realName);
 		if(fd2 < 0)
 			return 0;
-#ifdef DARWIN
-		chmod(realName, 0777);
-#endif
 		return 1;
 	}
-#endif
 	return 0;
 }
 
@@ -160,7 +126,6 @@ int fileExists(char *fnam) {
 	fclose(handle);
 	return 1;
 }
-#endif
 
 void debug_printf(char *format, ...) {
 	va_list arglist;

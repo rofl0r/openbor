@@ -95,11 +95,7 @@ int findPaks(void) {
 	int i = 0;
 	DIR *dp = NULL;
 	struct dirent *ds;
-#ifdef WII
-	dp = opendir("sd:/apps/OpenBOR/Paks");
-#else
 	dp = opendir(paksDir);
-#endif
 	if(dp != NULL) {
 		while((ds = readdir(dp)) != NULL) {
 			if(packfile_supported(ds)) {
@@ -541,11 +537,7 @@ void drawMenu() {
 			if(list == dListCurrentPosition) {
 				shift = 2;
 				colors = RED;
-#ifdef WII
-				Image = NULL;
-#else
 				Image = getPreview(filelist[list + dListScrollPosition].filename);
-#endif
 				if(Image) {
 					Image->clip_rect.x = factor * (isWide ? 286 : 155);
 					Image->clip_rect.y =
@@ -571,10 +563,6 @@ void drawMenu() {
 		  control_getkeyname(savedata.keys[0][SDID_SPECIAL]));
 	printText((isWide ? 330 : 197), (isWide ? 170 : 155), BLACK, 0, 0, "www.LavaLit.com");
 	printText((isWide ? 322 : 190), (isWide ? 180 : 165), BLACK, 0, 0, "www.SenileTeam.com");
-
-#ifdef SPK_SUPPORTED
-	printText((isWide ? 324 : 192), (isWide ? 191 : 176), DARK_RED, 0, 0, "SecurePAK Edition");
-#endif
 
 	drawScreens(Image);
 	if(Image) {
@@ -638,10 +626,6 @@ void drawBGMPlayer() {
 	printText((isWide ? 330 : 197), (isWide ? 170 : 155), BLACK, 0, 0, "www.LavaLit.com");
 	printText((isWide ? 322 : 190), (isWide ? 180 : 165), BLACK, 0, 0, "www.SenileTeam.com");
 
-#ifdef SPK_SUPPORTED
-	printText((isWide ? 324 : 192), (isWide ? 191 : 176), DARK_RED, 0, 0, "SecurePAK Edition");
-#endif
-
 	if(!bgmPlay)
 		bgmCurrent = dListCurrentPosition + dListScrollPosition;
 	if(strlen(filelist[bgmCurrent].filename) - 4 < 24)
@@ -679,9 +663,7 @@ void Menu() {
 	dListCurrentPosition = 0;
 	if((dListTotal = findPaks()) != 1) {
 		sortList();
-#ifndef WII
 		packfile_music_read(filelist, dListTotal);
-#endif
 		initMenu(1);
 		drawMenu();
 		pControl = ControlMenu;

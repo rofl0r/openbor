@@ -23,7 +23,6 @@
 	dword	headerstart
 */
 #include <assert.h>
-#ifndef SPK_SUPPORTED
 #include "sdlport.h"
 #include <fcntl.h>
 #include "debug.h"
@@ -962,4 +961,3 @@ int packfile_music_play(struct fileliststruct *filelist, FILE * bgmFile, int bgm
 	return 1;
 }
 
-#endif
