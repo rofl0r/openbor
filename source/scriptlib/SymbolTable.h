@@ -29,7 +29,7 @@ typedef struct SymbolTable {
 void Symbol_Init(Symbol * symbol, const char* theName, u32 flags, ScriptVariant * pvar, Instruction * theRef);
 void SymbolTable_Init(SymbolTable * stable, const char* theName);
 void SymbolTable_Clear(SymbolTable * stable);
-BOOL SymbolTable_FindSymbol(SymbolTable * stable, const char* symbolName, Symbol ** pp_theSymbol);
+bool SymbolTable_FindSymbol(SymbolTable * stable, const char* symbolName, Symbol ** pp_theSymbol);
 void SymbolTable_AddSymbol(SymbolTable * stable, Symbol * p_theSymbol);
 
 #endif

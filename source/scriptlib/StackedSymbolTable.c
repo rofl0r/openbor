@@ -89,9 +89,9 @@ void StackedSymbolTable_PopScope(StackedSymbolTable * sstable) {
 *  Returns: true if the symbol is found.
 *           false otherwise.
 ******************************************************************************/
-BOOL StackedSymbolTable_FindSymbol(StackedSymbolTable * sstable, const char* symbolName, Symbol ** pp_theSymbol) {
+bool StackedSymbolTable_FindSymbol(StackedSymbolTable * sstable, const char* symbolName, Symbol ** pp_theSymbol) {
 	SymbolTable *currentSymbolTable = NULL;
-	BOOL bFound = FALSE;
+	bool bFound = FALSE;
 	int i, size;
 	FOREACH(sstable->SymbolTableStack,
 		currentSymbolTable = (SymbolTable *) List_Retrieve(&(sstable->SymbolTableStack));

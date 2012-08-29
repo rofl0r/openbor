@@ -37,8 +37,8 @@ typedef struct Interpreter {
 	};
 	int bHasImmediateCode;
 
-	BOOL bCallCompleted;
-	BOOL bMainCompleted;
+	bool bCallCompleted;
+	bool bMainCompleted;
 } Interpreter;
 
 void Interpreter_Init(Interpreter * pinterpreter, const char* name, List * pflist);

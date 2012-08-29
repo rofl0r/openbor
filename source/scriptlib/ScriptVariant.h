@@ -50,7 +50,7 @@ void ScriptVariant_ChangeType(ScriptVariant * var, VARTYPE cvt);
 VARTYPE ScriptVariant_GetType(ScriptVariant * var);
 s32 ScriptVariant_IntegerValue(ScriptVariant * var, s32 * pVal);
 s32 ScriptVariant_DecimalValue(ScriptVariant * var, double * pVal);
-BOOL ScriptVariant_IsTrue(ScriptVariant * svar);
+bool ScriptVariant_IsTrue(ScriptVariant * svar);
 void ScriptVariant_ToString(ScriptVariant * svar, char* buffer);
 
 // light version, for compiled call, faster than above, but not safe in some situations

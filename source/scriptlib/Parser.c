@@ -159,7 +159,7 @@ void Parser_AddInstructionViaLabel(Parser * pparser, OpCode pCode, Label instrLa
 *  Returns: true if the current token type matches theType
 *           false otherwise.
 ******************************************************************************/
-BOOL Parser_Check(Parser * pparser, MY_TOKEN_TYPE theType) {
+bool Parser_Check(Parser * pparser, MY_TOKEN_TYPE theType) {
 	//compare the token types
 	return (pparser->theNextToken.theType == theType);
 }
@@ -226,7 +226,7 @@ void Parser_External_decl(Parser * pparser) {
 // this function is used by Parser_External_decl, because there can be multiple identifiers share only one type token
 // variable only means the function only accept variables, not function declaration, e.g.
 // int a, b=1, c;
-void Parser_External_decl2(Parser * pparser, BOOL variableonly) {
+void Parser_External_decl2(Parser * pparser, bool variableonly) {
 	Token token = pparser->theNextToken;
 	//ignore the type of this declaration
 	if(!Parser_Check(pparser, TOKEN_IDENTIFIER)) {

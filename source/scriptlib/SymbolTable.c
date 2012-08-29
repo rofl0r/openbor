@@ -56,7 +56,7 @@ void SymbolTable_Clear(SymbolTable * stable) {
 *  Returns: true if the symbol is found.
 *           false otherwise.
 ******************************************************************************/
-BOOL SymbolTable_FindSymbol(SymbolTable * stable, const char* symbolName, Symbol ** pp_theSymbol) {
+bool SymbolTable_FindSymbol(SymbolTable * stable, const char* symbolName, Symbol ** pp_theSymbol) {
 	if(symbolName && List_FindByName(&(stable->SymbolList), (char *) symbolName)) {
 		*pp_theSymbol = (Symbol *) List_Retrieve(&(stable->SymbolList));
 		return TRUE;

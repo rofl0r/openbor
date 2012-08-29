@@ -185,7 +185,7 @@ s32 ScriptVariant_DecimalValue(ScriptVariant * var, double * pVal) {
 }
 
 
-BOOL ScriptVariant_IsTrue(ScriptVariant * svar) {
+bool ScriptVariant_IsTrue(ScriptVariant * svar) {
 	switch (svar->vt) {
 		case VT_STR:
 			return StrCache_Get(svar->strVal)[0] != 0;

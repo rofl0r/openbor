@@ -224,7 +224,7 @@ s32 Interpreter_Call(Interpreter * pinterpreter) {
 *           E_FAIL
 ******************************************************************************/
 s32 Interpreter_EvaluateImmediate(Interpreter * pinterpreter) {
-	BOOL bImmediate = FALSE;
+	bool bImmediate = FALSE;
 	s32 hr = S_OK;
 	Instruction *pInstruction = NULL;
 	int size, index;

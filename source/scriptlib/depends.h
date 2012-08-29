@@ -11,13 +11,10 @@
 
 #include "types.h"
 #include "globals.h"
+#include <stdbool.h>
 
 #ifndef COMPILED_SCRIPT
 #define COMPILED_SCRIPT 1
-#endif
-
-#ifndef WII
-typedef int BOOL;
 #endif
 
 #ifdef VOID

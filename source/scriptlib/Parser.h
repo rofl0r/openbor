@@ -23,7 +23,7 @@ typedef struct Parser {
 	Token theFieldToken;	//A pointer to the field source token
 	int paramCount;
 	char currentPath[256];	// current path info of the text
-	BOOL errorFound;
+	bool errorFound;
 } Parser;
 
 void Parser_Init(Parser * pparser);
@@ -33,12 +33,12 @@ void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, ch
 void Parser_ParseExpression(Parser * pparser, List * pIList, char* scriptText, u32 startingLineNumber, const char* path);
 void Parser_AddInstructionViaToken(Parser * pparser, OpCode pCode, Token * pToken, Label label);
 void Parser_AddInstructionViaLabel(Parser * pparser, OpCode pCode, Label instrLabel, Label listLabel);
-BOOL Parser_Check(Parser * pparser, MY_TOKEN_TYPE theType);
+bool Parser_Check(Parser * pparser, MY_TOKEN_TYPE theType);
 void Parser_Match(Parser * pparser);
 Label Parser_CreateLabel(Parser * pparser);
 void Parser_Start(Parser * pparser);
 void Parser_External_decl(Parser * pparser);
-void Parser_External_decl2(Parser * pparser, BOOL variableonly);
+void Parser_External_decl2(Parser * pparser, bool variableonly);
 void Parser_Decl_spec(Parser * pparser);
 void Parser_Decl(Parser * pparser);
 void Parser_Decl2(Parser * pparser);

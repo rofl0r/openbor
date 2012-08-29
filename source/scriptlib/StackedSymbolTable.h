@@ -21,6 +21,6 @@ void StackedSymbolTable_Clear(StackedSymbolTable * sstable);
 void StackedSymbolTable_PushScope(StackedSymbolTable * sstable, const char* scopeName);
 SymbolTable *StackedSymbolTable_TopScope(StackedSymbolTable * sstable);
 void StackedSymbolTable_PopScope(StackedSymbolTable * sstable);
-BOOL StackedSymbolTable_FindSymbol(StackedSymbolTable * sstable, const char* symbolName, Symbol ** pp_theSymbol);
+bool StackedSymbolTable_FindSymbol(StackedSymbolTable * sstable, const char* symbolName, Symbol ** pp_theSymbol);
 void StackedSymbolTable_AddSymbol(StackedSymbolTable * sstable, Symbol * p_theSymbol);
 #endif
