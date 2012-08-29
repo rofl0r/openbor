@@ -103,10 +103,12 @@ int video_set_mode(s_videomodes videomodes) {
 	if(bscreen2)
 		SDL_FreeAndNullVideoSurface(bscreen2);
 
+#ifdef OPENGL
 	// try OpenGL initialization first
 	if((savedata.usegl || savedata.fullscreen) && video_gl_set_mode(videomodes))
 		return 1;
 	else
+#endif
 		opengl = 0;
 
 	// FIXME: OpenGL surfaces aren't freed when switching from OpenGL to SDL
@@ -170,10 +172,12 @@ int video_set_mode(s_videomodes videomodes) {
 
 void video_fullscreen_flip() {
 	size_t w, h;
+#ifdef OPENGL
 	if(savedata.usegl) {
 		video_gl_fullscreen_flip();
 		return;
 	}
+#endif
 	savedata.fullscreen ^= 1;
 
 	if(savedata.fullscreen) {
@@ -287,9 +291,11 @@ int video_copy_screen(s_screen * src) {
 	SDL_Surface *ds = NULL;
 	SDL_Rect rectdes, rectsrc;
 
+#ifdef OPENGL
 	// use video_gl_copy_screen if in OpenGL mode
 	if(opengl)
 		return video_gl_copy_screen(src);
+#endif
 
 	width = screen->w;
 	if(width > src->width)
@@ -375,11 +381,12 @@ int video_copy_screen(s_screen * src) {
 void video_clearscreen() {
 	int gotlock;
 
+#ifdef OPENGL
 	if(opengl) {
 		video_gl_clearscreen();
 		return;
 	}
-
+#endif
 	lock_screens();
 	gotlock = lock_if_necessary(screen);
 
@@ -414,7 +421,9 @@ void vga_vwait(void) {
 
 void vga_setpalette(unsigned char *palette) {
 	int i;
+#ifdef OPENGL
 	video_gl_setpalette(palette);
+#endif
 	for(i = 0; i < 256; i++) {
 		sdl_colors[i].r = palette[0];
 		sdl_colors[i].g = palette[1];
@@ -432,6 +441,8 @@ void vga_setpalette(unsigned char *palette) {
 
 // TODO: give this function a boolean (int) return type denoting success/failure
 void vga_set_color_correction(int gm, int br) {
+#ifdef OPENGL	
 	if(opengl)
 		video_gl_set_color_correction(gm, br);
+#endif
 }

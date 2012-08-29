@@ -17,8 +17,11 @@ BUILD_SDL       = 1
 BUILD_GFX       = 1
 BUILD_PTHREAD   = 1
 BUILD_SDL_IO    = 1
+ifndef NO_GL
 BUILD_OPENGL    = 1
 BUILD_LOADGL    = 1
+CFLAGS += -DOPENGL
+endif
 BUILD_VORBIS    = 1
 BUILDING        = 1
 CC              ?= gcc
