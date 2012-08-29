@@ -25,8 +25,8 @@
 #include <sys/stat.h>
 
 #ifdef SDL
-#include <unistd.h>
-#include "sdlport.h"
+#  include <unistd.h>
+#  include "sdlport.h"
 #endif
 
 #define MKDIR(x) mkdir(x, 0777)
@@ -160,67 +160,7 @@ int fileExists(char *fnam) {
 	fclose(handle);
 	return 1;
 }
-
-stringptr *readFromLogFile(int which) {
-	long size;
-	int disCcWarns;
-	FILE *handle = NULL;
-	stringptr *buffer = NULL;
-	handle = READ_LOGFILE((which ? OPENBOR_LOG : SCRIPT_LOG));
-	if(handle == NULL)
-		return NULL;
-	fseek(handle, 0, SEEK_END);
-	size = ftell(handle);
-	rewind(handle);
-	if(size == 0)
-		goto CLOSE_AND_QUIT;
-	// allocate memory to contain the whole file:
-	//buffer = (char*)malloc(sizeof(char)*(size+1)); // alloc one additional byte for the
-	buffer = new_string(size);
-	if(buffer == NULL)
-		goto CLOSE_AND_QUIT;
-	disCcWarns = fread(buffer->ptr, 1, size, handle);
-	CLOSE_AND_QUIT:
-	fclose(handle);
-	return buffer;
-}
 #endif
-
-void writeToLogFile(const char *msg, ...) {
-	va_list arglist;
-
-#ifdef DC
-	va_start(arglist, msg);
-	vfprintf(stdout, msg, arglist);
-	va_end(arglist);
-	fflush(stdout);
-#else
-	if(openborLog == NULL) {
-		openborLog = OPEN_LOGFILE(OPENBOR_LOG);
-		if(openborLog == NULL)
-			return;
-	}
-	va_start(arglist, msg);
-	vfprintf(openborLog, msg, arglist);
-	va_end(arglist);
-	fflush(openborLog);
-#endif
-}
-
-void writeToScriptLog(const char *msg) {
-#ifndef DC
-	int disCcWarns;
-
-	if(scriptLog == NULL) {
-		scriptLog = OPEN_LOGFILE(SCRIPT_LOG);
-		if(scriptLog == NULL)
-			return;
-	}
-
-	disCcWarns = fwrite(msg, 1, strlen(msg), scriptLog);
-	fflush(scriptLog);
-#endif
-}
 
 void debug_printf(char *format, ...) {
 	va_list arglist;

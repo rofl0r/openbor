@@ -63,15 +63,6 @@ unsigned int bgmPlay = 0, bgmLoop = 0, bgmCycle = 0, bgmCurrent = 0, bgmStatus =
 extern u32 bothkeys, bothnewkeys;
 fileliststruct *filelist;
 
-typedef struct {
-	stringptr *buf;
-	int *pos;
-	int line;
-	int rows;
-	char ready;
-} s_logfile;
-s_logfile logfile[2];
-
 typedef int (*ControlInput) ();
 
 int ControlMenu();
@@ -82,60 +73,6 @@ static ControlInput pControl;
 
 int Control() {
 	return pControl();
-}
-
-void getAllLogs() {
-	ptrdiff_t i, j, k;
-	for(i = 0; i < 2; i++) {
-		logfile[i].buf = readFromLogFile(i);
-		if(logfile[i].buf != NULL) {
-			logfile[i].pos = malloc(++logfile[i].rows * sizeof(int));
-			if(logfile[i].pos == NULL)
-				return;
-			memset(logfile[i].pos, 0, logfile[i].rows * sizeof(int));
-
-			for(k = 0, j = 0; j < logfile[i].buf->size; j++) {
-				if(!k) {
-					logfile[i].pos[logfile[i].rows - 1] = j;
-					k = 1;
-				}
-				if(logfile[i].buf->ptr[j] == '\n') {
-					int *_pos = malloc(++logfile[i].rows * sizeof(int));
-					if(_pos == NULL)
-						return;
-					memcpy(_pos, logfile[i].pos, (logfile[i].rows - 1) * sizeof(int));
-					_pos[logfile[i].rows - 1] = 0;
-					free(logfile[i].pos);
-					logfile[i].pos = NULL;
-					logfile[i].pos = malloc(logfile[i].rows * sizeof(int));
-					if(logfile[i].pos == NULL)
-						return;
-					memcpy(logfile[i].pos, _pos, logfile[i].rows * sizeof(int));
-					free(_pos);
-					_pos = NULL;
-					logfile[i].buf->ptr[j] = 0;
-					k = 0;
-				}
-				if(logfile[i].buf->ptr[j] == '\r')
-					logfile[i].buf->ptr[j] = 0;
-				if(logfile[i].rows > 0xFFFFFFFE)
-					break;
-			}
-			logfile[i].ready = 1;
-		}
-	}
-}
-
-void freeAllLogs() {
-	int i;
-	for(i = 0; i < 2; i++) {
-		if(logfile[i].ready) {
-			free_string(logfile[i].buf);
-			logfile[i].buf = NULL;
-			free(logfile[i].pos);
-			logfile[i].pos = NULL;
-		}
-	}
 }
 
 void sortList() {
@@ -442,7 +379,6 @@ int ControlMenu() {
 			break;
 
 		case FLAG_JUMP:
-			//drawLogs();
 			status = 3;
 			break;
 
@@ -631,8 +567,6 @@ void drawMenu() {
 		  control_getkeyname(savedata.keys[0][SDID_ATTACK]));
 	printText((isWide ? 150 : 84), (isWide ? 251 : 226), WHITE, 0, 0, "%s: BGM Player",
 		  control_getkeyname(savedata.keys[0][SDID_ATTACK2]));
-	printText((isWide ? 270 : 164), (isWide ? 251 : 226), WHITE, 0, 0, "%s: View Logs",
-		  control_getkeyname(savedata.keys[0][SDID_JUMP]));
 	printText((isWide ? 390 : 244), (isWide ? 251 : 226), WHITE, 0, 0, "%s: Quit Game",
 		  control_getkeyname(savedata.keys[0][SDID_SPECIAL]));
 	printText((isWide ? 330 : 197), (isWide ? 170 : 155), BLACK, 0, 0, "www.LavaLit.com");
@@ -738,63 +672,6 @@ void drawBGMPlayer() {
 	drawScreens(NULL);
 }
 
-void drawLogs() {
-	int i = which_logfile, j, k, l, done = 0;
-	SDL_Surface *Viewer = NULL;
-
-	bothkeys = bothnewkeys = 0;
-	Viewer = SDL_AllocSurface(SDL_SWSURFACE, Source->w, Source->h, bpp, 0, 0, 0, 0);
-	bothkeys = bothnewkeys = 0;
-
-	while(!done) {
-		copyScreens(Viewer);
-		inputrefresh();
-		sound_update_music();
-		printText((isWide ? 410 : 250), 3, RED, 0, 0, "Quit : Escape");
-		if(bothnewkeys & FLAG_ESC)
-			done = 1;
-
-		if(logfile[i].ready) {
-			printText(5, 3, RED, 0, 0, "OpenBorLog.txt");
-			if(bothkeys & FLAG_MOVEUP)
-				--logfile[i].line;
-			if(bothkeys & FLAG_MOVEDOWN)
-				++logfile[i].line;
-			if(bothkeys & FLAG_MOVELEFT)
-				logfile[i].line = 0;
-			if(bothkeys & FLAG_MOVERIGHT)
-				logfile[i].line = logfile[i].rows - (LOG_SCREEN_END - LOG_SCREEN_TOP);
-			if(logfile[i].line > logfile[i].rows - (LOG_SCREEN_END - LOG_SCREEN_TOP) - 1)
-				logfile[i].line = logfile[i].rows - (LOG_SCREEN_END - LOG_SCREEN_TOP) - 1;
-			if(logfile[i].line < 0)
-				logfile[i].line = 0;
-			for(l = LOG_SCREEN_TOP, j = logfile[i].line; j < logfile[i].rows - 1; l++, j++) {
-				if(l < LOG_SCREEN_END) {
-					char textpad[480] = { "" };
-					for(k = 0; k < 480; k++) {
-						if(!logfile[i].buf->ptr[logfile[i].pos[j] + k])
-							break;
-						textpad[k] = logfile[i].buf->ptr[logfile[i].pos[j] + k];
-					}
-					if(logfile[i].rows > 0xFFFF)
-						printText(5, l * 10, WHITE, 0, 0, "0x%08x:  %s", j, textpad);
-					else
-						printText(5, l * 10, WHITE, 0, 0, "0x%04x:  %s", j, textpad);
-				} else
-					break;
-			}
-		} else if(i == SCRIPT_LOG)
-			printText(5, 3, RED, 0, 0, "Log NOT Found: ScriptLog.txt");
-		else
-			printText(5, 3, RED, 0, 0, "Log NOT Found: OpenBorLog.txt");
-
-		drawScreens(NULL);
-	}
-	SDL_FreeSurface(Viewer);
-	Viewer = NULL;
-	drawMenu();
-}
-
 void Menu() {
 	int done = 0;
 	int ctrl = 0;
@@ -802,7 +679,6 @@ void Menu() {
 	dListCurrentPosition = 0;
 	if((dListTotal = findPaks()) != 1) {
 		sortList();
-		getAllLogs();
 #ifndef WII
 		packfile_music_read(filelist, dListTotal);
 #endif
@@ -830,21 +706,14 @@ void Menu() {
 				case 2:
 					done = 1;
 					break;
-
-				case 3:
-					drawLogs();
-					break;
-
 				case -1:
 					drawMenu();
 					break;
-
 				case -2:
 					drawBGMPlayer();
 					break;
 			}
 		}
-		freeAllLogs();
 		termMenu();
 		if(ctrl == 2) {
 			if(filelist) {

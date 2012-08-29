@@ -31,8 +31,10 @@ extern char debug_msg[2048];
 extern unsigned long debug_time;
 
 // *** FUNCTIONS DECLARATIONS ***
-void writeToLogFile(const char *, ...);
-void writeToScriptLog(const char *msg);
+#define LOGHANDLE stderr
+#define writeToLogFile(fmt...) fprintf(LOGHANDLE, fmt)
+#define SCRIPTLOGHANDLE stderr
+#define writeToScriptLog(fmt...) fprintf(SCRIPTLOGHANDLE, fmt)
 
 int fileExists(char *fnam);
 int dirExists(char *dname, int create);
