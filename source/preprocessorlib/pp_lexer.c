@@ -64,7 +64,7 @@
 
 //Constructor
 void pp_token_Init(pp_token * ptoken, PP_TOKEN_TYPE theType, const char* theSource, TEXTPOS theTextPosition,
-		   ULONG charOffset) {
+		   u32 charOffset) {
 	ptoken->theType = theType;
 	ptoken->theTextPosition = theTextPosition;
 	ptoken->charOffset = charOffset;

@@ -44,7 +44,7 @@ void Parser_Clear(Parser * pparser) {
 *  Returns:
 ******************************************************************************/
 void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, char* scriptText,
-		      ULONG startingLineNumber, const char* path) {
+		      u32 startingLineNumber, const char* path) {
 	//Create a new CLexer for this script text.
 	TEXTPOS thePosition;
 	thePosition.row = startingLineNumber;
@@ -86,7 +86,7 @@ void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, ch
 *                        line counts.
 *  Returns:
 ******************************************************************************/
-void Parser_ParseExpression(Parser * pparser, List * pIList, char* scriptText, ULONG startingLineNumber, const char* path) {
+void Parser_ParseExpression(Parser * pparser, List * pIList, char* scriptText, u32 startingLineNumber, const char* path) {
 	TEXTPOS thePosition;
 
 	//Append a semi-colon to the end of the expression, in order to use the
