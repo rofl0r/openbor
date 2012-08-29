@@ -5,11 +5,13 @@ use File::Slurp qw(read_file write_file);
 use Data::Dump qw(dump);
 #use re 'debugcolor';
 use IO::Handle;
+use File::Basename;
 STDOUT->autoflush(1);
 
 sub getext {
 	my $a = shift;
-	return substr($a, length($a) - 3, 3);
+	return lc($1) if($a =~ /(\.\w+)$/);
+	return "";
 }
 
 sub processfile {
@@ -18,7 +20,9 @@ sub processfile {
 	my $rw = 0;
 	my @outfc = "";
 	for (@fc) {		
-		if (lc($_) =~ /^music\s+(\w|~|_|\-|\/|\\)+\.bor/i || lc($_) =~ /^bossmusic\s+(\w|~|_|\-|\/|\\)+\.bor/i) {
+		if (lc($_) =~ /music\s+(\w|~|_|\-|\/|\\)+\.bor/i || lc($_) =~ /bossmusic\s+(\w|~|_|\-|\/|\\)+\.bor/i
+			|| lc($_) =~ /playmusic\s*\(\s*"(\w|~|_|\-|\/|\\)+\.bor/i
+		) {
 			#/^(music\s+)(?:\w+\/)+((\w+)\.bor)(\w+(1|0))/)) {
 			#print $_ . "\n";
 			#dump @mat;
@@ -41,11 +45,11 @@ sub processdir {
 #		print $d . "\n";
 		if ($d ne $ind && $d ne "." && $d ne "..") {
 			if (-d $d) { processdir($d); } else {
-				my $uf = uc(getext($d));
-#				print $uf . "\n";
-				if ($uf eq "TXT") {
+				my $uf = getext($d);
+
+				if ($uf eq ".txt" || $uf eq ".c") {
 					processfile($d);
-				} elsif ($uf eq "XT~") {
+				} elsif ($uf eq ".txt~") {
 					unlink($d);
 				}
 			}
