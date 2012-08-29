@@ -51,7 +51,7 @@ VARTYPE ScriptVariant_GetType(ScriptVariant * var);
 s32 ScriptVariant_IntegerValue(ScriptVariant * var, LONG * pVal);
 s32 ScriptVariant_DecimalValue(ScriptVariant * var, DOUBLE * pVal);
 BOOL ScriptVariant_IsTrue(ScriptVariant * svar);
-void ScriptVariant_ToString(ScriptVariant * svar, LPSTR buffer);
+void ScriptVariant_ToString(ScriptVariant * svar, char* buffer);
 
 // light version, for compiled call, faster than above, but not safe in some situations
 // This function are used by compiled scripts

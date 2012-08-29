@@ -359,7 +359,7 @@ s32 Token_InitFromPreprocessor(Token * ptoken, pp_token * ppToken) {
 	return S_OK;
 }
 
-void Lexer_Init(Lexer * plexer, pp_context * pcontext, const char* thePath, LPSTR theSource, TEXTPOS theStartingPosition) {
+void Lexer_Init(Lexer * plexer, pp_context * pcontext, const char* thePath, char* theSource, TEXTPOS theStartingPosition) {
 	plexer->thePath = thePath;
 	plexer->ptheSource = theSource;
 	plexer->theTokenPosition = theStartingPosition;

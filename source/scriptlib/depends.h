@@ -16,7 +16,6 @@
 #define COMPILED_SCRIPT 1
 #endif
 
-typedef char *LPSTR;
 typedef u32 DWORD;
 typedef u32 ULONG;
 typedef s32 LONG;

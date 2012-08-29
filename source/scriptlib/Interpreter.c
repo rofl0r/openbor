@@ -71,7 +71,7 @@ void Interpreter_Clear(Interpreter * pinterpreter) {
 *                                 for the script being parsed.
 *  Returns: E_FAIL if parser errors found else S_OK
 ******************************************************************************/
-s32 Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, const char* path) {
+s32 Interpreter_ParseText(Interpreter * pinterpreter, char* scriptText, ULONG startingLineNumber, const char* path) {
 
 	//Parse the script
 	Parser_ParseText(&(pinterpreter->theParser), &(pinterpreter->theContext),

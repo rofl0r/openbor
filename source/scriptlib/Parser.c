@@ -43,7 +43,7 @@ void Parser_Clear(Parser * pparser) {
 *                        line counts.
 *  Returns:
 ******************************************************************************/
-void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, LPSTR scriptText,
+void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, char* scriptText,
 		      ULONG startingLineNumber, const char* path) {
 	//Create a new CLexer for this script text.
 	TEXTPOS thePosition;
@@ -86,12 +86,12 @@ void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, LP
 *                        line counts.
 *  Returns:
 ******************************************************************************/
-void Parser_ParseExpression(Parser * pparser, List * pIList, LPSTR scriptText, ULONG startingLineNumber, const char* path) {
+void Parser_ParseExpression(Parser * pparser, List * pIList, char* scriptText, ULONG startingLineNumber, const char* path) {
 	TEXTPOS thePosition;
 
 	//Append a semi-colon to the end of the expression, in order to use the
 	//same grammar as regular script text.
-	LPSTR expressionText = (CHAR *) malloc(sizeof(CHAR) * strlen(scriptText) + 2);
+	char* expressionText = (CHAR *) malloc(sizeof(CHAR) * strlen(scriptText) + 2);
 	strcpy((CHAR *) expressionText, scriptText);
 	strcat((CHAR *) expressionText, ";");
 

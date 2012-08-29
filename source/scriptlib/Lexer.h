@@ -64,7 +64,7 @@ typedef struct Lexer {
 
 //Constructor
 void Token_Init(Token * ptoken, MY_TOKEN_TYPE theType, const char* theSource, TEXTPOS theTextPosition, ULONG charOffset);
-void Lexer_Init(Lexer * plexer, pp_context * pcontext, const char* thePath, LPSTR theSource, TEXTPOS theStartingPosition);
+void Lexer_Init(Lexer * plexer, pp_context * pcontext, const char* thePath, char* theSource, TEXTPOS theStartingPosition);
 void Lexer_Clear(Lexer * plexer);
 s32 Lexer_GetNextToken(Lexer * plexer, Token * theNextToken);
 s32 Lexer_GetTokenIdentifier(Lexer * plexer, Token * theNextToken);

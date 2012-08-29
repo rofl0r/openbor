@@ -50,5 +50,5 @@ void Instruction_NewData(Instruction * pins);
 void Instruction_NewData2(Instruction * pins);
 void Instruction_ConvertConstant(Instruction * pins);
 
-void Instruction_ToString(Instruction * pins, LPSTR strRep);
+void Instruction_ToString(Instruction * pins, char* strRep);
 #endif

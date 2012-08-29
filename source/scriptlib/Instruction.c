@@ -143,7 +143,7 @@ void Instruction_ConvertConstant(Instruction * pins) {
 }
 
 
-void Instruction_ToString(Instruction * pins, LPSTR strRep) {
+void Instruction_ToString(Instruction * pins, char* strRep) {
 	strRep[0] = 0;
 
 	switch (pins->OpCode) {
