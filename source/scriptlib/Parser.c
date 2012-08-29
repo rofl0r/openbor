@@ -37,14 +37,14 @@ void Parser_Clear(Parser * pparser) {
 *  Parameters: pcontext -- Preprocessor context for the script to be parsed.
 *              pIList -- pointer to a TList<CInstruction> which takes the
 *                        stream of CInstructions representing the parsed text
-*              scriptText -- LPCSTR which contains ths script to be parsed.
+*              scriptText -- const char* which contains ths script to be parsed.
 *              startingLineNumber -- Line on which this script starts.  The
 *                        lexer needs this information to maintain accurate
 *                        line counts.
 *  Returns:
 ******************************************************************************/
 void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, LPSTR scriptText,
-		      ULONG startingLineNumber, LPCSTR path) {
+		      ULONG startingLineNumber, const char* path) {
 	//Create a new CLexer for this script text.
 	TEXTPOS thePosition;
 	thePosition.row = startingLineNumber;
@@ -80,13 +80,13 @@ void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, LP
 *  global variable and function definition.
 *  Parameters: pIList -- pointer to a TList<CInstruction> which takes the
 *                        stream of CInstructions representing the parsed text
-*              scriptText -- LPCSTR which contains ths script to be parsed.
+*              scriptText -- const char* which contains ths script to be parsed.
 *              startingLineNumber -- Line on which this script starts.  The
 *                        lexer needs this information to maintain accurate
 *                        line counts.
 *  Returns:
 ******************************************************************************/
-void Parser_ParseExpression(Parser * pparser, List * pIList, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path) {
+void Parser_ParseExpression(Parser * pparser, List * pIList, LPSTR scriptText, ULONG startingLineNumber, const char* path) {
 	TEXTPOS thePosition;
 
 	//Append a semi-colon to the end of the expression, in order to use the

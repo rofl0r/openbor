@@ -21,7 +21,7 @@ void Instruction_InitViaToken(Instruction * pins, OpCode code, Token * pToken) {
 		pins->theToken->theType = END_OF_TOKENS;
 }
 
-void Instruction_InitViaLabel(Instruction * pins, OpCode code, LPCSTR label) {
+void Instruction_InitViaLabel(Instruction * pins, OpCode code, const char* label) {
 	memset(pins, 0, sizeof(Instruction));
 	pins->OpCode = code;
 	pins->theToken = malloc(sizeof(Token));

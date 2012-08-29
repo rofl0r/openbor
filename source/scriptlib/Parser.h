@@ -29,8 +29,8 @@ typedef struct Parser {
 void Parser_Init(Parser * pparser);
 void Parser_Clear(Parser * pparser);
 void Parser_ParseText(Parser * pparser, pp_context * pcontext, List * pIList, LPSTR scriptText,
-		      ULONG startingLineNumber, LPCSTR path);
-void Parser_ParseExpression(Parser * pparser, List * pIList, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path);
+		      ULONG startingLineNumber, const char* path);
+void Parser_ParseExpression(Parser * pparser, List * pIList, LPSTR scriptText, ULONG startingLineNumber, const char* path);
 void Parser_AddInstructionViaToken(Parser * pparser, OpCode pCode, Token * pToken, Label label);
 void Parser_AddInstructionViaLabel(Parser * pparser, OpCode pCode, Label instrLabel, Label listLabel);
 BOOL Parser_Check(Parser * pparser, MY_TOKEN_TYPE theType);

@@ -41,12 +41,12 @@ typedef struct Interpreter {
 	BOOL bMainCompleted;
 } Interpreter;
 
-void Interpreter_Init(Interpreter * pinterpreter, LPCSTR name, List * pflist);
+void Interpreter_Init(Interpreter * pinterpreter, const char* name, List * pflist);
 void Interpreter_Clear(Interpreter * pinterpreter);
-s32 Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, LPCSTR path);
-s32 Interpreter_PutValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue, int refFlag);
-s32 Interpreter_GetValue(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant * pValue);
-s32 Interpreter_GetValueByRef(Interpreter * pinterpreter, LPCSTR variable, ScriptVariant ** pValue);
+s32 Interpreter_ParseText(Interpreter * pinterpreter, LPSTR scriptText, ULONG startingLineNumber, const char* path);
+s32 Interpreter_PutValue(Interpreter * pinterpreter, const char* variable, ScriptVariant * pValue, int refFlag);
+s32 Interpreter_GetValue(Interpreter * pinterpreter, const char* variable, ScriptVariant * pValue);
+s32 Interpreter_GetValueByRef(Interpreter * pinterpreter, const char* variable, ScriptVariant ** pValue);
 s32 Interpreter_EvaluateImmediate(Interpreter * pinterpreter);
 s32 Interpreter_EvaluateCall(Interpreter * pinterpreter);
 s32 Interpreter_CompileInstructions(Interpreter * pinterpreter);

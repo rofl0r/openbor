@@ -14,7 +14,7 @@
 #include "SolidList.h"
 #include "ScriptVariant.h"
 
-typedef LPCSTR Label;
+typedef const char* Label;
 
 typedef enum OpCode { CONSTSTR, CONSTDBL, CONSTINT, LOAD, SAVE, INC, DEC, FIELD, CALL, POS, NEG,
 	NOT, MUL, DIV, MOD, ERR, ADD, SUB, JUMP, GE, LE, LT, GT, EQ, NE, OR,
@@ -42,7 +42,7 @@ typedef struct Instruction {
 
 
 void Instruction_InitViaToken(Instruction * pins, OpCode code, Token * pToken);
-void Instruction_InitViaLabel(Instruction * pins, OpCode code, LPCSTR label);
+void Instruction_InitViaLabel(Instruction * pins, OpCode code, const char* label);
 void Instruction_Init(Instruction * pins);
 void Instruction_Clear(Instruction * pins);
 
