@@ -2816,10 +2816,12 @@ void free_models(void) {
 s_anim *alloc_anim() {
 	s_anim_list *curr = NULL, *head = NULL;
 	curr = malloc(sizeof(s_anim_list));
-	curr->anim = malloc(sizeof(s_anim));
-	if(curr == NULL || curr->anim == NULL)
+	if(!curr) return NULL;
+	curr->anim = calloc(1, sizeof(s_anim));
+	if(!curr->anim) {
+		free(curr);
 		return NULL;
-	memset(curr->anim, 0, sizeof(s_anim));
+	}
 	if(anim_list == NULL) {
 		anim_list = curr;
 		anim_list->next = NULL;
