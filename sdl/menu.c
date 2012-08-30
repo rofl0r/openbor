@@ -58,17 +58,13 @@ int dListTotal;
 int dListCurrentPosition;
 int dListScrollPosition;
 int which_logfile = OPENBOR_LOG;
-FILE *bgmFile = NULL;
-unsigned int bgmPlay = 0, bgmLoop = 0, bgmCycle = 0, bgmCurrent = 0, bgmStatus = 0;
 extern u32 bothkeys, bothnewkeys;
 fileliststruct *filelist;
 
 typedef int (*ControlInput) ();
 
 int ControlMenu();
-int ControlBGM();
-void PlayBGM();
-void StopBGM();
+
 static ControlInput pControl;
 
 int Control() {
@@ -311,19 +307,6 @@ SDL_Surface *getPreview(char *filename) {
 	return image;
 }
 
-void StopBGM() {
-	sound_close_music();
-	if(bgmFile) {
-		fclose(bgmFile);
-		bgmFile = NULL;
-	}
-	bgmPlay = 0;
-}
-
-void PlayBGM() {
-	bgmPlay = packfile_music_play(filelist, bgmFile, bgmLoop, dListCurrentPosition, dListScrollPosition);
-}
-
 int ControlMenu() {
 	int status = -1;
 	int dListMaxDisplay = 17;
@@ -363,11 +346,6 @@ int ControlMenu() {
 			status = 1;
 			break;
 
-		case FLAG_ATTACK2:
-			pControl = ControlBGM;
-			status = -2;
-			break;
-
 		case FLAG_SPECIAL:
 		case FLAG_ESC:
 			// Exit Engine!
@@ -376,93 +354,6 @@ int ControlMenu() {
 
 		case FLAG_JUMP:
 			status = 3;
-			break;
-
-		default:
-			// No Update Needed!
-			status = 0;
-			break;
-	}
-	return status;
-}
-
-int ControlBGM() {
-	int status = -2;
-	int dListMaxDisplay = 17;
-	bothnewkeys = 0;
-	inputrefresh();
-	switch (bothnewkeys) {
-		case FLAG_MOVEUP:
-			dListScrollPosition--;
-			if(dListScrollPosition < 0) {
-				dListScrollPosition = 0;
-				dListCurrentPosition--;
-			}
-			if(dListCurrentPosition < 0)
-				dListCurrentPosition = 0;
-			break;
-
-		case FLAG_MOVEDOWN:
-			dListCurrentPosition++;
-			if(dListCurrentPosition > dListTotal - 1)
-				dListCurrentPosition = dListTotal - 1;
-			if(dListCurrentPosition > dListMaxDisplay) {
-				if((dListCurrentPosition + dListScrollPosition) < dListTotal)
-					dListScrollPosition++;
-				dListCurrentPosition = dListMaxDisplay;
-			}
-			break;
-
-		case FLAG_MOVELEFT:
-			if(!bgmStatus || (bgmPlay && bgmCurrent == dListCurrentPosition + dListScrollPosition)) {
-				filelist[bgmCurrent].bgmTrack--;
-				if(filelist[bgmCurrent].bgmTrack < 0)
-					filelist[bgmCurrent].bgmTrack = filelist[bgmCurrent].nTracks - 1;
-				if(bgmStatus)
-					PlayBGM();
-			}
-			break;
-
-		case FLAG_MOVERIGHT:
-			if(!bgmStatus || (bgmPlay && bgmCurrent == dListCurrentPosition + dListScrollPosition)) {
-				filelist[bgmCurrent].bgmTrack++;
-				if(filelist[bgmCurrent].bgmTrack > filelist[bgmCurrent].nTracks - 1)
-					filelist[bgmCurrent].bgmTrack = 0;
-				if(bgmStatus)
-					PlayBGM();
-			}
-			break;
-
-		case FLAG_START:
-		case FLAG_ATTACK:
-			if(bgmPlay)
-				StopBGM();
-			else
-				PlayBGM();
-			break;
-
-		case FLAG_ATTACK2:
-			if(!bgmPlay) {
-				if(bgmLoop)
-					bgmLoop = 0;
-				else
-					bgmLoop = 1;
-			}
-			break;
-
-		case FLAG_JUMP:
-			if(!bgmPlay) {
-				if(bgmCycle)
-					bgmCycle = 0;
-				else
-					bgmCycle = 1;
-			}
-			break;
-
-		case FLAG_SPECIAL:
-		case FLAG_ESC:
-			pControl = ControlMenu;
-			status = -1;
 			break;
 
 		default:
@@ -557,8 +448,6 @@ void drawMenu() {
 	printText((isWide ? 392 : 261), (isWide ? 11 : 4), WHITE, 0, 0, __DATE__);
 	printText((isWide ? 23 : 4), (isWide ? 251 : 226), WHITE, 0, 0, "%s: Start Game",
 		  control_getkeyname(savedata.keys[0][SDID_ATTACK]));
-	printText((isWide ? 150 : 84), (isWide ? 251 : 226), WHITE, 0, 0, "%s: BGM Player",
-		  control_getkeyname(savedata.keys[0][SDID_ATTACK2]));
 	printText((isWide ? 390 : 244), (isWide ? 251 : 226), WHITE, 0, 0, "%s: Quit Game",
 		  control_getkeyname(savedata.keys[0][SDID_SPECIAL]));
 	printText((isWide ? 330 : 197), (isWide ? 170 : 155), BLACK, 0, 0, "www.LavaLit.com");
@@ -569,91 +458,6 @@ void drawMenu() {
 		SDL_FreeSurface(Image);
 		Image = NULL;
 	}
-}
-
-void drawBGMPlayer() {
-	SDL_Surface *Image = NULL;
-	SDL_Rect rect;
-	char listing[45] = { "" }, bgmListing[25] = {
-	""};
-	char t1[64] = "", t2[25] = "Unknown";
-	char a1[64] = "", a2[25] = "Unknown";
-	int list = 0, colors = 0, shift = 0;
-
-	// Allocate Preview Box for Music Text Info.
-	Image = SDL_AllocSurface(SDL_SWSURFACE, Source->w, Source->h, bpp, 0, 0, 0, 0);
-	if(Image != NULL) {
-		SDL_BlitSurface(Source, NULL, Image, NULL);
-		rect.x = (isWide ? 286 : 155);
-		rect.y = (isWide ? (factor == 4 ? (Sint16) 32.5 : 32) : (factor == 4 ? (Sint16) 21.5 : 21));
-		rect.w = 160;
-		rect.h = 120;
-		SDL_FillRect(Image, &rect, LIGHT_GRAY);
-		copyScreens(Image);
-		SDL_FreeSurface(Image);
-		Image = NULL;
-	}
-
-	for(list = 0; list < dListTotal; list++) {
-		if(list < 18) {
-			shift = 0;
-			colors = GRAY;
-			strncpy(listing, "", (isWide ? 44 : 28));
-			if(strlen(filelist[list + dListScrollPosition].filename) - 4 < (isWide ? 44 : 28))
-				strncpy(listing, filelist[list + dListScrollPosition].filename,
-					strlen(filelist[list + dListScrollPosition].filename) - 4);
-			if(strlen(filelist[list + dListScrollPosition].filename) - 4 > (isWide ? 44 : 28))
-				strncpy(listing, filelist[list + dListScrollPosition].filename, (isWide ? 44 : 28));
-			if(list == dListCurrentPosition) {
-				shift = 2;
-				colors = RED;
-			}
-			printText((isWide ? 30 : 7) + shift, (isWide ? 33 : 22) + (11 * list), colors, 0, 0, "%s",
-				  listing);
-		}
-	}
-
-	printText((isWide ? 26 : 5), (isWide ? 11 : 4), WHITE, 0, 0, "OpenBoR %s", VERSION);
-	printText((isWide ? 392 : 261), (isWide ? 11 : 4), WHITE, 0, 0, __DATE__);
-	printText((isWide ? 23 : 4), (isWide ? 251 : 226), WHITE, 0, 0, "%s: %s",
-		  control_getkeyname(savedata.keys[0][SDID_ATTACK]), bgmPlay ? "Stop" : "Play");
-	printText((isWide ? 150 : 84), (isWide ? 251 : 226), WHITE, 0, 0, "%s: %s",
-		  control_getkeyname(savedata.keys[0][SDID_ATTACK2]), bgmLoop ? "Repeat On" : "Repeat Off");
-	printText((isWide ? 270 : 164), (isWide ? 251 : 226), WHITE, 0, 0, "%s: %s",
-		  control_getkeyname(savedata.keys[0][SDID_JUMP]), bgmCycle ? "Cycle On" : "Cycle Off");
-	printText((isWide ? 390 : 244), (isWide ? 251 : 226), WHITE, 0, 0, "%s: Exit Player",
-		  control_getkeyname(savedata.keys[0][SDID_SPECIAL]));
-	printText((isWide ? 330 : 197), (isWide ? 170 : 155), BLACK, 0, 0, "www.LavaLit.com");
-	printText((isWide ? 322 : 190), (isWide ? 180 : 165), BLACK, 0, 0, "www.SenileTeam.com");
-
-	if(!bgmPlay)
-		bgmCurrent = dListCurrentPosition + dListScrollPosition;
-	if(strlen(filelist[bgmCurrent].filename) - 4 < 24)
-		strncpy(bgmListing, filelist[bgmCurrent].filename, strlen(filelist[bgmCurrent].filename) - 4);
-	if(strlen(filelist[bgmCurrent].filename) - 4 > 24)
-		strncpy(bgmListing, filelist[bgmCurrent].filename, 24);
-	if(!sound_query_music(a1, t1)) {
-		PlayBGM();
-		sound_query_music(a1, t1);
-		StopBGM();
-	}
-	if(t1[0])
-		strncpy(t2, t1, 25);
-	if(a1[0])
-		strncpy(a2, a1, 25);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 0), DARK_RED, 0, 0, "Game: %s", bgmListing);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 1), bgmPlay ? DARK_GREEN : DARK_BLUE, 0, 0,
-		  "Total Tracks: %d", filelist[bgmCurrent].nTracks - 1);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 2), bgmPlay ? DARK_GREEN : DARK_BLUE, 0, 0,
-		  "Current Track: %d", filelist[bgmCurrent].bgmTrack);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 3), bgmPlay ? DARK_GREEN : DARK_BLUE, 0, 0,
-		  "File: %s", filelist[bgmCurrent].bgmFileName[filelist[bgmCurrent].bgmTrack]);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 4), bgmPlay ? DARK_GREEN : DARK_BLUE, 0, 0,
-		  "Track: %s", t2);
-	printText((isWide ? 288 : 157), (isWide ? 35 : 23) + (11 * 5), bgmPlay ? DARK_GREEN : DARK_BLUE, 0, 0,
-		  "Artist: %s", a2);
-
-	drawScreens(NULL);
 }
 
 void Menu() {
@@ -670,17 +474,6 @@ void Menu() {
 
 		while(!done) {
 			sound_update_music();
-			bgmStatus = sound_query_music(NULL, NULL);
-			if(bgmPlay && !bgmStatus) {
-				if(bgmCycle) {
-					filelist[bgmCurrent].bgmTrack++;
-					if(filelist[bgmCurrent].bgmTrack > filelist[bgmCurrent].nTracks - 1)
-						filelist[bgmCurrent].bgmTrack = 0;
-					PlayBGM();
-				} else
-					StopBGM();
-				drawBGMPlayer();
-			}
 
 			ctrl = Control();
 			switch (ctrl) {
@@ -690,9 +483,6 @@ void Menu() {
 					break;
 				case -1:
 					drawMenu();
-					break;
-				case -2:
-					drawBGMPlayer();
 					break;
 			}
 		}
