@@ -10,6 +10,7 @@
 #define stringswitch_enumerator_eval_func(N) strswitch_enumerator_eval_func_##N
 #define stringswitch_enumerator_default_member_name(N) stringswitch_enumerator_member_name(N, DEFAULT__________)
 
+#define get_stringswitch_value(N, X, L) stringswitch_enumerator_eval_func(N)((X), (L))
 #define stringswitch_l(N, X, L) int stringswitch_enumerator_value_name(N) = stringswitch_enumerator_eval_func(N)((X), (L)); \
 	switch(stringswitch_enumerator_value_name(N))
 		

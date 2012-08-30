@@ -3980,221 +3980,122 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 		(*newanim)->custstar = (*newanim)->custpshotno = -1;
 	memset((*newanim)->quakeframe, 0, sizeof((*newanim)->quakeframe));
 	
-	stringswitch_l(lcm_cmdanim, lowercase_buf, l) {
-		stringcase(lcm_cmdanim, waiting):
-			(*ani_id) = ANI_SELECT;
-			break;
-		stringcase(lcm_cmdanim, sleep):
-			(*ani_id) = ANI_SLEEP;
-			break;
-		stringcase(lcm_cmdanim, run):
-			(*ani_id) = ANI_RUN;
-			break;
+#define AEM(string, enum_member) [stringswitch_enumerator_member_name(lcm_cmdanim, string)] = enum_member
+	static const ani_types enum_mapping[] = {
+		AEM(waiting, ANI_SELECT),
+		AEM(sleep, ANI_SLEEP),
+		AEM(run, ANI_RUN),
+		AEM(jump, ANI_JUMP),
+		AEM(duck, ANI_DUCK),
+		AEM(land, ANI_LAND),
+		AEM(spain, ANI_SHOCKPAIN),
+		AEM(bpain, ANI_BURNPAIN),
+		AEM(shock, ANI_SHOCK),
+		AEM(burn, ANI_BURN),
+		AEM(sdie, ANI_SHOCKDIE),
+		AEM(bdie, ANI_BURNDIE),
+		AEM(chipdeath, ANI_CHIPDEATH),
+		AEM(guardbreak, ANI_GUARDBREAK),
+		AEM(riseb, ANI_RISEB),
+		AEM(rises, ANI_RISES),
+		AEM(riseattackb, ANI_RISEATTACKB),
+		AEM(riseattacks, ANI_RISEATTACKS),
+		AEM(select, ANI_PICK),
+		AEM(throwattack, ANI_THROWATTACK),
+		AEM(upper, ANI_UPPER),
+		AEM(cant, ANI_CANT),
+		AEM(jumpcant, ANI_JUMPCANT),
+		AEM(charge, ANI_CHARGE),
+		AEM(faint, ANI_FAINT),
+		AEM(dodge, ANI_DODGE),
+		AEM(jumpforward, ANI_JUMPFORWARD),
+		AEM(runjumpattack, ANI_RUNJUMPATTACK),
+		AEM(runattack, ANI_RUNATTACK),
+		AEM(attackup, ANI_ATTACKUP),
+		AEM(attackdown, ANI_ATTACKDOWN),
+		AEM(attackforward, ANI_ATTACKFORWARD),
+		AEM(attackbackward, ANI_ATTACKBACKWARD),
+		AEM(attackboth, ANI_ATTACKBOTH),
+		AEM(get, ANI_GET),
+		AEM(grab, ANI_GRAB),
+		AEM(grabwalk, ANI_GRABWALK),
+		AEM(grabwalkup, ANI_GRABWALKUP),
+		AEM(grabwalkdown, ANI_GRABWALKDOWN),
+		AEM(grabbackwalk, ANI_GRABBACKWALK),
+		AEM(grabturn, ANI_GRABTURN),
+		AEM(grabbed, ANI_GRABBED),
+		AEM(grabbedwalk, ANI_GRABBEDWALK),
+		AEM(grabbedwalkup, ANI_GRABWALKUP),
+		AEM(grabbedwalkdown, ANI_GRABWALKDOWN),
+		AEM(grabbedbackwalk, ANI_GRABBEDBACKWALK),
+		AEM(grabbedturn, ANI_GRABBEDTURN),
+		AEM(spawn, ANI_SPAWN),
+		AEM(respawn, ANI_RESPAWN),
+		AEM(throw, ANI_THROW),
+		AEM(block, ANI_BLOCK),
+		AEM(chargeattack, ANI_CHARGEATTACK),
+		AEM(vault, ANI_VAULT),
+		AEM(turn, ANI_TURN),
+		AEM(forwardjump, ANI_FORWARDJUMP),
+		AEM(runjump, ANI_RUNJUMP),
+		AEM(jumpland, ANI_JUMPLAND),
+		AEM(jumpdelay, ANI_JUMPDELAY),
+		AEM(hitwall, ANI_HITWALL),
+		AEM(slide, ANI_SLIDE),
+		AEM(runslide, ANI_RUNSLIDE),
+		AEM(blockpainb, ANI_BLOCKPAINB),
+		AEM(blockpains, ANI_BLOCKPAINS),
+		AEM(duckattack, ANI_DUCKATTACK),
+		AEM(walkoff, ANI_WALKOFF),
+		AEM(attack, ANI_ATTACK),
+		AEM(walk, ANI_WALK),
+		AEM(up, ANI_UP),
+		AEM(down, ANI_DOWN),
+		AEM(backwalk, ANI_BACKWALK),
+		AEM(idle, ANI_IDLE),
+		AEM(follow, ANI_FOLLOW),
+		AEM(jumpattack, ANI_JUMPATTACK),
+		AEM(grabattack, ANI_GRABATTACK),
+		AEM(grabforward, ANI_GRABFORWARD),
+		AEM(grabbackward, ANI_GRABBACKWARD),
+		AEM(grabup, ANI_GRABUP),
+		AEM(grabdown, ANI_GRABDOWN),
+		AEM(jumpspecial, ANI_JUMPSPECIAL),
+		AEM(special, ANI_SPECIAL),
+		AEM(pain, ANI_PAIN),
+		AEM(rise, ANI_RISE),
+		AEM(death, ANI_DIE),
+		AEM(fall, ANI_FALL),
+		AEM(riseattack, ANI_RISEATTACK),
+		AEM(blockpain, ANI_BLOCKPAIN),
+		AEM(freespecial, ANI_FREESPECIAL),
+	};
+#undef AEM
+	
+	int strswitch_result = get_stringswitch_value(lcm_cmdanim, lowercase_buf, l);
+	if (strswitch_result == stringswitch_enumerator_default_member_name(lcm_cmdanim)) return 1;
+	(*ani_id) = enum_mapping[strswitch_result];
+	(*ani_id) += (commandIndex - 1);
+	
+	switch(strswitch_result) {
 		stringcase(lcm_cmdanim, jump):
-			(*ani_id) = ANI_JUMP;
 			(*newanim)->range[0] = 50;	// Used for enemies that jump on walls
 			(*newanim)->range[1] = 60;	// Used for enemies that jump on walls
 			break;
-		stringcase(lcm_cmdanim, duck):
-			(*ani_id) = ANI_DUCK;
-			break;
-		stringcase(lcm_cmdanim, land):
-			(*ani_id) = ANI_LAND;
-			break;
-		stringcase(lcm_cmdanim, spain):
-			// If shock attacks don't knock opponent down, play this
-			(*ani_id) = ANI_SHOCKPAIN;
-			break;
-		stringcase(lcm_cmdanim, bpain):
-			// If burn attacks don't knock opponent down, play this
-			(*ani_id) = ANI_BURNPAIN;
-			break;
-		stringcase(lcm_cmdanim, shock):
-			// If shock attacks do knock opponent down, play this
-			(*ani_id) = ANI_SHOCK;
-			(*newanim)->bounce = 4;
-			break;
 		stringcase(lcm_cmdanim, burn):
-			// If burn attacks do knock opponent down, play this
-			(*ani_id) = ANI_BURN;
+		stringcase(lcm_cmdanim, shock):
 			(*newanim)->bounce = 4;
-			break;
-		stringcase(lcm_cmdanim, sdie):
-			(*ani_id) = ANI_SHOCKDIE;
-			break;
-		stringcase(lcm_cmdanim, bdie):
-			(*ani_id) = ANI_BURNDIE;
-			break;
-		stringcase(lcm_cmdanim, chipdeath):
-			(*ani_id) = ANI_CHIPDEATH;
-			break;
-		stringcase(lcm_cmdanim, guardbreak):
-			(*ani_id) = ANI_GUARDBREAK;
-			break;
-		stringcase(lcm_cmdanim, riseb):
-			(*ani_id) = ANI_RISEB;
-			break;
-		stringcase(lcm_cmdanim, rises):
-			(*ani_id) = ANI_RISES;
-			break;
-		stringcase(lcm_cmdanim, riseattackb):
-			(*ani_id) = ANI_RISEATTACKB;
-			break;
-		stringcase(lcm_cmdanim, riseattacks):
-			(*ani_id) = ANI_RISEATTACKS;
-			break;
-		stringcase(lcm_cmdanim, select):
-			(*ani_id) = ANI_PICK;
-			break;
-		stringcase(lcm_cmdanim, throwattack):
-			(*ani_id) = ANI_THROWATTACK;
 			break;
 		stringcase(lcm_cmdanim, upper):
-			(*ani_id) = ANI_UPPER;
 			attack->counterattack = 100;	//default to 100
 			(*newanim)->range[0] = -10;
 			(*newanim)->range[1] = 120;
 			break;
-		stringcase(lcm_cmdanim, cant):
-			(*ani_id) = ANI_CANT;
-			break;
-		stringcase(lcm_cmdanim, jumpcant):
-			(*ani_id) = ANI_JUMPCANT;
-			break;
-		stringcase(lcm_cmdanim, charge):
-			(*ani_id) = ANI_CHARGE;
-			break;
-		stringcase(lcm_cmdanim, faint):
-			(*ani_id) = ANI_FAINT;
-			break;
-		stringcase(lcm_cmdanim, dodge):
-			(*ani_id) = ANI_DODGE;
-			break;
-		stringcase(lcm_cmdanim, jumpforward):
-			(*ani_id) = ANI_JUMPFORWARD;
-			break;
-		stringcase(lcm_cmdanim, runjumpattack):
-			(*ani_id) = ANI_RUNJUMPATTACK;
-			break;
-		stringcase(lcm_cmdanim, runattack):
-			(*ani_id) = ANI_RUNATTACK;	// New attack for when a player is running
-			break;
-		stringcase(lcm_cmdanim, attackup):
-			(*ani_id) = ANI_ATTACKUP;	// New attack for when a player presses u u
-			break;
-		stringcase(lcm_cmdanim, attackdown):
-			(*ani_id) = ANI_ATTACKDOWN;	// New attack for when a player presses d d
-			break;
-		stringcase(lcm_cmdanim, attackforward):
-			(*ani_id) = ANI_ATTACKFORWARD;	// New attack for when a player presses f f
-			break;
-		stringcase(lcm_cmdanim, attackbackward):
-			(*ani_id) = ANI_ATTACKBACKWARD;	// New attack for when a player presses b a
-			break;
-		stringcase(lcm_cmdanim, attackboth):
-			(*ani_id) = ANI_ATTACKBOTH;
-			break;
-		stringcase(lcm_cmdanim, get):
-			(*ani_id) = ANI_GET;
-			break;
-		stringcase(lcm_cmdanim, grab):
-			(*ani_id) = ANI_GRAB;
-			break;
-		stringcase(lcm_cmdanim, grabwalk):
-			(*ani_id) = ANI_GRABWALK;
-			break;
-		stringcase(lcm_cmdanim, grabwalkup):
-			(*ani_id) = ANI_GRABWALKUP;
-			break;
-		stringcase(lcm_cmdanim, grabwalkdown):
-			(*ani_id) = ANI_GRABWALKDOWN;
-			break;
-		stringcase(lcm_cmdanim, grabbackwalk):
-			(*ani_id) = ANI_GRABBACKWALK;
-			break;
-		stringcase(lcm_cmdanim, grabturn):
-			(*ani_id) = ANI_GRABTURN;
-			break;
-		stringcase(lcm_cmdanim, grabbed):
-			// New grabbed animation for when grabbed
-			(*ani_id) = ANI_GRABBED;
-			break;
-		stringcase(lcm_cmdanim, grabbedwalk):
-			// New animation for when grabbed and forced to walk
-			(*ani_id) = ANI_GRABBEDWALK;
-			break;
-		stringcase(lcm_cmdanim, grabbedwalkup):
-			(*ani_id) = ANI_GRABWALKUP;
-			break;
-		stringcase(lcm_cmdanim, grabbedwalkdown):
-			(*ani_id) = ANI_GRABWALKDOWN;
-			break;
-		stringcase(lcm_cmdanim, grabbedbackwalk):
-			(*ani_id) = ANI_GRABBEDBACKWALK;
-			break;
-		stringcase(lcm_cmdanim, grabbedturn):
-			(*ani_id) = ANI_GRABBEDTURN;
-			break;
-		stringcase(lcm_cmdanim, spawn):
-			//  spawn/respawn works separately now
-			(*ani_id) = ANI_SPAWN;
-			break;
-		stringcase(lcm_cmdanim, respawn):
-			//  spawn/respawn works separately now
-			(*ani_id) = ANI_RESPAWN;
-			break;
-		stringcase(lcm_cmdanim, throw):
-			(*ani_id) = ANI_THROW;
-			break;
 		stringcase(lcm_cmdanim, block):
 			// Now enemies can block attacks on occasion
-			(*ani_id) = ANI_BLOCK;
 			(*newanim)->range[0] = 1;
 			(*newanim)->range[1] = 100;
 			break;
-		stringcase(lcm_cmdanim, chargeattack):
-			(*ani_id) = ANI_CHARGEATTACK;
-			break;
-		stringcase(lcm_cmdanim, vault):
-			(*ani_id) = ANI_VAULT;
-			break;
-		stringcase(lcm_cmdanim, turn):
-			(*ani_id) = ANI_TURN;
-			break;
-		stringcase(lcm_cmdanim, forwardjump):
-			(*ani_id) = ANI_FORWARDJUMP;
-			break;
-		stringcase(lcm_cmdanim, runjump):
-			(*ani_id) = ANI_RUNJUMP;
-			break;
-		stringcase(lcm_cmdanim, jumpland):
-			(*ani_id) = ANI_JUMPLAND;
-			break;
-		stringcase(lcm_cmdanim, jumpdelay):
-			(*ani_id) = ANI_JUMPDELAY;
-			break;
-		stringcase(lcm_cmdanim, hitwall):
-			(*ani_id) = ANI_HITWALL;
-			break;
-		stringcase(lcm_cmdanim, slide):
-			(*ani_id) = ANI_SLIDE;
-			break;
-		stringcase(lcm_cmdanim, runslide):
-			(*ani_id) = ANI_RUNSLIDE;
-			break;
-		stringcase(lcm_cmdanim, blockpainb):
-			(*ani_id) = ANI_BLOCKPAINB;
-			break;
-		stringcase(lcm_cmdanim, blockpains):
-			(*ani_id) = ANI_BLOCKPAINS;
-			break;
-		stringcase(lcm_cmdanim, duckattack):
-			(*ani_id) = ANI_DUCKATTACK;
-			break;
-		stringcase(lcm_cmdanim, walkoff):
-			(*ani_id) = ANI_WALKOFF;
-			break;
-		
 		stringcase(lcm_cmdanim, attack):
 			(*ani_id) = dyn_anims.animattacks[commandIndex - 1];
 			break;
@@ -4217,93 +4118,62 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 			(*ani_id) = dyn_anims.animfollows[commandIndex - 1];
 			break;
 		stringcase(lcm_cmdanim, jumpattack):
-			(*ani_id) = ANI_JUMPATTACK + (commandIndex - 1);
 			if(commandIndex == 1 && newchar->jumpheight == 4) {
 				(*newanim)->range[0] = 150;
 				(*newanim)->range[1] = 200;
 			}
 			break;
 		stringcase(lcm_cmdanim, grabattack):
-			(*ani_id) = ANI_GRABATTACK + (commandIndex - 1);
-			(*newanim)->attackone = 1;	// default to 1, attack one one opponent
-			break;
 		stringcase(lcm_cmdanim, grabforward):
-			// New grab attack for when pressing forward attack
-			(*ani_id) = ANI_GRABFORWARD + (commandIndex - 1);
-			(*newanim)->attackone = 1;
-			break;
 		stringcase(lcm_cmdanim, grabbackward):
-			// New grab attack for when pressing backward attack
-			(*ani_id) = ANI_GRABBACKWARD + (commandIndex - 1);
-			(*newanim)->attackone = 1;
-			break;
 		stringcase(lcm_cmdanim, grabup):
-			// New grab attack for when pressing up attack
-			(*ani_id) = ANI_GRABUP + (commandIndex - 1);
-			(*newanim)->attackone = 1;
-			break;
 		stringcase(lcm_cmdanim, grabdown):
 			// New grab attack for when pressing down attack
-			(*ani_id) = ANI_GRABDOWN + (commandIndex - 1);
 			(*newanim)->attackone = 1;
 			break;
-		stringcase(lcm_cmdanim, jumpspecial):
-			commandIndex = 3; /* fall through to special */
 		stringcase(lcm_cmdanim, special):
-			(*ani_id) = ANI_SPECIAL + (commandIndex - 1);
 			if(commandIndex == 1) (*newanim)->energycost[0] = 6;
 			break;
 		stringcase(lcm_cmdanim, pain):
-			if(commandIndex < 11)
-				(*ani_id) = ANI_PAIN + (commandIndex - 1);
-			else {
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animpains[commandIndex + STA_ATKS - 1];
 			}
 			break;
 		stringcase(lcm_cmdanim, rise):
-			if(commandIndex < 11)
-				(*ani_id) = ANI_RISE + (commandIndex - 1);
-			else {
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animrises[commandIndex + STA_ATKS - 1];
 			}
 			break;
 		stringcase(lcm_cmdanim, death):
-			if(commandIndex < 11)
-				(*ani_id) = ANI_DIE + (commandIndex - 1);
-			else {
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animdies[commandIndex + STA_ATKS - 1];
 			}
 			break;
 		stringcase(lcm_cmdanim, fall):
-			if(commandIndex == 1) 
+			if(commandIndex == 1)
 				(*newanim)->bounce = 4;
-			if(commandIndex < 11)
-				(*ani_id) = ANI_FALL + (commandIndex - 1);
-			else {
+			else
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animfalls[commandIndex + STA_ATKS - 1];
 			}
 			break;
 		stringcase(lcm_cmdanim, riseattack):
-			if(commandIndex < 11)
-				(*ani_id) = ANI_RISEATTACK + (commandIndex - 1);
-			else {
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animriseattacks[commandIndex + STA_ATKS - 1];
 			}
 			break;
 		stringcase(lcm_cmdanim, blockpain):
-			if(commandIndex < 11)
-				(*ani_id) = ANI_BLOCKPAIN + (commandIndex - 1);
-			else {
+			if(!(commandIndex < 11)) {
 				if(commandIndex < MAX_ATKS - STA_ATKS + 1)
 					commandIndex = MAX_ATKS - STA_ATKS + 1;
 				(*ani_id) = dyn_anims.animblkpains[commandIndex + STA_ATKS - 1];
@@ -4341,7 +4211,7 @@ int lcmHandleCommandAnim(ArgList * arglist, s_model *newchar, s_anim **newanim, 
 			}
 			break;
 		default:
-			return 1;
+			break;
 	}
 
 	newchar->animation[(*ani_id)] = (*newanim);

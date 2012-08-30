@@ -262,25 +262,30 @@ typedef enum {
 	ANI_WALK,
 	ANI_JUMP,
 	ANI_LAND,
-	ANI_ATTACK1,
+	ANI_ATTACK,
+	ANI_ATTACK1 = ANI_ATTACK,
 	ANI_ATTACK2,
 	ANI_ATTACK3,
 	ANI_ATTACK4, // Very important
 	ANI_UPPER,
 	ANI_BLOCK, // New block animation
 	ANI_JUMPATTACK,
+	ANI_JUMPATTACK1 = ANI_JUMPATTACK,
 	ANI_JUMPATTACK2,
 	ANI_JUMPATTACK3,
 	ANI_GET,
 	ANI_GRAB,
 	ANI_GRABATTACK,
+	ANI_GRABATTACK1 = ANI_GRABATTACK,
 	ANI_GRABATTACK2,
 	ANI_THROW,
 	ANI_SPECIAL,
+	ANI_SPECIAL1 = ANI_SPECIAL,
 	ANI_SPECIAL2,	// Animation played for when pressing forward special
 	ANI_SPECIAL3,	// special3 is an alias for jumpspecial
 	ANI_JUMPSPECIAL = ANI_SPECIAL3,
 	ANI_FREESPECIAL,
+	ANI_FREESPECIAL1 = ANI_FREESPECIAL,
 	ANI_FREESPECIAL2,
 	ANI_FREESPECIAL3,
 	ANI_FREESPECIAL4,	// More freespecials added
@@ -324,6 +329,7 @@ typedef enum {
 	ANI_BURNDIE,
 	ANI_SHOCKDIE,
 	ANI_PAIN, //the pain anims must be in a sequence as they're used to calculate offsets in lcmHandleCommandAnim()
+	ANI_PAIN1 = ANI_PAIN,
 	ANI_PAIN2,
 	ANI_PAIN3,
 	ANI_PAIN4,
@@ -334,6 +340,7 @@ typedef enum {
 	ANI_PAIN9,
 	ANI_PAIN10,
 	ANI_FALL,
+	ANI_FALL1 = ANI_FALL,
 	ANI_FALL2,
 	ANI_FALL3,
 	ANI_FALL4,
@@ -344,6 +351,7 @@ typedef enum {
 	ANI_FALL9,
 	ANI_FALL10,
 	ANI_DIE,	// 29-12-2004 new animation added here ani_die
+	ANI_DIE1 = ANI_DIE,
 	ANI_DIE2,
 	ANI_DIE3,
 	ANI_DIE4,
@@ -356,7 +364,8 @@ typedef enum {
 	ANI_CHARGE,
 	ANI_BACKWALK,
 	ANI_SLEEP,
-	ANI_FOLLOW1,
+	ANI_FOLLOW,
+	ANI_FOLLOW1 = ANI_FOLLOW,
 	ANI_FOLLOW2,
 	ANI_FOLLOW3,
 	ANI_FOLLOW4,
@@ -368,6 +377,7 @@ typedef enum {
 	ANI_JUMPDELAY,
 	ANI_HITWALL,
 	ANI_GRABBACKWARD,
+	ANI_GRABBACKWARD1 = ANI_GRABBACKWARD,
 	ANI_GRABBACKWARD2,
 	ANI_GRABWALK,
 	ANI_GRABBEDWALK,
@@ -383,6 +393,7 @@ typedef enum {
 	ANI_RUNSLIDE,	//Down + Jump while running.
 	ANI_DUCKATTACK,
 	ANI_RISE,
+	ANI_RISE1 = ANI_RISE,
 	ANI_RISE2,
 	ANI_RISE3,
 	ANI_RISE4,
@@ -395,6 +406,7 @@ typedef enum {
 	ANI_RISEB,
 	ANI_RISES,
 	ANI_BLOCKPAIN,	//If entity has this, it will play in place of "pain" when its blockpain is 1 and incoming attack is blocked.
+	ANI_BLOCKPAIN1 = ANI_BLOCKPAIN,
 	ANI_BLOCKPAIN2,
 	ANI_BLOCKPAIN3,
 	ANI_BLOCKPAIN4,
@@ -409,6 +421,7 @@ typedef enum {
 	ANI_CHIPDEATH,
 	ANI_GUARDBREAK,
 	ANI_RISEATTACK,	// Attack used for enemies when players are crowding around after knocking them down
+	ANI_RISEATTACK1 = ANI_RISEATTACK,
 	ANI_RISEATTACK2,
 	ANI_RISEATTACK3,
 	ANI_RISEATTACK4,
