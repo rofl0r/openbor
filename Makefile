@@ -152,7 +152,7 @@ OBJS = $(MAIN) $(GAME_CONSOLE) $(ADPCM) $(GFX) $(GAME) $(SOURCE) $(SCRIPT) $(RAN
 #----------------------------------------------------------------------------------------------------
 
 CFLAGS 	       += $(addprefix -I", $(addsuffix ", $(INCS))) $(ARCHFLAGS)
-CFLAGS 	       += -Wall -Werror -fsigned-char
+CFLAGS 	       += -Wall -fsigned-char
 
 ifndef BUILD_DEBUG
   CFLAGS 	       += -fno-ident -freorder-blocks 
