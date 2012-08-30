@@ -9,12 +9,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#ifdef DEBUG
-#include <stdio.h>
-# define PDEBUG(fmt, args...) do { fprintf(stderr,"DEBUG: "fmt, ## args); fflush(stderr); } while (0)
-#else
-# define PDEBUG(fmt, args...) do {} while (0)
-#endif
+#include "debug.h"
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
