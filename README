@@ -1,178 +1,95 @@
+OpenBOR (anallyst edition)
+--------------------------
 
-OpenBOR
-----------------------
-OpenBOR is a continuation of the Beats Of Rage 2D game engine, which was originally
-created by the wonderful folks over at http://www.senileteam.com.
+BUILD
+=====
+just run:
 
+make
 
-History and Future
-----------------------
-In 2004, Senile Team released Beats of Rage, a free beat-'em-up for DOS inspired 
-by SEGA's Streets of Rage series and using sprites from SNK Playmore's King of 
-Fighters series.  The game spread only by word of mouth, but it nonetheless 
-amassed popularity very quickly.  Senile Team soon released an edit pack allowing 
-anyone interested to create a mod for the BOR engine.
+an executable of the name "OpenBOR" will be created.
 
-In 2005, Kirby2000 asked Senile Team to open the source code to BOR.  They 
-agreed, and OpenBOR was born.  Development on the engine was continued by the 
-community, and still is to this day.
+possible flags to make:
 
-This led to some achievements such as a port to SDL, 
-but also to tons of half-baked features.
+NO_GL=1 BUILD_DEBUG=1 make #will build without opengl but with debugging support
 
-Some really untalented coders started shitting all over the source code.
-copy and paste all over, and tons of clueless code.
-
-despite that, the community created some really nice mods, which partially 
-depend on those new features.
-
-in 2011, rofl0r aka anallyst joined the OpenBOR crew and started cleaning up the
-code (~ SVN rev 2900+).
-together with an efficient re-implementation of the previously used single-
-linked list to a hash-backed double-linked list, this resulted in major speed gains.
-waiting times for loading a level have been reduced around 100 times through this
-effort (if you dont believe it, compare how long it takes to load 
-"contra - locked and loaded" on the official build ~2800 vs ~3300). 
-after a while one of the "OpenBOR team" members got jealous on anallyst's 
-skills and started vandalizing his code.
-also one of the forum admins started to become a "coder" and implemented random
-features for his WIP mod (which is not released up to this day...a year later) in
-a kamikaze style. i can't remember a single commit he made which properly encapsulated
-one logical change instead of dozens, and didnt introduce a number of bugs.
-needless to say that cooperating in such a hostile environment gets tiring soon.
-
-this is when this fork was created.
-
-shortly after anallyst left the OpenBOR crew (~ SVN rev 3320), utunnels, the god of 
-copypasta came back and continued his unholy and untalented code rape. 
-you can be sure that the current OpenBOR SVN trunk is totally borked and full of bugs.
-
-
-the main repo was checked in 2012, and the only notable change (screenshot engine
-changed from PCX to PNG backend) was merged back into this fork.
-all other changes in the official repo are new features for two not yet released 
-mods which the authors of those changes intend to create...
-
-in the beginning of 2012, anallyst started another major cleanup effort.
-he ripped off all platform-specific code and code duplication,
-decreasing the size of the executable from 1.2MB to 750KB as of 09 Feb 2012.
-(-Os -flto -fwhole-program)
-
-the goal of this fork is to cleanup the code to a sane level, and then start
-implementation of a LUA script engine, which should replace the current 
-Pseudo-C script engine, which is incredibly slow, ugly and badly designed.
-Once that's done it should be straightforward to translate the notable Mods which use
-the scripting system to lua.
-
-Available Platforms
-----------------------
-OpenBOR has a very modular and portable design inherited from Beats of Rage. Ports 
-to the following platforms are currently supported:
-
-* Linux
-* POSIX compliant systems with an SDL port.
-* Windows using MINGW ?
-
-i don't see much sense in adding all kinds of hacks for hacked consoles.
-why hacking consoles at all ? you shouldn't give your money to big evil corporations
-like SONY which create proprietary devices, and then try to run your own code
-on them. 
-this is how you support proprietary, black-boxed systems and evil companies.
-instead you should give your money to projects aimed at homebrew development.
-examples: dingoo, gp2x, and anything that runs linux on it and gives you full
-access to the underlying hardware as well as a SDK.
-
-In addition to the above, the original Beats of Rage engine (downloadable from 
-the Senile Team website) is available for the following platforms:
-
-* DOS
-* Playstation 2
-* Xbox
-* GP32
-* Palmtop
-
-
-
-OpenBOR Hall of Shame
-----------------------
-
-SumolX (2006-2011)
-Project Manager, Lead Programmer, Known for porting PSP, PS3, Linux, Wii, GP2X and 
-maintaining all other platforms and code base.
-
-uTunnels (2007-2010)
-Developed the scripting engine for OpenBOR and also added many exciting features.
-
-KBbandressen (2007-2011)
-New developer that is feature rich!
-
-Plombo (2009-2011)
-A developer who prefers to work on OpenBOR's supporting libraries and 
-platform-specific backends.  Known for maintaining the Wii port, writing the 
-GPU-accelerated video code for Wii and OpenGL, and a few engine features.
-
-Damon Caskey (2007-2011)
-Scripter, Tester and Developer.  What else can I say.
-
-CGRemakes (2005-2006)
-Main developer after Kirby2K.  Introduced many exicting features to engine.
-
-LordBall (2006)
-Developed offshoot engine based on OpenBOR.  Shared features with both engines.
-
-Tails (2006)
-Developed offshoot engine based on OpenBOR.  Shared features with both engines.
-
-Fugue (2006)
-Developed offshoot engine based on OpenBOR.  Shared features with both engines.
-
-Kirby2K (2004-2005)
-The original developer of OpenBOR who asked Senile Team for permission to open 
-up Beats Of Rage.
-
-
-
-Senile Team Members
-----------------------
-Roel (credited as "Opla" in BoR)
-The team's chieftain. Does most of the game design, programming and artwork.
-http://www.roelvanmastbergen.nl
-
-Jeroen (credited as "Leila" in BoR)
-Does all the things no one else does.
-
-Sander (credited as "Albatross" in BoR)
-3D artist and animation sequence editor.
-
-Ben
-Senile Team's composer, who is currently working on the soundtrack for Age of the Beast.
-
-Neill
-Neill was the first to port Beats of Rage to other systems, namely Playstation 2 
-and Dreamcast. He now supports Senile Team with advice regarding console hardware 
-and code compatibility, and has agreed to port Age of the Beast when it's ready.
-http://www.neillcorlett.com
-
-
-
-Websites
-----------------------
-LavaLit (home of OpenBOR development) - http://www.lavalit.com
-Senile Team (original authors of Beats of Rage) - http://www.senileteam.com
-
-
-
-OpenBOR File Layout
-----------------------
-
-
--> OpenBOR/
-      |
-      -> OpenBOR
-      |
-      -> Paks/
+OpenBOR directory layout:
+      -> OpenBOR       (executable)
+      -> Paks/         (put paks or directories with extracted paks)
       -> ScreenShots/
       -> Logs/
       -> Saves/
-      
 
+ABOUT
+=====
+
+OpenBOR is a continuation of the Beats Of Rage 2D game engine, which was originally
+created by http://www.senileteam.com.
+
+this is a fork of "official OpenBOR" (i.e. from lavalit forums) 
+by rofl0r aka anallyst, former "OpenBOR team" member.
+
+his work on OpenBOR started back with (~ SVN rev 2900+).
+he left the lavalit team due to internal differences at around SVN rev 3316 and 
+started his own fork.
+
+instead of adding features over features, it is the intent to strip off unnecesary
+stuff and simplify things, while staying compatible to the existing mods and POSIX.
+
+this is a huge task, since OpenBOR source is really badly designed 
+(as can be expected of any good C source taken by gamers and scriptkiddies and 
+collectively extended with half-baked features).
+
+a plan is to add lua scripting support at some point in the future, and the
+ugly and slow "C script" interpreter code can be removed and the good mods be
+converted to lua.
+
+Current Situation/Comparison with "official" OpenBOR
+====================================================
+PAKS:
+  since commit a10ae8340ac9187d2590fa0ce8a3390122b570e1 the internal layout of
+  .pak files has changed to simplify things.
+  filenames are stored in unix fashion (/) and lowercase only.
+  to make old pak files compatible, they have to be "converted":
+
+  extract them using the borpak tool in tools/borpak,
+  then repack them using the same tool.
+  this results in a fresh pak in the required format.
+
+  this change made it possible to use extracted paks in a directory.
+  you can simply create a directory in the Paks dir for each game
+  (i.e. Paks/MyGame/data/)
+
+BLOAT:
+  OpenBOR (anallyst edition) x64 binary           :  750 KB
+  OpenBOR (lavalit edition, rev 3320)  x64 binary : 1250 KB
+  OpenBOR (lavalit edition, rev 3600+) x64 binary : probably 1.5 MB+
+
+SPEED:
+  anallysts work on OpenBOR made for huge speed improvements in loading times.
+  most mods now load in an instant and took several seconds (up to minutes (!))
+  formerly.
+  this improvements have gone into the lavalit version as well, but some team
+  members there prefer seeing a moving loading bar between levels over instant
+  loading, so some of the optimisations has been removed by them.
+  it's likely that the lavalit version will get slower and slower over time.
+  
+  this fork is currently the fastest openbor version available.
+  
+MOD COMPATIBILITY:
+  some upstream features have been ported so mods relying on OpenBOR 36xx features
+  should work exactly as intended.
+
+  compatibilty to older mods should be even better as the lavalit version
+  as some bugs have been fixed that prevented some mods to work with anything
+  newer than rev 28xx.
+
+PLATFORMS:
+  support for any non-posix compatible game console has been removed.
+  this fork builds well on any posix compatible platform that has ports
+  of libogg/vorbis and SDL.
+  this means it should build on any linux based device, *BSD, etc.
+  possibly even mingw.
+  we're taking the stance than rather to buy a commercial game console and
+  crack it for homebrew usage, you should rather buy products that are intended
+  for homebrewers and thus support the companies producing them.
