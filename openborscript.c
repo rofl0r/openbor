@@ -9901,7 +9901,6 @@ s32 openbor_performattack(ScriptVariant ** varlist, ScriptVariant ** pretvar, in
 s32 openbor_setidle(ScriptVariant ** varlist, ScriptVariant ** pretvar, int paramCount) {
 	s32 anim, resetable = 0, stalladd;
 	entity *e;
-	extern unsigned int time;
 
 	*pretvar = NULL;
 	if(paramCount < 1)
@@ -9938,7 +9937,7 @@ s32 openbor_setidle(ScriptVariant ** varlist, ScriptVariant ** pretvar, int para
 	ent_set_anim(e, (int) anim, (int) resetable);
 
 	if(stalladd > 0)
-		e->stalltime = time + stalladd;
+		e->stalltime = borTime + stalladd;
 
 	return S_OK;
 
