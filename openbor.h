@@ -762,7 +762,7 @@ struct animlist {
 	struct animlist *next;
 };
 typedef struct animlist s_anim_list;
-s_anim_list *anim_list;
+extern s_anim_list *anim_list;
 
 typedef enum {
 	horizontalbar = 0,
@@ -1073,7 +1073,7 @@ typedef struct {
 	char loadflag;
 	char selectable;
 } s_modelcache;
-s_modelcache *model_cache;
+extern s_modelcache *model_cache;
 
 
 typedef struct entity {

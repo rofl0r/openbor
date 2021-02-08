@@ -125,7 +125,7 @@ struct sprite_list {
 	struct sprite_list *next;
 };
 typedef struct sprite_list s_sprite_list;
-s_sprite_list *sprite_list;
+extern s_sprite_list *sprite_list;
 
 typedef struct {
 	char *filename;
@@ -135,7 +135,7 @@ typedef struct {
 	int centery;
 	s_sprite *sprite;
 } s_sprite_map;
-s_sprite_map *sprite_map;
+extern s_sprite_map *sprite_map;
 
 void set_blendtables(unsigned char *tables[]);	// set global blend tables for 8bit mode
 

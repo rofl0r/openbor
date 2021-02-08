@@ -17,6 +17,8 @@
 
 
 SDL_Joystick *joystick[JOY_LIST_TOTAL];	// SDL struct for joysticks
+s_joysticks joysticks[JOY_LIST_TOTAL];
+
 static int usejoy;		// To be or Not to be used?
 static int numjoy;		// Number of Joy(s) found
 static int lastkey;		// Last keyboard key Pressed

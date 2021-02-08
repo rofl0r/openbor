@@ -44,6 +44,10 @@ s_screen *bgbuffer = NULL;
 char bgbuffer_updated = 0;
 s_bitmap *texture = NULL;
 s_videomodes videomodes;
+s_sprite_list *sprite_list;
+s_sprite_map *sprite_map;
+s_anim_list *anim_list;
+s_modelcache *model_cache;
 
 s_player_min_max_z_bgheight player_min_max_z_bgheight = {
 	160, 232, 160
