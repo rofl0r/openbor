@@ -150,6 +150,37 @@ func (w *luaWriter) statement(stmt cStatement) error {
 		w.line("end")
 		w.indent--
 		w.line("end")
+	case *cSwitchStatement:
+		value, err := luaExpression(s.Expression)
+		if err != nil { return fmt.Errorf("switch expression: %w", err) }
+		for i, item := range s.Cases {
+			if item.Default && i != len(s.Cases)-1 { return fmt.Errorf("default label must be last; C switch fallthrough is not supported") }
+			if len(item.Statements) == 0 { return fmt.Errorf("empty switch case may fall through; explicit case bodies are required") }
+			body := item.Statements
+			last := body[len(body)-1]
+			if _, ok := last.(*cBreakStatement); ok {
+				body = body[:len(body)-1]
+			} else if _, ok := last.(*cReturnStatement); !ok {
+				if i != len(s.Cases)-1 { return fmt.Errorf("switch case %q can fall through; add break or return", item.Value) }
+			}
+			if item.Default {
+				w.line("else")
+			} else if i == 0 {
+				caseValue, err := luaExpression(item.Value)
+				if err != nil { return fmt.Errorf("case label %q: %w", item.Value, err) }
+				w.line("if " + value + " == " + caseValue + " then")
+			} else {
+				caseValue, err := luaExpression(item.Value)
+				if err != nil { return fmt.Errorf("case label %q: %w", item.Value, err) }
+				w.line("elseif " + value + " == " + caseValue + " then")
+			}
+			w.indent++
+			for _, child := range body {
+				if err := w.statement(child); err != nil { return err }
+			}
+			w.indent--
+		}
+		w.line("end")
 	case *cBreakStatement:
 		w.line("break")
 	case *cContinueStatement:
@@ -176,6 +207,8 @@ func containsContinue(stmt cStatement) bool {
 		return containsContinue(s.Body)
 	case *cForStatement:
 		return containsContinue(s.Body)
+	case *cSwitchStatement:
+		for _, item := range s.Cases { for _, child := range item.Statements { if containsContinue(child) { return true } } }
 	}
 	return false
 }
