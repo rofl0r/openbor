@@ -8,7 +8,7 @@ OpenBOR-SMART is a standalone Go-based toolkit for helping developers migrate le
 
 The lexer tokenizes legacy C-style source while preserving whitespace, comments, literals, and source positions. It reports unterminated comments and quoted literals with line and column information.
 
-The initial parser stage recognises C-style function definitions, typed parameters, local variable declarations, pointer and array declarators, initialisers, return statements, expression statements, and nested blocks. Expressions are retained as source text at this stage; Lua code generation and full expression/control-flow parsing are not implemented yet.
+The parser recognises C-style function definitions, typed parameters, local variable declarations, pointer and array declarators, initialisers, return statements, expression statements, nested blocks, `if`/`else` (including `else if`), `while`, `do`/`while`, `for`, `break`, `continue`, and empty statements. Expressions and loop clauses are retained as source text; expression parsing and Lua code generation are not implemented yet.
 
 Animation text is currently preserved verbatim. In particular, **all `@cmd` lines are copied unchanged**. The Lua-enabled OpenBOR engine is responsible for executing legacy `@cmd` syntax, so the converter must not rewrite, parse, or otherwise alter those commands.
 
@@ -38,7 +38,7 @@ go test ./...
 
 ## Planned next steps
 
-- Expand parsing to handle control flow and expressions, with explicit diagnostics for unsupported syntax rather than silently producing incorrect Lua.
+- Add full expression parsing with precedence, unary/binary operators, calls, indexing, member access, casts, and assignments.
 - Add Lua generation for the parsed legacy C script dialect.
 - Extract and translate embedded `@script` blocks while leaving surrounding animation data and every `@cmd` line unchanged.
 - Preserve legacy OpenBOR API names and callback entry points; check API compatibility against the target-era engine.
