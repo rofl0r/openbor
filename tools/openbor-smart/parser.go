@@ -86,6 +86,18 @@ func (*cBreakStatement) isCStatement() {}
 type cContinueStatement struct{}
 func (*cContinueStatement) isCStatement() {}
 
+type cSwitchCase struct {
+	Value string
+	Default bool
+	Statements []cStatement
+}
+
+type cSwitchStatement struct {
+	Expression string
+	Cases []cSwitchCase
+}
+func (*cSwitchStatement) isCStatement() {}
+
 type cEmptyStatement struct{}
 func (*cEmptyStatement) isCStatement() {}
 
@@ -219,6 +231,8 @@ func (p *cParser) parseStatement() (cStatement, error) {
 		return p.parseDoWhileStatement()
 	case "for":
 		return p.parseForStatement()
+	case "switch":
+		return p.parseSwitchStatement()
 	case "return":
 		p.pos++
 		expr, err := p.collectUntil(";")
@@ -278,6 +292,39 @@ func (p *cParser) parseDoWhileStatement() (cStatement, error) {
 	if err != nil { return nil, err }
 	if !p.accept(";") { return nil, p.errorHere("expected ';' after do-while") }
 	return &cDoWhileStatement{Body: body, Condition: condition}, nil
+}
+
+func (p *cParser) parseSwitchStatement() (cStatement, error) {
+	p.pos++
+	expression, err := p.parseParenthesizedExpression("switch")
+	if err != nil { return nil, err }
+	if !p.accept("{") { return nil, p.errorHere("expected '{' after switch expression") }
+	stmt := &cSwitchStatement{Expression: expression}
+	for !p.eof() && p.currentText() != "}" {
+		item := cSwitchCase{}
+		switch p.currentText() {
+		case "case":
+			p.pos++
+			item.Value, err = p.collectUntil(":")
+			if err != nil { return nil, err }
+			if strings.TrimSpace(item.Value) == "" { return nil, p.errorHere("empty case expression") }
+		case "default":
+			p.pos++
+			item.Default = true
+		default:
+			return nil, p.errorHere("expected case or default label in switch")
+		}
+		if !p.accept(":") { return nil, p.errorHere("expected ':' after switch label") }
+		for !p.eof() && p.currentText() != "case" && p.currentText() != "default" && p.currentText() != "}" {
+			child, err := p.parseStatement()
+			if err != nil { return nil, err }
+			item.Statements = append(item.Statements, child)
+		}
+		stmt.Cases = append(stmt.Cases, item)
+	}
+	if !p.accept("}") { return nil, p.errorHere("expected '}' after switch") }
+	if len(stmt.Cases) == 0 { return nil, p.errorHere("switch requires at least one case") }
+	return stmt, nil
 }
 
 func (p *cParser) parseForStatement() (cStatement, error) {
