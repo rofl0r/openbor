@@ -28,7 +28,9 @@ func (cCastExpr) isCExpr() {}
 
 type cSizeofTypeExpr struct{ Type string }
 
-func (cSizeofTypeExpr) isCExpr() {}\n\ntype cUnaryExpr struct {
+func (cSizeofTypeExpr) isCExpr() {}
+
+type cUnaryExpr struct {
 	Operator string
 	Operand  cExpr
 	Postfix  bool
