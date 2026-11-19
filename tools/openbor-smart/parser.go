@@ -53,6 +53,39 @@ func (*cReturnStatement) isCStatement() {}
 type cExpressionStatement struct{ Expression string }
 func (*cExpressionStatement) isCStatement() {}
 
+type cIfStatement struct {
+	Condition string
+	Then      cStatement
+	Else      cStatement
+}
+func (*cIfStatement) isCStatement() {}
+
+type cWhileStatement struct {
+	Condition string
+	Body      cStatement
+}
+func (*cWhileStatement) isCStatement() {}
+
+type cDoWhileStatement struct {
+	Body      cStatement
+	Condition string
+}
+func (*cDoWhileStatement) isCStatement() {}
+
+type cForStatement struct {
+	Initializer cStatement
+	Condition   string
+	Post        string
+	Body        cStatement
+}
+func (*cForStatement) isCStatement() {}
+
+type cBreakStatement struct{}
+func (*cBreakStatement) isCStatement() {}
+
+type cContinueStatement struct{}
+func (*cContinueStatement) isCStatement() {}
+
 var cTypeWords = map[string]bool{
 	"void": true, "char": true, "short": true, "int": true, "long": true,
 	"float": true, "double": true, "signed": true, "unsigned": true,
@@ -152,24 +185,48 @@ func (p *cParser) parseParameters() ([]cParameter, error) {
 
 func (p *cParser) parseBlockAfterOpen() (*cBlock, error) {
 	block := &cBlock{}
-	for !p.eof() && !p.accept("}") {
+	for {
+		if p.eof() {
+			return nil, p.errorHere("unterminated block")
+		}
+		if p.accept("}") {
+			return block, nil
+		}
 		stmt, err := p.parseStatement()
-		if err != nil { return nil, err }
+		if err != nil {
+			return nil, err
+		}
 		block.Statements = append(block.Statements, stmt)
 	}
-	if p.eof() && (len(p.tokens) == 0 || p.tokens[len(p.tokens)-1].text != "}") {
-		return nil, p.errorHere("unterminated function body")
-	}
-	return block, nil
 }
 
 func (p *cParser) parseStatement() (cStatement, error) {
-	if p.accept("{") { return p.parseBlockAfterOpen() }
-	if p.accept("return") {
+	switch p.currentText() {
+	case "{":
+		p.pos++
+		return p.parseBlockAfterOpen()
+	case "if":
+		return p.parseIfStatement()
+	case "while":
+		return p.parseWhileStatement()
+	case "do":
+		return p.parseDoWhileStatement()
+	case "for":
+		return p.parseForStatement()
+	case "return":
+		p.pos++
 		expr, err := p.collectUntil(";")
 		if err != nil { return nil, err }
 		if !p.accept(";") { return nil, p.errorHere("expected ';' after return") }
 		return &cReturnStatement{Expression: expr}, nil
+	case "break":
+		p.pos++
+		if !p.accept(";") { return nil, p.errorHere("expected ';' after break") }
+		return &cBreakStatement{}, nil
+	case "continue":
+		p.pos++
+		if !p.accept(";") { return nil, p.errorHere("expected ';' after continue") }
+		return &cContinueStatement{}, nil
 	}
 	if p.current() != nil && cTypeWords[p.current().text] {
 		decl, err := p.parseDeclaration()
@@ -181,6 +238,80 @@ func (p *cParser) parseStatement() (cStatement, error) {
 	if expr == "" { return nil, p.errorHere("expected statement") }
 	if !p.accept(";") { return nil, p.errorHere("expected ';' after expression") }
 	return &cExpressionStatement{Expression: expr}, nil
+}
+
+func (p *cParser) parseIfStatement() (cStatement, error) {
+	p.pos++
+	condition, err := p.parseParenthesizedExpression("if")
+	if err != nil { return nil, err }
+	thenStmt, err := p.parseStatement()
+	if err != nil { return nil, err }
+	stmt := &cIfStatement{Condition: condition, Then: thenStmt}
+	if p.accept("else") {
+		stmt.Else, err = p.parseStatement()
+		if err != nil { return nil, err }
+	}
+	return stmt, nil
+}
+
+func (p *cParser) parseWhileStatement() (cStatement, error) {
+	p.pos++
+	condition, err := p.parseParenthesizedExpression("while")
+	if err != nil { return nil, err }
+	body, err := p.parseStatement()
+	if err != nil { return nil, err }
+	return &cWhileStatement{Condition: condition, Body: body}, nil
+}
+
+func (p *cParser) parseDoWhileStatement() (cStatement, error) {
+	p.pos++
+	body, err := p.parseStatement()
+	if err != nil { return nil, err }
+	if !p.accept("while") { return nil, p.errorHere("expected 'while' after do body") }
+	condition, err := p.parseParenthesizedExpression("do-while")
+	if err != nil { return nil, err }
+	if !p.accept(";") { return nil, p.errorHere("expected ';' after do-while") }
+	return &cDoWhileStatement{Body: body, Condition: condition}, nil
+}
+
+func (p *cParser) parseForStatement() (cStatement, error) {
+	p.pos++
+	if !p.accept("(") { return nil, p.errorHere("expected '(' after for") }
+	stmt := &cForStatement{}
+	if p.currentText() != ";" {
+		if p.current() != nil && cTypeWords[p.current().text] {
+			decl, err := p.parseDeclaration()
+			if err != nil { return nil, err }
+			stmt.Initializer = &cDeclarationStatement{Declaration: decl}
+		} else {
+			init, err := p.collectUntil(";")
+			if err != nil { return nil, err }
+			if !p.accept(";") { return nil, p.errorHere("expected ';' after for initializer") }
+			if init != "" { stmt.Initializer = &cExpressionStatement{Expression: init} }
+		}
+	} else {
+		p.pos++
+	}
+	condition, err := p.collectUntil(";")
+	if err != nil { return nil, err }
+	stmt.Condition = condition
+	if !p.accept(";") { return nil, p.errorHere("expected ';' after for condition") }
+	post, err := p.collectUntil(")")
+	if err != nil { return nil, err }
+	stmt.Post = post
+	if !p.accept(")") { return nil, p.errorHere("expected ')' after for clauses") }
+	stmt.Body, err = p.parseStatement()
+	if err != nil { return nil, err }
+	return stmt, nil
+}
+
+func (p *cParser) parseParenthesizedExpression(context string) (string, error) {
+	if !p.accept("(") { return "", p.errorHere("expected '(' after " + context) }
+	expr, err := p.collectUntil(")")
+	if err != nil { return "", err }
+	if !p.accept(")") { return "", p.errorHere("expected ')' after " + context + " condition") }
+	if expr == "" { return "", p.errorHere("empty " + context + " condition") }
+	return expr, nil
 }
 
 func (p *cParser) parseDeclaration() (cDeclaration, error) {
