@@ -216,7 +216,7 @@ func luaLValue(expr cExpr) (string, error) {
 	case cIndexExpr:
 		base, err := luaExprNode(e.Value); if err != nil { return "", err }
 		index, err := luaExprNode(e.Index); if err != nil { return "", err }
-		return base + "[" + index + "]", nil
+		return base + "[(" + index + ") + 1]", nil
 	default:
 		return "", fmt.Errorf("assignment target %T is not a supported variable", expr)
 	}
