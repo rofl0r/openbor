@@ -115,6 +115,28 @@ func TestParseCExpressionPointerArithmeticAndPostfixChains(t *testing.T) {
 }
 
 
+
+func TestParseCExpressionGroupedPointerAndMemberChains(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"(*items[index]).health", "(*items[index]).health"},
+		{"(&entity)->health", "(&entity)->health"},
+		{"(*get_entity())->animation.frame++", "(*get_entity())->animation.frame++"},
+		{"get_entity()->animation.frame++", "get_entity()->animation.frame++"},
+		{"(*get_entity())->health += damage", "((*get_entity())->health += damage)"},
+		{"(pointer + offset)->animation->frame", "(pointer + offset)->animation->frame"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
+
+
 func TestParseCExpressionUnaryAndConditional(t *testing.T) {
 	expr, err := parseCExpression("!dead ? ++health : health - damage")
 	if err != nil { t.Fatalf("parseCExpression failed: %v", err) }
