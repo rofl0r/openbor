@@ -76,3 +76,32 @@ func TestLexNumericLiteralForms(t *testing.T) {
 		})
 	}
 }
+
+func TestLexNumericLiteralBoundaries(t *testing.T) {
+	cases := []struct {
+		source string
+		want   []string
+	}{
+		{"1+2", []string{"1", "+", "2"}},
+		{"1e-3-2", []string{"1e-3", "-", "2"}},
+		{"0xFFU+1", []string{"0xFFU", "+", "1"}},
+		{".5*2", []string{".5", "*", "2"}},
+		{"42ULL, name", []string{"42ULL", ",", " ", "name"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.source, func(t *testing.T) {
+			got, err := lex(tc.source)
+			if err != nil {
+				t.Fatalf("lex failed: %v", err)
+			}
+			if len(got) != len(tc.want) {
+				t.Fatalf("token count = %d, want %d: %#v", len(got), len(tc.want), got)
+			}
+			for i, want := range tc.want {
+				if got[i].text != want {
+					t.Errorf("token %d = %q, want %q", i, got[i].text, want)
+				}
+			}
+		})
+	}
+}
