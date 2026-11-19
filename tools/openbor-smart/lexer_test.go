@@ -51,3 +51,28 @@ func TestLexTracksLineAndColumn(t *testing.T) {
 		}
 	}
 }
+
+func TestLexNumericLiteralForms(t *testing.T) {
+	cases := []string{
+		"0x2A",
+		"0x2AUL",
+		"0777U",
+		"42LL",
+		"1.5f",
+		".25",
+		"1e-3",
+		"0x1.fp+2",
+		"0X.8P-1f",
+	}
+	for _, literal := range cases {
+		t.Run(literal, func(t *testing.T) {
+			got, err := lex(literal)
+			if err != nil {
+				t.Fatalf("lex failed: %v", err)
+			}
+			if len(got) != 1 || got[0].kind != tokenNumber || got[0].text != literal {
+				t.Fatalf("tokens = %#v, want one number token %q", got, literal)
+			}
+		})
+	}
+}
