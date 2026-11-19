@@ -109,6 +109,7 @@ func (w *luaWriter) statement(stmt cStatement) error {
 			w.line("end")
 		}
 	case *cWhileStatement:
+		if containsContinue(s.Body) { return fmt.Errorf("continue inside while-loop is not supported yet") }
 		condition, err := luaExpression(s.Condition)
 		if err != nil { return fmt.Errorf("while condition: %w", err) }
 		w.line("while __openbor_smart_truth(" + condition + ") do")
