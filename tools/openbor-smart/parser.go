@@ -86,6 +86,9 @@ func (*cBreakStatement) isCStatement() {}
 type cContinueStatement struct{}
 func (*cContinueStatement) isCStatement() {}
 
+type cEmptyStatement struct{}
+func (*cEmptyStatement) isCStatement() {}
+
 var cTypeWords = map[string]bool{
 	"void": true, "char": true, "short": true, "int": true, "long": true,
 	"float": true, "double": true, "signed": true, "unsigned": true,
@@ -202,6 +205,9 @@ func (p *cParser) parseBlockAfterOpen() (*cBlock, error) {
 
 func (p *cParser) parseStatement() (cStatement, error) {
 	switch p.currentText() {
+	case ";":
+		p.pos++
+		return &cEmptyStatement{}, nil
 	case "{":
 		p.pos++
 		return p.parseBlockAfterOpen()
