@@ -11,6 +11,57 @@ func TestParseCExpressionOperatorPrecedence(t *testing.T) {
 	}
 }
 
+func TestParseCExpressionPointerAndIncrementCombinations(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"*pointer++", "*pointer++"},
+		{"(*pointer)++", "*pointer++"},
+		{"++*pointer", "++*pointer"},
+		{"--entity->health", "--entity->health"},
+		{"&items[index++]", "&items[index++]"},
+		{"*(*pointer + offset)", "(*(*pointer + offset))"},
+		{"entity->health += ++damage", "(entity->health += ++damage)"},
+		{"array[--index]", "array[--index]"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+
+	// In C, *pointer++ means *(pointer++), while (*pointer)++ increments
+	// the pointed-to value. Their printed shapes are similar, so verify
+	// the AST structure as well as the diagnostic shape.
+	expr, err := parseCExpression("*pointer++")
+	if err != nil {
+		t.Fatalf("*pointer++: parse failed: %v", err)
+	}
+	deref, ok := expr.(cUnaryExpr)
+	if !ok || deref.Operator != "*" {
+		t.Fatalf("*pointer++: expected outer dereference, got %#v", expr)
+	}
+	postfix, ok := deref.Operand.(cUnaryExpr)
+	if !ok || !postfix.Postfix || postfix.Operator != "++" {
+		t.Fatalf("*pointer++: expected postfix increment of pointer, got %#v", deref.Operand)
+	}
+
+	expr, err = parseCExpression("(*pointer)++")
+	if err != nil {
+		t.Fatalf("(*pointer)++: parse failed: %v", err)
+	}
+	postfix, ok = expr.(cUnaryExpr)
+	if !ok || !postfix.Postfix || postfix.Operator != "++" {
+		t.Fatalf("(*pointer)++: expected postfix increment, got %#v", expr)
+	}
+	deref, ok = postfix.Operand.(cUnaryExpr)
+	if !ok || deref.Operator != "*" {
+		t.Fatalf("(*pointer)++: expected increment operand to be dereference, got %#v", postfix.Operand)
+	}
+}
+
 func TestParseCExpressionAssignmentAssociativity(t *testing.T) {
 	expr, err := parseCExpression("a = b += c * 2")
 	if err != nil { t.Fatalf("parseCExpression failed: %v", err) }
