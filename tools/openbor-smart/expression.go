@@ -19,7 +19,7 @@ type cLiteralExpr struct {
 }
 func (cLiteralExpr) isCExpr() {}
 
-type cCastExpr struct {\n\tType string\n\tValue cExpr\n}\nfunc (cCastExpr) isCExpr() {}\n\ntype cSizeofTypeExpr struct{ Type string }\nfunc (cSizeofTypeExpr) isCExpr() {}\n\ntype cUnaryExpr struct {
+type cCastExpr struct {\n\tType  string\n\tValue cExpr\n}\n\nfunc (cCastExpr) isCExpr() {}\n\ntype cSizeofTypeExpr struct{ Type string }\n\nfunc (cSizeofTypeExpr) isCExpr() {}\n\ntype cUnaryExpr struct {
 	Operator string
 	Operand  cExpr
 	Postfix  bool
