@@ -8,9 +8,11 @@ OpenBOR-SMART is a standalone Go-based toolkit for helping developers migrate le
 
 The lexer tokenizes legacy C-style source while preserving whitespace, comments, literals, and source positions. It reports unterminated comments and quoted literals with line and column information.
 
+The initial parser stage recognises C-style function definitions, typed parameters, local variable declarations, pointer and array declarators, initialisers, return statements, expression statements, and nested blocks. Expressions are retained as source text at this stage; Lua code generation and full expression/control-flow parsing are not implemented yet.
+
 Animation text is currently preserved verbatim. In particular, **all `@cmd` lines are copied unchanged**. The Lua-enabled OpenBOR engine is responsible for executing legacy `@cmd` syntax, so the converter must not rewrite, parse, or otherwise alter those commands.
 
-The C-style script-to-Lua parser and generator are the next implementation task. They must support standalone legacy script files and C-style `@script` blocks embedded in animation text, while preserving legacy function names, callback entry points, and engine API calls. Compatibility checks must use the target-era OpenBOR source (around builds 3000–4000); newer APIs must not be assumed to exist.
+The remaining conversion work must support standalone legacy script files and C-style `@script` blocks embedded in animation text, while preserving legacy function names, callback entry points, and engine API calls. Compatibility checks must use the target-era OpenBOR source (around builds 3000–4000); newer APIs must not be assumed to exist.
 
 ## Build and use
 
@@ -26,7 +28,7 @@ Run the current command-line tool:
 ./openbor-smart -in path/to/input-file
 ```
 
-The current CLI writes the input unchanged beside the original file, with its extension replaced by `.lua`. This is only the current pass-through behaviour; C-to-Lua conversion is not implemented yet. The original file is left untouched.
+The current CLI still writes the input unchanged beside the original file, with its extension replaced by `.lua`. The parser is not yet connected to Lua code generation or the CLI. The original file is left untouched.
 
 Run the tests:
 
@@ -36,9 +38,8 @@ go test ./...
 
 ## Planned next steps
 
-- Implement a parser and Lua generator for the legacy C script dialect, building on the existing lexer.
-- Recognize function definitions, parameters, declarations, and statements, including multiple declarators, pointers, and arrays.
-- Add control-flow and expression parsing, with explicit diagnostics for unsupported syntax rather than silently producing incorrect Lua.
+- Expand parsing to handle control flow and expressions, with explicit diagnostics for unsupported syntax rather than silently producing incorrect Lua.
+- Add Lua generation for the parsed legacy C script dialect.
 - Extract and translate embedded `@script` blocks while leaving surrounding animation data and every `@cmd` line unchanged.
 - Preserve legacy OpenBOR API names and callback entry points; check API compatibility against the target-era engine.
 - Add safe folder/batch conversion and collision checks.
