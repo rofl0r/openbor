@@ -8,7 +8,9 @@ OpenBOR-SMART is a standalone Go-based toolkit for helping developers migrate le
 
 The lexer tokenizes legacy C-style source while preserving whitespace, comments, literals, and source positions. It reports unterminated comments and quoted literals with line and column information.
 
-The parser recognises C-style function definitions, typed parameters, local variable declarations, pointer and array declarators, initialisers, return statements, expression statements, nested blocks, `if`/`else` (including `else if`), `while`, `do`/`while`, `for`, `break`, `continue`, and empty statements. Expressions and loop clauses are retained as source text; expression parsing and Lua code generation are not implemented yet.
+The statement parser recognises C-style function definitions, typed parameters, local variable declarations, pointer and array declarators, initialisers, return statements, expression statements, nested blocks, `if`/`else`, `while`, `do`/`while`, `for`, `break`, `continue`, and empty statements.
+
+A separate expression parser now builds an AST for identifiers and literals; unary and postfix operators; arithmetic, bitwise, comparison, logical, assignment and comma operators; conditional expressions; function calls; array indexing; and `.` / `->` member access. Operator precedence and associativity are represented in the tree. The statement parser still retains expression source text, and Lua code generation is not implemented yet. C casts and several less-common C expression forms remain future work and must be diagnosed rather than silently mistranslated when integrated.
 
 Animation text is currently preserved verbatim. In particular, **all `@cmd` lines are copied unchanged**. The Lua-enabled OpenBOR engine is responsible for executing legacy `@cmd` syntax, so the converter must not rewrite, parse, or otherwise alter those commands.
 
@@ -38,8 +40,9 @@ go test ./...
 
 ## Planned next steps
 
-- Add full expression parsing with precedence, unary/binary operators, calls, indexing, member access, casts, and assignments.
-- Add Lua generation for the parsed legacy C script dialect.
+- Expand expression parsing for casts, `sizeof(type)`, compound literals, and other legacy C forms found in real game scripts.
+- Connect expression ASTs to statements and declarations without losing source positions or comments needed for diagnostics.
+- Add Lua generation with explicit compatibility rules for C-to-Lua differences.
 - Extract and translate embedded `@script` blocks while leaving surrounding animation data and every `@cmd` line unchanged.
 - Preserve legacy OpenBOR API names and callback entry points; check API compatibility against the target-era engine.
 - Add safe folder/batch conversion and collision checks.
