@@ -45,3 +45,24 @@ func TestParseCExpressionPointerAndTaggedTypeCasts(t *testing.T) {
 		}
 	}
 }
+
+func TestParseCExpressionSizeofAndCastPrecedence(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"sizeof value", "sizeof(value)"},
+		{"sizeof *pointer", "sizeof(*pointer)"},
+		{"sizeof pointer->health", "sizeof(pointer->health)"},
+		{"sizeof(value + offset) * scale", "(sizeof(value + offset) * scale)"},
+		{"(int)*pointer + offset", "((int)*pointer + offset)"},
+		{"(float)(health + bonus) / scale", "((float)(health + bonus) / scale)"},
+		{"(unsigned long)value >> 2", "((unsigned long)value >> 2)"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
