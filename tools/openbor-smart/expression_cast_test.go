@@ -5,11 +5,11 @@ import "testing"
 func TestParseCExpressionCasts(t *testing.T) {
 	for _, tc := range []struct{ source, want string }{
 		{"(int)value", "(int)value"},
-		{"(float *)(pointer + offset)", "(float *)((pointer + offset))"},
+		{"(float *)(pointer + offset)", "(float *)(pointer + offset)"},
 		{"(unsigned long)health + 1", "((unsigned long)health + 1)"},
 		{"sizeof(int)", "sizeof(int)"},
 		{"sizeof(const char *)", "sizeof(const char *)"},
-		{"sizeof(value + 1)", "sizeof((value + 1))"},
+		{"sizeof(value + 1)", "sizeof(value + 1)"},
 	} {
 		expr, err := parseCExpression(tc.source)
 		if err != nil { t.Errorf("%s: parse failed: %v", tc.source, err); continue }
