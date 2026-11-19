@@ -156,7 +156,6 @@ void filter_dotmatrix(u8 * srcPtr, u32 srcPitch, u8 * deltaPtr, u8 * dstPtr, u32
 	}
 }
 
-// NEED_OPTIMIZE
 static void MULT(u16 c, float *r, float *g, float *b, float alpha) {
 	*r += alpha * ((c & RED_MASK565) >> 11);
 	*g += alpha * ((c & GREEN_MASK565) >> 5);

@@ -22,7 +22,10 @@
 	} rep
 	dword	headerstart
 */
-#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include "sdlport.h"
 #include <fcntl.h>
 #include "debug.h"
@@ -35,7 +38,6 @@
 #include "globals.h"
 #include "openbor.h"
 
-#include <sys/stat.h>
 
 #define	stricmp	strcasecmp
 
@@ -71,7 +73,6 @@ static int packhandle[MAXPACKHANDLES] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 // Own file pointers and sizes
 static unsigned int packfilepointer[MAXPACKHANDLES];
 static unsigned int packfilesize[MAXPACKHANDLES];
-//char packfile[128] <- defined in sdl/sdlport.c... hmmm
 List *filenamelist = NULL;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,6 @@ char tolowerOneChar(const char *c) {
 		default:
 			return *c;
 	}
-	return '\0';		//should never be reached
 }
 
 // file name lowercase in-place.
@@ -178,7 +178,6 @@ int myfilenamecmp(const char *a, size_t asize, const char *b, size_t bsize) {
 		ca++;
 		cb++;
 	}
-	return -2;		// should never be reached
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -713,9 +712,8 @@ int seekPackfileCached(int handle, int offset, int whence) {
 // returns number of sectors read successfully
 //
 static int pak_getsectors(void *dest, int lba, int n) {
-	int disCcWarns;
 	lseek(pakfd, lba << 11, SEEK_SET);
-	disCcWarns = read(pakfd, dest, n << 11);
+	read(pakfd, dest, n << 11);
 	return n;
 }
 
@@ -843,14 +841,13 @@ int pak_init() {
 		// add a trailing null o/~
 		pak_header[pak_headersize] = 0;
 	}
-	//printf("pak cached header (%d bytes)\n", pak_headersize);
 	// initialize vfd table
 	for(i = 0; i < MAXPACKHANDLES; i++)
 		pak_vfdexists[i] = 0;
 	// finally, initialize the filecache
 	filecache_init(pakfd, (paksize + 0x7FF) / 0x800, CACHEBLOCKSIZE, CACHEBLOCKS, MAXPACKHANDLES);
 	pak_initialized = 1;
-	return (CACHEBLOCKSIZE * CACHEBLOCKS + 64);
+	return CACHEBLOCKSIZE * CACHEBLOCKS + 64;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -858,7 +855,7 @@ int pak_init() {
 int packfileeof(int handle) {
 	if(!pak_isvalidhandle(handle))
 		return -1;
-	return (pak_vfdpos[handle] >= pak_vfdsize[handle]);
+	return pak_vfdpos[handle] >= pak_vfdsize[handle];
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -898,7 +895,7 @@ void packfile_music_read(fileliststruct * filelist, int dListTotal) {
 	FILE *fd;
 	int len, i;
 	unsigned int off;
-	char pack[4], *p = NULL;
+	char pack[4], *p;
 	for(i = 0; i < dListTotal; i++) {
 		getBasePath(packfile, filelist[i].filename, 1);
 		if(stristr(packfile, ".pak")) {
@@ -946,7 +943,6 @@ int packfile_music_play(struct fileliststruct *filelist, FILE * bgmFile, int bgm
 	getBasePath(packfile, filelist[curPos + scrPos].filename, 1);
 	if(bgmFile) {
 		fclose(bgmFile);
-		bgmFile = NULL;
 	}
 	bgmFile = fopen(packfile, "rb");
 	if(!bgmFile)

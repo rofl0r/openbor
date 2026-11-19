@@ -10,6 +10,7 @@
 #include "packfile.h"
 #include "video.h"
 #include "menu.h"
+#include "../source/crashhandler.h"
 
 #define appExit exit
 #undef exit
@@ -25,19 +26,9 @@ void borExit(int reset) {
 }
 
 int main(int argc, char *argv[]) {
-#ifdef CUSTOM_SIGNAL_HANDLER
-	struct sigaction sigact;
-#endif
 
-#ifdef CUSTOM_SIGNAL_HANDLER
-	sigact.sa_sigaction = handleFatalSignal;
-	sigact.sa_flags = SA_RESTART | SA_SIGINFO;
-
-	if(sigaction(SIGSEGV, &sigact, NULL) != 0) {
-		printf("Error setting signal handler for %d (%s)\n", SIGSEGV, strsignal(SIGSEGV));
-		exit(EXIT_FAILURE);
-	}
-#endif
+	/* Install as early as possible so native faults during SDL startup are logged. */
+	bor_install_crash_handler();
 
 	initSDL();
 

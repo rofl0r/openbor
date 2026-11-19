@@ -44,7 +44,6 @@ void debug_printf(char *, ...);
 typedef enum {
 	ST_SAVE = 0,
 	ST_HISCORE,
-	ST_SCRIPT,
 	ST_INP,
 	ST_CFG,
 	ST_MAX

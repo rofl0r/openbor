@@ -9,8 +9,7 @@
 #ifndef _STRINGPTR_H_
 #define _STRINGPTR_H_
 
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>
 
 typedef struct {
 	char *ptr;

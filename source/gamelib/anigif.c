@@ -8,7 +8,6 @@
 
 // Animated GIF player.
 
-#include <stdio.h>
 #include <string.h>
 #include "packfile.h"
 #include "borendian.h"
@@ -17,11 +16,6 @@
 
 
 #pragma pack (1)
-
-
-// ============================== This is it! ===============================
-// Should be something like this...
-
 
 #define			ANIGIF_DECODE_END		0
 #define			ANIGIF_DECODE_FRAME		1
@@ -108,8 +102,6 @@ static void handle_gfx_control(int handle) {
 			transparent = buf[3];
 		lastdelay = (buf[2] << 8) | buf[1];
 
-		// disposal = (buf[0]>>2) & 7;
-		// inputflag = (buf[0]>>1) & 1;
 	}
 }
 
@@ -138,15 +130,6 @@ static void gifextension(int handle) {
 
 
 
-/*
-int readnonzero(int handle){
-	char b = 0;
-	while(b==0){
-		if(readpackfile(handle, &b, 1) < 1) return 0;
-	}
-	return b;
-}
-*/
 
 
 
@@ -205,7 +188,6 @@ static int decodegifblock(int handle, unsigned char *buf, int width, int height,
 
 	linebuffer = buf + (gb->top * width);
 
-	// loop until something breaks
 	for(;;) {
 		if(bitsleft == 8) {
 			if(++p >= q && (((blocksize = readbyte(handle)) < 1) ||
@@ -432,33 +414,17 @@ int anigif_decode(s_screen * screen, int *delay, int x, int y) {
 			iblock.top += y;
 
 			decodegifblock(handle, (unsigned char *) screen->data, screen->width, screen->height, &iblock);
-/*
-			if(!decodegifblock(handle, screen->data, screen->width, screen->height, &iblock)){
-				anigif_close();
-				return ANIGIF_DECODE_END;
-			}
-*/
 
 			if(delay)
 				*delay = lastdelay;
-			// lastdelay = 0;
 			return ANIGIF_DECODE_FRAME;
 
 		case '!':
 			// Handle GIF extension
 			gifextension(handle);
-			// if(delay) *delay = lastdelay;
-			// lastdelay = 0;
 			return ANIGIF_DECODE_RETRY;
 
-//              case 0:
 		default:
-			// Isn't this an EOF?
 			return ANIGIF_DECODE_RETRY;
-//                      anigif_close();
-//                      return ANIGIF_DECODE_END;
 	}
-
-	anigif_close();
-	return ANIGIF_DECODE_END;
 }

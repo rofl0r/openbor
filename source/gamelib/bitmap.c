@@ -7,9 +7,7 @@
  */
 
 // Simple bitmap code. Not fast, but useful nonetheless...
-// 25-jan-2003
 
-#include <stdio.h>
 #include <string.h>
 #include <stddef.h>
 #include "globals.h"
@@ -43,15 +41,12 @@ s_bitmap *allocbitmap(int width, int height, int format) {
 void freebitmap(s_bitmap * bitmap) {
 	if(bitmap != NULL) {
 		free(bitmap);
-		bitmap = NULL;
 	}
 }
 
-// Sluggish getbitmap function. Should be redone in ASM.
 void getbitmap(int x, int y, int width, int height, s_bitmap * bitmap, s_screen * screen) {
 
 	int s, d;
-	//int i;
 	int j;
 
 	// Clip width and height
@@ -83,13 +78,6 @@ void getbitmap(int x, int y, int width, int height, s_bitmap * bitmap, s_screen 
 		s = x + (y + j) * screen->width;
 		memcpy(((char *) bitmap->data) + d, ((char *) screen->data) + s, width);
 		d += width;
-		/*
-		   for(i=0; i<width; i++){
-		   bitmap->data[d] = screen->data[s];
-		   ++d;
-		   ++s;
-		   }
-		 */
 	}
 }
 

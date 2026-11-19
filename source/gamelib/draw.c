@@ -6,8 +6,7 @@
  * Copyright (c) 2004 - 2011 OpenBOR Team
  */
 
-// Primitive drawing functions. Should really be done in ASM...
-// Last update: 24-jun-2002
+// Primitive drawing functions.
 
 #include "types.h"
 
@@ -137,7 +136,7 @@ void line(int sx, int sy, int ex, int ey, int colour, s_screen * screen, int alp
 		ydir = -ydir;
 	while(sy != ey) {
 		d = sx + sy;
-		screen->data[d] = (lut && screen->data[d]) ? (lut[screen->data[d]]) : colour;;
+		screen->data[d] = (lut && screen->data[d]) ? (lut[screen->data[d]]) : colour;
 		sy += ydir;
 		if((thres -= absdiffx) <= 0) {
 			sx += xdir;
@@ -211,12 +210,7 @@ void putpixel(unsigned x, unsigned y, int colour, s_screen * screen, int alpha) 
 
 
 
-// Code to draw a circle.
-// I ripped this, not sure how it works...
-// It seems it devides the circle into 8 parts, which are drawn
-// simultaneously.
-// Not much optimization, though, since every pixel is clipped
-// separately.
+// Draw a circle using eight-way symmetry.
 
 void circle(int x, int y, int rad, int col, s_screen * screen, int alpha) {
 	int cx = 0;		// 'Circle X'

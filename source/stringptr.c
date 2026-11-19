@@ -7,16 +7,15 @@
  */
 
 #include "stringptr.h"
-#include <assert.h>
-#include <string.h>
+#include <stdlib.h>
 
 stringptr *new_string(size_t size) {
 	stringptr *result = malloc(sizeof(stringptr) + size + 1);
 	if(result == NULL)
 		return NULL;
-	result->ptr = (char *) result + sizeof(stringptr);
+	result->ptr = (char *) (result + 1);
 	result->size = size;
-	*((char *) (result->ptr + size)) = '\0';
+	result->ptr[size] = '\0';
 	return result;
 }
 

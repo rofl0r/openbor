@@ -5,11 +5,11 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "utils.h"
 #include "packfile.h"
 #include "filecache.h"
-#include "openbor.h"
 
 #ifdef PSP
 #include <pspsuspend.h>
@@ -30,9 +30,7 @@ static int filecache_blocksize;
 static int filecache_blocks;
 static int max_vfds;
 
-//static int default_minimum_run_bytes = 98304;
 static int default_minimum_run_bytes = 131072;
-//static int default_minimum_run_bytes = 262144;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -381,11 +379,9 @@ void filecache_process(void) {
 				sceIoctl(real_pakfd, SCE_FS_EXECUTING, &busy);
 			sceRead(real_pakfd, filecache + (cacheblock_read * filecache_blocksize), filecache_blocksize);
 #else
-			int disCcWarns;
 			lseek(real_pakfd, pakblock_read * filecache_blocksize, SEEK_SET);
-			disCcWarns =
-			    read(real_pakfd, (char *) filecache + (cacheblock_read * filecache_blocksize),
-				 filecache_blocksize);
+			read(real_pakfd, filecache + (cacheblock_read * filecache_blocksize),
+			     filecache_blocksize);
 #endif
 		}
 	}
@@ -427,7 +423,6 @@ int filecache_readpakblock(unsigned char *dest, int pakblock, int startofs, int 
 
 		filecache_process();
 	}
-	return bytes;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -582,9 +577,6 @@ void filecache_init(int realfd, int pakcdsectors, int blocksize, unsigned char b
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
-// quick and dirty
-//
 void filecache_wait_for_prebuffer(int vfd, int nblocks) {
 	if(vfd_readptr_pakblock[vfd] < 0)
 		return;

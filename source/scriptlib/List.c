@@ -9,774 +9,263 @@
  * 
  * the whole smart stuff going on here was written by anallyst.
  * at the time anallyst touched this code, this was a very simple single linked list.
- * double linked list functionality, index hash and string hash functionality is (C) anallyst.
+ * double linked list functionality is (C) anallyst.
  * 
  */
 
 #include "List.h"
 #include <assert.h>
-
-void List_Set_UseStrdup(List* list, int use) {
-	list->no_strdup = !use;
-}
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef DEBUG
-void chklist(List * list) {
+static void chklist(const List *list) {
 	assert(list);
-	assert(list->initdone == 1);	// method called on uninitialised list
+	assert(list->initdone == 1);
 }
 #endif
 
-#ifdef USE_STRING_HASHES
-unsigned char strhash(char *s) {
-	ptrdiff_t tmp = 0;
-	char *p = s;
-	while(*p) {
-		tmp += *p - 'A';
-		p++;
-	}
-	return (size_t) tmp % 256;
+#define HASH_BUCKET_COUNT 256
+
+static unsigned char strhash(const char *s) {
+	ptrdiff_t hash = 0;
+	while(*s)
+		hash += *s++ - 'A';
+	return (size_t) hash % HASH_BUCKET_COUNT;
 }
 
-/* add a single node to the hash list */
-#define BUCKET_INIT_NODES_ALLOC 2
-void List_AddHash(List * list, Node * node) {
+#define BUCKET_INIT_NODES_ALLOC ((size_t) 2)
+static void List_AddHash(List *list, Node *node) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	unsigned char h;
-	size_t save;
-
 	assert(node);
 	if(!node->name)
 		return;
 
-	if(!list->buckets)
-		list->buckets = calloc(1, sizeof(Bucket *) * 256);
-
-	h = strhash((char *) node->name);
-	if(!list->buckets[h]) {
-		list->buckets[h] = calloc(1, sizeof(Bucket));
-		list->buckets[h]->nodes = calloc(1, sizeof(Node *) * BUCKET_INIT_NODES_ALLOC);
-		assert(list->buckets[h]->nodes != NULL);
-		list->buckets[h]->size = BUCKET_INIT_NODES_ALLOC;
+	if(!list->buckets) {
+		list->buckets = calloc(HASH_BUCKET_COUNT, sizeof *list->buckets);
+		assert(list->buckets);
 	}
 
-	save = list->buckets[h]->size;
-	assert(list->buckets[h]->used <= save);
-	if(list->buckets[h]->used == save) {
-		list->buckets[h]->nodes = realloc(list->buckets[h]->nodes, sizeof(Node *) * (save * 2));
-		assert(list->buckets[h]->nodes != NULL);
-		list->buckets[h]->size = save * 2;
+	const unsigned char bucket_index = strhash(node->name);
+	Bucket *bucket = list->buckets[bucket_index];
+	if(!bucket) {
+		bucket = calloc(1, sizeof *bucket);
+		assert(bucket);
+		list->buckets[bucket_index] = bucket;
+		bucket->nodes = calloc(BUCKET_INIT_NODES_ALLOC, sizeof *bucket->nodes);
+		assert(bucket->nodes);
+		bucket->size = BUCKET_INIT_NODES_ALLOC;
 	}
 
-	list->buckets[h]->nodes[list->buckets[h]->used] = node;
-	list->buckets[h]->used++;
+	const size_t capacity = bucket->size;
+	assert(capacity > 0);
+	assert(bucket->used <= capacity);
+	if(bucket->used == capacity) {
+		Node **nodes = realloc(bucket->nodes, sizeof *bucket->nodes * (capacity * 2));
+		assert(nodes);
+		bucket->nodes = nodes;
+		bucket->size = capacity * 2;
+	}
+
+	assert(bucket->used < bucket->size);
+	bucket->nodes[bucket->used++] = node;
 }
 
-/* removes the last element from the index list
-only use on fully indexed list */
-void List_RemoveHash(List * list, Node * node) {
+static void List_RemoveHash(List *list, const Node *node) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	unsigned char h;
-	size_t i;
 	if(!node->name)
 		return;
-	h = strhash((char *) node->name);
-	assert(list->buckets[h]);
-	assert(list->buckets[h]->used > 0);
-	for(i = 0; i < list->buckets[h]->used; i++) {
-		if(node == list->buckets[h]->nodes[i]) {
-			list->buckets[h]->nodes[i] = NULL;
+	assert(list->buckets);
+	const unsigned char bucket_index = strhash(node->name);
+	Bucket *bucket = list->buckets[bucket_index];
+	assert(bucket);
+	assert(bucket->used > 0);
+	for(size_t node_index = 0; node_index < bucket->used; node_index++) {
+		if(node == bucket->nodes[node_index]) {
+			bucket->nodes[node_index] = NULL;
 			break;
 		}
 	}
 }
 
-/* free everything related to the string hash list
-usually you dont have to do it manually, since its called by List_Clear
-but it won't hurt either */
-void List_FreeHashes(List * list) {
+static void List_FreeHashes(List *list) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	int i;
 	if(!list->buckets)
 		return;
-	for(i = 0; i < 256; i++) {
-		if(list->buckets[i]) {
-			free(list->buckets[i]->nodes);
-			free(list->buckets[i]);
+
+	for(size_t bucket_index = 0; bucket_index < HASH_BUCKET_COUNT; bucket_index++) {
+		Bucket *bucket = list->buckets[bucket_index];
+		if(bucket) {
+			free(bucket->nodes);
+			free(bucket);
 		}
 	}
 	free(list->buckets);
 	list->buckets = NULL;
 }
 
-/* build hashes for entire list
-this is only required when doing a list copy.
-*/
-void List_CreateHashes(List * list) {
+int List_GotoFirst(List *list) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	Node *n = list->first;
-	while(n) {
-		List_AddHash(list, n);
-		n = n->next;
-	}
-}
-#endif
-
-#ifdef USE_INDEX
-unsigned char ptrhash(void *value) {
-	size_t tmp = (size_t) value;
-	tmp >>= 4;
-	return tmp % 256;
-}
-
-/* add a single node to the index list */
-void List_AddIndex(List * list, Node * node, size_t index) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	unsigned char h;
-	size_t save;
-
-	assert(node);
-
-	if(!list->mindices)
-		list->mindices = calloc(1, sizeof(LIndex *) * 256);
-
-	h = ptrhash(node->value);
-	if(!list->mindices[h]) {
-		list->mindices[h] = calloc(1, sizeof(LIndex));
-		list->mindices[h]->nodes = calloc(1, sizeof(Node *) * 8);
-		assert(list->mindices[h]->nodes != NULL);
-		list->mindices[h]->indices = calloc(1, sizeof(ptrdiff_t) * 8);
-		assert(list->mindices[h]->indices != NULL);
-		list->mindices[h]->size = 8;
-	}
-
-	save = list->mindices[h]->size;
-	assert(list->mindices[h]->used <= save);
-	if(list->mindices[h]->used == save) {
-		list->mindices[h]->nodes = realloc(list->mindices[h]->nodes, sizeof(Node *) * (save * 2));
-		assert(list->mindices[h]->nodes != NULL);
-		list->mindices[h]->indices = realloc(list->mindices[h]->indices, sizeof(ptrdiff_t) * (save * 2));
-		assert(list->mindices[h]->indices != NULL);
-		list->mindices[h]->size = save * 2;
-	}
-
-	list->mindices[h]->nodes[list->mindices[h]->used] = node;
-	list->mindices[h]->indices[list->mindices[h]->used] = index;
-	list->mindices[h]->used++;
-}
-
-/* removes the last element from the index list
-   only use on fully indexed list */
-void List_RemoveLastIndex(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	unsigned char h;
-	assert(list->last);
-	assert(list->current);
-	assert(list->current == list->last);
-	h = ptrhash(list->last->value);
-	assert(list->mindices[h]);
-	assert(list->mindices[h]->used > 0);
-	list->mindices[h]->used--;	// it would be wrong to do this to a random element, but it's ok for the last one, since it was added as last
-	list->mindices[h]->nodes[list->mindices[h]->used] = NULL;
-	list->mindices[h]->indices[list->mindices[h]->used] = 0;
-}
-
-/* build indices for entire list
-   the indices will be destroyed whenever an element is either
-   inserted or removed from the list,
-   except if it was the last node/inserted after the last node */
-void List_CreateIndices(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	Node *n = list->first;
-	size_t index = 0;
-	while(n) {
-		List_AddIndex(list, n, index);
-		index++;
-		n = n->next;
-	}
-}
-
-/* free everything related to the index list
-   usually you dont have to do it manually, since its called by List_Clear
-   but it won't hurt either */
-void List_FreeIndices(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	int i;
-	if(!list->mindices)
-		return;
-	for(i = 0; i < 256; i++) {
-		if(list->mindices[i]) {
-			free(list->mindices[i]->indices);
-			free(list->mindices[i]->nodes);
-			free(list->mindices[i]);
-		}
-	}
-	free(list->mindices);
-	list->mindices = NULL;
-}
-#endif
-
-int List_GotoLast(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-#ifdef LIST_DEBUG
-	printf("List_Last %p\n", list);
-#endif
-	if(list->size)
-		list->current = list->last;
-	else
+	if(!list->size)
 		return 0;
+	assert(list->first);
+	list->current = list->first;
 	return 1;
 }
 
-int List_GotoFirst(List * list) {
+Node *List_GetCurrentNode(const List *list) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-#ifdef LIST_DEBUG
-	printf("List_First %p\n", list);
-#endif
-	if(list->size)
-		list->current = list->first;
-	else
-		return 0;
-	return 1;
+	return list ? list->current : NULL;
 }
 
-Node *List_GetCurrentNode(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	return list == NULL ? NULL : list->current;
-}
-
-void List_SetCurrent(List * list, Node * current) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	if(list)
-		list->current = current;
-}
-
-
-void Node_Clear(Node * node) {
-	if(!node)
-		return;
-	if(node->name) {
-		free((void *) node->name);
-		node->name = NULL;
-	}
-}
-
-void List_Init(List * list) {
-#ifdef LIST_DEBUG
-	printf("List_Init %p\n", list);
-#endif
+void List_Init(List *list) {
 	list->first = list->current = list->last = NULL;
-	list->size = list->index = 0;
-#ifdef USE_INDEX
-	list->mindices = NULL;
-#endif
-#ifdef USE_STRING_HASHES
+	list->size = 0;
 	list->buckets = NULL;
-#endif
 #ifdef DEBUG
 	list->initdone = 1;
 #endif
-	list->no_strdup = 0;
 }
 
-int List_GetNodeIndex(List * list, Node * node) {
+
+void List_Clear(List *list) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	int i;
-	Node *n;
-#ifdef USE_INDEX
-	unsigned char h;
-	if(list->mindices) {
-		h = ptrhash(node->value);
-		assert(list->mindices[h]);
-		for(i = 0; i < list->mindices[h]->used; i++) {
-			//assert(list->mindices[h]->nodes[i]); gets overwritten by update with NULL
-			if(list->mindices[h]->nodes[i] && list->mindices[h]->nodes[i] == node)
-				return list->mindices[h]->indices[i];
-		}
-		return -1;
-	} else
-#endif
-	{
-		n = list->first;
-		i = 0;
-		while(n) {
-			if(n == node)
-				return i;
-			i++;
-			n = n->next;
-		}
-		return -1;
+	Node *current_node = list->first;
+	while(current_node) {
+		Node *next_node = current_node->next;
+		free(current_node->name);
+		free(current_node);
+		current_node = next_node;
 	}
-}
-
-int List_GetIndex(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	return List_GetNodeIndex(list, list->current);
-}
-
-void List_Copy(List * listdest, const List * listsrc) {
-#ifdef DEBUG
-	chklist((List *) listsrc);
-#endif
-#ifdef LIST_DEBUG
-	printf("List_Copy %p %p\n", listsrc, listdest);
-#endif
-	Node *lptr = listsrc->first;
-	Node *nptr;
-	int i = 0, curr = -1;
-
-	List_Init(listdest);
-	if(!lptr)
-		return;
-	//create the first Node
-	nptr = (Node *) malloc(sizeof(Node));
-	if(!nptr)
-		return;
-	nptr->value = lptr->value;
-	nptr->name = (listdest->no_strdup) ? lptr->name : NAME(lptr->name);
-	nptr->prev = NULL;
-	nptr->next = NULL;
-
-	listdest->current = nptr;
-	listdest->first = nptr;
-	listdest->last = nptr;
-	listdest->size = 1;
-
-	if(listsrc->current == lptr)
-		curr = i;
-	while((lptr = lptr->next) != NULL) {
-		i++;
-		if(listsrc->current == lptr)
-			curr = i;
-		List_InsertAfter(listdest, lptr->value, lptr->name);
-
-	}
-	assert(curr != -1);
-	List_GotoFirst(listdest);
-	for(i = 0; i < curr; i++)
-		List_GotoNext(listdest);	//setting current to the right value
-
-#ifdef USE_INDEX
-	if(listsrc->mindices)
-		List_CreateIndices(listdest);
-#endif
-
-#ifdef USE_STRING_HASHES
-	List_CreateHashes(listdest);
-#endif
-
-}
-
-void List_Clear(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-#ifdef LIST_DEBUG
-	printf("List_clear %p \n", list);
-#endif
-
-	//Delete all the Nodes in the list.
-	Node *nptr = list->first;
-	list->current = list->first;
-
-	while(list->current) {
-		list->current = list->current->next;
-		if(!list->no_strdup) Node_Clear(nptr);
-		free(nptr);
-		nptr = list->current;
-	}
-
-#ifdef USE_INDEX
-	if(list->mindices)
-		List_FreeIndices(list);
-#endif
-
-#ifdef USE_STRING_HASHES
 	List_FreeHashes(list);
-#endif
-
 	List_Init(list);
 }
 
-//Insertion functions
-void List_InsertBefore(List * list, void *e, char *theName) {
+void List_InsertAfter(List *list, void *value, char *name) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-#ifdef LIST_DEBUG
-	printf("List_InsertBefore %p %s\n", list, theName ? theName : "no-name");
-#endif
-#ifdef USE_INDEX
-	if(list->mindices)
-		List_FreeIndices(list);	// inserting something before something else destroys our indices list.
-#endif
+	Node *node = malloc(sizeof *node);
+	Node *current = list->current;
 
-	//Construct a new Node
-	Node *nptr = (Node *) malloc(sizeof(Node));
-	assert(nptr != NULL);
+	assert(node);
+	if(list->size)
+		assert(current);
+	node->value = value;
+	node->name = name ? strdup(name) : NULL;
 
-	nptr->value = e;
-	nptr->name = (list->no_strdup) ? theName : NAME(theName);
+	List_AddHash(list, node);
 
-#ifdef USE_STRING_HASHES
-	List_AddHash(list, nptr);
-#endif
-
-	if(list->size == 0) {
-		nptr->next = NULL;
-		nptr->prev = NULL;
-		list->current = list->first = list->last = nptr;
+	if(!list->size) {
+		node->prev = NULL;
+		node->next = NULL;
+		list->current = list->first = list->last = node;
 	} else {
-		nptr->next = list->current;
-		nptr->prev = list->current->prev;
-		if(list->current->prev != NULL)
-			list->current->prev->next = nptr;
-		list->current->prev = nptr;
-		if(list->current == list->first)
-			list->first = nptr;
-		list->current = nptr;
+		node->next = current->next;
+		node->prev = current;
+		if(current->next)
+			current->next->prev = node;
+		current->next = node;
+		if(current == list->last)
+			list->last = node;
+		list->current = node;
 	}
 	list->size++;
 }
 
-void List_InsertAfter(List * list, void *e, char *theName) {
+void List_Remove(List *list) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-#ifdef LIST_DEBUG
-	printf("List_InsertAfter %p %s\n", list, theName ? theName : "no-name");
-#endif
-#ifdef USE_INDEX
-	int doIndex = 0;
-	if(list->mindices) {
-		if(list->current != list->last)
-			List_FreeIndices(list);	// inserting something in the middle of something else destroys our indices list.
-		else
-			doIndex = 1;
-	}
-#endif
-
-	//Construct a new Node and fill it with the appropriate value
-	Node *nptr = (Node *) malloc(sizeof(Node));
-
-	assert(nptr != NULL);
-	nptr->value = e;
-	nptr->name = (list->no_strdup) ? theName : NAME(theName);
-
-#ifdef USE_STRING_HASHES
-	List_AddHash(list, nptr);
-#endif
-
-	if(list->size == 0) {
-		nptr->prev = NULL;
-		nptr->next = NULL;
-		list->current = list->first = list->last = nptr;
-	} else {
-		nptr->next = list->current->next;
-		nptr->prev = list->current;
-		if(list->current->next != NULL)
-			list->current->next->prev = nptr;
-		list->current->next = nptr;
-		if(list->current == list->last)
-			list->last = nptr;
-		list->current = nptr;
-	}
-#ifdef USE_INDEX
-	if(doIndex)
-		List_AddIndex(list, list->current, list->size);
-#endif
-	list->size++;
-}
-
-//removes the current node and sets current to next, if applicable
-void List_Remove(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	Node *nptr;
-#ifdef LIST_DEBUG
-	printf("List_Remove %p\n", list);
-#endif
-	if(list->size == 0) {
-		//OutputDebugString("Attempted to remove from empty list.\n");
+	Node *current_node = list->current;
+	if(!list->size)
 		return;
-	} else if(list->size == 1) {
-#ifdef USE_STRING_HASHES
-		List_RemoveHash(list, list->current);
-#endif
-		if(!list->no_strdup) Node_Clear(list->current);
-		free(list->current);
+	assert(current_node);
+	assert(list->first);
+	assert(list->last);
+	if(list->size == 1) {
+		List_RemoveHash(list, current_node);
+		free(current_node->name);
+		free(current_node);
 		list->first = list->current = list->last = NULL;
-#ifdef USE_INDEX
-		List_FreeIndices(list);
-#endif
 	} else {
-#ifdef USE_INDEX
-		if(list->mindices) {
-			if(list->current != list->last)
-				List_FreeIndices(list);	// removing something before something else destroys our indices list.
-			else
-				List_RemoveLastIndex(list);
-		}
-#endif
+		const int was_last = current_node == list->last;
+		const int was_first = current_node == list->first;
+		if(current_node->prev)
+			current_node->prev->next = current_node->next;
+		if(current_node->next)
+			current_node->next->prev = current_node->prev;
+		Node *next_current = was_last ? current_node->prev : current_node->next;
 
-		if(list->current->prev != NULL)
-			list->current->prev->next = list->current->next;
-		if(list->current->next)
-			list->current->next->prev = list->current->prev;
-		if(list->current == list->last)
-			nptr = list->current->prev;
-		else
-			nptr = list->current->next;
+		List_RemoveHash(list, current_node);
 
-#ifdef USE_STRING_HASHES
-		List_RemoveHash(list, list->current);
-#endif
+		free(current_node->name);
+		free(current_node);
 
-		if(!list->no_strdup) Node_Clear(list->current);
-		free(list->current);
-
-		if(list->current == list->last)
-			list->last = nptr;
-		if(list->current == list->first)
-			list->first = nptr;
-		list->current = nptr;
+		if(was_last)
+			list->last = next_current;
+		if(was_first)
+			list->first = next_current;
+		list->current = next_current;
 	}
 	list->size--;
 }
 
-int List_GotoNext(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-#ifdef LIST_DEBUG
-	printf("List_Next %p\n", list);
-#endif
-	if(list->current != list->last)
-		list->current = list->current->next;
-	else
-		return 0;
-	return 1;
-}
-
-int List_GotoPrevious(List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-#ifdef LIST_DEBUG
-	printf("List_Prev %p\n", list);
-#endif
-	if(list->current->prev)
-		list->current = list->current->prev;
-	else
-		return 0;
-	return 1;
-}
-
-void *List_Retrieve(const List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	if(list->current)
-		return list->current->value;
-	else
-		return NULL;
-}
-
-void *List_GetFirst(const List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	if(list->first)
-		return list->first->value;
-	else
-		return NULL;
-}
-
-void *List_GetLast(const List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	if(list->last)
-		return list->last->value;
-	else
-		return NULL;
-}
-
-void List_Update(List * list, void *e) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-#ifdef USE_INDEX
-	unsigned char h;
-	ptrdiff_t save, i;
-	if(list->mindices) {
-		h = ptrhash(list->current->value);
-		assert(list->mindices[h]);
-		for(i = 0; i < list->mindices[h]->used; i++) {
-			if(list->mindices[h]->nodes[i] == list->current) {
-				list->mindices[h]->nodes[i] = NULL;
-				save = list->mindices[h]->indices[i];
-				list->mindices[h]->indices[i] = -1;
-				list->current->value = e;
-				List_AddIndex(list, list->current, save);
-				break;
-			}
-		}
-	} else
-#endif
-	if(list->size != 0)
-		list->current->value = e;
-}
-
-/* returns the node that contains e, or NULL, if not found */
-Node *List_GetNodeByValue(List * list, void *e) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	Node *n;
-#ifdef USE_INDEX
-	unsigned char h;
-	ptrdiff_t i;
-	if(list->mindices) {
-		h = ptrhash(e);
-		if(!list->mindices[h])
-			return NULL;
-		for(i = 0; i < list->mindices[h]->used; i++) {
-			//assert(list->indices[h]->nodes[i]); gets overwritten by update with NULL
-			if(list->mindices[h]->nodes[i] && list->mindices[h]->nodes[i]->value == e) {
-				//gotcha
-				return list->mindices[h]->nodes[i];
-			}
-		}
-		return NULL;
-	} else
-#endif
-	{
-		n = list->first;
-		while(n && (n->value != e))
-			n = n->next;
-		return n;
-	}
-}
-
-
-/* SIDE EFFECT: Moves list->current to found entity.
-use List_Contains if you dont like that.
-*/
-int List_Includes(List * list, void *e) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	Node *n = List_GetNodeByValue(list, e);
-	if(n) {
-		list->current = n;
-		return 1;
-	}
-	return 0;
-}
-
-/* returns the first node of which name is equal to theName */
-Node *List_GetNodeByName(List * list, char *name) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	Node *nptr;
-	if(!name)
-		return NULL;
-
-#ifdef USE_STRING_HASHES
-	size_t i;
-	unsigned char h = strhash(name);
-	if(!list->buckets || !list->buckets[h])
-		return 0;
-	for(i = 0; i < list->buckets[h]->used; i++) {
-		nptr = list->buckets[h]->nodes[i];
-		if(nptr && strcmp(name, nptr->name) == 0) {
-			return list->buckets[h]->nodes[i];
-		}
-	}
-	return NULL;
-#else
-	nptr = list->first;
-
-	while(nptr) {
-		if(nptr->name) {
-			if(strcmp(nptr->name, name) == 0)
-				return nptr;
-		}
-		nptr = nptr->next;
-	}
-	return NULL;
-#endif
-
-}
-
-/* SIDE EFFECTS: sets list->current to the first found node */
-int List_FindByName(List * list, char *name) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-
-	Node *n = List_GetNodeByName(list, name);
-	if(n) {
-		list->current = n;
-		return 1;
-	}
-	return 0;
-}
-
-char *List_GetName(const List * list) {
-#ifdef DEBUG
-	chklist((List *) list);
-#endif
-	if(list->size != 0)
-		return list->current->name;
-	else
-		return NULL;
-}
-
-void List_Reset(List * list) {
+int List_GotoNext(List *list) {
 #ifdef DEBUG
 	chklist(list);
 #endif
-#ifdef LIST_DEBUG
-	printf("List_Reset %p\n", list);
-#endif
-	list->current = list->first;
+	if(list->current == list->last)
+		return 0;
+	assert(list->current);
+	assert(list->current->next);
+	list->current = list->current->next;
+	return 1;
 }
 
-int List_GetSize(const List * list) {
+Node *List_GetNodeByName(const List *list, const char *name) {
 #ifdef DEBUG
-	chklist((List *) list);
+	chklist(list);
 #endif
-	return list->size;
+	if(!name || !list->buckets)
+		return NULL;
+
+	const unsigned char bucket_index = strhash(name);
+	const Bucket *bucket = list->buckets[bucket_index];
+	if(!bucket)
+		return NULL;
+	assert(bucket->used <= bucket->size);
+	assert(bucket->nodes);
+	for(size_t node_index = 0; node_index < bucket->used; node_index++) {
+		Node *node = bucket->nodes[node_index];
+		if(node) {
+			assert(node->name);
+			if(strcmp(name, node->name) == 0)
+				return node;
+		}
+	}
+	return NULL;
+}
+
+int List_FindByName(List *list, const char *name) {
+#ifdef DEBUG
+	chklist(list);
+#endif
+	Node *node = List_GetNodeByName(list, name);
+	if(!node)
+		return 0;
+	list->current = node;
+	return 1;
 }
