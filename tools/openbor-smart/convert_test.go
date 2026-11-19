@@ -112,3 +112,20 @@ func TestConvertCSourceRejectsSwitchFallthrough(t *testing.T) {
 }`
 	if _, err := ConvertCSource(source); err == nil { t.Fatal("expected switch fallthrough error") }
 }
+
+func TestConvertCSourceLegacyStringConcatenationAndNull(t *testing.T) {
+	source := `void update() {
+		int rush = 4;
+		void self = getplayerproperty(0, "entity");
+		drawstring(21, 80, 1, "Bonus_"+25*rush);
+		if (self == NULL()) { drawstring(1, 1, 1, "none"); }
+	}`
+	got, err := ConvertCSource(source)
+	if err != nil { t.Fatalf("ConvertCSource failed: %v", err) }
+	for _, want := range []string{
+		`("Bonus_" .. tostring((25 * rush)))`,
+			"if __openbor_smart_truth((self == nil)) then",
+	} {
+		if !strings.Contains(got, want) { t.Errorf("converted Lua missing %q:\\n%s", want, got) }
+	}
+}
