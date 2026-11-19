@@ -136,6 +136,24 @@ func scanNumber(source string, i, line, column int) (int, int, int) {
 		for i < len(source) && (isHexDigit(source[i]) || source[i] == '_') {
 			i, line, column = advance(source, i, line, column)
 		}
+		if i < len(source) && source[i] == '.' {
+			i, line, column = advance(source, i, line, column)
+			for i < len(source) && (isHexDigit(source[i]) || source[i] == '_') {
+				i, line, column = advance(source, i, line, column)
+			}
+		}
+		if i < len(source) && (source[i] == 'p' || source[i] == 'P') {
+			i, line, column = advance(source, i, line, column)
+			if i < len(source) && (source[i] == '+' || source[i] == '-') {
+				i, line, column = advance(source, i, line, column)
+			}
+			for i < len(source) && isDigit(source[i]) {
+				i, line, column = advance(source, i, line, column)
+			}
+		}
+		for i < len(source) && strings.ContainsRune("uUlLfF", rune(source[i])) {
+			i, line, column = advance(source, i, line, column)
+		}
 		return i, line, column
 	}
 
