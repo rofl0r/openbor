@@ -338,7 +338,14 @@ func cExprShape(expr cExpr) string {
 	case cMemberExpr:
 		op := "."
 		if e.Pointer { op = "->" }
-		return cExprShape(e.Value) + op + e.Member
+		value := cExprShape(e.Value)
+		// A grouped prefix expression can be the base of member access,
+		// e.g. (*get_entity())->health. Preserve those parentheses in the
+		// diagnostic shape so the expression's binding remains unambiguous.
+		if unary, ok := e.Value.(cUnaryExpr); ok && !unary.Postfix {
+			value = "(" + value + ")"
+		}
+		return value + op + e.Member
 	case cCommaExpr:
 		parts := make([]string, len(e.Values))
 		for i, value := range e.Values { parts[i] = cExprShape(value) }
