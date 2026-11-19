@@ -144,6 +144,28 @@ func TestParseCExpressionUnaryAndConditional(t *testing.T) {
 	if got := cExprShape(expr); got != want { t.Fatalf("expression shape = %s, want %s", got, want) }
 }
 
+
+func TestParseCExpressionNestedConditionalsAndCommaPrecedence(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"alive ? health : dead ? 0 : fallback", "(alive ? health : (dead ? 0 : fallback))"},
+		{"a ? b ? c : d : e", "(a ? (b ? c : d) : e)"},
+		{"ready ? spawn(name, x) : remove(name)", "(ready ? spawn(name, x) : remove(name))"},
+		{"(x = 1, y = 2, x + y)", "(x = 1, y = 2, (x + y))"},
+		{"a ? b : c, d", "((a ? b : c), d)"},
+		{"call((x++, y--), result ? left : right)", "call((x++, y--), (result ? left : right))"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
+
+
 func TestParseCExpressionCommaAndPostfix(t *testing.T) {
 	expr, err := parseCExpression("(x++, y--, ++z)")
 	if err != nil { t.Fatalf("parseCExpression failed: %v", err) }
