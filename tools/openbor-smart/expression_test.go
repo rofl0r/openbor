@@ -90,6 +90,31 @@ func TestParseCExpressionArraysPointersAndMembers(t *testing.T) {
 	if got := cExprShape(expr); got != want { t.Fatalf("expression shape = %s, want %s", got, want) }
 }
 
+
+func TestParseCExpressionPointerArithmeticAndPostfixChains(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"*(base + index)", "*(base + index)"},
+		{"&entity->health", "&entity->health"},
+		{"matrix[row][column]", "matrix[row][column]"},
+		{"(pointer + offset)->health", "(pointer + offset)->health"},
+		{"(*get_entity())->health", "(*get_entity())->health"},
+		{"items[index].animation.frame", "items[index].animation.frame"},
+		{"pointer++->field", "pointer++->field"},
+		{"*items[index + offset]", "*items[(index + offset)]"},
+		{"*(pointer + offset)++", "*(pointer + offset)++"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
+
+
 func TestParseCExpressionUnaryAndConditional(t *testing.T) {
 	expr, err := parseCExpression("!dead ? ++health : health - damage")
 	if err != nil { t.Fatalf("parseCExpression failed: %v", err) }
