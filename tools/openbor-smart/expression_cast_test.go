@@ -66,3 +66,55 @@ func TestParseCExpressionSizeofAndCastPrecedence(t *testing.T) {
 		}
 	}
 }
+
+func TestParseCExpressionSizeofAST(t *testing.T) {
+	// sizeof(type) must remain distinct from sizeof(expression), and the
+	// unparenthesized form consumes exactly one unary expression.
+	expr, err := parseCExpression("sizeof(unsigned int *)")
+	if err != nil {
+		t.Fatalf("sizeof type: parse failed: %v", err)
+	}
+	if got, ok := expr.(cSizeofTypeExpr); !ok || got.Type != "unsigned int *" {
+		t.Fatalf("sizeof type: unexpected AST %#v", expr)
+	}
+
+	for _, tc := range []struct {
+		source string
+		operator string
+		postfix bool
+	}{
+		{"sizeof value", "", false},
+		{"sizeof *pointer", "*", false},
+		{"sizeof pointer->health", "", false},
+		{"sizeof value++", "++", true},
+	} {
+		expr, err = parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		sizeofExpr, ok := expr.(cUnaryExpr)
+		if !ok || sizeofExpr.Operator != "sizeof" {
+			t.Errorf("%s: expected sizeof expression AST, got %#v", tc.source, expr)
+			continue
+		}
+		if tc.operator != "" {
+			operand, ok := sizeofExpr.Operand.(cUnaryExpr)
+			if !ok || operand.Operator != tc.operator || operand.Postfix != tc.postfix {
+				t.Errorf("%s: unexpected sizeof operand AST %#v", tc.source, sizeofExpr.Operand)
+			}
+		}
+	}
+
+	expr, err = parseCExpression("sizeof value + offset")
+	if err != nil {
+		t.Fatalf("sizeof unary operand with addition: parse failed: %v", err)
+	}
+	binary, ok := expr.(cBinaryExpr)
+	if !ok || binary.Operator != "+" {
+		t.Fatalf("sizeof value + offset: expected addition outside sizeof, got %#v", expr)
+	}
+	if sizeofExpr, ok := binary.Left.(cUnaryExpr); !ok || sizeofExpr.Operator != "sizeof" {
+		t.Fatalf("sizeof value + offset: expected sizeof on left operand, got %#v", binary.Left)
+	}
+}
