@@ -68,3 +68,24 @@ func TestParseCExpressionRejectsMalformedInput(t *testing.T) {
 		}
 	}
 }
+
+func TestParseCExpressionBitwiseModuloAndAssociativity(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"health % 3 + bonus", "((health % 3) + bonus)"},
+		{"flags & FLAG_HIDDEN | FLAG_FALLING", "((flags & FLAG_HIDDEN) | FLAG_FALLING)"},
+		{"mask ^ bits & other", "(mask ^ (bits & other))"},
+		{"health >= 0 && alive != 0", "((health >= 0) && (alive != 0))"},
+		{"index << 2 + offset", "(index << (2 + offset))"},
+		{"score - damage - bonus", "((score - damage) - bonus)"},
+		{"health *= scale + bonus", "(health *= (scale + bonus))"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
