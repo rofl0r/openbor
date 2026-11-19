@@ -83,3 +83,32 @@ func TestConvertPathBatchRecursiveAndSafeOverwrite(t *testing.T) {
 	if err := convertPath(root, out, true, false); err == nil { t.Fatal("expected existing outputs to be protected") }
 	if err := convertPath(root, out, true, true); err != nil { t.Fatalf("forced batch conversion failed: %v", err) }
 }
+
+func TestConvertCSourceSwitchCases(t *testing.T) {
+	source := `void test(int state) {
+	switch (state) {
+	case 1: activate(); break;
+	case 2: return;
+	default: reset(); break;
+	}
+}`
+	got, err := ConvertCSource(source)
+	if err != nil { t.Fatalf("ConvertCSource failed: %v", err) }
+	for _, want := range []string{
+		"repeat",
+		"if state == 1 then",
+		"elseif state == 2 then",
+		"else",
+		"reset()",
+		"until true",
+	} {
+		if !strings.Contains(got, want) { t.Errorf("converted Lua missing %q:\\n%s", want, got) }
+	}
+}
+
+func TestConvertCSourceRejectsSwitchFallthrough(t *testing.T) {
+	source := `void test(int state) {
+	switch (state) { case 1: activate(); case 2: reset(); break; }
+}`
+	if _, err := ConvertCSource(source); err == nil { t.Fatal("expected switch fallthrough error") }
+}
