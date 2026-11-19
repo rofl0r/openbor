@@ -19,7 +19,7 @@ type cLiteralExpr struct {
 }
 func (cLiteralExpr) isCExpr() {}
 
-type cUnaryExpr struct {
+type cCastExpr struct {\n\tType string\n\tValue cExpr\n}\nfunc (cCastExpr) isCExpr() {}\n\ntype cSizeofTypeExpr struct{ Type string }\nfunc (cSizeofTypeExpr) isCExpr() {}\n\ntype cUnaryExpr struct {
 	Operator string
 	Operand  cExpr
 	Postfix  bool
@@ -132,8 +132,10 @@ func (p *cExpressionParser) parsePrefix() (cExpr, error) {
 	case tokenIdentifier:
 		p.pos++
 		if t.text == "sizeof" && p.currentText() == "(" {
-			// Keep sizeof(type-or-expression) intact as a unary operation. The
-			// parser deliberately does not guess whether the contents are a type.
+			if typ, end, ok := p.typeNameAt(p.pos + 1); ok && end < len(p.tokens) && p.tokens[end].text == ")" {
+				p.pos = end + 1
+				return cSizeofTypeExpr{Type:typ}, nil
+			}
 			p.pos++
 			inner, err := p.parseExpression(1)
 			if err != nil { return nil, err }
@@ -152,13 +154,43 @@ func (p *cExpressionParser) parsePrefix() (cExpr, error) {
 		if err != nil { return nil, err }
 		return cUnaryExpr{Operator:t.text, Operand:operand}, nil
 	}
-	if p.accept("(") {
+	if p.currentText() == "(" {
+		if typ, end, ok := p.typeNameAt(p.pos + 1); ok && end < len(p.tokens) && p.tokens[end].text == ")" {
+			p.pos = end + 1
+			value, err := p.parseExpression(14)
+			if err != nil { return nil, err }
+			return cCastExpr{Type:typ, Value:value}, nil
+		}
+		p.pos++
 		expr, err := p.parseExpression(1)
 		if err != nil { return nil, err }
 		if !p.accept(")") { return nil, p.errorHere("expected ')' in grouped expression") }
 		return expr, nil
 	}
 	return nil, p.errorHere("expected expression")
+}
+
+
+// typeNameAt recognises the built-in type-name subset supported by this
+// parser. It intentionally does not guess typedef names.
+func (p *cExpressionParser) typeNameAt(start int) (string, int, bool) {
+	if start >= len(p.tokens) || !cTypeWords[p.tokens[start].text] { return "", start, false }
+	parts := []string{}
+	i := start
+	for i < len(p.tokens) && cTypeWords[p.tokens[i].text] {
+		word := p.tokens[i].text
+		parts = append(parts, word)
+		i++
+		if (word == "struct" || word == "union" || word == "enum") && i < len(p.tokens) && p.tokens[i].kind == tokenIdentifier {
+			parts = append(parts, p.tokens[i].text)
+			i++
+		}
+	}
+	for i < len(p.tokens) && p.tokens[i].text == "*" {
+		parts = append(parts, "*")
+		i++
+	}
+	return strings.Join(parts, " "), i, true
 }
 
 func (p *cExpressionParser) parsePostfix(expr cExpr) (cExpr, error) {
