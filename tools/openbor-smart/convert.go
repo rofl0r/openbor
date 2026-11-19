@@ -27,7 +27,7 @@ func ConvertCSource(source string) (string, error) {
 	w.line("return value ~= nil and value ~= false and value ~= 0")
 	w.indent--
 	w.line("end")
-	w.out.WriteByte('\\n')
+	w.out.WriteByte('\n')
 	for i, fn := range functions {
 		if i > 0 { w.out.WriteByte('\n') }
 		if err := w.function(fn); err != nil {
