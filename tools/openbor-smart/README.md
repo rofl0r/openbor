@@ -2,29 +2,15 @@
 
 **System, Media, Automated Rewrite Technology**
 
-OpenBOR-SMART is a standalone Go-based toolkit for helping developers migrate and maintain OpenBOR game assets and scripts.
+OpenBOR-SMART is a standalone Go-based toolkit for helping developers migrate legacy OpenBOR scripts to Lua while preserving compatibility with the target-era engine.
 
 ## Current implementation
 
-The animation-text pass converts legacy whitespace-separated `@cmd` commands into explicit Lua calls while leaving all other animation text untouched.
+The lexer tokenizes legacy C-style source while preserving whitespace, comments, literals, and source positions. It reports unterminated comments and quoted literals with line and column information.
 
-For example:
+Animation text is currently preserved verbatim. In particular, **all `@cmd` lines are copied unchanged**. The Lua-enabled OpenBOR engine is responsible for executing legacy `@cmd` syntax, so the converter must not rewrite, parse, or otherwise alter those commands.
 
-```text
-@cmd changeentityproperty getlocalvar("self") "velocity" 0 1 0
-```
-
-becomes:
-
-```text
-@cmd changeentityproperty(getlocalvar("self"),"velocity",0,1,0)
-```
-
-Quoted arguments are kept intact, including spaces inside quoted strings. Commands already written with parentheses are not rewritten. A command with no arguments becomes a zero-argument call, such as `@cmd clearL()`.
-
-The current pass treats whitespace outside quoted strings as the separator between command arguments. It does not parse nested expressions containing whitespace, comments, or arbitrary C expressions; those forms must be tested against the original engine before being accepted as supported syntax.
-
-The actual C-style script-to-Lua conversion is the next major implementation task. It must handle standalone `.c` script files and C-style `@script` blocks embedded in animation text, while preserving legacy function names, callback entry points, and engine API calls. API compatibility checks must use the target-era OpenBOR source (around builds 3000–4000); newer APIs must not be assumed to exist.
+The C-style script-to-Lua parser and generator are the next implementation task. They must support standalone legacy script files and C-style `@script` blocks embedded in animation text, while preserving legacy function names, callback entry points, and engine API calls. Compatibility checks must use the target-era OpenBOR source (around builds 3000–4000); newer APIs must not be assumed to exist.
 
 ## Build and use
 
@@ -34,13 +20,13 @@ Build from this directory:
 go build -o openbor-smart .
 ```
 
-Convert a script or animation file:
+Run the current command-line tool:
 
 ```sh
-./openbor-smart -in path/to/animation.txt
+./openbor-smart -in path/to/input-file
 ```
 
-The converted file is written beside the input, with its extension replaced by `.lua`. For example, `data/scripts/boss.c` produces `data/scripts/boss.lua`, and `data/chars/player/player.txt` produces `data/chars/player/player.lua`. The original file is left untouched.
+The current CLI writes the input unchanged beside the original file, with its extension replaced by `.lua`. This is only the current pass-through behaviour; C-to-Lua conversion is not implemented yet. The original file is left untouched.
 
 Run the tests:
 
@@ -50,10 +36,11 @@ go test ./...
 
 ## Planned next steps
 
-- Implement the parser and Lua generator for the legacy C script dialect.
-- Translate supported C declarations, function definitions, control flow, and statements into Lua without corrupting strings or comments.
-- Extract and translate embedded `@script` blocks while leaving surrounding animation data and converted `@cmd` commands intact.
-- Add compatibility diagnostics for functions and properties missing from the target engine.
+- Implement a parser and Lua generator for the legacy C script dialect, building on the existing lexer.
+- Recognize function definitions, parameters, declarations, and statements, including multiple declarators, pointers, and arrays.
+- Add control-flow and expression parsing, with explicit diagnostics for unsupported syntax rather than silently producing incorrect Lua.
+- Extract and translate embedded `@script` blocks while leaving surrounding animation data and every `@cmd` line unchanged.
+- Preserve legacy OpenBOR API names and callback entry points; check API compatibility against the target-era engine.
 - Add safe folder/batch conversion and collision checks.
 
 PAK extraction/packing, sound conversion, and automatic asset-path rewriting are outside the initial script-conversion scope.
