@@ -150,7 +150,7 @@ func TestParseCExpressionNestedConditionalsAndCommaPrecedence(t *testing.T) {
 		{"alive ? health : dead ? 0 : fallback", "(alive ? health : (dead ? 0 : fallback))"},
 		{"a ? b ? c : d : e", "(a ? (b ? c : d) : e)"},
 		{"ready ? spawn(name, x) : remove(name)", "(ready ? spawn(name, x) : remove(name))"},
-		{"(x = 1, y = 2, x + y)", "(x = 1, y = 2, (x + y))"},
+		{"(x = 1, y = 2, x + y)", "((x = 1), (y = 2), (x + y))"},
 		{"a ? b : c, d", "((a ? b : c), d)"},
 		{"call((x++, y--), result ? left : right)", "call((x++, y--), (result ? left : right))"},
 	} {
