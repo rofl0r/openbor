@@ -153,6 +153,8 @@ func (w *luaWriter) statement(stmt cStatement) error {
 	case *cSwitchStatement:
 		value, err := luaExpression(s.Expression)
 		if err != nil { return fmt.Errorf("switch expression: %w", err) }
+		w.line("repeat")
+		w.indent++
 		for i, item := range s.Cases {
 			if item.Default && i != len(s.Cases)-1 { return fmt.Errorf("default label must be last; C switch fallthrough is not supported") }
 			if len(item.Statements) == 0 { return fmt.Errorf("empty switch case may fall through; explicit case bodies are required") }
@@ -163,7 +165,9 @@ func (w *luaWriter) statement(stmt cStatement) error {
 			} else if _, ok := last.(*cReturnStatement); !ok {
 				if i != len(s.Cases)-1 { return fmt.Errorf("switch case %q can fall through; add break or return", item.Value) }
 			}
-			if item.Default {
+			if item.Default && i == 0 {
+				w.line("if true then")
+			} else if item.Default {
 				w.line("else")
 			} else if i == 0 {
 				caseValue, err := luaExpression(item.Value)
@@ -181,6 +185,8 @@ func (w *luaWriter) statement(stmt cStatement) error {
 			w.indent--
 		}
 		w.line("end")
+		w.indent--
+		w.line("until true")
 	case *cBreakStatement:
 		w.line("break")
 	case *cContinueStatement:
