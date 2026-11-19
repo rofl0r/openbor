@@ -142,15 +142,20 @@ func (p *cExpressionParser) parsePrefix() (cExpr, error) {
 	switch t.kind {
 	case tokenIdentifier:
 		p.pos++
-		if t.text == "sizeof" && p.currentText() == "(" {
-			if typ, end, ok := p.typeNameAt(p.pos + 1); ok && end < len(p.tokens) && p.tokens[end].text == ")" {
-				p.pos = end + 1
-				return cSizeofTypeExpr{Type:typ}, nil
+		if t.text == "sizeof" {
+			if p.currentText() == "(" {
+				if typ, end, ok := p.typeNameAt(p.pos + 1); ok && end < len(p.tokens) && p.tokens[end].text == ")" {
+					p.pos = end + 1
+					return cSizeofTypeExpr{Type:typ}, nil
+				}
+				p.pos++
+				inner, err := p.parseExpression(1)
+				if err != nil { return nil, err }
+				if !p.accept(")") { return nil, p.errorHere("expected ')' after sizeof") }
+				return cUnaryExpr{Operator:"sizeof", Operand:inner}, nil
 			}
-			p.pos++
-			inner, err := p.parseExpression(1)
+			inner, err := p.parseExpression(14)
 			if err != nil { return nil, err }
-			if !p.accept(")") { return nil, p.errorHere("expected ')' after sizeof") }
 			return cUnaryExpr{Operator:"sizeof", Operand:inner}, nil
 		}
 		return cIdentifierExpr{Name:t.text}, nil
