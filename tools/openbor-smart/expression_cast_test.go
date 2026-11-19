@@ -118,3 +118,49 @@ func TestParseCExpressionSizeofAST(t *testing.T) {
 		t.Fatalf("sizeof value + offset: expected sizeof on left operand, got %#v", binary.Left)
 	}
 }
+
+func TestParseCExpressionCastASTPrecedence(t *testing.T) {
+	expr, err := parseCExpression("(int)*pointer + offset")
+	if err != nil {
+		t.Fatalf("cast with pointer operand: parse failed: %v", err)
+	}
+	binary, ok := expr.(cBinaryExpr)
+	if !ok || binary.Operator != "+" {
+		t.Fatalf("cast with addition: expected addition at root, got %#v", expr)
+	}
+	cast, ok := binary.Left.(cCastExpr)
+	if !ok || cast.Type != "int" {
+		t.Fatalf("cast with addition: expected int cast on left, got %#v", binary.Left)
+	}
+	if operand, ok := cast.Value.(cUnaryExpr); !ok || operand.Operator != "*" {
+		t.Fatalf("cast with pointer operand: expected dereference inside cast, got %#v", cast.Value)
+	}
+
+	expr, err = parseCExpression("(float)(health + bonus) / scale")
+	if err != nil {
+		t.Fatalf("cast of grouped expression: parse failed: %v", err)
+	}
+	binary, ok = expr.(cBinaryExpr)
+	if !ok || binary.Operator != "/" {
+		t.Fatalf("cast division: expected division at root, got %#v", expr)
+	}
+	cast, ok = binary.Left.(cCastExpr)
+	if !ok || cast.Type != "float" {
+		t.Fatalf("cast division: expected float cast on left, got %#v", binary.Left)
+	}
+	if operand, ok := cast.Value.(cBinaryExpr); !ok || operand.Operator != "+" {
+		t.Fatalf("cast of grouped expression: expected addition inside cast, got %#v", cast.Value)
+	}
+
+	expr, err = parseCExpression("(unsigned long)value >> 2")
+	if err != nil {
+		t.Fatalf("cast with shift: parse failed: %v", err)
+	}
+	binary, ok = expr.(cBinaryExpr)
+	if !ok || binary.Operator != ">>" {
+		t.Fatalf("cast shift: expected shift at root, got %#v", expr)
+	}
+	if cast, ok := binary.Left.(cCastExpr); !ok || cast.Type != "unsigned long" {
+		t.Fatalf("cast shift: expected unsigned long cast on left, got %#v", binary.Left)
+	}
+}
