@@ -307,6 +307,11 @@ func luaExprNode(expr cExpr) (string, error) {
 		left, err := luaExprNode(e.Left); if err != nil { return "", err }
 		right, err := luaExprNode(e.Right); if err != nil { return "", err }
 		op := e.Operator
+		if op == "+" && (isStringLiteral(e.Left) || isStringLiteral(e.Right)) {
+			if !isStringLiteral(e.Left) { left = "tostring(" + left + ")" }
+			if !isStringLiteral(e.Right) { right = "tostring(" + right + ")" }
+			return "(" + left + " .. " + right + ")", nil
+		}
 		switch op { case "&&": op = "and"; case "||": op = "or"; case "!=": op = "~=" }
 		if strings.HasSuffix(op, "=") && op != "==" && op != "!=" && op != "~=" && op != "<=" && op != ">=" {
 			return "", fmt.Errorf("compound assignment %q is only supported as a standalone statement", op)
@@ -318,6 +323,9 @@ func luaExprNode(expr cExpr) (string, error) {
 		elseValue, err := luaExprNode(e.Else); if err != nil { return "", err }
 		return "(function() if __openbor_smart_truth(" + condition + ") then return " + thenValue + " else return " + elseValue + " end end)()", nil
 	case cCallExpr:
+		if id, ok := e.Callee.(cIdentifierExpr); ok && id.Name == "NULL" && len(e.Arguments) == 0 {
+			return "nil", nil
+		}
 		callee, err := luaExprNode(e.Callee); if err != nil { return "", err }
 		args := make([]string, len(e.Arguments))
 		for i, arg := range e.Arguments { args[i], err = luaExprNode(arg); if err != nil { return "", err } }
@@ -333,6 +341,11 @@ func luaExprNode(expr cExpr) (string, error) {
 		return "", fmt.Errorf("comma operator is not supported in Lua expressions")
 	}
 	return "", fmt.Errorf("unsupported expression node %T", expr)
+}
+
+func isStringLiteral(expr cExpr) bool {
+	literal, ok := expr.(cLiteralExpr)
+	return ok && literal.Kind == tokenString
 }
 
 func normalizeNumber(text string) string {
