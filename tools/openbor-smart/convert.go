@@ -307,7 +307,7 @@ func luaExprNode(expr cExpr) (string, error) {
 		left, err := luaExprNode(e.Left); if err != nil { return "", err }
 		right, err := luaExprNode(e.Right); if err != nil { return "", err }
 		op := e.Operator
-		switch op { case "&&": op = "and"; case "||": op = "or" }
+		switch op { case "&&": op = "and"; case "||": op = "or"; case "!=": op = "~=" }
 		if strings.HasSuffix(op, "=") && op != "==" && op != "!=" && op != "<=" && op != ">=" {
 			return "", fmt.Errorf("compound assignment %q is only supported as a standalone statement", op)
 		}
