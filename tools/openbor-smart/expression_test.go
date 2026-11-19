@@ -5,7 +5,7 @@ import "testing"
 func TestParseCExpressionOperatorPrecedence(t *testing.T) {
 	expr, err := parseCExpression("a + b * c << 2 == d && ready || fallback")
 	if err != nil { t.Fatalf("parseCExpression failed: %v", err) }
-	want := "((((((a + (b * c)) << 2) == d) && ready) || fallback)"
+	want := "(((((a + (b * c)) << 2) == d) && ready) || fallback)"
 	if got := cExprShape(expr); got != want {
 		t.Fatalf("expression shape = %s, want %s", got, want)
 	}
