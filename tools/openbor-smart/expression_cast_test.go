@@ -26,3 +26,22 @@ func TestParseCExpressionDoesNotTreatGroupingAsCast(t *testing.T) {
 		t.Fatalf("shape = %s, want %s", got, want)
 	}
 }
+
+func TestParseCExpressionPointerAndTaggedTypeCasts(t *testing.T) {
+	for _, tc := range []struct{ source, want string }{
+		{"(int **)pointer", "(int * *)pointer"},
+		{"(const unsigned char *)buffer", "(const unsigned char *)buffer"},
+		{"(struct Entity *)value", "(struct Entity *)value"},
+		{"sizeof(void *)", "sizeof(void *)"},
+		{"sizeof(struct Entity **)", "sizeof(struct Entity * *)"},
+	} {
+		expr, err := parseCExpression(tc.source)
+		if err != nil {
+			t.Errorf("%s: parse failed: %v", tc.source, err)
+			continue
+		}
+		if got := cExprShape(expr); got != tc.want {
+			t.Errorf("%s: shape = %s, want %s", tc.source, got, tc.want)
+		}
+	}
+}
