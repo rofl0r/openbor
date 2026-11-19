@@ -22,6 +22,12 @@ func ConvertCSource(source string) (string, error) {
 	if err != nil { return "", fmt.Errorf("parse C source: %w", err) }
 	if len(functions) == 0 { return "", fmt.Errorf("no functions found") }
 	w := &luaWriter{}
+	w.line("local function __openbor_smart_truth(value)")
+	w.indent++
+	w.line("return value ~= nil and value ~= false and value ~= 0")
+	w.indent--
+	w.line("end")
+	w.out.WriteByte('\\n')
 	for i, fn := range functions {
 		if i > 0 { w.out.WriteByte('\n') }
 		if err := w.function(fn); err != nil {
@@ -89,7 +95,7 @@ func (w *luaWriter) statement(stmt cStatement) error {
 	case *cIfStatement:
 		condition, err := luaExpression(s.Condition)
 		if err != nil { return fmt.Errorf("if condition: %w", err) }
-		w.line("if " + condition + " then")
+		w.line("if __openbor_smart_truth(" + condition + ") then")
 		w.indent++
 		if err := w.statement(s.Then); err != nil { return err }
 		w.indent--
@@ -105,7 +111,7 @@ func (w *luaWriter) statement(stmt cStatement) error {
 	case *cWhileStatement:
 		condition, err := luaExpression(s.Condition)
 		if err != nil { return fmt.Errorf("while condition: %w", err) }
-		w.line("while " + condition + " do")
+		w.line("while __openbor_smart_truth(" + condition + ") do")
 		w.indent++
 		if err := w.statement(s.Body); err != nil { return err }
 		w.indent--
@@ -118,7 +124,7 @@ func (w *luaWriter) statement(stmt cStatement) error {
 		w.indent++
 		if err := w.statement(s.Body); err != nil { return err }
 		w.indent--
-		w.line("until not (" + condition + ")")
+		w.line("until not __openbor_smart_truth(" + condition + ")")
 	case *cForStatement:
 		if containsContinue(s.Body) { return fmt.Errorf("continue inside for-loop is not supported yet") }
 		w.line("do")
@@ -132,7 +138,7 @@ func (w *luaWriter) statement(stmt cStatement) error {
 			condition, err = luaExpression(s.Condition)
 			if err != nil { return fmt.Errorf("for condition: %w", err) }
 		}
-		w.line("while " + condition + " do")
+		w.line("while __openbor_smart_truth(" + condition + ") do")
 		w.indent++
 		if err := w.statement(s.Body); err != nil { return err }
 		if strings.TrimSpace(s.Post) != "" {
@@ -266,7 +272,10 @@ func luaExprNode(expr cExpr) (string, error) {
 		}
 		return "(" + left + " " + op + " " + right + ")", nil
 	case cConditionalExpr:
-		return "", fmt.Errorf("C conditional operator ?: needs explicit control-flow conversion and is not supported yet")
+		condition, err := luaExprNode(e.Condition); if err != nil { return "", err }
+		thenValue, err := luaExprNode(e.Then); if err != nil { return "", err }
+		elseValue, err := luaExprNode(e.Else); if err != nil { return "", err }
+		return "(function() if __openbor_smart_truth(" + condition + ") then return " + thenValue + " else return " + elseValue + " end end)()", nil
 	case cCallExpr:
 		callee, err := luaExprNode(e.Callee); if err != nil { return "", err }
 		args := make([]string, len(e.Arguments))
@@ -275,7 +284,7 @@ func luaExprNode(expr cExpr) (string, error) {
 	case cIndexExpr:
 		base, err := luaExprNode(e.Value); if err != nil { return "", err }
 		index, err := luaExprNode(e.Index); if err != nil { return "", err }
-		return base + "[" + index + "]", nil
+		return base + "[(" + index + ") + 1]", nil
 	case cMemberExpr:
 		base, err := luaExprNode(e.Value); if err != nil { return "", err }
 		return base + "." + e.Member, nil
