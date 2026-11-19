@@ -313,7 +313,13 @@ func cExprShape(expr cExpr) string {
 		return e.Text
 	case cUnaryExpr:
 		if e.Postfix { return cExprShape(e.Operand) + e.Operator }
-		if e.Operator == "sizeof" { return "sizeof(" + cExprShape(e.Operand) + ")" }
+		if e.Operator == "sizeof" {
+			operand := cExprShape(e.Operand)
+			if _, ok := e.Operand.(cBinaryExpr); ok && strings.HasPrefix(operand, "(") && strings.HasSuffix(operand, ")") {
+				operand = operand[1 : len(operand)-1]
+			}
+			return "sizeof(" + operand + ")"
+		}
 		return e.Operator + cExprShape(e.Operand)
 	case cCastExpr:
 		return "(" + e.Type + ")" + cExprShape(e.Value)
