@@ -39,11 +39,11 @@ Existing output files are never overwritten unless `-force` is supplied. Batch c
 
 ## Current conversion support
 
-The converter currently handles C-style function definitions, typed parameters, local scalar and array declarations, assignments, arithmetic and comparison expressions, logical operators, function calls, array indexing, member access, unary not/sign operators, the conditional operator, and common control flow: `if/else`, `while`, `do/while`, `for`, `break`, and `return`.
+The converter currently handles C-style function definitions, typed parameters, local scalar and array declarations, assignments, arithmetic and comparison expressions, logical operators, function calls, array indexing, member access, unary not/sign operators, the conditional operator, and common control flow: `if/else`, `while`, `do/while`, `for`, non-fallthrough `switch/case/default`, `break`, and `return`.
 
 C array indices are shifted by one for Lua's 1-based tables. C truth testing is preserved for conditions so numeric zero is false, as it is in C. Scalar C casts are removed because Lua does not need C's static type casts.
 
-The converter deliberately reports unsupported constructs instead of silently emitting potentially incorrect Lua. Current limitations include pointer operations/declarations, `sizeof`, comma expressions, postfix increments used inside larger expressions, `continue`, array initializer lists, typedef-based declarations, preprocessor directives, global declarations, and some less-common C declarators. Comments are currently omitted from generated Lua. Real game scripts may use constructs outside this subset, so inspect conversion errors and test generated scripts in the target OpenBOR build before using them in a release.
+The converter deliberately reports unsupported constructs instead of silently emitting potentially incorrect Lua. Current limitations include pointer operations/declarations, `sizeof`, comma expressions, postfix increments used inside larger expressions, `continue`, switch fallthrough/grouped empty labels, array initializer lists, typedef-based declarations, preprocessor directives, global declarations, and some less-common C declarators. Comments are currently omitted from generated Lua. Real game scripts may use constructs outside this subset, so inspect conversion errors and test generated scripts in the target OpenBOR build before using them in a release.
 
 ## Animation files and @cmd
 
