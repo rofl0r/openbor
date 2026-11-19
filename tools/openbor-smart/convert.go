@@ -284,6 +284,7 @@ func luaExprNode(expr cExpr) (string, error) {
 			return strconv.Quote(value), nil
 		}
 	case cCastExpr:
+		if strings.Contains(e.Type, "*") { return "", fmt.Errorf("pointer casts are not supported") }
 		return luaExprNode(e.Value)
 	case cSizeofTypeExpr:
 		return "", fmt.Errorf("sizeof(type) has no direct Lua equivalent")
