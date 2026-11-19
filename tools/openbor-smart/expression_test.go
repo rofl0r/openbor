@@ -18,7 +18,7 @@ func TestParseCExpressionPointerAndIncrementCombinations(t *testing.T) {
 		{"++*pointer", "++*pointer"},
 		{"--entity->health", "--entity->health"},
 		{"&items[index++]", "&items[index++]"},
-		{"*(*pointer + offset)", "(*(*pointer + offset))"},
+		{"*(*pointer + offset)", "*(*pointer + offset)"},
 		{"entity->health += ++damage", "(entity->health += ++damage)"},
 		{"array[--index]", "array[--index]"},
 	} {
